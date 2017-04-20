@@ -1,12 +1,39 @@
-﻿<Window x:Class="Dependencies.MainWindow"
+﻿<Window x:Name="Dependencies" x:Class="Dependencies.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
+        Title="MainWindow" HorizontalContentAlignment="Stretch" Height="493.458" Width="746.5" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom">
+    <Grid x:Name="MainGrid" Margin="7,5" Background="#FF5C8F88">
+        <StatusBar x:Name="AppStatusBar" Height="38" VerticalAlignment="Bottom" Background="#FFC17D7D" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,-1"/>
+        <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" Background="#FFC7DE78" HorizontalContentAlignment="Stretch"/>
+        <Grid x:Name="ResizeElemGrid" Margin="0,25,0,37">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="146*"/>
+                <RowDefinition Height="3*"/>
+                <RowDefinition Height="46*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="385*"/>
+                <ColumnDefinition Width="5*"/>
+                <ColumnDefinition Width="334*"/>
+            </Grid.ColumnDefinitions>
+            <ListBox x:Name="LogWidget" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="2"/>
+            <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Background="#FFDC5AAD" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
+            <TreeView Background="#FF663F7C" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0"/>
+            <Grid x:Name="ImportExportGrid" Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="145*"/>
+                    <RowDefinition Height="5*"/>
+                    <RowDefinition Height="142*"/>
+                </Grid.RowDefinitions>
+                <ListBox x:Name="ImportList" Background="#FFB05A5A" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
+                <ListBox x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Background="#FF66CD8C"/>
+                <GridSplitter x:Name="ImportExportSplitter" HorizontalAlignment="Stretch" Grid.Row="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" MinHeight="8"/>
+            </Grid>
+            <GridSplitter Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        </Grid>
     </Grid>
 </Window>
