@@ -14,7 +14,7 @@
         <StatusBar x:Name="AppStatusBar" Height="38" VerticalAlignment="Bottom" Background="#FFC17D7D" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,-1" Grid.RowSpan="2"/>
         <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" Background="#FFC7DE78" HorizontalContentAlignment="Stretch">
             <MenuItem x:Name="FileItem" Header="File" Height="25" Width="39" AutomationProperties.AccessKey="&amp;File">
-                <MenuItem x:Name="OpenItem" Header="Open" Height="25" AutomationProperties.AccessKey="&amp;Open" AutomationProperties.AcceleratorKey="Ctrl+O"/>
+                <MenuItem x:Name="OpenItem" Header="Open" Height="25" AutomationProperties.AccessKey="&amp;Open" AutomationProperties.AcceleratorKey="Ctrl+O" Click="OpenItem_Click"/>
                 <Separator Height="3"/>
                 <MenuItem x:Name="RecentItem" Header="Recents" Height="100"/>
                 <Separator Height="3" Margin="-1,0,0,0"/>
@@ -57,8 +57,19 @@
                     <RowDefinition Height="5*"/>
                     <RowDefinition Height="142*"/>
                 </Grid.RowDefinitions>
-                <ListBox x:Name="ImportList" Background="#FFB05A5A" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"/>
-                <ListBox x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Background="#FF66CD8C"/>
+                <ListView x:Name="ImportList" Background="#FFB05A5A"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" >
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="true">
+                            <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}"/>
+                            <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}"/>
+                            <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}"/>
+                            <GridViewColumn Header="Function" Width="100" DisplayMemberBinding="{Binding Name}"/>
+                            <GridViewColumn Header="Module" Width="100" DisplayMemberBinding="{Binding ModuleName}"/>
+                            <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Background="#FF66CD8C"/>
                 <GridSplitter x:Name="ImportExportSplitter" HorizontalAlignment="Stretch" Grid.Row="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" MinHeight="8"/>
             </Grid>
             <GridSplitter Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch"/>
