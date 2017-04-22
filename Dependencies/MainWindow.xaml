@@ -14,14 +14,14 @@
         <StatusBar x:Name="AppStatusBar" Height="38" VerticalAlignment="Bottom" Background="#FFC17D7D" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,-1" Grid.RowSpan="2"/>
         <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" Background="#FFC7DE78" HorizontalContentAlignment="Stretch">
             <MenuItem x:Name="FileItem" Header="File" Height="25" Width="39" AutomationProperties.AccessKey="&amp;File">
-                <MenuItem x:Name="OpenItem" Header="Open" Height="25" Click="MenuItem_Click" AutomationProperties.AccessKey="&amp;Open" AutomationProperties.AcceleratorKey="Ctrl+O"/>
+                <MenuItem x:Name="OpenItem" Header="Open" Height="25" AutomationProperties.AccessKey="&amp;Open" AutomationProperties.AcceleratorKey="Ctrl+O"/>
                 <Separator Height="3"/>
                 <MenuItem x:Name="RecentItem" Header="Recents" Height="100"/>
                 <Separator Height="3" Margin="-1,0,0,0"/>
                 <MenuItem x:Name="ExitItem" Header="Exit" Height="20" AutomationProperties.AccessKey="E&amp;xit"/>
             </MenuItem>
             <MenuItem x:Name="ViewItem" Header="View" Height="25" Width="42" AutomationProperties.AccessKey="&amp;View">
-                <MenuItem x:Name="SystemInformation" Header="System Information ..." Height="25" Click="MenuItem_Click_1"/>
+                <MenuItem x:Name="SystemInformation" Header="System Information ..." Height="25" />
                 <Separator Height="3" Margin="0"/>
                 <MenuItem x:Name="AutoExpandItem" Header="Auto Expand" Height="25" AutomationProperties.AcceleratorKey="F8" Margin="0"/>
                 <Separator Height="3" Margin="0"/>
@@ -31,7 +31,7 @@
                 <MenuItem x:Name="StatusBarItem" Header="Status Bar" Height="25" IsChecked="True" IsCheckable="True" Margin="0"/>
             </MenuItem>
             <MenuItem x:Name="OptionsItem" Header="Options" Height="25" Width="54" AutomationProperties.AccessKey="&amp;Options">
-                <MenuItem x:Name="ConfModuleItem" Header="Configure Module search order" Height="25" Click="MenuItem_Click_2" Margin="0" AutomationProperties.AccessKey="Configure Module &amp;search order"/>
+                <MenuItem x:Name="ConfModuleItem" Header="Configure Module search order" Height="25" Margin="0" AutomationProperties.AccessKey="Configure Module &amp;search order"/>
             </MenuItem>
             <MenuItem x:Name="HelpIem" Header="Help" Height="25" Width="49" AutomationProperties.AccessKey="&amp;Help">
                 <MenuItem x:Name="HelpAboutItem" Header="About Dependencies" Height="25"/>
