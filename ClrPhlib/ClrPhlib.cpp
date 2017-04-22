@@ -56,12 +56,6 @@ namespace System
     }
 
 
-	PE::PE()
-	:m_Impl(new UnmanagedPE)
-	{
-
-	}
-
     PE::PE(
         _In_ String ^ Filepath
     )
@@ -76,5 +70,70 @@ namespace System
     {
         delete m_Impl;
     }
+
+	Collections::Generic::List<PeExport^> ^ PE::GetExports()
+	{
+		Collections::Generic::List<PeExport^> ^Exports = gcnew Collections::Generic::List<PeExport^>();
+
+		if (NT_SUCCESS(PhGetMappedImageExports(&m_Impl->m_PvExports, &m_Impl->m_PvMappedImage)))
+		{
+			for (size_t Index = 0; Index < m_Impl->m_PvExports.NumberOfEntries; Index++)
+			{
+				Exports->Add(gcnew PeExport(*m_Impl, Index));
+			}
+		}
+
+		return Exports;
+	}
+
+	PeExport::PeExport(const UnmanagedPE &refPe, size_t Index)
+	{
+		PH_MAPPED_IMAGE_EXPORT_ENTRY exportEntry;
+		PH_MAPPED_IMAGE_EXPORT_FUNCTION exportFunction;
+
+		if (
+			NT_SUCCESS(PhGetMappedImageExportEntry((PPH_MAPPED_IMAGE_EXPORTS)&refPe.m_PvExports, (ULONG) Index, &exportEntry)) &&
+			NT_SUCCESS(PhGetMappedImageExportFunction((PPH_MAPPED_IMAGE_EXPORTS)&refPe.m_PvExports, NULL, exportEntry.Ordinal, &exportFunction))
+			)
+		{
+			Ordinal = exportEntry.Ordinal;
+			ExportByOrdinal = (exportEntry.Name == nullptr);
+			if (ExportByOrdinal)
+			{
+				Name = gcnew String("");
+			}
+			else
+			{
+				Name = gcnew String(exportEntry.Name);
+			}
+
+			if (!exportFunction.ForwardedName)
+			{
+				ForwardedName = gcnew String("");
+			}
+			else
+			{
+				ForwardedName = gcnew String(exportFunction.ForwardedName);
+			}
+
+			VirtualAddress = (Int64) exportFunction.Function;
+		}
+
+		
+	}
+
+	PeExport::PeExport(const PeExport ^ other)
+	{
+		this->Ordinal = Ordinal;
+		this->ExportByOrdinal = ExportByOrdinal;
+		this->Name = String::Copy(other->Name);
+		this->ForwardedName = String::Copy(other->ForwardedName);
+		this->VirtualAddress = other->VirtualAddress;
+	}
+
+	PeExport::~PeExport()
+	{
+
+	}
 
 };
