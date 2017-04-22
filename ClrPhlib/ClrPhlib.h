@@ -21,6 +21,8 @@ public:
 
 	PH_MAPPED_IMAGE m_PvMappedImage;
 	PH_MAPPED_IMAGE_EXPORTS m_PvExports;
+	PH_MAPPED_IMAGE_IMPORTS m_PvImports;
+	PH_MAPPED_IMAGE_IMPORTS m_PvDelayImports;
 
 	union {
 		PIMAGE_LOAD_CONFIG_DIRECTORY32 m_PvConfig32;
@@ -36,6 +38,20 @@ namespace ClrPh {
 	public ref class Phlib {
 	public:
 		static bool InitializePhLib();
+	};
+
+	public ref struct PeImport {
+		Int16 Hint;
+		Int16 Ordinal;
+		String ^  Name; // may be NULL.
+		String ^ ModuleName;
+		Boolean ImportByOrdinal;
+		Boolean	DelayImport;
+
+		PeImport(const PH_MAPPED_IMAGE_IMPORT_DLL &importDll, size_t Index, Boolean DelayImport);
+		PeImport(const PeImport ^ other);
+		~PeImport();
+
 	};
 
 	public ref struct PeExport {
@@ -59,6 +75,7 @@ namespace ClrPh {
         ~PE();
 
 		Collections::Generic::List<PeExport ^>^ GetExports();
+		Collections::Generic::List<PeImport ^>^ GetImports();
 
     protected:
         // Deallocate the native object on the finalizer just in case no destructor is called  

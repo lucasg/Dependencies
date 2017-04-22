@@ -14,11 +14,12 @@ namespace ClrPhTester
             Phlib.InitializePhLib();
 
             //String FileName = "F:\\Dev\\processhacker2\\TestBt\\ClangDll\\Release\\ClangDll.dll";
-            String FileName = "C:\\Windows\\System32\\kernel32.dll";
+            String FileName = "C:\\Windows\\System32\\kernelbase.dll";
             PE Pe = new PE(FileName);
             List<PeExport> Exports = Pe.GetExports();
+            List<PeImport> Imports = Pe.GetImports();
 
-            
+
             Console.WriteLine("Export listing for file : {0}" , FileName);
             foreach(PeExport Export in Exports)
             {
@@ -30,7 +31,25 @@ namespace ClrPhTester
             }
 
             Console.WriteLine("Export listing done");
-            //List < PeExport > ExportList = Pe;
+
+            Console.WriteLine("Import listing for file : {0}", FileName);
+            foreach (PeImport Import in Imports)
+            {
+                if (Import.ImportByOrdinal)
+                {
+                    Console.WriteLine("Import {0:s} Ordinal_{1:d} :", Import.ModuleName, Import.Ordinal);
+                }
+                else
+                {
+                    Console.WriteLine("Import {0:s} Name {1:d} :", Import.ModuleName, Import.Name);
+                }
+                if (Import.DelayImport)
+                    Console.WriteLine("\t Delay Import");
+
+            }
+
+            Console.WriteLine("Import listing done");
+
         }
     }
 }
