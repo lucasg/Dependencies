@@ -11,8 +11,8 @@
             <RowDefinition Height="819*"/>
             <RowDefinition Height="20*"/>
         </Grid.RowDefinitions>
-        <StatusBar x:Name="AppStatusBar" Height="38" VerticalAlignment="Bottom" Background="#FFC17D7D" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,-1" Grid.RowSpan="2"/>
-        <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" Background="#FFC7DE78" HorizontalContentAlignment="Stretch">
+        <StatusBar x:Name="AppStatusBar" Height="38" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,-1" Grid.RowSpan="2"/>
+        <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" HorizontalContentAlignment="Stretch">
             <MenuItem x:Name="FileItem" Header="File" Height="25" Width="39" AutomationProperties.AccessKey="&amp;File">
                 <MenuItem x:Name="OpenItem" Header="Open" Height="25" AutomationProperties.AccessKey="&amp;Open" AutomationProperties.AcceleratorKey="Ctrl+O" Click="OpenItem_Click"/>
                 <Separator Height="3"/>
@@ -48,28 +48,51 @@
                 <ColumnDefinition Width="5*"/>
                 <ColumnDefinition Width="334*"/>
             </Grid.ColumnDefinitions>
-            <ListBox x:Name="LogWidget" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="2"/>
-            <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" Background="#FFDC5AAD" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
-            <TreeView Background="#FF663F7C" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0"/>
+            <ListView x:Name="ModulesList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="2">
+                <ListView.View>
+                    <GridView AllowsColumnReorder="true">
+                        <GridViewColumn Header="Module" Width="80" DisplayMemberBinding="{Binding Name}"/>
+                        <GridViewColumn Header="Target Machine" Width="60" DisplayMemberBinding="{Binding Cpu}"/>
+                        <GridViewColumn Header="File Size" Width="40" DisplayMemberBinding="{Binding FileSize}"/>
+                        <GridViewColumn Header="Image Base" Width="200" DisplayMemberBinding="{Binding ImageBase}"/>
+                        <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize}"/>
+                        <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem}"/>
+                        <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion}"/>
+                        <GridViewColumn Header="Checksum" Width="100" DisplayMemberBinding="{Binding Checksum}"/>
+                    </GridView>
+                </ListView.View>
+             </ListView>
+            <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
+            <TreeView x:Name="DllTreeView"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0"/>
             <Grid x:Name="ImportExportGrid" Grid.Column="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="145*"/>
                     <RowDefinition Height="5*"/>
                     <RowDefinition Height="142*"/>
                 </Grid.RowDefinitions>
-                <ListView x:Name="ImportList" Background="#FFB05A5A"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" >
+                <ListView x:Name="ImportList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" >
                     <ListView.View>
                         <GridView AllowsColumnReorder="true">
                             <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}"/>
                             <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}"/>
                             <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}"/>
-                            <GridViewColumn Header="Function" Width="100" DisplayMemberBinding="{Binding Name}"/>
+                            <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}"/>
                             <GridViewColumn Header="Module" Width="100" DisplayMemberBinding="{Binding ModuleName}"/>
                             <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}"/>
                         </GridView>
                     </ListView.View>
                 </ListView>
-                <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Background="#FF66CD8C"/>
+                <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="true">
+                            <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}"/>
+                            <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}"/>
+                            <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}"/>
+                            <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}"/>
+                            <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
                 <GridSplitter x:Name="ImportExportSplitter" HorizontalAlignment="Stretch" Grid.Row="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" MinHeight="8"/>
             </Grid>
             <GridSplitter Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch"/>
