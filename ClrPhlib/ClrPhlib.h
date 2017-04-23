@@ -87,6 +87,24 @@ namespace ClrPh {
 
 	};
 
+	public ref struct PeProperties {
+		Int16 Machine;
+		DateTime ^ Time;
+		Int16 Magic;
+		
+		IntPtr ImageBase;
+		Int32  SizeOfImage;
+		IntPtr EntryPoint;
+
+		
+		Int32 Checksum;
+		Boolean CorrectChecksum;
+
+		Int16 Subsystem;
+		Int16 Characteristics;
+		Int16 DllCharacteristics;
+	};
+
 
 
 	public ref class PE
@@ -99,11 +117,16 @@ namespace ClrPh {
 		Collections::Generic::List<PeExport ^>^ GetExports();
 		Collections::Generic::List<PeImportDll ^>^ GetImports();
 
+		PeProperties ^Properties;
+		Boolean LoadSuccessful;
+
     protected:
         // Deallocate the native object on the finalizer just in case no destructor is called  
         !PE() {
             delete m_Impl;
         }
+
+		void InitProperties();
 
     private:
         UnmanagedPE * m_Impl;

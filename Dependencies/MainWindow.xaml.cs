@@ -98,6 +98,114 @@ namespace Dependencies
         public string name;
         public string ForwardName;
     }
+
+    [Flags]
+    public enum PeTypes
+    {
+        None=0,
+        IMAGE_FILE_EXECUTABLE_IMAGE = 0x02,
+        IMAGE_FILE_DLL = 0x2000,
+
+    }
+
+    public class DisplayModuleInfo
+    {
+        public DisplayModuleInfo(int index, PeImportDll Module, PeProperties Properties)
+        {
+            Info.index = index;
+            Info.Name = Module.Name;
+
+            Info.Machine = Properties.Machine;
+            Info.Magic = Properties.Magic;
+
+            Info.ImageBase = Properties.ImageBase;
+            Info.SizeOfImage = Properties.SizeOfImage;
+            Info.EntryPoint = Properties.EntryPoint;
+
+            Info.Checksum = Properties.Checksum;
+            Info.CorrectChecksum = Properties.CorrectChecksum;
+
+            Info.Subsystem = Properties.Subsystem;
+            Info.Characteristics = Properties.Characteristics;
+            Info.DllCharacteristics = Properties.DllCharacteristics;
+
+        }
+
+        public int Index { get { return Info.index; } }
+        public string Name { get { return Info.Name; } }
+        public string Cpu  { get {
+                int machine_id = Info.Machine &0xffff;
+                switch (machine_id)
+                {
+                    case 0x014c: /*IMAGE_FILE_MACHINE_I386*/
+                        return "i386";
+
+                    case 0x8664: /*IMAGE_FILE_MACHINE_AMD64*/
+                        return "AMD64";
+
+                    case 0x0200:/*IMAGE_FILE_MACHINE_IA64*/
+                        return "IA64";
+
+                    case 0x01c4:/*IMAGE_FILE_MACHINE_ARMNT*/
+                        return "ARM Thumb-2";
+
+                    default:
+                        return "Unknown";
+                }
+            }
+        }
+        public string Type { get {
+                List<String>TypeList = new List<String>();
+                PeTypes Type = (PeTypes)Info.Characteristics;
+
+                if ((Type & PeTypes.IMAGE_FILE_DLL) != PeTypes.None)/* IMAGE_FILE_DLL */
+                    TypeList.Add("Dll");
+
+                if ( (Type & PeTypes.IMAGE_FILE_EXECUTABLE_IMAGE) != PeTypes.None) /* IMAGE_FILE_EXECUTABLE_IMAGE */
+                    TypeList.Add("Executable");
+                
+                
+
+                return String.Join("; ", TypeList.ToArray());
+            } }
+        public string Filesize { get { return String.Format("{0:x}", 0x00); } }
+        public string ImageBase{ get { return String.Format("{0:x}", Info.ImageBase); } }
+        public string VirtualSize{ get { return String.Format("{0:x}", Info.SizeOfImage); } }
+        public string EntryPoint{ get { return String.Format("{0:x}", Info.EntryPoint); } }
+        public string Subsystem { get { return String.Format("{0:x}", Info.Subsystem); } }
+        public string SubsystemVersion { get { return ""; } }
+        public string Checksum{ get {
+                if (Info.CorrectChecksum)
+                    return String.Format("{0:x} (correct)", Info.Subsystem);
+                else
+                    return String.Format("{0:x} (incorrect)", Info.Subsystem);
+        } }
+
+        private
+            ModuleInfo Info;
+    }
+
+
+    public struct ModuleInfo
+    {
+        public int index;
+        public string Name;
+        public Int16 Machine;
+        public Int16 Magic;
+
+        public IntPtr ImageBase;
+        public Int32 SizeOfImage;
+        public IntPtr EntryPoint;
+
+
+        public Int32 Checksum;
+        public Boolean CorrectChecksum;
+
+        public Int16 Subsystem;
+        public Int16 Characteristics;
+        public Int16 DllCharacteristics;
+    }
+
     /// <summary>
     /// Logique d'interaction pour MainWindow.xaml
     /// </summary>
@@ -141,16 +249,30 @@ namespace Dependencies
                 i++;
             }
 
+            this.ModulesList.Items.Clear();
             this.DllTreeView.Items.Clear();
             TreeViewItem treeNode = new TreeViewItem();
             treeNode.Header = InputFileNameDlg.FileName;
 
+            i = 0;
             foreach (PeImportDll DllImport in PeImports)
             {
+                // Find Dll in "paths"
+                PE ImportPe = new PE("C:\\Windows\\System32\\" + DllImport.Name);
+
+                if (ImportPe.LoadSuccessful)
+                {
+                    this.ModulesList.Items.Add(new DisplayModuleInfo(i, DllImport, ImportPe.Properties));
+                }
+
+                
+                // Add to tree view
                 TreeViewItem childTreeNode = new TreeViewItem();
                 childTreeNode.Header = DllImport.Name;
-
                 treeNode.Items.Add(childTreeNode);
+
+                // 
+                i++;
             }
 
             this.DllTreeView.Items.Add(treeNode);
