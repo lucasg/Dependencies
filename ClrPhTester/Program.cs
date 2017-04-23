@@ -17,7 +17,7 @@ namespace ClrPhTester
             String FileName = "C:\\Windows\\System32\\kernelbase.dll";
             PE Pe = new PE(FileName);
             List<PeExport> Exports = Pe.GetExports();
-            List<PeImport> Imports = Pe.GetImports();
+            List<PeImportDll> Imports = Pe.GetImports();
 
 
             Console.WriteLine("Export listing for file : {0}" , FileName);
@@ -33,19 +33,25 @@ namespace ClrPhTester
             Console.WriteLine("Export listing done");
 
             Console.WriteLine("Import listing for file : {0}", FileName);
-            foreach (PeImport Import in Imports)
+            foreach (PeImportDll DllImport in Imports)
             {
-                if (Import.ImportByOrdinal)
-                {
-                    Console.WriteLine("Import {0:s} Ordinal_{1:d} :", Import.ModuleName, Import.Ordinal);
-                }
-                else
-                {
-                    Console.WriteLine("Import {0:s} Name {1:d} :", Import.ModuleName, Import.Name);
-                }
-                if (Import.DelayImport)
-                    Console.WriteLine("\t Delay Import");
+                Console.WriteLine("Import from module {0:s} :", DllImport.Name);
 
+                foreach (PeImport Import in DllImport.ImportList)
+                {
+                    if (Import.ImportByOrdinal)
+                    {
+                        Console.Write("\t Ordinal_{0:d} ", Import.Ordinal);
+                    }
+                    else
+                    {
+                        Console.Write("\t Function {0:s}", Import.Name);
+                    }
+                    if (Import.DelayImport)                        
+                        Console.WriteLine(" (Delay Import)");
+                    else
+                        Console.WriteLine("");
+                }
             }
 
             Console.WriteLine("Import listing done");

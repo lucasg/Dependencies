@@ -122,60 +122,42 @@ namespace System
 
 	}
 
-	Collections::Generic::List<PeImport^> ^ PE::GetImports()
+	Collections::Generic::List<PeImportDll^> ^ PE::GetImports()
 	{
-		Collections::Generic::List<PeImport^> ^Imports = gcnew Collections::Generic::List<PeImport^>();
+		Collections::Generic::List<PeImportDll^> ^Imports = gcnew Collections::Generic::List<PeImportDll^>();
 
-		// Imports
+		// Standard Imports
 		if (NT_SUCCESS(PhGetMappedImageImports(&m_Impl->m_PvImports, &m_Impl->m_PvMappedImage)))
 		{
 			for (size_t IndexDll = 0; IndexDll< m_Impl->m_PvImports.NumberOfDlls; IndexDll++)
 			{
-				PH_MAPPED_IMAGE_IMPORT_DLL importDll;
-
-				if (NT_SUCCESS(PhGetMappedImageImportDll(&m_Impl->m_PvImports, (ULONG) IndexDll, &importDll)))
-				{
-					for (size_t IndexImport = 0; IndexImport < importDll.NumberOfEntries; IndexImport++)
-					{
-						
-						Imports->Add(gcnew PeImport(importDll, IndexImport, false));
-					}
-				}
+				Imports->Add(gcnew PeImportDll(&m_Impl->m_PvImports, IndexDll));
 			}
 		}
 
-		// Exports
+		// Delayed Imports
 		if (NT_SUCCESS(PhGetMappedImageDelayImports(&m_Impl->m_PvDelayImports, &m_Impl->m_PvMappedImage)))
 		{
 			for (size_t IndexDll = 0; IndexDll< m_Impl->m_PvImports.NumberOfDlls; IndexDll++)
 			{
-				PH_MAPPED_IMAGE_IMPORT_DLL importDll;
-
-				if (NT_SUCCESS(PhGetMappedImageImportDll(&m_Impl->m_PvImports, (ULONG)IndexDll, &importDll)))
-				{
-					for (size_t IndexImport = 0; IndexImport < importDll.NumberOfEntries; IndexImport++)
-					{
-
-						Imports->Add(gcnew PeImport(importDll, IndexImport, true));
-					}
-				}
+				Imports->Add(gcnew PeImportDll(&m_Impl->m_PvDelayImports, IndexDll));
 			}
 		}
 
 		return Imports;
 	}
 
-	PeImport::PeImport(const PH_MAPPED_IMAGE_IMPORT_DLL &importDll, size_t Index, Boolean DelayImport)
+	PeImport::PeImport(const PPH_MAPPED_IMAGE_IMPORT_DLL importDll, size_t Index)
 	{
 		PH_MAPPED_IMAGE_IMPORT_ENTRY importEntry;
 
-		if (NT_SUCCESS(PhGetMappedImageImportEntry((PPH_MAPPED_IMAGE_IMPORT_DLL) &importDll, (ULONG)Index, &importEntry)))
+		if (NT_SUCCESS(PhGetMappedImageImportEntry((PPH_MAPPED_IMAGE_IMPORT_DLL) importDll, (ULONG)Index, &importEntry)))
 		{
 			this->Hint = importEntry.NameHint;
 			this->Ordinal = importEntry.Ordinal;
-			this->DelayImport = DelayImport;
+			this->DelayImport = (importDll->Flags) & PH_MAPPED_IMAGE_DELAY_IMPORTS;
 			this->Name = gcnew String(importEntry.Name);
-			this->ModuleName = gcnew String(importDll.Name);
+			this->ModuleName = gcnew String(importDll->Name);
 			this->ImportByOrdinal = (importEntry.Name == nullptr);
 		}
 
@@ -194,6 +176,54 @@ namespace System
 
 	PeImport::~PeImport()
 	{
+	}
+
+
+	PeImportDll::PeImportDll(const PPH_MAPPED_IMAGE_IMPORTS &PvMappedImports, size_t ImportDllIndex)
+	: ImportDll (new PH_MAPPED_IMAGE_IMPORT_DLL)
+	{
+		ImportList = gcnew Collections::Generic::List<PeImport^>();
+
+		if (!NT_SUCCESS(PhGetMappedImageImportDll(PvMappedImports, (ULONG)ImportDllIndex, ImportDll)))
+		{
+			return;
+		}
+
+		Flags = ImportDll->Flags;
+		Name = gcnew String(ImportDll->Name);
+		NumberOfEntries = ImportDll->NumberOfEntries;
+
+		for (size_t IndexImport = 0; IndexImport < (size_t) NumberOfEntries; IndexImport++)
+		{
+			ImportList->Add(gcnew PeImport(ImportDll, IndexImport));
+		}
+	}
+
+	PeImportDll::~PeImportDll()
+	{
+		delete ImportDll;
+	}
+
+	PeImportDll::!PeImportDll()
+	{
+		delete ImportDll;
+	}
+
+	PeImportDll::PeImportDll(const PeImportDll ^ other)
+	: ImportDll(new PH_MAPPED_IMAGE_IMPORT_DLL)
+	{
+		ImportList = gcnew Collections::Generic::List<PeImport^>();
+
+		memcpy(ImportDll, other->ImportDll, sizeof(PH_MAPPED_IMAGE_IMPORT_DLL));
+
+		Flags = other->Flags;
+		Name = String::Copy(other->Name);
+		NumberOfEntries = other->NumberOfEntries;
+
+		for (size_t IndexImport = 0; IndexImport < (size_t)NumberOfEntries; IndexImport++)
+		{
+			ImportList->Add(gcnew PeImport(other->ImportList[IndexImport]));
+		}
 
 	}
 

@@ -40,18 +40,38 @@ namespace ClrPh {
 		static bool InitializePhLib();
 	};
 
+
+
 	public ref struct PeImport {
 		Int16 Hint;
 		Int16 Ordinal;
-		String ^  Name; // may be NULL.
+		String ^ Name;
 		String ^ ModuleName;
 		Boolean ImportByOrdinal;
 		Boolean	DelayImport;
 
-		PeImport(const PH_MAPPED_IMAGE_IMPORT_DLL &importDll, size_t Index, Boolean DelayImport);
+		PeImport(const PPH_MAPPED_IMAGE_IMPORT_DLL importDll, size_t Index);
 		PeImport(const PeImport ^ other);
 		~PeImport();
 
+	};
+
+	public ref struct PeImportDll {
+	public:
+		Int64 Flags;
+		String ^Name;
+		Int64 NumberOfEntries;
+
+		Collections::Generic::List<PeImport^>^ ImportList;
+
+		PeImportDll(const PPH_MAPPED_IMAGE_IMPORTS &PvMappedImports, size_t ImportDllIndex);
+		PeImportDll(const PeImportDll ^ other);
+		~PeImportDll();
+	protected:
+		!PeImportDll();
+
+	private:
+		PPH_MAPPED_IMAGE_IMPORT_DLL ImportDll;
 	};
 
 	public ref struct PeExport {
@@ -67,6 +87,8 @@ namespace ClrPh {
 
 	};
 
+
+
 	public ref class PE
 	{
 	public:
@@ -75,7 +97,7 @@ namespace ClrPh {
         ~PE();
 
 		Collections::Generic::List<PeExport ^>^ GetExports();
-		Collections::Generic::List<PeImport ^>^ GetImports();
+		Collections::Generic::List<PeImportDll ^>^ GetImports();
 
     protected:
         // Deallocate the native object on the finalizer just in case no destructor is called  

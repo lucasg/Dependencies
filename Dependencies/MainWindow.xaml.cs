@@ -120,16 +120,18 @@ namespace Dependencies
             
             this.Pe = new PE(InputFileNameDlg.FileName);
             List<PeExport> PeExports = Pe.GetExports();
-            List<PeImport> PeImports = this.Pe.GetImports();
+            List<PeImportDll> PeImports = this.Pe.GetImports();
 
             this.ImportList.Items.Clear();
             this.ExportList.Items.Clear();
 
             int i = 0;
-            foreach (PeImport Import in PeImports)
-            {
-                this.ImportList.Items.Add(new DisplayPeImport(i, Import));
-                i++;
+            foreach (PeImportDll DllImport in PeImports) {
+                foreach (PeImport Import in DllImport.ImportList)
+                {
+                    this.ImportList.Items.Add(new DisplayPeImport(i, Import));
+                    i++;
+                }
             }
 
             i = 0;
@@ -142,12 +144,11 @@ namespace Dependencies
             this.DllTreeView.Items.Clear();
             TreeViewItem treeNode = new TreeViewItem();
             treeNode.Header = InputFileNameDlg.FileName;
-            
 
-            for (i = 0; i < 10; i++)
+            foreach (PeImportDll DllImport in PeImports)
             {
                 TreeViewItem childTreeNode = new TreeViewItem();
-                childTreeNode.Header = "toto";
+                childTreeNode.Header = DllImport.Name;
 
                 treeNode.Items.Add(childTreeNode);
             }
