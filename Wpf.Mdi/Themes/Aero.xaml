@@ -1,0 +1,481 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WPF.MDI;assembly=WPF.MDI">
+
+    <SolidColorBrush x:Key="NormalBorderBrush" Color="#FF6A7A93" />
+
+    <LinearGradientBrush x:Key="NormalSubBorderBackground" EndPoint="0,1">
+        <GradientStop Color="#FFC3D4E7" Offset="0.0" />
+        <GradientStop Color="#FFBED3E8" Offset="0.5" />
+        <GradientStop Color="#FF98B1CC" Offset="0.5" />
+        <GradientStop Color="#FFB7D0E9" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalSubBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFDFE8F2" Offset="0.0" />
+        <GradientStop Color="#FFDDE7F3" Offset="0.5" />
+        <GradientStop Color="#FFC8D5E4" Offset="0.5" />
+        <GradientStop Color="#FFD9E7F4" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalDownBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FF7F9AAC" Offset="0.0" />
+        <GradientStop Color="#FF5D778C" Offset="0.5" />
+        <GradientStop Color="#FF203B52" Offset="0.5" />
+        <GradientStop Color="#FF27C9C8" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalDownBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFACBEC9" Offset="0.0" />
+        <GradientStop Color="#FF90A2B1" Offset="0.5" />
+        <GradientStop Color="#FF667888" Offset="0.5" />
+        <GradientStop Color="#FF67E6E4" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalUnfocusedBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FFBDCBDA" Offset="0"/>
+        <GradientStop Color="#FFCEDCEB" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalUnfocusedBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFD1DBE5" Offset="0"/>
+        <GradientStop Color="#FFD1DBE5" Offset="1"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="NormalUnfocusedSubBorderBrush" Color="#FF838EA8" />
+
+    <LinearGradientBrush x:Key="NormalOverBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FFAAD5F3" Offset="0.0" />
+        <GradientStop Color="#FF81C0EA" Offset="0.5" />
+        <GradientStop Color="#FF2D73A3" Offset="0.5" />
+        <GradientStop Color="#FF24C6EB" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalOverBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFD6EBFA" Offset="0.0" />
+        <GradientStop Color="#FFBBDDF3" Offset="0.5" />
+        <GradientStop Color="#FF8EB4CE" Offset="0.5" />
+        <GradientStop Color="#FF85EFF9" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalDisabledBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FFB5CAE1" Offset="0"/>
+        <GradientStop Color="#FFB7D0E9" Offset="1"/>
+        <GradientStop Color="#FFB5CCE5" Offset="0.5"/>
+        <GradientStop Color="#FFA3BCD7" Offset="0.5"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalDisabledBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFC2D3E6" Offset="0"/>
+        <GradientStop Color="#FFC9DDF0" Offset="1"/>
+        <GradientStop Color="#FFC4D7EA" Offset="0.5"/>
+        <GradientStop Color="#FFBBCEE3" Offset="0.5"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="NormalDisabledSubBorderBrush" Color="#FF859BB5" />
+
+    <LinearGradientBrush x:Key="NormalDisabledFocusedBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FFC4D2E0" Offset="0"/>
+        <GradientStop Color="#FFD5E3F2" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="NormalDisabledFocusedBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFD3DEE9" Offset="0"/>
+        <GradientStop Color="#FFE2EDF7" Offset="1"/>
+    </LinearGradientBrush>
+
+    <Style x:Key="WindowButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Name="BaseBorder" CornerRadius="2" BorderThickness="1" BorderBrush="{StaticResource NormalBorderBrush}">
+                        <Border Name="Border" CornerRadius="2" BorderThickness="1" Background="{StaticResource NormalSubBorderBackground}" BorderBrush="{StaticResource NormalSubBorderBrush}">
+                            <ContentPresenter Content="{TemplateBinding Content}" />
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource NormalDownBackgroundBrush}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource NormalDownBorderBrush}" />
+                        </Trigger>
+                        <Trigger Property="Tag" Value="0">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource NormalUnfocusedBackgroundBrush}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource NormalUnfocusedBorderBrush}" />
+                            <Setter TargetName="BaseBorder" Property="BorderBrush" Value="{StaticResource NormalUnfocusedSubBorderBrush}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsPressed" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource NormalOverBackgroundBrush}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource NormalOverBorderBrush}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource NormalDisabledBackgroundBrush}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource NormalDisabledBorderBrush}" />
+                            <Setter TargetName="BaseBorder" Property="BorderBrush" Value="{StaticResource NormalDisabledSubBorderBrush}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Tag" Value="0" />
+                                <Condition Property="IsEnabled" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource NormalDisabledFocusedBackgroundBrush}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource NormalDisabledFocusedBorderBrush}" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
+    <SolidColorBrush x:Key="CloseBorderBrush" Color="#FF431422" />
+
+    <LinearGradientBrush x:Key="CloseSubBorderBackground" EndPoint="0,1">
+        <GradientStop Color="#FFE9A99C" Offset="0.0" />
+        <GradientStop Color="#FFDF9487" Offset="0.5" />
+        <GradientStop Color="#FFB8432C" Offset="0.5" />
+        <GradientStop Color="#FFD27E6F" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="CloseSubBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFF4D3CC" Offset="0.0" />
+        <GradientStop Color="#FFEDC4BD" Offset="0.5" />
+        <GradientStop Color="#FFD99A8E" Offset="0.5" />
+        <GradientStop Color="#FFECC6C0" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="CloseDownBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FFCFA38B" Offset="0.0" />
+        <GradientStop Color="#FFBE836A" Offset="0.5" />
+        <GradientStop Color="#FF831800" Offset="0.5" />
+        <GradientStop Color="#FFC4954C" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="CloseDownBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFE6CFC3" Offset="0.0" />
+        <GradientStop Color="#FFCCB0A5" Offset="0.5" />
+        <GradientStop Color="#FFB28176" Offset="0.5" />
+        <GradientStop Color="#FFF5EC6A" Offset="1.0" />
+    </LinearGradientBrush>
+            
+    <LinearGradientBrush x:Key="CloseUnfocusedBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FFBDCBDA" Offset="0"/>
+        <GradientStop Color="#FFCEDCEB" Offset="1"/>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="CloseUnfocusedBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFD1DBE5" Offset="0"/>
+        <GradientStop Color="#FFD1DBE5" Offset="1"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="CloseUnfocusedSubBorderBrush" Color="#FF838EA8" />
+
+    <LinearGradientBrush x:Key="CloseOverBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FFE9A99C" Offset="0.0" />
+        <GradientStop Color="#FFFAA99A" Offset="0.5" />
+        <GradientStop Color="#FFD22302" Offset="0.5" />
+        <GradientStop Color="#FFE5934D" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="CloseOverBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFFDE4E0" Offset="0.0" />
+        <GradientStop Color="#FFFDE4E0" Offset="0.5" />
+        <GradientStop Color="#FFE78977" Offset="0.5" />
+        <GradientStop Color="#FFFAEE6B" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <Style x:Key="CloseButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Name="BaseBorder" CornerRadius="2" BorderThickness="1" BorderBrush="{StaticResource CloseBorderBrush}">
+                        <Border Name="Border" CornerRadius="2" BorderThickness="1" Background="{StaticResource CloseSubBorderBackground}" BorderBrush="{StaticResource CloseSubBorderBrush}">
+                            <Image Width="11" Height="9" HorizontalAlignment="Center" VerticalAlignment="Center" Source="/WPF.MDI;component/Themes/Aero/Close.png" />
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource CloseDownBackgroundBrush}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource CloseDownBorderBrush}" />
+                        </Trigger>
+                        <Trigger Property="Tag" Value="0">
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource CloseUnfocusedBackgroundBrush}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource CloseUnfocusedBorderBrush}" />
+                            <Setter TargetName="BaseBorder" Property="BorderBrush" Value="{StaticResource CloseUnfocusedSubBorderBrush}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsPressed" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource CloseOverBackgroundBrush}" />
+                            <Setter TargetName="Border" Property="BorderBrush" Value="{StaticResource CloseOverBorderBrush}" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <SolidColorBrush x:Key="MaximizedBaseBorderBrush" Color="#FF98A6B4" />
+    <SolidColorBrush x:Key="MaximizedDownBaseBorderBrush" Color="#FF6F7D8B" />
+
+    <LinearGradientBrush x:Key="MaximizedSubBorderBrush" EndPoint="0,1">
+        <GradientStop Color="#FFF6FAFF" Offset="0"/>
+        <GradientStop Color="#FFF6FAFF" Offset="0.15"/>
+        <GradientStop Color="#FFE9F3FF" Offset="0.15"/>
+        <GradientStop Color="#FFE3F1FF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="MaximizedDownSubBorderBrush" Color="#d0deec" />
+
+    <LinearGradientBrush x:Key="MaximizedBorderBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#FFF1F8FF" Offset="0"/>
+        <GradientStop Color="#FFF1F8FF" Offset="0.15"/>
+        <GradientStop Color="#FFDEECFA" Offset="0.15"/>
+        <GradientStop Color="#FFDAE8F6" Offset="1"/>
+    </LinearGradientBrush>
+
+    <Style x:Key="MaximizedButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="Width" Value="18" />
+        <Setter Property="Height" Value="18" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Name="BaseBorder" BorderThickness="1" BorderBrush="{StaticResource MaximizedBaseBorderBrush}">
+                        <Border Name="SubBorder" BorderThickness="1,1,1,0" BorderBrush="{StaticResource MaximizedSubBorderBrush}">
+                            <Border Name="Border" Background="{StaticResource MaximizedBorderBackgroundBrush}">
+                                <ContentPresenter Margin="0,2,0,0" Content="{TemplateBinding Content}" />
+                            </Border>
+                        </Border>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsPressed" Value="True" />
+                                <Condition Property="IsEnabled" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="BaseBorder" Property="BorderBrush" Value="{StaticResource MaximizedDownBaseBorderBrush}" />
+                            <Setter TargetName="SubBorder" Property="BorderBrush" Value="{StaticResource MaximizedDownSubBorderBrush}" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <SolidColorBrush x:Key="BackBorderBackgroundBrush" Color="#FFBBD2EB" />
+    <SolidColorBrush x:Key="BackBorderBrush" Color="Black" />
+
+    <LinearGradientBrush x:Key="DarkenBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#20000000" Offset="0.0" />
+        <GradientStop Color="#00000000" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HighlightBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#00FFFFFF" Offset="0.0" />
+        <GradientStop Color="#7DFFFFFF" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="NearBorderBrush" Color="White" />
+    <SolidColorBrush x:Key="FarBorderBrush" Color="#FF3FCEF2" />
+    
+    <SolidColorBrush x:Key="ChildBackground" Color="#FFF0F0F0" />
+    
+    <BitmapImage x:Key="RestoreImage" UriSource="/WPF.MDI;component/Themes/Aero/Restore.png" />
+
+    <SolidColorBrush x:Key="BackBorderMaximizedBrush" Color="#FF4A5764" />
+    
+    <LinearGradientBrush x:Key="DarkenMaximizedBrush" EndPoint="0,1">
+        <GradientStop Color="#FFFEFEFF" Offset="0.0" />
+        <GradientStop Color="#FFE5EAF5" Offset="0.3" />
+        <GradientStop Color="#FFD4DBED" Offset="0.3" />
+        <GradientStop Color="#FFE1E6F6" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="DarkenMaximizedBorderBrush" Color="#FFFB6BCC" />
+
+    <SolidColorBrush x:Key="ContentMaximizedBorderBrush" Color="#FFA0A0A0" />
+    
+    <BitmapImage x:Key="MaximizedMinimizeImage" UriSource="/WPF.MDI;component/Themes/Aero/MaximizedMinimize.png" />
+    <BitmapImage x:Key="MaximizedRestoreImage" UriSource="/WPF.MDI;component/Themes/Aero/MaximizedRestore.png" />
+    <BitmapImage x:Key="MaximizedCloseImage" UriSource="/WPF.MDI;component/Themes/Aero/MaximizedClose.png" />
+    
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+    <Style TargetType="{x:Type local:MdiChild}">
+        <Setter Property="Width" Value="300" />
+        <Setter Property="Height" Value="300" />
+        <Setter Property="MinWidth" Value="150" />
+        <Setter Property="MinHeight" Value="35" />
+        <Setter Property="Background" Value="{StaticResource ChildBackground}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:MdiChild}">
+                    <Border Name="BaseBorder" BorderThickness="1" CornerRadius="5,5,0,0" Background="{StaticResource BackBorderBackgroundBrush}" BorderBrush="{StaticResource BackBorderBrush}">
+                        <Grid>
+                            <Border Name="DarkenBackground" Height="28" VerticalAlignment="Top" CornerRadius="5,5,0,0" Background="{StaticResource DarkenBackgroundBrush}" />
+                            <Border Name="HighlightBackground" Height="134" VerticalAlignment="Top" CornerRadius="5,5,0,0" Background="{StaticResource HighlightBackgroundBrush}" />
+
+                            <Thumb Name="DragThumb" Height="30" VerticalAlignment="Top" Opacity="0" />
+
+                            <StackPanel Name="ButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,9,8,0" VerticalAlignment="Top" >
+                                <Button Name="MinimizeButton" Width="31" Height="17" Margin="0,0,2,0" RenderOptions.BitmapScalingMode="NearestNeighbor" Style="{DynamicResource WindowButtonStyle}">
+                                    <Image Width="11" Height="5" Margin="0,3,0,0" Source="/WPF.MDI;component/Themes/Aero/Minimize.png" />
+                                </Button>
+                                <Button Name="MaximizeButton" Width="31" Height="17" Margin="0,0,2,0" Style="{DynamicResource WindowButtonStyle}">
+                                    <Image Width="11" Height="9" Source="/WPF.MDI;component/Themes/Aero/Maximize.png" />
+                                </Button>
+                                <Button Name="CloseButton" Width="31" Height="17" Style="{DynamicResource CloseButtonStyle}" />
+                            </StackPanel>
+
+                            <Grid Name="HeaderContent" Height="28" Margin="6,0,109,0" VerticalAlignment="Top" IsHitTestVisible="False">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Image Name="IconImage" Width="16" Height="16" Margin="2,6,0,0" Stretch="Fill" RenderOptions.BitmapScalingMode="NearestNeighbor" Source="{TemplateBinding Icon}" Visibility="{TemplateBinding ShowIcon, Converter={StaticResource BoolToVisibility}}" />
+                                <TextBlock Name="Header" Grid.Column="1" Margin="4,9,0,0" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Text="{TemplateBinding Title}" />
+                            </Grid>
+
+                            <Border Name="ContentBorder" Margin="6,30,6,6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentControl Content="{TemplateBinding Content}" />
+                            </Border>
+
+                            <Rectangle Name="LeftBorder" Width="1" HorizontalAlignment="Left" RadiusX="9" RadiusY="9" Fill="{StaticResource NearBorderBrush}" />
+                            <Rectangle Name="TopBorder" Height="1" VerticalAlignment="Top" RadiusX="9" RadiusY="9" Fill="{StaticResource NearBorderBrush}" />
+                            <Rectangle Name="RightBorder" Width="1" HorizontalAlignment="Right" RadiusX="9" RadiusY="9" Fill="{StaticResource FarBorderBrush}" />
+                            <Rectangle Name="BottomBorder" Height="1" VerticalAlignment="Bottom" RadiusX="9" RadiusY="9" Fill="{StaticResource FarBorderBrush}" />
+
+                            <Thumb Name="ResizeLeft" Width="6" HorizontalAlignment="Left" Margin="0,6,0,6" Opacity="0" Cursor="SizeWE" IsHitTestVisible="{TemplateBinding Resizable}" />
+                            <Thumb Name="ResizeTop" Height="4" VerticalAlignment="Top" Margin="6,0,6,0" Opacity="0" Cursor="SizeNS" IsHitTestVisible="{TemplateBinding Resizable}" />
+                            <Thumb Name="ResizeRight" Width="6" HorizontalAlignment="Right" Margin="0,6,0,6" Opacity="0" Cursor="SizeWE" IsHitTestVisible="{TemplateBinding Resizable}" />
+                            <Thumb Name="ResizeBottom" Height="6" VerticalAlignment="Bottom" Margin="6,0,6,0" Opacity="0" Cursor="SizeNS" IsHitTestVisible="{TemplateBinding Resizable}" />
+                            <Thumb Name="ResizeTopLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Top" Opacity="0" Cursor="SizeNWSE" IsHitTestVisible="{TemplateBinding Resizable}" />
+                            <Thumb Name="ResizeTopRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Top" Opacity="0" Cursor="SizeNESW" IsHitTestVisible="{TemplateBinding Resizable}" />
+                            <Thumb Name="ResizeBottomRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Bottom" Opacity="0" Cursor="SizeNWSE" IsHitTestVisible="{TemplateBinding Resizable}" />
+                            <Thumb Name="ResizeBottomLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Bottom" Opacity="0" Cursor="SizeNESW" IsHitTestVisible="{TemplateBinding Resizable}" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="Focused" Value="False">
+                            <Setter TargetName="BaseBorder" Property="Background" Value="#d7e4f2" />
+                            <Setter TargetName="HighlightBackground" Property="Opacity" Value="0" />
+                            <Setter TargetName="DarkenBackground" Property="Opacity" Value="0.5" />
+                            <Setter TargetName="LeftBorder" Property="Opacity" Value="0.75" />
+                            <Setter TargetName="TopBorder" Property="Opacity" Value="0.75" />
+                            <Setter TargetName="RightBorder" Property="Opacity" Value="0" />
+                            <Setter TargetName="BottomBorder" Property="Opacity" Value="0" />
+                            <Setter TargetName="CloseButton" Property="Tag" Value="0" />
+                            <Setter TargetName="MaximizeButton" Property="Tag" Value="0" />
+                            <Setter TargetName="MinimizeButton" Property="Tag" Value="0" />
+                        </Trigger>
+                        <Trigger SourceName="IconImage" Property="Source" Value="{x:Null}">
+                            <Setter TargetName="IconImage" Property="Width" Value="0" />
+                            <Setter TargetName="IconImage" Property="Margin" Value="0" />
+                        </Trigger>
+                        <Trigger Property="WindowState" Value="Minimized">
+                            <Setter Property="MinWidth" Value="160" />
+                            <Setter Property="MinHeight" Value="29" />
+                            <Setter Property="Width" Value="160" />
+                            <Setter Property="Height" Value="29" />
+                            <Setter Property="Resizable" Value="False" />
+                            <Setter TargetName="ButtonsPanel" Property="Margin" Value="0,5,5,0" />
+                            <Setter TargetName="IconImage" Property="Margin" Value="2,0,0,0" />
+                            <Setter TargetName="Header" Property="Margin" Value="4,6,0,0" />
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Button Width="31" Height="17" Style="{DynamicResource WindowButtonStyle}">
+                                            <Image Width="12" Height="11" Source="{StaticResource RestoreImage}" />
+                                        </Button>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="WindowState" Value="Minimized" />
+                                <Condition Property="Focused" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Button Tag="0" Width="31" Height="17" Style="{DynamicResource WindowButtonStyle}">
+                                            <Image Width="12" Height="11" Source="{StaticResource RestoreImage}" />
+                                        </Button>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <Trigger Property="WindowState" Value="Maximized">
+                            <Setter Property="Resizable" Value="False" />
+                            <Setter TargetName="BaseBorder" Property="BorderThickness" Value="0,1,0,0" />
+                            <Setter TargetName="BaseBorder" Property="BorderBrush" Value="{StaticResource BackBorderMaximizedBrush}" />
+                            <Setter TargetName="BaseBorder" Property="CornerRadius" Value="0" />
+                            <Setter TargetName="DarkenBackground" Property="Background" Value="{StaticResource DarkenMaximizedBrush}" />
+                            <Setter TargetName="DarkenBackground" Property="BorderBrush" Value="{StaticResource DarkenMaximizedBorderBrush}" />
+                            <Setter TargetName="DarkenBackground" Property="BorderThickness" Value="0,0,0,1" />
+                            <Setter TargetName="DarkenBackground" Property="CornerRadius" Value="0" />
+                            <Setter TargetName="HighlightBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="ContentBorder" Property="BorderThickness" Value="1" />
+                            <Setter TargetName="ContentBorder" Property="BorderBrush" Value="{StaticResource ContentMaximizedBorderBrush}" />
+                            <Setter TargetName="ContentBorder" Property="Margin" Value="0,0,0,0" /> <!-- HERE -->
+                            <Setter TargetName="HeaderContent" Property="Height" Value="20" />
+                            <Setter TargetName="LeftBorder" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="TopBorder" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="RightBorder" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="BottomBorder" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="Header" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="IconImage" Property="Margin" Value="2,0,0,0" />
+                            <Setter TargetName="MinimizeButton" Property="Margin" Value="20,1,1,1" />
+                            <Setter TargetName="MaximizeButton" Property="Margin" Value="1" />
+                            <Setter TargetName="CloseButton" Property="Margin" Value="1" />
+                            <Setter TargetName="MinimizeButton" Property="Width" Value="18" />
+                            <Setter TargetName="MaximizeButton" Property="Width" Value="18" />
+                            <Setter TargetName="CloseButton" Property="Width" Value="18" />
+                            <Setter TargetName="MinimizeButton" Property="Height" Value="18" />
+                            <Setter TargetName="MaximizeButton" Property="Height" Value="18" />
+                            <Setter TargetName="CloseButton" Property="Height" Value="18" />
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Button Style="{DynamicResource MaximizedButtonStyle}">
+                                            <Image Width="14" Height="13" Source="{StaticResource MaximizedMinimizeImage}" />
+                                        </Button>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="MaximizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Button Style="{DynamicResource MaximizedButtonStyle}">
+                                            <Image Width="14" Height="13" Source="{StaticResource MaximizedRestoreImage}" />
+                                        </Button>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="CloseButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Button Style="{DynamicResource MaximizedButtonStyle}">
+                                            <Image Width="14" Height="13" Source="{StaticResource MaximizedCloseImage}" />
+                                        </Button>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

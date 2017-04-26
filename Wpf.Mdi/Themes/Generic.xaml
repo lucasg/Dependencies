@@ -1,0 +1,35 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WPF.MDI">
+
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+    <SolidColorBrush x:Key="BaseBackgroundBrush" Color="White" />
+    <SolidColorBrush x:Key="BaseBorderBrush" Color="#FFBDBDBD" />
+
+    <SolidColorBrush x:Key="TitleForegroundBrush" Color="#FFBEBEBE" />
+    <SolidColorBrush x:Key="InnerBorderBrush" Color="#FFF6F6F6" />
+
+    <Style TargetType="{x:Type local:MdiChild}">
+        <Setter Property="Width" Value="300" />
+        <Setter Property="Height" Value="300" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:MdiChild}">
+                    <Border BorderThickness="1" Background="{StaticResource BaseBackgroundBrush}" BorderBrush="{StaticResource BaseBorderBrush}">
+                        <Border.BitmapEffect>
+                            <OuterGlowBitmapEffect GlowColor="Black" GlowSize="5" Opacity="0.2" />
+                        </Border.BitmapEffect>
+                        <Grid>
+                            <TextBlock Margin="10,0,0,0" Foreground="{StaticResource TitleForegroundBrush}" Text="{TemplateBinding Title}" />
+                            <Border Margin="10,26,10,10" BorderThickness="1" Background="{TemplateBinding Background}" BorderBrush="{StaticResource InnerBorderBrush}">
+                                <ContentControl Content="{TemplateBinding Content}" />
+                            </Border>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

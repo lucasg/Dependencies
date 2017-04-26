@@ -1,0 +1,461 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WPF.MDI;assembly=WPF.MDI">
+    
+    <Style x:Key="WindowButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <ContentPresenter Content="{TemplateBinding Content}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <SolidColorBrush x:Key="BackBorderBackgroundBrush" Color="#bbd2eb" />
+    <SolidColorBrush x:Key="BackBorderBrush" Color="Black" />
+
+    <LinearGradientBrush x:Key="DarkenBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#20000000" Offset="0.0" />
+        <GradientStop Color="#00000000" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HighlightBackgroundBrush" EndPoint="0,1">
+        <GradientStop Color="#00FFFFFF" Offset="0.0" />
+        <GradientStop Color="#7DFFFFFF" Offset="1.0" />
+    </LinearGradientBrush>
+
+    <SolidColorBrush x:Key="NearBorderBrush" Color="White" />
+    <SolidColorBrush x:Key="FarBorderBrush" Color="#FF3FCEF2" />
+
+    <BitmapImage x:Key="TopLeftFocused" UriSource="/WPF.MDI;component/Themes/Luna/TopLeftFocused.png" />
+    <BitmapImage x:Key="TopLeftUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/TopLeftUnfocused.png" />
+
+    <BitmapImage x:Key="TopMiddleFocused" UriSource="/WPF.MDI;component/Themes/Luna/TopMiddleFocused.png" />
+    <BitmapImage x:Key="TopMiddleUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/TopMiddleUnfocused.png" />
+
+    <BitmapImage x:Key="TopRightFocused" UriSource="/WPF.MDI;component/Themes/Luna/TopRightFocused.png" />
+    <BitmapImage x:Key="TopRightUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/TopRightUnfocused.png" />
+
+    <BitmapImage x:Key="LeftFocused" UriSource="/WPF.MDI;component/Themes/Luna/LeftFocused.png" />
+    <BitmapImage x:Key="LeftUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/LeftUnfocused.png" />
+
+    <BitmapImage x:Key="RightFocused" UriSource="/WPF.MDI;component/Themes/Luna/RightFocused.png" />
+    <BitmapImage x:Key="RightUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/RightUnfocused.png" />
+
+    <BitmapImage x:Key="BottomLeftFocused" UriSource="/WPF.MDI;component/Themes/Luna/BottomLeftFocused.png" />
+    <BitmapImage x:Key="BottomLeftUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/BottomLeftUnfocused.png" />
+
+    <BitmapImage x:Key="BottomMiddleFocused" UriSource="/WPF.MDI;component/Themes/Luna/BottomMiddleFocused.png" />
+    <BitmapImage x:Key="BottomMiddleUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/BottomMiddleUnfocused.png" />
+
+    <BitmapImage x:Key="BottomRightFocused" UriSource="/WPF.MDI;component/Themes/Luna/BottomRightFocused.png" />
+    <BitmapImage x:Key="BottomRightUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/BottomRightUnfocused.png" />
+
+    <BitmapImage x:Key="CloseNormalFocused" UriSource="/WPF.MDI;component/Themes/Luna/CloseNormalFocused.png" />
+    <BitmapImage x:Key="CloseNormalUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/CloseNormalUnfocused.png" />
+    <BitmapImage x:Key="CloseOver" UriSource="/WPF.MDI;component/Themes/Luna/CloseOver.png" />
+    <BitmapImage x:Key="CloseDown" UriSource="/WPF.MDI;component/Themes/Luna/CloseDown.png" />
+
+    <BitmapImage x:Key="MaximizeNormalFocused" UriSource="/WPF.MDI;component/Themes/Luna/MaximizeNormalFocused.png" />
+    <BitmapImage x:Key="MaximizeNormalUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/MaximizeNormalUnfocused.png" />
+    <BitmapImage x:Key="MaximizeDisabledFocused" UriSource="/WPF.MDI;component/Themes/Luna/MaximizeDisabledFocused.png" />
+    <BitmapImage x:Key="MaximizeDisabledUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/MaximizeDisabledUnfocused.png" />
+    <BitmapImage x:Key="MaximizeOver" UriSource="/WPF.MDI;component/Themes/Luna/MaximizeOver.png" />
+    <BitmapImage x:Key="MaximizeDown" UriSource="/WPF.MDI;component/Themes/Luna/MaximizeDown.png" />
+
+    <BitmapImage x:Key="MinimizeNormalFocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizeNormalFocused.png" />
+    <BitmapImage x:Key="MinimizeNormalUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizeNormalUnfocused.png" />
+    <BitmapImage x:Key="MinimizeDisabledFocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizeDisabledFocused.png" />
+    <BitmapImage x:Key="MinimizeDisabledUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizeDisabledUnfocused.png" />
+    <BitmapImage x:Key="MinimizeOver" UriSource="/WPF.MDI;component/Themes/Luna/MinimizeOver.png" />
+    <BitmapImage x:Key="MinimizeDown" UriSource="/WPF.MDI;component/Themes/Luna/MinimizeDown.png" />
+
+    <BitmapImage x:Key="RestoreNormalFocused" UriSource="/WPF.MDI;component/Themes/Luna/RestoreNormalFocused.png" />
+    <BitmapImage x:Key="RestoreNormalUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/RestoreNormalUnfocused.png" />
+    <BitmapImage x:Key="RestoreOver" UriSource="/WPF.MDI;component/Themes/Luna/RestoreOver.png" />
+    <BitmapImage x:Key="RestoreDown" UriSource="/WPF.MDI;component/Themes/Luna/RestoreDown.png" />
+
+    <SolidColorBrush x:Key="ChildBackgroundBrush" Color="#FFEFEBDE" />
+
+    <BitmapImage x:Key="MinimizedTopLeftFocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizedLeftFocused.png" />
+    <BitmapImage x:Key="MinimizedTopMiddleFocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizedMiddleFocused.png" />
+    <BitmapImage x:Key="MinimizedTopRightFocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizedRightFocused.png" />
+    <BitmapImage x:Key="MinimizedTopLeftUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizedLeftUnfocused.png" />
+    <BitmapImage x:Key="MinimizedTopMiddleUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizedMiddleUnfocused.png" />
+    <BitmapImage x:Key="MinimizedTopRightUnfocused" UriSource="/WPF.MDI;component/Themes/Luna/MinimizedRightUnfocused.png" />
+
+    <BitmapImage x:Key="MaximizedMinimizeImage" UriSource="/WPF.MDI;component/Themes/Luna/MaximizedMinimize.png" />
+    <BitmapImage x:Key="MaximizedRestoreImage" UriSource="/WPF.MDI;component/Themes/Luna/MaximizedRestore.png" />
+    <BitmapImage x:Key="MaximizedCloseImage" UriSource="/WPF.MDI;component/Themes/Luna/MaximizedClose.png" />
+
+    <SolidColorBrush x:Key="ContentHostBackgroundBrush" Color="#FFADAA9C" />
+    <SolidColorBrush x:Key="TopBackgroundBrush" Color="#FFEFEBDE" />
+    <SolidColorBrush x:Key="TopBackgroundBorderBrush" Color="White" />
+    
+    <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+
+    <Style TargetType="{x:Type local:MdiChild}">
+        <Setter Property="Width" Value="300" />
+        <Setter Property="Height" Value="300" />
+        <Setter Property="MinWidth" Value="150" />
+        <Setter Property="MinHeight" Value="31" />
+        <Setter Property="Background" Value="{StaticResource ChildBackgroundBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:MdiChild}">
+                    <Grid>
+                        <Border Name="TopBackground" Height="21" VerticalAlignment="Top" Background="Transparent" />
+
+                        <Image Name="TopLeftBackground" Width="33" Height="29" HorizontalAlignment="Left" VerticalAlignment="Top" Source="{StaticResource TopLeftFocused}" />
+                        <Image Name="TopMiddleBackground" Height="29" Margin="33,0,33,0"  HorizontalAlignment="Stretch" VerticalAlignment="Top" Stretch="Fill" Source="{StaticResource TopMiddleFocused}" />
+                        <Image Name="TopRightBackground" Width="33" Height="29" HorizontalAlignment="Right" VerticalAlignment="Top" Source="{StaticResource TopRightFocused}" />
+                        
+                        <Image Name="LeftBackground" Width="5" Margin="0,29,0,5" HorizontalAlignment="Left" VerticalAlignment="Stretch" Stretch="Fill" Source="{StaticResource LeftFocused}" />
+                        <Image Name="RightBackground" Width="5" Margin="0,29,0,5" HorizontalAlignment="Right" VerticalAlignment="Stretch" Stretch="Fill" Source="{StaticResource RightFocused}"  />
+
+                        <Image Name="BottomLeftBackground" Width="24" Height="5" HorizontalAlignment="Left" VerticalAlignment="Bottom" Source="{StaticResource BottomLeftFocused}" />
+                        <Image Name="BottomMiddleBackground" Height="5" Margin="24,0,24,0" HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Stretch="Fill" Source="{StaticResource BottomMiddleFocused}" />
+                        <Image Name="BottomRightBackground" Height="5" Width="24" HorizontalAlignment="Right" VerticalAlignment="Bottom" Source="{StaticResource BottomRightFocused}" />
+
+                        <Thumb Opacity="0" Height="30" VerticalAlignment="Top" Name="DragThumb" />                        
+                        
+                        <StackPanel Name="ButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,5,6,0">
+                            <Button Name="MinimizeButton" Height="21" Width="21" Margin="0,0,2,0" Style="{DynamicResource WindowButtonStyle}">
+                                <Image Width="21" Height="21" Source="{StaticResource MinimizeNormalFocused}" />
+                            </Button>
+                            <Button Name="MaximizeButton" Height="21" Width="21" Margin="0,0,2,0" Style="{DynamicResource WindowButtonStyle}">
+                                <Image Width="21" Height="21" Source="{StaticResource MaximizeNormalFocused}"/>
+                            </Button>
+                            <Button Name="CloseButton" Width="21" Height="21" Style="{DynamicResource WindowButtonStyle}">
+                                <Image Width="21" Height="21" Source="{StaticResource CloseNormalFocused}" />
+                            </Button>
+                        </StackPanel>
+
+                        <Grid Name="HeaderContent" Height="28" Margin="6,0,78,0" VerticalAlignment="Top" IsHitTestVisible="False">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Image Name="IconImage" Width="16" Height="16" Margin="2,6,0,0" Stretch="Fill" RenderOptions.BitmapScalingMode="NearestNeighbor" Source="{TemplateBinding Icon}" Visibility="{TemplateBinding ShowIcon, Converter={StaticResource BoolToVisibility}}" />
+                            <TextBlock Name="Header" Grid.Column="1" Margin="4,9,0,0" Foreground="White" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" Text="{TemplateBinding Title}" />
+                        </Grid>
+
+                        <Border Name="ContentHost" Margin="5,29,5,5" Background="{TemplateBinding Background}">
+                            <ContentControl Content="{TemplateBinding Content}" />
+                        </Border>
+
+                        <Thumb Name="ResizeLeft" Width="6" Margin="0,6,0,6" HorizontalAlignment="Left" Cursor="SizeWE" Opacity="0" IsHitTestVisible="{TemplateBinding Resizable}" />
+                        <Thumb Name="ResizeTop" Height="4" Margin="6,0,6,0" VerticalAlignment="Top" Cursor="SizeNS" Opacity="0" IsHitTestVisible="{TemplateBinding Resizable}" />
+                        <Thumb Name="ResizeRight" Width="6" Margin="0,6,0,6" HorizontalAlignment="Right" Cursor="SizeWE" Opacity="0" IsHitTestVisible="{TemplateBinding Resizable}" />
+                        <Thumb Name="ResizeBottom" Height="6" Margin="6,0,6,0" VerticalAlignment="Bottom" Cursor="SizeNS" Opacity="0" IsHitTestVisible="{TemplateBinding Resizable}" />
+                        <Thumb Name="ResizeTopLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" Opacity="0" IsHitTestVisible="{TemplateBinding Resizable}" />
+                        <Thumb Name="ResizeTopRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" Opacity="0" IsHitTestVisible="{TemplateBinding Resizable}" />
+                        <Thumb Name="ResizeBottomRight" Width="6" Height="6" HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" Opacity="0" IsHitTestVisible="{TemplateBinding Resizable}" />
+                        <Thumb Name="ResizeBottomLeft" Width="6" Height="6" HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" Opacity="0" IsHitTestVisible="{TemplateBinding Resizable}" />
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                		<Trigger SourceName="CloseButton" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="CloseButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource CloseOver}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger SourceName="CloseButton" Property="IsPressed" Value="True">
+                            <Setter TargetName="CloseButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource CloseDown}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="MaximizeButton" Property="IsEnabled" Value="False" />
+                                <Condition Property="Focused" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MaximizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MaximizeDisabledFocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="MaximizeButton" Property="IsEnabled" Value="False" />
+                                <Condition Property="Focused" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MaximizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MaximizeDisabledUnfocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <Trigger SourceName="MaximizeButton" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MaximizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MaximizeOver}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger SourceName="MaximizeButton" Property="IsPressed" Value="True">
+                            <Setter TargetName="MaximizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MaximizeDown}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="MinimizeButton" Property="IsEnabled" Value="False" />
+                                <Condition Property="Focused" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MinimizeDisabledFocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="MinimizeButton" Property="IsEnabled" Value="False" />
+                                <Condition Property="Focused" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MinimizeDisabledUnfocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <Trigger SourceName="MinimizeButton" Property="IsMouseOver" Value="True">
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MinimizeOver}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger SourceName="MinimizeButton" Property="IsPressed" Value="True">
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MinimizeDown}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="MinimizeButton" Property="IsMouseOver" Value="True" />
+                                <Condition Property="WindowState" Value="Minimized" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource RestoreOver}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition SourceName="MinimizeButton" Property="IsPressed" Value="True" />
+                                <Condition Property="WindowState" Value="Minimized" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource RestoreDown}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Focused" Value="True" />
+                                <Condition SourceName="MinimizeButton" Property="IsPressed" Value="False" />
+                                <Condition SourceName="MinimizeButton" Property="IsMouseOver" Value="False" />
+                                <Condition Property="WindowState" Value="Minimized" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource RestoreNormalFocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Focused" Value="False" />
+                                <Condition SourceName="MinimizeButton" Property="IsPressed" Value="False" />
+                                <Condition SourceName="MinimizeButton" Property="IsMouseOver" Value="False" />
+                                <Condition Property="WindowState" Value="Minimized" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource RestoreNormalUnfocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <Trigger Property="Focused" Value="False">
+                            <Setter TargetName="TopLeftBackground" Property="Source" Value="{StaticResource TopLeftUnfocused}" />
+                            <Setter TargetName="TopMiddleBackground" Property="Source" Value="{StaticResource TopMiddleUnfocused}" />
+                            <Setter TargetName="TopRightBackground" Property="Source" Value="{StaticResource TopRightUnfocused}" />
+                            <Setter TargetName="LeftBackground" Property="Source" Value="{StaticResource LeftUnfocused}" />
+                            <Setter TargetName="RightBackground" Property="Source" Value="{StaticResource RightUnfocused}" />
+                            <Setter TargetName="BottomLeftBackground" Property="Source" Value="{StaticResource BottomLeftUnfocused}" />
+                            <Setter TargetName="BottomMiddleBackground" Property="Source" Value="{StaticResource BottomMiddleUnfocused}" />
+                            <Setter TargetName="BottomRightBackground" Property="Source" Value="{StaticResource BottomRightUnfocused}" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Focused" Value="False" />
+                                <Condition SourceName="CloseButton" Property="IsMouseOver" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="CloseButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource CloseNormalUnfocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Focused" Value="False" />
+                                <Condition SourceName="MaximizeButton" Property="IsEnabled" Value="True" />
+                                <Condition SourceName="MaximizeButton" Property="IsMouseOver" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MaximizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MaximizeNormalUnfocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="Focused" Value="False" />
+                                <Condition SourceName="MinimizeButton" Property="IsEnabled" Value="True" />
+                                <Condition SourceName="MinimizeButton" Property="IsMouseOver" Value="False" />
+                                <Condition Property="WindowState" Value="Normal" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="21" Height="21" Source="{StaticResource MinimizeNormalUnfocused}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </MultiTrigger>
+                        <Trigger SourceName="IconImage" Property="Source" Value="{x:Null}">
+                            <Setter TargetName="IconImage" Property="Width" Value="0" />
+                            <Setter TargetName="IconImage" Property="Margin" Value="0" />
+                        </Trigger>
+                        <Trigger Property="WindowState" Value="Minimized">
+                            <Setter TargetName="LeftBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="RightBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="BottomLeftBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="BottomMiddleBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="BottomRightBackground" Property="Visibility" Value="Hidden" />
+                            <Setter Property="Resizable" Value="False" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="WindowState" Value="Minimized" />
+                                <Condition Property="Focused" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="TopLeftBackground" Property="Source" Value="{StaticResource MinimizedTopLeftFocused}" />
+                            <Setter TargetName="TopMiddleBackground" Property="Source" Value="{StaticResource MinimizedTopMiddleFocused}" />
+                            <Setter TargetName="TopRightBackground" Property="Source" Value="{StaticResource MinimizedTopRightFocused}" />
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="WindowState" Value="Minimized" />
+                                <Condition Property="Focused" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="TopLeftBackground" Property="Source" Value="{StaticResource MinimizedTopLeftUnfocused}" />
+                            <Setter TargetName="TopMiddleBackground" Property="Source" Value="{StaticResource MinimizedTopMiddleUnfocused}" />
+                            <Setter TargetName="TopRightBackground" Property="Source" Value="{StaticResource MinimizedTopRightUnfocused}" />
+                        </MultiTrigger>
+                        <Trigger Property="WindowState" Value="Maximized">
+                            <Setter TargetName="TopLeftBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="TopMiddleBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="TopRightBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="LeftBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="RightBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="BottomLeftBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="BottomMiddleBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="BottomRightBackground" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="Header" Property="Visibility" Value="Hidden" />
+                            <Setter TargetName="HeaderContent" Property="Height" Value="21" />
+                            <Setter TargetName="IconImage" Property="Margin" Value="2,0,0,0" />
+                            <Setter TargetName="ContentHost" Property="Margin" Value="0,0,0,0" /> <!-- HERE -->
+                            <Setter TargetName="ContentHost" Property="BorderBrush" Value="{StaticResource ContentHostBackgroundBrush}" />
+                            <Setter TargetName="ContentHost" Property="BorderThickness" Value="1" />
+                            <Setter TargetName="TopBackground" Property="Background" Value="{StaticResource TopBackgroundBrush}" />
+                            <Setter TargetName="TopBackground" Property="BorderBrush" Value="{StaticResource TopBackgroundBorderBrush}" />
+                            <Setter TargetName="TopBackground" Property="BorderThickness" Value="0,0,0,1" />
+                            <Setter TargetName="DragThumb" Property="IsHitTestVisible" Value="False" />
+                            <Setter Property="Resizable" Value="False" />
+                            <Setter TargetName="MinimizeButton" Property="Margin" Value="20,1,1,1" />
+                            <Setter TargetName="MaximizeButton" Property="Margin" Value="1" />
+                            <Setter TargetName="CloseButton" Property="Margin" Value="1" />
+                            <Setter TargetName="MinimizeButton" Property="Width" Value="18" />
+                            <Setter TargetName="MaximizeButton" Property="Width" Value="18" />
+                            <Setter TargetName="CloseButton" Property="Width" Value="18" />
+                            <Setter TargetName="MinimizeButton" Property="Height" Value="19" />
+                            <Setter TargetName="MaximizeButton" Property="Height" Value="19" />
+                            <Setter TargetName="CloseButton" Property="Height" Value="19" />
+                            <Setter TargetName="MinimizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="18" Height="19" Source="{StaticResource MaximizedMinimizeImage}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="MaximizeButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="18" Height="19" Source="{StaticResource MaximizedRestoreImage}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="CloseButton" Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type Button}">
+                                        <Image Width="18" Height="19" Source="{StaticResource MaximizedCloseImage}" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
