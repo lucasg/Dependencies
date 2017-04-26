@@ -4,14 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
+        xmlns:mdi="clr-namespace:WPF.MDI;assembly=WPF.MDI"
         mc:Ignorable="d"
         Title="Dependencies" HorizontalContentAlignment="Stretch" Height="871.458" Width="1044.5" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom">
     <Grid x:Name="MainGrid" Margin="0,0,2,1" Background="#FF5C8F88">
         <Grid.RowDefinitions>
-            <RowDefinition Height="819*"/>
-            <RowDefinition Height="20*"/>
+            <RowDefinition Height="25*"/>
+            <RowDefinition Height="776*"/>
+            <RowDefinition Height="38*"/>
         </Grid.RowDefinitions>
-        <StatusBar x:Name="AppStatusBar" Height="38" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,-1" Grid.RowSpan="2"/>
+        <StatusBar x:Name="AppStatusBar" Height="38" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,-1" Grid.Row="2"/>
+        <Grid x:Name="UserControlGrid" Margin="0,0,0,37" Grid.Row="1" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <mdi:MdiContainer Name="Container"/>
+        </Grid>
         <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" HorizontalContentAlignment="Stretch">
             <MenuItem x:Name="FileItem" Header="File" Height="25" Width="39" AutomationProperties.AccessKey="&amp;File">
                 <MenuItem x:Name="OpenItem" Header="Open" Height="25" AutomationProperties.AccessKey="&amp;Open" AutomationProperties.AcceleratorKey="Ctrl+O" Click="OpenItem_Click"/>
@@ -37,67 +45,5 @@
                 <MenuItem x:Name="HelpAboutItem" Header="About Dependencies" Height="25"/>
             </MenuItem>
         </Menu>
-        <Grid x:Name="ResizeElemGrid" Margin="0,25,0,1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="146*"/>
-                <RowDefinition Height="3*"/>
-                <RowDefinition Height="46*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="385*"/>
-                <ColumnDefinition Width="5*"/>
-                <ColumnDefinition Width="334*"/>
-            </Grid.ColumnDefinitions>
-            <ListView x:Name="ModulesList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="2">
-                <ListView.View>
-                    <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Header="Module" Width="80" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="Target Machine" Width="60" DisplayMemberBinding="{Binding Cpu}"/>
-                        <GridViewColumn Header="Type" Width="60" DisplayMemberBinding="{Binding Type}"/>
-                        <GridViewColumn Header="File Size" Width="40" DisplayMemberBinding="{Binding FileSize}"/>
-                        <GridViewColumn Header="Image Base" Width="200" DisplayMemberBinding="{Binding ImageBase}"/>
-                        <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize}"/>
-                        <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint}"/>
-                        <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem}"/>
-                        <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion}"/>
-                        <GridViewColumn Header="Checksum" Width="100" DisplayMemberBinding="{Binding Checksum}"/>
-                    </GridView>
-                </ListView.View>
-             </ListView>
-            <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
-            <TreeView x:Name="DllTreeView"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0"/>
-            <Grid x:Name="ImportExportGrid" Grid.Column="2">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="145*"/>
-                    <RowDefinition Height="5*"/>
-                    <RowDefinition Height="142*"/>
-                </Grid.RowDefinitions>
-                <ListView x:Name="ImportList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" >
-                    <ListView.View>
-                        <GridView AllowsColumnReorder="true">
-                            <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}"/>
-                            <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}"/>
-                            <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}"/>
-                            <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}"/>
-                            <GridViewColumn Header="Module" Width="100" DisplayMemberBinding="{Binding ModuleName}"/>
-                            <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-                <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
-                    <ListView.View>
-                        <GridView AllowsColumnReorder="true">
-                            <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}"/>
-                            <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}"/>
-                            <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}"/>
-                            <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}"/>
-                            <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress}"/>
-                        </GridView>
-                    </ListView.View>
-                </ListView>
-                <GridSplitter x:Name="ImportExportSplitter" HorizontalAlignment="Stretch" Grid.Row="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" MinHeight="8"/>
-            </Grid>
-            <GridSplitter Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch"/>
-        </Grid>
     </Grid>
 </Window>
