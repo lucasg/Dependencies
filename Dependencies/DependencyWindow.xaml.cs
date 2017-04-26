@@ -78,7 +78,7 @@ public class DisplayPeExport
             return PeInfo.name;
         }
     }
-    public string VirtualAddress { get { return String.Format("{0:x}", PeInfo.virtualAddress); } }
+    public string VirtualAddress { get { return String.Format("0x{0:08x}", PeInfo.virtualAddress); } }
 
 
 
@@ -174,10 +174,10 @@ public class DisplayModuleInfo
             return String.Join("; ", TypeList.ToArray());
         }
     }
-    public string Filesize { get { return String.Format("{0:x}", 0x00); } }
-    public string ImageBase { get { return String.Format("{0:x}", Info.ImageBase); } }
-    public string VirtualSize { get { return String.Format("{0:x}", Info.SizeOfImage); } }
-    public string EntryPoint { get { return String.Format("{0:x}", Info.EntryPoint); } }
+    public string Filesize { get { return String.Format("0x{0:08x}", 0x00); } }
+    public string ImageBase { get { return String.Format("0x{0:08x}", Info.ImageBase); } }
+    public string VirtualSize { get { return String.Format("0x{0:08x}", Info.SizeOfImage); } }
+    public string EntryPoint { get { return String.Format("0x{0:08x}", Info.EntryPoint); } }
     public string Subsystem { get { return String.Format("{0:x}", Info.Subsystem); } }
     public string SubsystemVersion { get { return ""; } }
     public string Checksum

@@ -20,10 +20,10 @@
             <ListView.View>
                 <GridView AllowsColumnReorder="true">
                     <GridViewColumn Header="Module" Width="80" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Target Machine" Width="60" DisplayMemberBinding="{Binding Cpu}"/>
-                    <GridViewColumn Header="Type" Width="60" DisplayMemberBinding="{Binding Type}"/>
-                    <GridViewColumn Header="File Size" Width="40" DisplayMemberBinding="{Binding FileSize}"/>
-                    <GridViewColumn Header="Image Base" Width="200" DisplayMemberBinding="{Binding ImageBase}"/>
+                    <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}"/>
+                    <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Type}"/>
+                    <GridViewColumn Header="File Size" Width="60" DisplayMemberBinding="{Binding FileSize}"/>
+                    <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase}"/>
                     <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize}"/>
                     <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint}"/>
                     <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem}"/>

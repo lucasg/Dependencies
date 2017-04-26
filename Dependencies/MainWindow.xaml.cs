@@ -30,7 +30,7 @@ namespace Dependencies
             InitializeComponent();
         }
 
-        private void OpenItem_Click(object sender, RoutedEventArgs e)
+        private void OpenCommandBinding_Executed(object sender, RoutedEventArgs e)
         {
             OpenFileDialog InputFileNameDlg = new OpenFileDialog();
             InputFileNameDlg.Filter = "exe files (*.exe, *.dll)| *.exe;*.dll; | All files (*.*)|*.*";
@@ -53,7 +53,12 @@ namespace Dependencies
 
         }
 
-
+        private void ExitCommandBinding_Executed(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
         
+
+
     }
 }

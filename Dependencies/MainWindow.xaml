@@ -7,43 +7,57 @@
         xmlns:mdi="clr-namespace:WPF.MDI;assembly=WPF.MDI"
         mc:Ignorable="d"
         Title="Dependencies" HorizontalContentAlignment="Stretch" Height="871.458" Width="1044.5" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom">
+    <Window.CommandBindings>
+        <!--<CommandBinding Command="Exit" Executed="ExitCommandBinding_Executed"></CommandBinding>-->
+        <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
+        <CommandBinding Command="Close" Executed="ExitCommandBinding_Executed"></CommandBinding>
+    </Window.CommandBindings>
+    
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Control" Command="Open"></KeyBinding>
+        <KeyBinding Key="Q" Modifiers="Control" Command="Close"></KeyBinding>
+    </Window.InputBindings>
     <Grid x:Name="MainGrid" Margin="0,0,2,1" Background="#FF5C8F88">
         <Grid.RowDefinitions>
             <RowDefinition Height="25*"/>
             <RowDefinition Height="776*"/>
             <RowDefinition Height="38*"/>
         </Grid.RowDefinitions>
-        <StatusBar x:Name="AppStatusBar" Height="38" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,-1" Grid.Row="2"/>
-        <Grid x:Name="UserControlGrid" Margin="0,0,0,37" Grid.Row="1" Grid.RowSpan="2">
+        
+        <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" HorizontalContentAlignment="Stretch">
+            <MenuItem x:Name="FileItem" Header="_File" Height="25" Width="39">
+                <MenuItem x:Name="OpenItem" Header="_Open" Height="25" Command="Open" InputGestureText="Ctrl+O"/>
+                <Separator Height="3"/>
+                <MenuItem x:Name="RecentItem" Header="Recents" Height="100"/>
+                <Separator Height="3" Margin="-1,0,0,0"/>
+                <MenuItem x:Name="ExitItem" Header="E_xit" Height="25"  InputGestureText="Ctrl+Q" Command="Close"/>
+                
+            </MenuItem>
+            <MenuItem x:Name="ViewItem" Header="_View" Height="25" Width="42">
+                <MenuItem x:Name="_SystemInformation" Header="System Information ..." Height="25" />
+                <Separator Height="3" Margin="0"/>
+                <MenuItem x:Name="_AutoExpandItem" Header="Auto Expand" Height="25" InputGestureText="F8" Margin="0"/>
+                <Separator Height="3" Margin="0"/>
+                <MenuItem x:Name="_FullPathItem" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="True" Margin="0,0,0.2,0"/>
+                <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True"/>
+                <Separator Height="3" Margin="0"/>
+                <MenuItem x:Name="_StatusBarItem" Header="Status Bar" Height="25" IsChecked="True" IsCheckable="True" Margin="0"/>
+            </MenuItem>
+            <MenuItem x:Name="OptionsItem" Header="_Options" Height="25" Width="54">
+                <MenuItem x:Name="ConfModuleItem" Header="Configure _Module search order" Height="25" Margin="0" AutomationProperties.AccessKey="Configure Module &amp;search order"/>
+            </MenuItem>
+            <MenuItem x:Name="HelpIem" Header="_Help" Height="25" Width="49">
+                <MenuItem x:Name="HelpAboutItem" Header="About Dependencies" Height="25"/>
+            </MenuItem>
+        </Menu>
+
+        <Grid x:Name="UserControlGrid" Margin="0,0,0,16" Grid.Row="1" Grid.RowSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <mdi:MdiContainer Name="Container"/>
         </Grid>
-        <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" HorizontalContentAlignment="Stretch">
-            <MenuItem x:Name="FileItem" Header="File" Height="25" Width="39" AutomationProperties.AccessKey="&amp;File">
-                <MenuItem x:Name="OpenItem" Header="Open" Height="25" AutomationProperties.AccessKey="&amp;Open" AutomationProperties.AcceleratorKey="Ctrl+O" Click="OpenItem_Click"/>
-                <Separator Height="3"/>
-                <MenuItem x:Name="RecentItem" Header="Recents" Height="100"/>
-                <Separator Height="3" Margin="-1,0,0,0"/>
-                <MenuItem x:Name="ExitItem" Header="Exit" Height="20" AutomationProperties.AccessKey="E&amp;xit"/>
-            </MenuItem>
-            <MenuItem x:Name="ViewItem" Header="View" Height="25" Width="42" AutomationProperties.AccessKey="&amp;View">
-                <MenuItem x:Name="SystemInformation" Header="System Information ..." Height="25" />
-                <Separator Height="3" Margin="0"/>
-                <MenuItem x:Name="AutoExpandItem" Header="Auto Expand" Height="25" AutomationProperties.AcceleratorKey="F8" Margin="0"/>
-                <Separator Height="3" Margin="0"/>
-                <MenuItem x:Name="FullPathItem" Header="Full Paths" Height="25" AutomationProperties.AcceleratorKey="F9" IsCheckable="True" IsChecked="True" Margin="0,0,0.2,0"/>
-                <MenuItem Header="Undecorate C++ Functions" Height="26" AutomationProperties.AcceleratorKey="F10" IsCheckable="True"/>
-                <Separator Height="3" Margin="0"/>
-                <MenuItem x:Name="StatusBarItem" Header="Status Bar" Height="25" IsChecked="True" IsCheckable="True" Margin="0"/>
-            </MenuItem>
-            <MenuItem x:Name="OptionsItem" Header="Options" Height="25" Width="54" AutomationProperties.AccessKey="&amp;Options">
-                <MenuItem x:Name="ConfModuleItem" Header="Configure Module search order" Height="25" Margin="0" AutomationProperties.AccessKey="Configure Module &amp;search order"/>
-            </MenuItem>
-            <MenuItem x:Name="HelpIem" Header="Help" Height="25" Width="49" AutomationProperties.AccessKey="&amp;Help">
-                <MenuItem x:Name="HelpAboutItem" Header="About Dependencies" Height="25"/>
-            </MenuItem>
-        </Menu>
+
+        <StatusBar x:Name="AppStatusBar" Height="16" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,0" Grid.Row="2"/>
     </Grid>
 </Window>
