@@ -74,6 +74,7 @@
     <Compile Include="DependencyWindow.xaml.cs">
       <DependentUpon>DependencyWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="GridViewSort.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -114,6 +115,10 @@
       <Project>{be1ed569-5e0b-4df0-8964-33ad2aae4c4a}</Project>
       <Name>WPF.MDI</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\GlyphSortAscending.png" />
+    <Resource Include="Images\GlyphSortDescending.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

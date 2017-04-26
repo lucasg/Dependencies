@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
+        xmlns:util="clr-namespace:Wpf.Util"
         mc:Ignorable="d" Height="515.5" Width="968">
     <Grid x:Name="ResizeElemGrid" Margin="0,0,0,0">
         <Grid.RowDefinitions>
@@ -16,19 +17,19 @@
             <ColumnDefinition Width="5*"/>
             <ColumnDefinition Width="334*"/>
         </Grid.ColumnDefinitions>
-        <ListView x:Name="ModulesList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="2">
+        <ListView x:Name="ModulesList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="2" util:GridViewSort.AutoSort="True">
             <ListView.View>
                 <GridView AllowsColumnReorder="true">
-                    <GridViewColumn Header="Module" Width="80" DisplayMemberBinding="{Binding Name}"/>
-                    <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}"/>
-                    <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Type}"/>
-                    <GridViewColumn Header="File Size" Width="60" DisplayMemberBinding="{Binding FileSize}"/>
-                    <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase}"/>
-                    <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize}"/>
-                    <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint}"/>
-                    <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem}"/>
-                    <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion}"/>
-                    <GridViewColumn Header="Checksum" Width="100" DisplayMemberBinding="{Binding Checksum}"/>
+                    <GridViewColumn Header="Module" Width="80" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
+                    <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}" util:GridViewSort.PropertyName="Cpu"/>
+                    <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Type}" util:GridViewSort.PropertyName="Type"/>
+                    <GridViewColumn Header="File Size" Width="60" DisplayMemberBinding="{Binding FileSize}" util:GridViewSort.PropertyName="FileSize"/>
+                    <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase}" util:GridViewSort.PropertyName="ImageBase"/>
+                    <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize}" util:GridViewSort.PropertyName="VirtualSize"/>
+                    <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint}" util:GridViewSort.PropertyName="EntryPoint"/>
+                    <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem}" util:GridViewSort.PropertyName="Subsystem"/>
+                    <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion}" util:GridViewSort.PropertyName="SubsystemVersion"/>
+                    <GridViewColumn Header="Checksum" Width="100" DisplayMemberBinding="{Binding Checksum}" util:GridViewSort.PropertyName="Checksum"/>
                 </GridView>
             </ListView.View>
         </ListView>
@@ -40,26 +41,26 @@
                 <RowDefinition Height="5*"/>
                 <RowDefinition Height="142*"/>
             </Grid.RowDefinitions>
-            <ListView x:Name="ImportList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" >
+            <ListView x:Name="ImportList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" util:GridViewSort.AutoSort="True">
                 <ListView.View>
                     <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}"/>
-                        <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}"/>
-                        <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}"/>
-                        <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="Module" Width="100" DisplayMemberBinding="{Binding ModuleName}"/>
-                        <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}"/>
+                        <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}" util:GridViewSort.PropertyName="Index"/>
+                        <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}" util:GridViewSort.PropertyName="Ordinal"/>
+                        <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}" util:GridViewSort.PropertyName="Hint"/>
+                        <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
+                        <GridViewColumn Header="Module" Width="100" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName"/>
+                        <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}" util:GridViewSort.PropertyName="DelayImport"/>
                     </GridView>
                 </ListView.View>
             </ListView>
-            <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+            <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" util:GridViewSort.AutoSort="True" util:GridViewSort.SortGlyphAscending="Images/GlyphSortAscending.png" util:GridViewSort.SortGlyphDescending="Images/GlyphSortDescending.png">
                 <ListView.View>
                     <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}"/>
-                        <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}"/>
-                        <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}"/>
-                        <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}"/>
-                        <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress}"/>
+                        <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}" util:GridViewSort.PropertyName="Index"/>
+                        <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}" util:GridViewSort.PropertyName="Ordinal"/>
+                        <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}" util:GridViewSort.PropertyName="Hint"/>
+                        <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
+                        <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress}" util:GridViewSort.PropertyName="VirtualAddress"/>
                     </GridView>
                 </ListView.View>
             </ListView>
