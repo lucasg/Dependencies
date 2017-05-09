@@ -233,11 +233,48 @@ namespace Dependencies
             Width = double.NaN;
             Height = double.NaN;
 
-            //this.Title = FileName;
-
+            
+            int i = 0;
             this.Pe = new PE(FileName);
-            List<PeExport> PeExports = Pe.GetExports();
             List<PeImportDll> PeImports = this.Pe.GetImports();
+
+            this.ModulesList.Items.Clear();
+            this.DllTreeView.Items.Clear();
+            TreeViewItem treeNode = new TreeViewItem();
+            treeNode.Header = FileName;
+            treeNode.DataContext = this.Pe;
+
+            i = 0;
+            foreach (PeImportDll DllImport in PeImports)
+            {
+                // Find Dll in "paths"
+                PE ImportPe = new PE("C:\\Windows\\System32\\" + DllImport.Name);
+
+                if (ImportPe.LoadSuccessful)
+                {
+                    this.ModulesList.Items.Add(new DisplayModuleInfo(i, DllImport, ImportPe.Properties));
+                }
+
+
+                // Add to tree view
+                TreeViewItem childTreeNode = new TreeViewItem();
+                childTreeNode.Header = DllImport.Name;
+                childTreeNode.DataContext = ImportPe;
+                treeNode.Items.Add(childTreeNode);
+                
+
+                // 
+                i++;
+            }
+
+            this.DllTreeView.Items.Add(treeNode);
+        }
+
+        private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            PE SelectedPE = (PE) ((TreeViewItem) this.DllTreeView.SelectedItem).DataContext;
+            List<PeExport> PeExports = SelectedPE.GetExports();
+            List<PeImportDll> PeImports = SelectedPE.GetImports();
 
 
             this.ImportList.Items.Clear();
@@ -259,34 +296,6 @@ namespace Dependencies
                 this.ExportList.Items.Add(new DisplayPeExport(i, Export));
                 i++;
             }
-
-            this.ModulesList.Items.Clear();
-            this.DllTreeView.Items.Clear();
-            TreeViewItem treeNode = new TreeViewItem();
-            treeNode.Header = FileName;
-
-            i = 0;
-            foreach (PeImportDll DllImport in PeImports)
-            {
-                // Find Dll in "paths"
-                PE ImportPe = new PE("C:\\Windows\\System32\\" + DllImport.Name);
-
-                if (ImportPe.LoadSuccessful)
-                {
-                    this.ModulesList.Items.Add(new DisplayModuleInfo(i, DllImport, ImportPe.Properties));
-                }
-
-
-                // Add to tree view
-                TreeViewItem childTreeNode = new TreeViewItem();
-                childTreeNode.Header = DllImport.Name;
-                treeNode.Items.Add(childTreeNode);
-
-                // 
-                i++;
-            }
-
-            this.DllTreeView.Items.Add(treeNode);
         }
     }
 }

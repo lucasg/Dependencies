@@ -34,7 +34,7 @@
             </ListView.View>
         </ListView>
         <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
-        <TreeView x:Name="DllTreeView"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0"/>
+        <TreeView x:Name="DllTreeView"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0" SelectedItemChanged="OnTreeViewSelectedItemChanged"/>
         <Grid x:Name="ImportExportGrid" Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="145*"/>
