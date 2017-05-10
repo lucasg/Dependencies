@@ -332,7 +332,7 @@ namespace Dependencies
             if (Filename == null)
                 return null;
 
-            Icon icon = ExtractIcon.GetIcon(Filename, false);
+            Icon icon = ExtractIcon.GetIcon(Filename, true);
 
             if (icon != null)
             {

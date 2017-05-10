@@ -45,7 +45,7 @@
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
                                     <!--<Image Width="25" Height="15" Source="{Binding Path=Tag,RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor},Converter={StaticResource img}}"></Image>-->
-                                    <Image Width="25" Height="15" Source="{Binding  Path=Header,RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor},Converter={StaticResource img} }"></Image>
+                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding  Path=Header,RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor},Converter={StaticResource img} }"></Image>
                                     <TextBlock Text="{Binding}"></TextBlock>
                                 </StackPanel>
                             </DataTemplate>
