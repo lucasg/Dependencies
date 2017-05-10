@@ -6,6 +6,9 @@
         xmlns:local="clr-namespace:Dependencies"
         xmlns:util="clr-namespace:Wpf.Util"
         mc:Ignorable="d" Height="515.5" Width="968">
+    <UserControl.Resources>
+        <local:ImageToHeaderConverter x:Key="img"/>
+    </UserControl.Resources>
     <Grid x:Name="ResizeElemGrid" Margin="0,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="146*"/>
@@ -34,7 +37,23 @@
             </ListView.View>
         </ListView>
         <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
-        <TreeView x:Name="DllTreeView"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0" SelectedItemChanged="OnTreeViewSelectedItemChanged"/>
+        <TreeView x:Name="DllTreeView"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0" SelectedItemChanged="OnTreeViewSelectedItemChanged">
+            <TreeView.Resources>
+                <Style TargetType="TreeViewItem">
+                    <Setter Property="HeaderTemplate">
+                        <Setter.Value>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <!--<Image Width="25" Height="15" Source="{Binding Path=Tag,RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor},Converter={StaticResource img}}"></Image>-->
+                                    <Image Width="25" Height="15" Source="{Binding  Path=Header,RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor},Converter={StaticResource img} }"></Image>
+                                    <TextBlock Text="{Binding}"></TextBlock>
+                                </StackPanel>
+                            </DataTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </TreeView.Resources>
+        </TreeView>
         <Grid x:Name="ImportExportGrid" Grid.Column="2">
             <Grid.RowDefinitions>
                 <RowDefinition Height="145*"/>
