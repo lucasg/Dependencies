@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WPF.MDI;
+using System.ClrPh;
 
 namespace Dependencies
 {
@@ -27,7 +28,9 @@ namespace Dependencies
     {
         public MainWindow()
         {
+            Phlib.InitializePhLib();
             InitializeComponent();
+            
         }
 
         private void OpenCommandBinding_Executed(object sender, RoutedEventArgs e)

@@ -77,7 +77,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);_PHLIB_</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_PHLIB_;_LIB;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <CallingConvention>StdCall</CallingConvention>
       <AdditionalIncludeDirectories>$(ProjectDir)phnt\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -93,7 +93,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);_PHLIB_</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_PHLIB_;_LIB;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <CallingConvention>StdCall</CallingConvention>
       <AdditionalIncludeDirectories>$(ProjectDir)phnt\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -101,6 +101,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>UxTheme.lib;Aclui.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -111,7 +112,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);_PHLIB_</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_PHLIB_;_LIB;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <CallingConvention>StdCall</CallingConvention>
       <AdditionalIncludeDirectories>$(ProjectDir)phnt\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -130,7 +131,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);_PHLIB_</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_PHLIB_;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <CallingConvention>StdCall</CallingConvention>
       <AdditionalIncludeDirectories>$(ProjectDir)phnt\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -139,6 +140,7 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>UxTheme.lib;Aclui.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

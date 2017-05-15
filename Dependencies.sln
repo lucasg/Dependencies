@@ -11,6 +11,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "phlib", "phlib\phlib.vcxproj", "{39C57BE1-23E6-4DB4-A4A5-8F0FD994445B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClrPhlib", "ClrPhlib\ClrPhlib.vcxproj", "{FC5FFCAF-982F-4A95-8FA6-2A95B1F7CDC8}"
+	ProjectSection(ProjectDependencies) = postProject
+		{39C57BE1-23E6-4DB4-A4A5-8F0FD994445B} = {39C57BE1-23E6-4DB4-A4A5-8F0FD994445B}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClrPhTester", "ClrPhTester\ClrPhTester.csproj", "{5565A612-B250-4FE0-98DD-07C56916C194}"
 EndProject

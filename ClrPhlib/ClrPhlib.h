@@ -4,6 +4,7 @@
 
 #include <ph.h>
 #include <mapimg.h>
+#include <symprv.h>
 
 #using <System.dll>  
 
@@ -31,6 +32,14 @@ public:
 
 private:
     bool            m_bImageLoaded;
+};
+
+class UnmanagedSymPrv {
+public :
+
+	static UnmanagedSymPrv* Create();
+
+	PPH_SYMBOL_PROVIDER m_SymbolProvider;
 };
 
 namespace ClrPh {
@@ -130,6 +139,20 @@ namespace ClrPh {
 
     private:
         UnmanagedPE * m_Impl;
+	};
+
+	public ref class PhSymbolProvider
+	{
+	public:
+		PhSymbolProvider();
+		~PhSymbolProvider();
+		!PhSymbolProvider();
+
+		String^ UndecorateName(_In_ String ^DecoratedName);
+
+	private:
+		UnmanagedSymPrv *m_Impl;
+
 	};
 }
 

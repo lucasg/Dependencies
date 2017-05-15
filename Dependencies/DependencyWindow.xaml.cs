@@ -15,43 +15,65 @@ using System.ClrPh;
 using System.Drawing;
 using System.Runtime.InteropServices;
 
+
+
+
 public class DisplayPeImport
 {
-    public DisplayPeImport(int Index, PeImport PeImport)
+    public DisplayPeImport(
+        /*_In_*/ int Index,
+        /*_In_*/ PeImport PeImport,
+        /*_In_*/ PhSymbolProvider SymPrv
+    )
     {
-        Info.index = Index;
-        Info.ordinal = PeImport.Ordinal;
-        Info.hint = PeImport.Hint;
-        Info.name = PeImport.Name;
-        Info.moduleName = PeImport.ModuleName;
-        Info.delayedImport = PeImport.DelayImport;
+       Info.index = Index;
+       Info.ordinal = PeImport.Ordinal;
+       Info.hint = PeImport.Hint;
+       Info.name = PeImport.Name;
+       Info.moduleName = PeImport.ModuleName;
+       Info.delayedImport = PeImport.DelayImport;
 
+        if (PeImport.Name[0] == '?')
+            Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
+        else
+            Info.UndecoratedName = "";
     }
 
-    public int Index { get { return Info.index; } }
-    public int Hint { get { return Info.hint; } }
-    public int Ordinal { get { return Info.ordinal; } }
-    public string Name { get { return Info.name; } }
-    public string ModuleName { get { return Info.moduleName; } }
-    public Boolean DelayImport { get { return Info.delayedImport; } }
+   public int Index { get { return Info.index; } }
+   public int Hint { get { return Info.hint; } }
+   public int Ordinal { get { return Info.ordinal; } }
+   public string Name { get {
 
-    private
-        PeImportInfo Info;
+            if (Info.UndecoratedName.Length > 0)
+                return Info.UndecoratedName;
+
+            return Info.name;
+    } }
+   public string ModuleName { get { return Info.moduleName; } }
+   public Boolean DelayImport { get { return Info.delayedImport; } }
+
+   private
+       PeImportInfo Info;
 }
 
 public struct PeImportInfo
 {
-    public int index;
-    public int ordinal;
-    public int hint;
-    public string name;
-    public string moduleName;
-    public Boolean delayedImport;
+   public int index;
+   public int ordinal;
+   public int hint;
+   public string name;
+   public string moduleName;
+   public Boolean delayedImport;
+   public string UndecoratedName;
 }
 
 public class DisplayPeExport
 {
-    public DisplayPeExport(int Index, PeExport PeExport)
+   public DisplayPeExport(
+       /*_In_*/ int Index,
+        /*_In_*/ PeExport PeExport,
+        /*_In_*/ PhSymbolProvider SymPrv
+    )
     {
         PeInfo.index = Index;
         PeInfo.ordinal = PeExport.Ordinal;
@@ -61,6 +83,11 @@ public class DisplayPeExport
         PeInfo.exportByOrdinal = PeExport.ExportByOrdinal;
         PeInfo.forwardedExport = PeExport.ForwardedName.Length > 0;
         PeInfo.virtualAddress = PeExport.VirtualAddress;
+
+        if (PeExport.Name[0] == '?')
+            PeInfo.UndecoratedName = SymPrv.UndecorateName(PeExport.Name);
+        else
+            PeInfo.UndecoratedName = "";
     }
 
     public int Index { get { return PeInfo.index; } }
@@ -70,12 +97,15 @@ public class DisplayPeExport
     {
         get
         {
-
             if (PeInfo.forwardedExport)
                 return PeInfo.ForwardName;
 
             if (PeInfo.exportByOrdinal)
                 return String.Format("Ordinal_{0:d}", PeInfo.ordinal);
+
+
+            if (PeInfo.UndecoratedName.Length > 0)
+                return PeInfo.UndecoratedName;
 
             return PeInfo.name;
         }
@@ -98,6 +128,7 @@ public struct PeExportInfo
     public long virtualAddress;
     public string name;
     public string ForwardName;
+    public string UndecoratedName;
 }
 
 [Flags]
@@ -176,10 +207,10 @@ public class DisplayModuleInfo
             return String.Join("; ", TypeList.ToArray());
         }
     }
-    public string Filesize { get { return String.Format("0x{0:08x}", 0x00); } }
-    public string ImageBase { get { return String.Format("0x{0:08x}", Info.ImageBase); } }
-    public string VirtualSize { get { return String.Format("0x{0:08x}", Info.SizeOfImage); } }
-    public string EntryPoint { get { return String.Format("0x{0:08x}", Info.EntryPoint); } }
+    public string Filesize { get { return String.Format("0x{0:x8}", 0x00); } }
+    public string ImageBase { get { return String.Format("0x{0:x8}", Info.ImageBase); } }
+    public string VirtualSize { get { return String.Format("0x{0:x8}", Info.SizeOfImage); } }
+    public string EntryPoint { get { return String.Format("0x{0:x8}", Info.EntryPoint); } }
     public string Subsystem { get { return String.Format("{0:x}", Info.Subsystem); } }
     public string SubsystemVersion { get { return ""; } }
     public string Checksum
@@ -358,7 +389,7 @@ namespace Dependencies
     public partial class DependencyWindow : UserControl
     {
         PE Pe;
-
+        PhSymbolProvider SymPrv;
 
         public DependencyWindow(String FileName)
         {
@@ -369,6 +400,7 @@ namespace Dependencies
             
             int i = 0;
             this.Pe = new PE(FileName);
+            this.SymPrv = new PhSymbolProvider();
             List<PeImportDll> PeImports = this.Pe.GetImports();
 
             this.ModulesList.Items.Clear();
@@ -418,7 +450,7 @@ namespace Dependencies
             {
                 foreach (PeImport Import in DllImport.ImportList)
                 {
-                    this.ImportList.Items.Add(new DisplayPeImport(i, Import));
+                    this.ImportList.Items.Add(new DisplayPeImport(i, Import, SymPrv));
                     i++;
                 }
             }
@@ -426,7 +458,7 @@ namespace Dependencies
             i = 0;
             foreach (PeExport Export in PeExports)
             {
-                this.ExportList.Items.Add(new DisplayPeExport(i, Export));
+                this.ExportList.Items.Add(new DisplayPeExport(i, Export, SymPrv));
                 i++;
             }
         }
