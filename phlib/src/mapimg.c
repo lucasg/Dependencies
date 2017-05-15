@@ -3,6 +3,7 @@
  *   mapped image
  *
  * Copyright (C) 2010 wj32
+ * Copyright (C) 2017 dmex
  *
  * This file is part of Process Hacker.
  *
@@ -29,8 +30,6 @@
 
 #include <ph.h>
 #include <mapimg.h>
-
-#include <delayimp.h>
 
 VOID PhpMappedImageProbe(
     _In_ PPH_MAPPED_IMAGE MappedImage,
@@ -658,7 +657,7 @@ NTSTATUS PhGetMappedImageExportEntry(
     Entry->Ordinal = (USHORT)Index + (USHORT)Exports->ExportDirectory->Base;
 
     // look into named exports ordinal list.
-    for (nameIndex = 0; nameIndex  < Exports->ExportDirectory->NumberOfNames; nameIndex++)
+    for (nameIndex = 0; nameIndex < Exports->ExportDirectory->NumberOfNames; nameIndex++)
     {
         if (Index == Exports->OrdinalTable[nameIndex])
         {
@@ -741,13 +740,8 @@ NTSTATUS PhGetMappedImageExportFunction(
     }
     else
     {
-        Function->Function = (ULONG_PTR) rva;
-/*        Function->Function = PhMappedImageRvaToVa(
-            Exports->MappedImage,
-            rva,
-            NULL
-            );
-*/        Function->ForwardedName = NULL;
+        Function->Function = UlongToPtr(rva);
+        Function->ForwardedName = NULL;
     }
 
     return STATUS_SUCCESS;
@@ -952,11 +946,11 @@ NTSTATUS PhGetMappedImageImportDll(
     }
     else
     {
-        ImportDll->DelayDescriptor = &((PImgDelayDescr)Imports->DelayDescriptorTable)[Index];
+        ImportDll->DelayDescriptor = &Imports->DelayDescriptorTable[Index];
 
         ImportDll->Name = PhMappedImageRvaToVa(
             ImportDll->MappedImage,
-            ((PImgDelayDescr)ImportDll->DelayDescriptor)->rvaDLLName,
+            ImportDll->DelayDescriptor->DllNameRVA,
             NULL
             );
 
@@ -967,7 +961,7 @@ NTSTATUS PhGetMappedImageImportDll(
 
         ImportDll->LookupTable = PhMappedImageRvaToVa(
             ImportDll->MappedImage,
-            ((PImgDelayDescr)ImportDll->DelayDescriptor)->rvaINT,
+            ImportDll->DelayDescriptor->ImportNameTableRVA,
             NULL
             );
     }
@@ -981,21 +975,17 @@ NTSTATUS PhGetMappedImageImportDll(
 
     if (ImportDll->MappedImage->Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
     {
-        PULONG entry;
+        PIMAGE_THUNK_DATA32 entry;
 
-        entry = (PULONG)ImportDll->LookupTable;
+        entry = (PIMAGE_THUNK_DATA32)ImportDll->LookupTable;
 
         __try
         {
             while (TRUE)
             {
-                PhpMappedImageProbe(
-                    ImportDll->MappedImage,
-                    entry,
-                    sizeof(ULONG)
-                    );
+                PhpMappedImageProbe(ImportDll->MappedImage, entry, sizeof(IMAGE_THUNK_DATA32));
 
-                if (*entry == 0)
+                if (entry->u1.AddressOfData == 0)
                     break;
 
                 entry++;
@@ -1009,21 +999,17 @@ NTSTATUS PhGetMappedImageImportDll(
     }
     else if (ImportDll->MappedImage->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
     {
-        PULONG64 entry;
+        PIMAGE_THUNK_DATA64 entry;
 
-        entry = (PULONG64)ImportDll->LookupTable;
+        entry = (PIMAGE_THUNK_DATA64)ImportDll->LookupTable;
 
         __try
         {
             while (TRUE)
             {
-                PhpMappedImageProbe(
-                    ImportDll->MappedImage,
-                    entry,
-                    sizeof(ULONG64)
-                    );
+                PhpMappedImageProbe(ImportDll->MappedImage, entry, sizeof(IMAGE_THUNK_DATA64));
 
-                if (*entry == 0)
+                if (entry->u1.AddressOfData == 0)
                     break;
 
                 entry++;
@@ -1058,15 +1044,15 @@ NTSTATUS PhGetMappedImageImportEntry(
 
     if (ImportDll->MappedImage->Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
     {
-        ULONG entry;
+        IMAGE_THUNK_DATA32 entry;
 
-        entry = ((PULONG)ImportDll->LookupTable)[Index];
+        entry = ((PIMAGE_THUNK_DATA32)ImportDll->LookupTable)[Index];
 
         // Is this entry using an ordinal?
-        if (entry & IMAGE_ORDINAL_FLAG32)
+        if (IMAGE_SNAP_BY_ORDINAL32(entry.u1.Ordinal))
         {
             Entry->Name = NULL;
-            Entry->Ordinal = (USHORT)IMAGE_ORDINAL32(entry);
+            Entry->Ordinal = (USHORT)IMAGE_ORDINAL32(entry.u1.Ordinal);
 
             return STATUS_SUCCESS;
         }
@@ -1074,22 +1060,22 @@ NTSTATUS PhGetMappedImageImportEntry(
         {
             importByName = PhMappedImageRvaToVa(
                 ImportDll->MappedImage,
-                entry,
+                entry.u1.AddressOfData,
                 NULL
                 );
         }
     }
     else if (ImportDll->MappedImage->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
     {
-        ULONG64 entry;
+        IMAGE_THUNK_DATA64 entry;
 
-        entry = ((PULONG64)ImportDll->LookupTable)[Index];
+        entry = ((PIMAGE_THUNK_DATA64)ImportDll->LookupTable)[Index];
 
         // Is this entry using an ordinal?
-        if (entry & IMAGE_ORDINAL_FLAG64)
+        if (IMAGE_SNAP_BY_ORDINAL64(entry.u1.Ordinal))
         {
             Entry->Name = NULL;
-            Entry->Ordinal = (USHORT)IMAGE_ORDINAL64(entry);
+            Entry->Ordinal = (USHORT)IMAGE_ORDINAL64(entry.u1.Ordinal);
 
             return STATUS_SUCCESS;
         }
@@ -1097,7 +1083,7 @@ NTSTATUS PhGetMappedImageImportEntry(
         {
             importByName = PhMappedImageRvaToVa(
                 ImportDll->MappedImage,
-                (ULONG)entry,
+                (ULONG)entry.u1.AddressOfData,
                 NULL
                 );
         }
@@ -1112,11 +1098,7 @@ NTSTATUS PhGetMappedImageImportEntry(
 
     __try
     {
-        PhpMappedImageProbe(
-            ImportDll->MappedImage,
-            importByName,
-            sizeof(IMAGE_IMPORT_BY_NAME)
-            );
+        PhpMappedImageProbe(ImportDll->MappedImage, importByName, sizeof(IMAGE_IMPORT_BY_NAME));
     }
     __except (EXCEPTION_EXECUTE_HANDLER)
     {
@@ -1138,7 +1120,7 @@ NTSTATUS PhGetMappedImageDelayImports(
 {
     NTSTATUS status;
     PIMAGE_DATA_DIRECTORY dataDirectory;
-    PImgDelayDescr descriptor;
+    PIMAGE_DELAYLOAD_DESCRIPTOR descriptor;
     ULONG i;
 
     Imports->MappedImage = MappedImage;
@@ -1172,9 +1154,9 @@ NTSTATUS PhGetMappedImageDelayImports(
     {
         while (TRUE)
         {
-            PhpMappedImageProbe(MappedImage, descriptor, sizeof(ImgDelayDescr));
+            PhpMappedImageProbe(MappedImage, descriptor, sizeof(PIMAGE_DELAYLOAD_DESCRIPTOR));
 
-            if (descriptor->rvaIAT == 0 && descriptor->rvaINT == 0)
+            if (descriptor->ImportAddressTableRVA == 0 && descriptor->ImportNameTableRVA == 0)
                 break;
 
             descriptor++;
@@ -1232,7 +1214,7 @@ ULONG PhCheckSumMappedImage(
     return checkSum;
 }
 
-NTSTATUS PhGetMappedImageCfg(
+NTSTATUS PhGetMappedImageCfg64(
     _Out_ PPH_MAPPED_IMAGE_CFG CfgConfig,
     _In_ PPH_MAPPED_IMAGE MappedImage
     )
@@ -1263,7 +1245,7 @@ NTSTATUS PhGetMappedImageCfg(
     CfgConfig->NumberOfGuardFunctionEntries = config64->GuardCFFunctionCount;
     CfgConfig->GuardFunctionTable = PhMappedImageRvaToVa(
         MappedImage,
-        (ULONG)(config64->GuardCFFunctionTable - MappedImage->NtHeaders->OptionalHeader.ImageBase),
+        (ULONG)(ULONG_PTR)PTR_SUB_OFFSET(config64->GuardCFFunctionTable, MappedImage->NtHeaders->OptionalHeader.ImageBase),
         NULL
         );
 
@@ -1295,7 +1277,7 @@ NTSTATUS PhGetMappedImageCfg(
         CfgConfig->NumberOfGuardAdressIatEntries = config64->GuardAddressTakenIatEntryCount;
         CfgConfig->GuardAdressIatTable = PhMappedImageRvaToVa(
             MappedImage,
-            (ULONG)(config64->GuardAddressTakenIatEntryTable - MappedImage->NtHeaders->OptionalHeader.ImageBase),
+            (ULONG)(ULONG_PTR)PTR_SUB_OFFSET(config64->GuardAddressTakenIatEntryTable, MappedImage->NtHeaders->OptionalHeader.ImageBase),
             NULL
             );
 
@@ -1307,7 +1289,7 @@ NTSTATUS PhGetMappedImageCfg(
                     MappedImage,
                     CfgConfig->GuardAdressIatTable,
                     (SIZE_T)(CfgConfig->EntrySize * CfgConfig->NumberOfGuardAdressIatEntries)
-                );
+                    );
             }
             __except (EXCEPTION_EXECUTE_HANDLER)
             {
@@ -1328,7 +1310,7 @@ NTSTATUS PhGetMappedImageCfg(
         CfgConfig->NumberOfGuardLongJumpEntries = config64->GuardLongJumpTargetCount;
         CfgConfig->GuardLongJumpTable = PhMappedImageRvaToVa(
             MappedImage,
-            (ULONG)(config64->GuardLongJumpTargetTable - MappedImage->NtHeaders->OptionalHeader.ImageBase),
+            (ULONG)(ULONG_PTR)PTR_SUB_OFFSET(config64->GuardLongJumpTargetTable, MappedImage->NtHeaders->OptionalHeader.ImageBase),
             NULL
             );
 
@@ -1350,6 +1332,141 @@ NTSTATUS PhGetMappedImageCfg(
     }
 
     return STATUS_SUCCESS;
+}
+
+NTSTATUS PhGetMappedImageCfg32(
+    _Out_ PPH_MAPPED_IMAGE_CFG CfgConfig,
+    _In_ PPH_MAPPED_IMAGE MappedImage
+    )
+{
+    NTSTATUS status;
+    PIMAGE_LOAD_CONFIG_DIRECTORY32 config32;
+
+    if (!NT_SUCCESS(status = PhGetMappedImageLoadConfig32(MappedImage, &config32)))
+        return status;
+    
+    // Not every load configuration defines CFG characteristics
+    if (config32->Size < (ULONG)FIELD_OFFSET(IMAGE_LOAD_CONFIG_DIRECTORY32, GuardFlags))
+        return STATUS_INVALID_VIEW_SIZE;
+
+    CfgConfig->MappedImage = MappedImage;
+    CfgConfig->EntrySize = sizeof(FIELD_OFFSET(IMAGE_CFG_ENTRY, Rva)) +
+        (ULONG)((config32->GuardFlags & IMAGE_GUARD_CF_FUNCTION_TABLE_SIZE_MASK) >> IMAGE_GUARD_CF_FUNCTION_TABLE_SIZE_SHIFT);
+    CfgConfig->CfgInstrumented = !!(config32->GuardFlags & IMAGE_GUARD_CF_INSTRUMENTED);
+    CfgConfig->WriteIntegrityChecks = !!(config32->GuardFlags & IMAGE_GUARD_CFW_INSTRUMENTED);
+    CfgConfig->CfgFunctionTablePresent = !!(config32->GuardFlags & IMAGE_GUARD_CF_FUNCTION_TABLE_PRESENT);
+    CfgConfig->SecurityCookieUnused = !!(config32->GuardFlags & IMAGE_GUARD_SECURITY_COOKIE_UNUSED);
+    CfgConfig->ProtectDelayLoadedIat = !!(config32->GuardFlags & IMAGE_GUARD_PROTECT_DELAYLOAD_IAT);
+    CfgConfig->DelayLoadInDidatSection = !!(config32->GuardFlags & IMAGE_GUARD_DELAYLOAD_IAT_IN_ITS_OWN_SECTION);
+    CfgConfig->EnableExportSuppression = !!(config32->GuardFlags & IMAGE_GUARD_CF_ENABLE_EXPORT_SUPPRESSION);
+    CfgConfig->HasExportSuppressionInfos = !!(config32->GuardFlags & IMAGE_GUARD_CF_EXPORT_SUPPRESSION_INFO_PRESENT);
+    CfgConfig->CfgLongJumpTablePresent = !!(config32->GuardFlags & IMAGE_GUARD_CF_LONGJUMP_TABLE_PRESENT);
+
+    CfgConfig->NumberOfGuardFunctionEntries = config32->GuardCFFunctionCount;
+    CfgConfig->GuardFunctionTable = PhMappedImageRvaToVa(
+        MappedImage,
+        (ULONG)(ULONG_PTR)PTR_SUB_OFFSET(config32->GuardCFFunctionTable , MappedImage->NtHeaders32->OptionalHeader.ImageBase),
+        NULL
+        );
+    
+    if (CfgConfig->GuardFunctionTable && CfgConfig->NumberOfGuardFunctionEntries)
+    {
+        __try
+        {
+            PhpMappedImageProbe(
+                MappedImage,
+                CfgConfig->GuardFunctionTable,
+                (SIZE_T)(CfgConfig->EntrySize * CfgConfig->NumberOfGuardFunctionEntries)
+                );
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return GetExceptionCode();
+        }
+    }
+
+    CfgConfig->NumberOfGuardAdressIatEntries = 0;
+    CfgConfig->GuardAdressIatTable = 0;
+
+    if (
+        config32->Size >= (ULONG)FIELD_OFFSET(IMAGE_LOAD_CONFIG_DIRECTORY32, GuardAddressTakenIatEntryTable) +
+        sizeof(config32->GuardAddressTakenIatEntryTable) +
+        sizeof(config32->GuardAddressTakenIatEntryCount)
+        )
+    {
+        CfgConfig->NumberOfGuardAdressIatEntries = config32->GuardAddressTakenIatEntryCount;
+        CfgConfig->GuardAdressIatTable = PhMappedImageRvaToVa(
+            MappedImage,
+            (ULONG)(ULONG_PTR)PTR_SUB_OFFSET(config32->GuardAddressTakenIatEntryTable, MappedImage->NtHeaders32->OptionalHeader.ImageBase),
+            NULL
+            );
+
+        if (CfgConfig->GuardAdressIatTable && CfgConfig->NumberOfGuardAdressIatEntries)
+        {
+            __try
+            {
+                PhpMappedImageProbe(
+                    MappedImage,
+                    CfgConfig->GuardAdressIatTable,
+                    (SIZE_T)(CfgConfig->EntrySize * CfgConfig->NumberOfGuardAdressIatEntries)
+                    );
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                return GetExceptionCode();
+            }
+        }
+    }
+
+    CfgConfig->NumberOfGuardLongJumpEntries = 0;
+    CfgConfig->GuardLongJumpTable = 0;
+
+    if (
+        config32->Size >= (ULONG)FIELD_OFFSET(IMAGE_LOAD_CONFIG_DIRECTORY32, GuardLongJumpTargetTable) +
+        sizeof(config32->GuardLongJumpTargetTable) +
+        sizeof(config32->GuardLongJumpTargetCount)
+        )
+    {
+        CfgConfig->NumberOfGuardLongJumpEntries = config32->GuardLongJumpTargetCount;
+        CfgConfig->GuardLongJumpTable = PhMappedImageRvaToVa(
+            MappedImage,
+            (ULONG)(ULONG_PTR)PTR_SUB_OFFSET(config32->GuardLongJumpTargetTable, MappedImage->NtHeaders32->OptionalHeader.ImageBase),
+            NULL
+            );
+
+        if (CfgConfig->GuardLongJumpTable && CfgConfig->NumberOfGuardLongJumpEntries)
+        {
+            __try
+            {
+                PhpMappedImageProbe(
+                    MappedImage,
+                    CfgConfig->GuardLongJumpTable,
+                    (SIZE_T)(CfgConfig->EntrySize * CfgConfig->NumberOfGuardLongJumpEntries)
+                    );
+            }
+            __except (EXCEPTION_EXECUTE_HANDLER)
+            {
+                return GetExceptionCode();
+            }
+        }
+    }
+
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS PhGetMappedImageCfg(
+    _Out_ PPH_MAPPED_IMAGE_CFG CfgConfig,
+    _In_ PPH_MAPPED_IMAGE MappedImage
+    )
+{
+    if (MappedImage->Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+    {
+        return PhGetMappedImageCfg32(CfgConfig, MappedImage);
+    }
+    else
+    {
+        return PhGetMappedImageCfg64(CfgConfig, MappedImage);
+    }
 }
 
 NTSTATUS PhGetMappedImageCfgEntry(

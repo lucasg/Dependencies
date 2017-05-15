@@ -3,6 +3,7 @@
  *   general support functions
  *
  * Copyright (C) 2009-2016 wj32
+ * Copyright (C) 2017 dmex
  *
  * This file is part of Process Hacker.
  *
@@ -1626,6 +1627,10 @@ PPH_STRING PhGetFileVersionInfoString(
     {
         PPH_STRING string;
 
+        // Check if the string has a valid length.
+        if (length <= sizeof(WCHAR))
+            return NULL;
+
         string = PhCreateStringEx((PWCHAR)buffer, length * sizeof(WCHAR));
         // length may include the null terminator.
         PhTrimToNullTerminatorString(string);
@@ -2387,13 +2392,13 @@ NTSTATUS PhCreateProcess(
     PUNICODE_STRING windowTitle;
     PUNICODE_STRING desktopInfo;
 
-    if (!RtlDosPathNameToNtPathName_U(
+    if (!NT_SUCCESS(status = RtlDosPathNameToNtPathName_U_WithStatus(
         FileName,
         &fileName,
         NULL,
         NULL
-        ))
-        return STATUS_OBJECT_NAME_NOT_FOUND;
+        )))
+        return status;
 
     if (CommandLine)
     {
@@ -2454,7 +2459,7 @@ NTSTATUS PhCreateProcess(
         RtlDestroyProcessParameters(parameters);
     }
 
-    RtlFreeHeap(RtlProcessHeap(), 0, fileName.Buffer);
+    RtlFreeUnicodeString(&fileName);
 
     if (NT_SUCCESS(status))
     {
@@ -4856,12 +4861,12 @@ BOOLEAN PhpSearchFilePath(
 
     // Make sure this is not a directory.
 
-    if (!RtlDosPathNameToNtPathName_U(
+    if (!NT_SUCCESS(RtlDosPathNameToNtPathName_U_WithStatus(
         Buffer,
         &fileName,
         NULL,
         NULL
-        ))
+        )))
         return FALSE;
 
     InitializeObjectAttributes(
@@ -4873,7 +4878,7 @@ BOOLEAN PhpSearchFilePath(
         );
 
     status = NtQueryAttributesFile(&objectAttributes, &basicInfo);
-    RtlFreeHeap(RtlProcessHeap(), 0, fileName.Buffer);
+    RtlFreeUnicodeString(&fileName);
 
     if (!NT_SUCCESS(status))
         return FALSE;

@@ -1,7 +1,6 @@
 #ifndef _PH_QUEUEDLOCK_H
 #define _PH_QUEUEDLOCK_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -346,7 +345,5 @@ PhfWaitForWakeEvent(
 #ifdef __cplusplus
 }
 #endif
-
-
 
 #endif

@@ -244,4 +244,28 @@ DbgUiConvertStateChangeStructure(
     _Out_ struct _DEBUG_EVENT *DebugEvent
     );
 
+struct _EVENT_FILTER_DESCRIPTOR;
+
+typedef VOID (NTAPI *PENABLECALLBACK)(
+    _In_ LPCGUID SourceId,
+    _In_ ULONG IsEnabled,
+    _In_ UCHAR Level,
+    _In_ ULONGLONG MatchAnyKeyword,
+    _In_ ULONGLONG MatchAllKeyword,
+    _In_opt_ struct _EVENT_FILTER_DESCRIPTOR *FilterData,
+    _Inout_opt_ PVOID CallbackContext
+    );
+
+typedef ULONGLONG REGHANDLE, *PREGHANDLE;
+
+NTSYSAPI
+NTSTATUS
+NTAPI
+EtwEventRegister(
+    _In_ LPCGUID ProviderId,
+    _In_opt_ PENABLECALLBACK EnableCallback,
+    _In_opt_ PVOID CallbackContext,
+    _Out_ PREGHANDLE RegHandle
+    );
+
 #endif

@@ -1174,12 +1174,11 @@ NtWaitForAlertByThreadId(
 
 // Attributes
 
-// begin_rev
+// private
 #define PS_ATTRIBUTE_NUMBER_MASK 0x0000ffff
-#define PS_ATTRIBUTE_THREAD 0x00010000 // can be used with threads
+#define PS_ATTRIBUTE_THREAD 0x00010000 // may be used with thread creation
 #define PS_ATTRIBUTE_INPUT 0x00020000 // input only
-#define PS_ATTRIBUTE_UNKNOWN 0x00040000
-// end_rev
+#define PS_ATTRIBUTE_ADDITIVE 0x00040000 // "accumulated" e.g. bitmasks, counters, etc.
 
 // private
 typedef enum _PS_ATTRIBUTE_NUM
@@ -1215,18 +1214,18 @@ typedef enum _PS_ATTRIBUTE_NUM
 
 // begin_rev
 
-#define PsAttributeValue(Number, Thread, Input, Unknown) \
+#define PsAttributeValue(Number, Thread, Input, Additive) \
     (((Number) & PS_ATTRIBUTE_NUMBER_MASK) | \
     ((Thread) ? PS_ATTRIBUTE_THREAD : 0) | \
     ((Input) ? PS_ATTRIBUTE_INPUT : 0) | \
-    ((Unknown) ? PS_ATTRIBUTE_UNKNOWN : 0))
+    ((Additive) ? PS_ATTRIBUTE_ADDITIVE : 0))
 
 #define PS_ATTRIBUTE_PARENT_PROCESS \
-    PsAttributeValue(PsAttributeParentProcess, FALSE, TRUE, TRUE)
+    PsAttributeValue(PsAttributeParentProcess, FALSE, TRUE, FALSE)
 #define PS_ATTRIBUTE_DEBUG_PORT \
-    PsAttributeValue(PsAttributeDebugPort, FALSE, TRUE, TRUE)
+    PsAttributeValue(PsAttributeDebugPort, FALSE, TRUE, FALSE)
 #define PS_ATTRIBUTE_TOKEN \
-    PsAttributeValue(PsAttributeToken, FALSE, TRUE, TRUE)
+    PsAttributeValue(PsAttributeToken, FALSE, TRUE, FALSE)
 #define PS_ATTRIBUTE_CLIENT_ID \
     PsAttributeValue(PsAttributeClientId, TRUE, FALSE, FALSE)
 #define PS_ATTRIBUTE_TEB_ADDRESS \
@@ -1322,6 +1321,31 @@ typedef enum _PS_CREATE_STATE
     PsCreateSuccess,
     PsCreateMaximumStates
 } PS_CREATE_STATE;
+
+// private
+typedef enum _PS_MITIGATION_OPTION
+{
+    PS_MITIGATION_OPTION_NX,
+    PS_MITIGATION_OPTION_SEHOP,
+    PS_MITIGATION_OPTION_FORCE_RELOCATE_IMAGES,
+    PS_MITIGATION_OPTION_HEAP_TERMINATE,
+    PS_MITIGATION_OPTION_BOTTOM_UP_ASLR,
+    PS_MITIGATION_OPTION_HIGH_ENTROPY_ASLR,
+    PS_MITIGATION_OPTION_STRICT_HANDLE_CHECKS,
+    PS_MITIGATION_OPTION_WIN32K_SYSTEM_CALL_DISABLE,
+    PS_MITIGATION_OPTION_EXTENSION_POINT_DISABLE,
+    PS_MITIGATION_OPTION_PROHIBIT_DYNAMIC_CODE,
+    PS_MITIGATION_OPTION_CONTROL_FLOW_GUARD,
+    PS_MITIGATION_OPTION_BLOCK_NON_MICROSOFT_BINARIES,
+    PS_MITIGATION_OPTION_FONT_DISABLE,
+    PS_MITIGATION_OPTION_IMAGE_LOAD_NO_REMOTE,
+    PS_MITIGATION_OPTION_IMAGE_LOAD_NO_LOW_LABEL,
+    PS_MITIGATION_OPTION_IMAGE_LOAD_PREFER_SYSTEM32,
+    PS_MITIGATION_OPTION_RETURN_FLOW_GUARD,
+    PS_MITIGATION_OPTION_LOADER_INTEGRITY_CONTINUITY,
+    PS_MITIGATION_OPTION_STRICT_CONTROL_FLOW_GUARD,
+    PS_MITIGATION_OPTION_RESTRICT_SET_THREAD_CONTEXT
+} PS_MITIGATION_OPTION;
 
 typedef struct _PS_CREATE_INFO
 {

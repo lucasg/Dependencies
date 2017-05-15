@@ -17,11 +17,17 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#if !defined(_PHLIB_)
+#if defined(_PHLIB_)
+#define PHLIBAPI
+#elif defined(_PHDLL_)
+#define PHLIBAPI __declspec(dllexport)
+#else
+#if defined(__cplusplus)
 #define PHLIBAPI __declspec(dllimport)
 #else
-#define PHLIBAPI
-#endif
+#define PHLIBAPI 
+#endif //  defined(__cplusplus)
+#endif //  defined(_PHLIB_)
 
 #include <phnt_windows.h>
 #include <phnt.h>

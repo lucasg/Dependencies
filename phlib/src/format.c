@@ -45,9 +45,10 @@ extern ULONG PhMaxSizeUnit;
 #define PHP_FORMAT_PAD 0x4
 
 // Internal CRT routine needed for floating-point conversion
-
+#if 0
 errno_t __cdecl _cfltcvt_l(double *arg, char *buffer, size_t sizeInBytes,
     int format, int precision, int caps, _locale_t plocinfo);
+#endif
 
 // Keep in sync with PhSizeUnitNames
 static PH_STRINGREF PhpSizeUnitNamesCounted[7] =
@@ -66,7 +67,8 @@ static WCHAR PhpFormatDecimalSeparator = '.';
 static WCHAR PhpFormatThousandSeparator = ',';
 static _locale_t PhpFormatUserLocale = NULL;
 
-#if (_MSC_VER >= 2100)
+#if 0
+#if (_MSC_VER >= 1900)
 
 // See Source\10.0.10150.0\ucrt\convert\cvt.cpp in SDK v10.
 errno_t __cdecl __acrt_fp_format(
@@ -93,6 +95,7 @@ static errno_t __cdecl _cfltcvt_l(double *arg, char *buffer, size_t sizeInBytes,
         format, precision, 0, plocinfo);
 }
 
+#endif
 #endif
 
 // From Source\10.0.10150.0\ucrt\inc\corecrt_internal_stdio_output.h in SDK v10.
