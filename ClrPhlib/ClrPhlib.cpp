@@ -238,6 +238,8 @@ namespace System
 			Name = gcnew String(exportEntry.Name);
 			ForwardedName = gcnew String(exportFunction.ForwardedName);
 			
+			if (exportEntry.Name == nullptr)
+				VirtualAddress = (Int64)exportFunction.Function;
 
 			VirtualAddress = (Int64) exportFunction.Function;
 		}

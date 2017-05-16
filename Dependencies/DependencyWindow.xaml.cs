@@ -33,7 +33,7 @@ public class DisplayPeImport
        Info.moduleName = PeImport.ModuleName;
        Info.delayedImport = PeImport.DelayImport;
 
-        if (PeImport.Name[0] == '?')
+        if (PeImport.Name.Length > 0 && PeImport.Name[0] == '?')
             Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
         else
             Info.UndecoratedName = "";
@@ -84,7 +84,7 @@ public class DisplayPeExport
         PeInfo.forwardedExport = PeExport.ForwardedName.Length > 0;
         PeInfo.virtualAddress = PeExport.VirtualAddress;
 
-        if (PeExport.Name[0] == '?')
+        if (PeExport.Name.Length > 0 && PeExport.Name[0] == '?')
             PeInfo.UndecoratedName = SymPrv.UndecorateName(PeExport.Name);
         else
             PeInfo.UndecoratedName = "";
