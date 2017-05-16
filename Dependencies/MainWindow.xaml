@@ -12,26 +12,26 @@
         <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
         <CommandBinding Command="Close" Executed="ExitCommandBinding_Executed"></CommandBinding>
     </Window.CommandBindings>
-    
+
     <Window.InputBindings>
         <KeyBinding Key="O" Modifiers="Control" Command="Open"></KeyBinding>
         <KeyBinding Key="Q" Modifiers="Control" Command="Close"></KeyBinding>
     </Window.InputBindings>
-    <Grid x:Name="MainGrid" Margin="0,0,2,1" Background="#FF5C8F88">
+    <Grid x:Name="MainGrid" Margin="0,0,0,0" Background="#FF5C8F88">
         <Grid.RowDefinitions>
-            <RowDefinition Height="25*"/>
-            <RowDefinition Height="776*"/>
-            <RowDefinition Height="38*"/>
+            <RowDefinition Height="26"/>
+            <RowDefinition Height="785*"/>
+            <RowDefinition Height="28"/>
         </Grid.RowDefinitions>
-        
-        <Menu x:Name="MainMenu" Height="25" VerticalAlignment="Top" HorizontalContentAlignment="Stretch">
-            <MenuItem x:Name="FileItem" Header="_File" Height="25" Width="39">
+
+        <Menu x:Name="MainMenu" HorizontalContentAlignment="Stretch" MinHeight="26" Panel.ZIndex="1" Grid.Row="0" VerticalContentAlignment="Top" VerticalAlignment="Top">
+            <MenuItem x:Name="FileItem" Header="_File" Height="25" Width="39" VerticalAlignment="Top">
                 <MenuItem x:Name="OpenItem" Header="_Open" Height="25" Command="Open" InputGestureText="Ctrl+O"/>
                 <Separator Height="3"/>
                 <MenuItem x:Name="RecentItem" Header="Recents" Height="100"/>
                 <Separator Height="3" Margin="-1,0,0,0"/>
                 <MenuItem x:Name="ExitItem" Header="E_xit" Height="25"  InputGestureText="Ctrl+Q" Command="Close"/>
-                
+
             </MenuItem>
             <MenuItem x:Name="ViewItem" Header="_View" Height="25" Width="42">
                 <MenuItem x:Name="_SystemInformation" Header="System Information ..." Height="25" />
@@ -51,13 +51,13 @@
             </MenuItem>
         </Menu>
 
-        <Grid x:Name="UserControlGrid" Margin="0,0,0,16" Grid.Row="1" Grid.RowSpan="2">
+        <Grid x:Name="UserControlGrid" Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
-            <mdi:MdiContainer Name="Container"/>
+            <mdi:MdiContainer Name="Container" Grid.ColumnSpan="1"/>
         </Grid>
 
-        <StatusBar x:Name="AppStatusBar" Height="16" VerticalAlignment="Bottom" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Margin="0,0,0,0" Grid.Row="2"/>
+        <StatusBar x:Name="AppStatusBar" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Grid.Row="2" MinHeight="28" Panel.ZIndex="1" Margin="0" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>
