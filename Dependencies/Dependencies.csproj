@@ -36,6 +36,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Dependencies.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -121,6 +124,9 @@
   <ItemGroup>
     <Resource Include="Images\GlyphSortAscending.png" />
     <Resource Include="Images\GlyphSortDescending.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Dependencies.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
