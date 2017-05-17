@@ -129,5 +129,11 @@
   <ItemGroup>
     <Resource Include="Dependencies.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Hourglass.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Question.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

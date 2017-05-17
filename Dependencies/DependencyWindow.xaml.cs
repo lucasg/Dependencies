@@ -238,6 +238,12 @@ public struct ModuleInfo
     public Int16 DllCharacteristics;
 }
 
+public struct TreeViewItemContext
+{
+    public PE PeProperties;
+    public PeImportDll ImportProperties;
+}
+
 namespace Dependencies
 {
 
@@ -269,8 +275,12 @@ namespace Dependencies
 
                 // Add to tree view
                 TreeViewItem childTreeNode = new TreeViewItem();
+                TreeViewItemContext childTreeContext = new TreeViewItemContext();
+                childTreeContext.PeProperties = ImportPe;
+                childTreeContext.ImportProperties = DllImport;
+
                 childTreeNode.Header = DllImport.Name;
-                childTreeNode.DataContext = ImportPe;
+                childTreeNode.DataContext = childTreeContext;
                 currentNode.Items.Add(childTreeNode);
 
 
@@ -309,8 +319,13 @@ namespace Dependencies
             this.DllTreeView.Items.Clear();
             
             TreeViewItem treeNode = new TreeViewItem();
+            TreeViewItemContext childTreeContext = new TreeViewItemContext();
+
+            childTreeContext.PeProperties = this.Pe;
+            childTreeContext.ImportProperties = null;
+
             treeNode.Header = FileName;
-            treeNode.DataContext = this.Pe;
+            treeNode.DataContext = childTreeContext;
             treeNode.IsExpanded = true;
 
             this.DllTreeView.Items.Add(treeNode);
@@ -324,7 +339,9 @@ namespace Dependencies
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            PE SelectedPE = (PE) ((TreeViewItem) this.DllTreeView.SelectedItem).DataContext;
+            TreeViewItemContext childTreeContext = (TreeViewItemContext) (this.DllTreeView.SelectedItem as TreeViewItem).DataContext;
+            PE SelectedPE = childTreeContext.PeProperties;
+
             List<PeExport> PeExports = SelectedPE.GetExports();
             List<PeImportDll> PeImports = SelectedPE.GetImports();
 

@@ -114,11 +114,13 @@ namespace Dependencies
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            string Filename = (string)value;
+            TreeViewItemContext childTreeContext = (TreeViewItemContext)value;
 
-            if (Filename == null)
-                return null;
+            if (!childTreeContext.PeProperties.LoadSuccessful)
+                return "Images/Question.png";
 
+
+            string Filename = (string) childTreeContext.PeProperties.Filepath;
             Icon icon = ExtractIcon.GetIcon(Filename, true);
 
             if (icon != null)
@@ -129,7 +131,27 @@ namespace Dependencies
                             new Int32Rect(0, 0, icon.Width, icon.Height),
                             BitmapSizeOptions.FromEmptyOptions()); 
             }
-            
+
+            return "Images/Question.png";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    public class DelayedImageToHeaderConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            TreeViewItemContext childTreeContext = (TreeViewItemContext) value;
+
+            if ((childTreeContext.ImportProperties != null) && ((childTreeContext.ImportProperties.Flags & 0x01) == 0x01))
+            {
+                return "Images/Hourglass.png";
+            }
+
             return null;
         }
 
