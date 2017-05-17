@@ -128,6 +128,7 @@ namespace ClrPh {
 
 		PeProperties ^Properties;
 		Boolean LoadSuccessful;
+		String^ Filepath;
 
     protected:
         // Deallocate the native object on the finalizer just in case no destructor is called  

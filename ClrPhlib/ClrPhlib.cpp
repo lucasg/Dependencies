@@ -156,7 +156,8 @@ namespace System
         CString PvFilePath(Filepath);
         m_Impl = new UnmanagedPE();
 
-		LoadSuccessful = m_Impl->LoadPE(PvFilePath.GetBuffer());
+		this->LoadSuccessful = m_Impl->LoadPE(PvFilePath.GetBuffer());
+		this->Filepath = gcnew String(Filepath);
 
 		if (LoadSuccessful)
 			InitProperties();

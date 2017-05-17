@@ -129,8 +129,33 @@ public enum PeTypes
 
 }
 
+public class DisplayErrorModuleInfo : DisplayModuleInfo
+{
+    public DisplayErrorModuleInfo(uint Index, PeImportDll Module)
+    : base(Index, Module.Name)
+    {
+    }
+
+    public override string Cpu { get { return ""; } }
+    public override string Type { get { return ""; } }
+    public override string Filesize { get { return ""; } }
+    public override string ImageBase { get { return ""; } }
+    public override string VirtualSize { get { return ""; } }
+    public override string EntryPoint { get { return ""; } }
+    public override string Subsystem { get { return ""; } }
+    public override string SubsystemVersion { get { return ""; } }
+    public override string Checksum { get { return ""; } }
+
+}
+
 public class DisplayModuleInfo
 {
+    public DisplayModuleInfo(uint index, string ModuleName)
+    {
+        Info.index = index;
+        Info.Name = ModuleName;
+    }
+
     public DisplayModuleInfo(uint index, PeImportDll Module, PeProperties Properties)
     {
         Info.index = index;
@@ -152,9 +177,9 @@ public class DisplayModuleInfo
 
     }
 
-    public uint Index { get { return Info.index; } }
-    public string Name { get { return Info.Name; } }
-    public string Cpu
+    public virtual uint Index { get { return Info.index; } }
+    public virtual string Name { get { return Info.Name; } }
+    public virtual string Cpu
     {
         get
         {
@@ -178,7 +203,7 @@ public class DisplayModuleInfo
             }
         }
     }
-    public string Type
+    public virtual string Type
     {
         get
         {
@@ -196,13 +221,13 @@ public class DisplayModuleInfo
             return String.Join("; ", TypeList.ToArray());
         }
     }
-    public string Filesize { get { return String.Format("0x{0:x8}", 0x00); } }
-    public string ImageBase { get { return String.Format("0x{0:x8}", Info.ImageBase); } }
-    public string VirtualSize { get { return String.Format("0x{0:x8}", Info.SizeOfImage); } }
-    public string EntryPoint { get { return String.Format("0x{0:x8}", Info.EntryPoint); } }
-    public string Subsystem { get { return String.Format("{0:x}", Info.Subsystem); } }
-    public string SubsystemVersion { get { return ""; } }
-    public string Checksum
+    public virtual string Filesize { get { return String.Format("0x{0:x8}", 0x00); } }
+    public virtual string ImageBase { get { return String.Format("0x{0:x8}", Info.ImageBase); } }
+    public virtual string VirtualSize { get { return String.Format("0x{0:x8}", Info.SizeOfImage); } }
+    public virtual string EntryPoint { get { return String.Format("0x{0:x8}", Info.EntryPoint); } }
+    public virtual string Subsystem { get { return String.Format("{0:x}", Info.Subsystem); } }
+    public virtual string SubsystemVersion { get { return ""; } }
+    public virtual string Checksum
     {
         get
         {
@@ -269,10 +294,6 @@ namespace Dependencies
                 String PeFilePath = "C:\\Windows\\System32\\" + DllImport.Name;
                 PE ImportPe = new PE(PeFilePath);
 
-                if (!ImportPe.LoadSuccessful)
-                    continue;
-
-
                 // Add to tree view
                 TreeViewItem childTreeNode = new TreeViewItem();
                 TreeViewItemContext childTreeContext = new TreeViewItemContext();
@@ -283,11 +304,16 @@ namespace Dependencies
                 childTreeNode.DataContext = childTreeContext;
                 currentNode.Items.Add(childTreeNode);
 
-
+                
                 if (!this.ModulesFound.Contains(PeFilePath))
                 {
-                    this.ModulesList.Items.Add(new DisplayModuleInfo(0xdeadbeef, DllImport, ImportPe.Properties));
-                    this.ModulesFound.Add(PeFilePath);
+                    if (!ImportPe.LoadSuccessful)
+                        this.ModulesList.Items.Add(new DisplayErrorModuleInfo(0xdeadbeef, DllImport));
+                    else
+                    {
+                        this.ModulesList.Items.Add(new DisplayModuleInfo(0xdeadbeef, DllImport, ImportPe.Properties));
+                        this.ModulesFound.Add(PeFilePath);
+                    }
 
                     // do not process twice the same PE in order to lessen memory pressure
                     BacklogPeToProcess.Add(new Tuple<TreeViewItem, PE>(childTreeNode, ImportPe));
