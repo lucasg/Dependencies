@@ -131,7 +131,7 @@ public enum PeTypes
 
 public class DisplayModuleInfo
 {
-    public DisplayModuleInfo(int index, PeImportDll Module, PeProperties Properties)
+    public DisplayModuleInfo(uint index, PeImportDll Module, PeProperties Properties)
     {
         Info.index = index;
         Info.Name = Module.Name;
@@ -152,7 +152,7 @@ public class DisplayModuleInfo
 
     }
 
-    public int Index { get { return Info.index; } }
+    public uint Index { get { return Info.index; } }
     public string Name { get { return Info.Name; } }
     public string Cpu
     {
@@ -220,7 +220,7 @@ public class DisplayModuleInfo
 
 public struct ModuleInfo
 {
-    public int index;
+    public uint index;
     public string Name;
     public Int16 Machine;
     public Int16 Magic;
@@ -248,49 +248,78 @@ namespace Dependencies
     {
         PE Pe;
         PhSymbolProvider SymPrv;
+        HashSet<String> ModulesFound;
 
-        public DependencyWindow(String FileName)
+
+        public Boolean ProcessPe(int level,  TreeViewItem currentNode, PE newPe)
         {
-            InitializeComponent();
-            Width = double.NaN;
-            Height = double.NaN;
-
             
-            int i = 0;
-            this.Pe = new PE(FileName);
-            this.SymPrv = new PhSymbolProvider();
-            List<PeImportDll> PeImports = this.Pe.GetImports();
+            List<PeImportDll> PeImports = newPe.GetImports();
 
-            this.ModulesList.Items.Clear();
-            this.DllTreeView.Items.Clear();
-            TreeViewItem treeNode = new TreeViewItem();
-            treeNode.Header = FileName;
-            treeNode.DataContext = this.Pe;
-
-            i = 0;
+            List<Tuple<TreeViewItem, PE>> BacklogPeToProcess = new List<Tuple<TreeViewItem, PE>>();
             foreach (PeImportDll DllImport in PeImports)
             {
                 // Find Dll in "paths"
-                PE ImportPe = new PE("C:\\Windows\\System32\\" + DllImport.Name);
+                String PeFilePath = "C:\\Windows\\System32\\" + DllImport.Name;
+                PE ImportPe = new PE(PeFilePath);
 
-                if (ImportPe.LoadSuccessful)
-                {
-                    this.ModulesList.Items.Add(new DisplayModuleInfo(i, DllImport, ImportPe.Properties));
-                }
+                if (!ImportPe.LoadSuccessful)
+                    continue;
 
 
                 // Add to tree view
                 TreeViewItem childTreeNode = new TreeViewItem();
                 childTreeNode.Header = DllImport.Name;
                 childTreeNode.DataContext = ImportPe;
-                treeNode.Items.Add(childTreeNode);
-                
+                currentNode.Items.Add(childTreeNode);
 
-                // 
-                i++;
+
+                if (!this.ModulesFound.Contains(PeFilePath))
+                {
+                    this.ModulesList.Items.Add(new DisplayModuleInfo(0xdeadbeef, DllImport, ImportPe.Properties));
+                    this.ModulesFound.Add(PeFilePath);
+
+                    // do not process twice the same PE in order to lessen memory pressure
+                    BacklogPeToProcess.Add(new Tuple<TreeViewItem, PE>(childTreeNode, ImportPe));
+                }                    
             }
 
+
+            // Process next batch of dll imports
+            foreach (Tuple<TreeViewItem, PE> NewPeNode in BacklogPeToProcess)
+            {
+                ProcessPe(level+1, NewPeNode.Item1, NewPeNode.Item2); // warning : recursive call
+            }
+
+            return true;
+
+        }
+
+        public DependencyWindow(String FileName)
+        {
+            InitializeComponent();
+            Width = double.NaN;
+            Height = double.NaN;
+            
+            this.Pe = new PE(FileName);
+            this.SymPrv = new PhSymbolProvider();
+            this.ModulesFound = new HashSet<String>();
+
+            this.ModulesList.Items.Clear();
+            this.DllTreeView.Items.Clear();
+            
+            TreeViewItem treeNode = new TreeViewItem();
+            treeNode.Header = FileName;
+            treeNode.DataContext = this.Pe;
+            treeNode.IsExpanded = true;
+
             this.DllTreeView.Items.Add(treeNode);
+
+
+            // Recursively construct tree of dll imports
+            ProcessPe(0, treeNode, this.Pe);
+            
+
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
