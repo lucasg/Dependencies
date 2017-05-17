@@ -21,6 +21,7 @@ public class DisplayPeImport
        Info.name = PeImport.Name;
        Info.moduleName = PeImport.ModuleName;
        Info.delayedImport = PeImport.DelayImport;
+       Info.importByOrdinal = PeImport.ImportByOrdinal;
 
         if (PeImport.Name.Length > 0 && PeImport.Name[0] == '?')
             Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
@@ -30,11 +31,20 @@ public class DisplayPeImport
 
    public int Index { get { return Info.index; } }
    public int Hint { get { return Info.hint; } }
-   public int Ordinal { get { return Info.ordinal; } }
+   public string Ordinal { get {
+            if (Info.importByOrdinal)
+                return String.Format("{0:d} (0x{0:x8})", Info.ordinal, Info.ordinal);
+
+            return "N/A";
+
+   } }
    public string Name { get {
 
             if (Info.UndecoratedName.Length > 0)
                 return Info.UndecoratedName;
+
+            if (Info.importByOrdinal)
+                return String.Format("Ordinal_{0:d}", Info.ordinal);
 
             return Info.name;
     } }
@@ -53,6 +63,7 @@ public struct PeImportInfo
    public string name;
    public string moduleName;
    public Boolean delayedImport;
+   public Boolean importByOrdinal;
    public string UndecoratedName;
 }
 
