@@ -249,6 +249,7 @@ namespace Wpf.Util
                         direction,
                         direction == ListSortDirection.Ascending ? GetSortGlyphAscending(listView) : GetSortGlyphDescending(listView));
                 SetSortedColumnHeader(listView, sortedColumnHeader);
+               
             }
         }
 

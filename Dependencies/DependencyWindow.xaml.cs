@@ -344,6 +344,7 @@ namespace Dependencies
 
         public DependencyWindow(String FileName)
         {
+
             InitializeComponent();
             Width = double.NaN;
             Height = double.NaN;
@@ -364,7 +365,7 @@ namespace Dependencies
             treeNode.Header = FileName;
             treeNode.DataContext = childTreeContext;
             treeNode.IsExpanded = true;
-
+            
             this.DllTreeView.Items.Add(treeNode);
 
 

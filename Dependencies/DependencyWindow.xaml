@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
         <local:DelayedImageToHeaderConverter x:Key="imgdelayed"/>
+       
     </UserControl.Resources>
     <Grid x:Name="ResizeElemGrid" Margin="0,0,0,0">
         <Grid.RowDefinitions>
@@ -22,9 +23,18 @@
             <ColumnDefinition Width="334*"/>
         </Grid.ColumnDefinitions>
         <ListView x:Name="ModulesList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="2" util:GridViewSort.AutoSort="True">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="FontFamily" Value="Courier New" />
+                </Style>
+            </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView AllowsColumnReorder="true">
-                    <GridViewColumn Header="Module" Width="80" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
+                    <GridViewColumn 
+                      Header="Module" Width="80" DisplayMemberBinding="{Binding Name}" 
+                      util:GridViewSort.PropertyName="Name"/>
+                     
                     <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}" util:GridViewSort.PropertyName="Cpu"/>
                     <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Type}" util:GridViewSort.PropertyName="Type"/>
                     <GridViewColumn Header="File Size" Width="60" DisplayMemberBinding="{Binding FileSize}" util:GridViewSort.PropertyName="FileSize"/>
@@ -63,11 +73,36 @@
                 <RowDefinition Height="142*"/>
             </Grid.RowDefinitions>
             <ListView x:Name="ImportList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" util:GridViewSort.AutoSort="True">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="FontFamily" Value="Courier New" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                
                 <ListView.View>
                     <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}" util:GridViewSort.PropertyName="Index"/>
-                        <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}" util:GridViewSort.PropertyName="Ordinal"/>
-                        <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}" util:GridViewSort.PropertyName="Hint"/>
+                        <GridViewColumn Header="Index" Width="40" util:GridViewSort.PropertyName="Index">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Index}" TextAlignment="Right" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Ordinal" Width="60" util:GridViewSort.PropertyName="Ordinal">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Ordinal}" TextAlignment="Right" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Hint" Width="40" util:GridViewSort.PropertyName="Hint">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Hint}" TextAlignment="Right" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
                         <GridViewColumn Header="Module" Width="100" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName"/>
                         <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}" util:GridViewSort.PropertyName="DelayImport"/>
@@ -75,11 +110,36 @@
                 </ListView.View>
             </ListView>
             <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" util:GridViewSort.AutoSort="True" util:GridViewSort.SortGlyphAscending="Images/GlyphSortAscending.png" util:GridViewSort.SortGlyphDescending="Images/GlyphSortDescending.png">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="FontFamily" Value="Courier New" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+                
                 <ListView.View>
                     <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Header="Index" Width="40" DisplayMemberBinding="{Binding Index}" util:GridViewSort.PropertyName="Index"/>
-                        <GridViewColumn Header="Ordinal" Width="60" DisplayMemberBinding="{Binding Ordinal}" util:GridViewSort.PropertyName="Ordinal"/>
-                        <GridViewColumn Header="Hint" Width="40" DisplayMemberBinding="{Binding Hint}" util:GridViewSort.PropertyName="Hint"/>
+                        <GridViewColumn Header="Index" Width="40" util:GridViewSort.PropertyName="Index">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Index}" TextAlignment="Right" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Ordinal" Width="60" util:GridViewSort.PropertyName="Ordinal">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Ordinal}" TextAlignment="Right" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="Hint" Width="40" util:GridViewSort.PropertyName="Hint">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Hint}" TextAlignment="Right" />
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
                         <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
                         <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress}" util:GridViewSort.PropertyName="VirtualAddress"/>
                     </GridView>
