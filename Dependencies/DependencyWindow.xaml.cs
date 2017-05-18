@@ -31,14 +31,9 @@ public class DisplayPeImport
 
    public int Index { get { return Info.index; } }
    public int Hint { get { return Info.hint; } }
-   public string Ordinal { get {
-            if (Info.importByOrdinal)
-                return String.Format("{0:d} (0x{0:x8})", Info.ordinal, Info.ordinal);
+   public int? Ordinal { get { if (Info.importByOrdinal) { return Info.ordinal; } return null; } }
 
-            return "N/A";
-
-   } }
-   public string Name { get {
+    public string Name { get {
 
             if (Info.UndecoratedName.Length > 0)
                 return Info.UndecoratedName;
@@ -92,7 +87,7 @@ public class DisplayPeExport
 
     public int Index { get { return PeInfo.index; } }
     public int Hint { get { return PeInfo.hint; } }
-    public int Ordinal { get { return PeInfo.ordinal; } }
+    public int? Ordinal { get { if (PeInfo.exportByOrdinal) { return PeInfo.ordinal; } return null; } }
     public string Name
     {
         get

@@ -31,12 +31,12 @@
             <ListView.View>
                 <GridView AllowsColumnReorder="true">
                     <GridViewColumn 
-                      Header="Module" Width="80" DisplayMemberBinding="{Binding Name}" 
+                      Header="Module" Width="300" DisplayMemberBinding="{Binding Name}" 
                       util:GridViewSort.PropertyName="Name"/>
                      
                     <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}" util:GridViewSort.PropertyName="Cpu"/>
-                    <GridViewColumn Header="Type" Width="80" DisplayMemberBinding="{Binding Type}" util:GridViewSort.PropertyName="Type"/>
-                    <GridViewColumn Header="File Size" Width="60" DisplayMemberBinding="{Binding FileSize}" util:GridViewSort.PropertyName="FileSize"/>
+                    <GridViewColumn Header="Type" Width="150" DisplayMemberBinding="{Binding Type}" util:GridViewSort.PropertyName="Type"/>
+                    <GridViewColumn Header="File Size" Width="100" DisplayMemberBinding="{Binding FileSize}" util:GridViewSort.PropertyName="FileSize"/>
                     <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase}" util:GridViewSort.PropertyName="ImageBase"/>
                     <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize}" util:GridViewSort.PropertyName="VirtualSize"/>
                     <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint}" util:GridViewSort.PropertyName="EntryPoint"/>
@@ -88,22 +88,22 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Ordinal" Width="60" util:GridViewSort.PropertyName="Ordinal">
+                        <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Ordinal}" TextAlignment="Right" />
+                                    <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Hint" Width="40" util:GridViewSort.PropertyName="Hint">
+                        <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Hint}" TextAlignment="Right" />
+                                    <TextBlock Text="{Binding Hint, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
-                        <GridViewColumn Header="Module" Width="100" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName"/>
+                        <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
+                        <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName"/>
                         <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}" util:GridViewSort.PropertyName="DelayImport"/>
                     </GridView>
                 </ListView.View>
@@ -125,22 +125,22 @@
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Ordinal" Width="60" util:GridViewSort.PropertyName="Ordinal">
+                        <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Ordinal}" TextAlignment="Right" />
+                                    <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Hint" Width="40" util:GridViewSort.PropertyName="Hint">
+                        <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Hint}" TextAlignment="Right" />
+                                    <TextBlock Text="{Binding Hint, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Function" Width="200" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
-                        <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress}" util:GridViewSort.PropertyName="VirtualAddress"/>
+                        <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
+                        <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress, StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualAddress"/>
                     </GridView>
                 </ListView.View>
             </ListView>
