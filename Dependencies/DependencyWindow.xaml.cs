@@ -346,9 +346,7 @@ namespace Dependencies
         {
 
             InitializeComponent();
-            Width = double.NaN;
-            Height = double.NaN;
-            
+
             this.Pe = new PE(FileName);
             this.SymPrv = new PhSymbolProvider();
             this.ModulesFound = new HashSet<String>();

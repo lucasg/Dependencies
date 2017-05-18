@@ -43,16 +43,23 @@ namespace Dependencies
             if (InputFileNameDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
 
-           DependencyWindow nw = new DependencyWindow(InputFileNameDlg.FileName);
-            
+            DependencyWindow nw = new DependencyWindow(InputFileNameDlg.FileName);
+            double ChildWith = Math.Min((double)nw.GetValue(WidthProperty), Container.ActualWidth);
+            double ChildHeight = Math.Min((double)nw.GetValue(HeightProperty), Container.ActualHeight);
+
             Container.Children.Add(new MdiChild
             {
                 Title = InputFileNameDlg.FileName,
                 Content = nw,
-                Width = 1000,
-                Height = 600,
+                Width = ChildWith,
+                Height = ChildHeight,
+                //Margin = new System.Windows.Thickness(15,15,15,15)
                 //Icon = new BitmapImage(new Uri("OriginalLogo.png", UriKind.Relative))
             });
+
+            // Invalidate size in order to trigger resize for internal elements.
+            nw.Width = double.NaN;
+            nw.Height = double.NaN;
 
         }
 

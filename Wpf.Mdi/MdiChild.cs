@@ -25,15 +25,20 @@ namespace WPF.MDI
 		/// </summary>
 		internal const int MinimizedHeight = 29;
 
-		#endregion
+        /// <summary>
+        /// Size of the border in point
+        /// </summary>
+        public const int MdiBorderThickness = 1;
 
-		#region Dependency Properties
+        #endregion
 
-		/// <summary>
-		/// Identifies the WPF.MDI.MdiChild.ContentProperty dependency property.
-		/// </summary>
-		/// <returns>The identifier for the WPF.MDI.MdiChild.ContentProperty property.</returns>
-		public static readonly DependencyProperty ContentProperty =
+        #region Dependency Properties
+
+        /// <summary>
+        /// Identifies the WPF.MDI.MdiChild.ContentProperty dependency property.
+        /// </summary>
+        /// <returns>The identifier for the WPF.MDI.MdiChild.ContentProperty property.</returns>
+        public static readonly DependencyProperty ContentProperty =
 			DependencyProperty.Register("Content", typeof(UIElement), typeof(MdiChild));
 
 		/// <summary>
@@ -921,8 +926,8 @@ namespace WPF.MDI
 						mdiChild.Buttons = sp;
 
 						mdiChild.Position = new Point(0, 0);
-						mdiChild.Width = mdiChild.Container.ActualWidth;
-						mdiChild.Height = mdiChild.Container.InnerHeight - 2; // ContentBorder.BorderThickness="1" in template
+                        mdiChild.Width = mdiChild.Container.ActualWidth - 2* MdiBorderThickness;
+                        mdiChild.Height = mdiChild.Container.ActualHeight - 2* MdiBorderThickness; 
 
 						if (mdiChild.Container.AllowWindowStateMax)
 						{
@@ -936,7 +941,7 @@ namespace WPF.MDI
 										mdiContainer.Children[i].MaximizeBox)
 										mdiContainer.Children[i].WindowState = WindowState.Maximized;
 									else if (mdiContainer.Children[i].WindowState == WindowState.Maximized)
-										mdiContainer.Children[i].Height = mdiContainer.InnerHeight;
+										mdiContainer.Children[i].Height = mdiContainer.ActualHeight;
 								}
 
 							ScrollViewer sv = (ScrollViewer)((Grid)mdiContainer.Content).Children[1];

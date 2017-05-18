@@ -5,11 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
         xmlns:util="clr-namespace:Wpf.Util"
-        mc:Ignorable="d" Height="515.5" Width="968">
+        mc:Ignorable="d" Height="800" Width="1500" >
     <UserControl.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
         <local:DelayedImageToHeaderConverter x:Key="imgdelayed"/>
-       
     </UserControl.Resources>
     <Grid x:Name="ResizeElemGrid" Margin="0,0,0,0">
         <Grid.RowDefinitions>
@@ -18,9 +17,9 @@
             <RowDefinition Height="46*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="385*"/>
+            <ColumnDefinition Width="300*"/>
             <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="334*"/>
+            <ColumnDefinition Width="600*"/>
         </Grid.ColumnDefinitions>
         <ListView x:Name="ModulesList" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.ColumnSpan="3" Grid.Row="2" util:GridViewSort.AutoSort="True">
             <ListView.ItemContainerStyle>

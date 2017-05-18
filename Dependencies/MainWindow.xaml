@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Dependencies"
         xmlns:mdi="clr-namespace:WPF.MDI;assembly=WPF.MDI"
         mc:Ignorable="d"
-        Title="Dependencies" HorizontalContentAlignment="Stretch" Height="871.458" Width="1044.5" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom">
+        Title="Dependencies" HorizontalContentAlignment="Stretch" Height="900" Width="1600" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom">
     <Window.CommandBindings>
         <!--<CommandBinding Command="Exit" Executed="ExitCommandBinding_Executed"></CommandBinding>-->
         <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
