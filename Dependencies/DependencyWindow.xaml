@@ -9,6 +9,9 @@
     <UserControl.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
         <local:DelayedImageToHeaderConverter x:Key="imgdelayed"/>
+        <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}">
+            <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
+        </Style>
     </UserControl.Resources>
     <Grid x:Name="ResizeElemGrid" Margin="0,0,0,0">
         <Grid.RowDefinitions>
@@ -30,19 +33,27 @@
             </ListView.ItemContainerStyle>
             <ListView.View>
                 <GridView AllowsColumnReorder="true">
-                    <GridViewColumn 
-                      Header="Module" Width="300" DisplayMemberBinding="{Binding Name}" 
-                      util:GridViewSort.PropertyName="Name"/>
-                     
-                    <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}" util:GridViewSort.PropertyName="Cpu"/>
-                    <GridViewColumn Header="Type" Width="150" DisplayMemberBinding="{Binding Type}" util:GridViewSort.PropertyName="Type"/>
-                    <GridViewColumn Header="File Size" Width="100" DisplayMemberBinding="{Binding FileSize}" util:GridViewSort.PropertyName="FileSize"/>
-                    <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase}" util:GridViewSort.PropertyName="ImageBase"/>
-                    <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize}" util:GridViewSort.PropertyName="VirtualSize"/>
-                    <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint}" util:GridViewSort.PropertyName="EntryPoint"/>
-                    <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem}" util:GridViewSort.PropertyName="Subsystem"/>
-                    <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion}" util:GridViewSort.PropertyName="SubsystemVersion"/>
-                    <GridViewColumn Header="Checksum" Width="100" DisplayMemberBinding="{Binding Checksum}" util:GridViewSort.PropertyName="Checksum"/>
+                    <GridViewColumn Header="" Width="50" util:GridViewSort.PropertyName="Type">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding  Context, Converter={StaticResource imgdelayed} }"></Image>
+                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding  Context, Converter={StaticResource img} }"></Image>
+                                </StackPanel>
+                                <!--<Image Width="30" Height="14" Source="{Binding IconUri}"/>-->
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}" util:GridViewSort.PropertyName="Cpu" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Type" Width="150" DisplayMemberBinding="{Binding Type}" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <!--<GridViewColumn Header="File Size" Width="100" DisplayMemberBinding="{Binding FileSize, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="FileSize" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>-->
+                    <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="ImageBase" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualSize" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="EntryPoint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="Subsystem" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion}" util:GridViewSort.PropertyName="SubsystemVersion" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Checksum" Width="100" DisplayMemberBinding="{Binding Checksum}" util:GridViewSort.PropertyName="Checksum" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                 </GridView>
             </ListView.View>
         </ListView>
@@ -84,7 +95,7 @@
                         <GridViewColumn Header="Index" Width="40" util:GridViewSort.PropertyName="Index">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Index}" TextAlignment="Right" />
+                                    <Image Width="30" Height="14" Source="{Binding IconUri}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>

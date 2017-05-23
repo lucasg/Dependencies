@@ -135,5 +135,21 @@
   <ItemGroup>
     <Resource Include="Images\Question.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Dependencies.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\dependencies_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\export_c.gif" />
+    <Resource Include="Images\export_cpp.gif" />
+    <Resource Include="Images\export_forward.gif" />
+    <Resource Include="Images\export_ord.gif" />
+    <Resource Include="Images\import_c.gif" />
+    <Resource Include="Images\import_cpp.gif" />
+    <Resource Include="Images\import_err.gif" />
+    <Resource Include="Images\import_ord.gif" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

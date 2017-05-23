@@ -10,28 +10,54 @@ using System.ClrPh;
 public class DisplayPeImport
 {
     public DisplayPeImport(
-        /*_In_*/ int Index,
         /*_In_*/ PeImport PeImport,
         /*_In_*/ PhSymbolProvider SymPrv
     )
     {
-       Info.index = Index;
        Info.ordinal = PeImport.Ordinal;
        Info.hint = PeImport.Hint;
        Info.name = PeImport.Name;
        Info.moduleName = PeImport.ModuleName;
        Info.delayedImport = PeImport.DelayImport;
+       Info.importAsCppName = (PeImport.Name.Length > 0 && PeImport.Name[0] == '?');
        Info.importByOrdinal = PeImport.ImportByOrdinal;
 
-        if (PeImport.Name.Length > 0 && PeImport.Name[0] == '?')
+        if (Info.importAsCppName)
             Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
         else
             Info.UndecoratedName = "";
     }
 
-   public int Index { get { return Info.index; } }
-   public int Hint { get { return Info.hint; } }
-   public int? Ordinal { get { if (Info.importByOrdinal) { return Info.ordinal; } return null; } }
+    public string IconUri
+    {
+        get
+        {
+            //if (Info.importNotFound)
+            //     return "Images/import_err.gif";
+            if (Info.importByOrdinal)
+                return "Images/import_ord.gif";
+            if (Info.importAsCppName)
+                return "Images/import_cpp.gif";
+
+            return "Images/import_c.gif";
+        }
+    }
+    public int Type
+    {
+        get
+        {
+            //if (Info.importNotFound)
+            //    return 1;
+            if (Info.importByOrdinal)
+                return 2;
+            if (Info.importAsCppName)
+                return 3;
+
+            return 0;
+        }
+    }
+    public int Hint { get { return Info.hint; } }
+    public int? Ordinal { get { if (Info.importByOrdinal) { return Info.ordinal; } return null; } }
 
     public string Name { get {
 
@@ -52,40 +78,67 @@ public class DisplayPeImport
 
 public struct PeImportInfo
 {
-   public int index;
    public int ordinal;
    public int hint;
    public string name;
    public string moduleName;
    public Boolean delayedImport;
    public Boolean importByOrdinal;
+   public Boolean importAsCppName;
    public string UndecoratedName;
 }
 
 public class DisplayPeExport
 {
    public DisplayPeExport(
-       /*_In_*/ int Index,
         /*_In_*/ PeExport PeExport,
         /*_In_*/ PhSymbolProvider SymPrv
     )
     {
-        PeInfo.index = Index;
         PeInfo.ordinal = PeExport.Ordinal;
-        PeInfo.hint = /*PeExport.Hint*/ PeExport.Ordinal - 1;
+        PeInfo.hint = /*PeExport.Hint*/ PeExport.Ordinal - 1; // @TODO(add hints to exports)
         PeInfo.name = PeExport.Name;
         PeInfo.ForwardName = PeExport.ForwardedName;
         PeInfo.exportByOrdinal = PeExport.ExportByOrdinal;
         PeInfo.forwardedExport = PeExport.ForwardedName.Length > 0;
+        PeInfo.exportAsCppName = (PeExport.Name.Length > 0 && PeExport.Name[0] == '?');
         PeInfo.virtualAddress = PeExport.VirtualAddress;
 
-        if (PeExport.Name.Length > 0 && PeExport.Name[0] == '?')
+        if (PeInfo.exportAsCppName)
             PeInfo.UndecoratedName = SymPrv.UndecorateName(PeExport.Name);
         else
             PeInfo.UndecoratedName = "";
     }
 
-    public int Index { get { return PeInfo.index; } }
+    public string IconUri
+    {
+        get
+        {
+            if (PeInfo.forwardedExport)
+                return "Images/export_forward.gif";
+            if (PeInfo.exportByOrdinal)
+                return "Images/export_ord.gif";
+            if (PeInfo.exportAsCppName)
+                return "Images/export_cpp.gif";
+            
+            return "Images/export_C.gif";
+        }
+    }
+
+    public int Type
+    {
+        get
+        {
+            if (PeInfo.forwardedExport)
+                return 1;
+            if (PeInfo.exportByOrdinal)
+                return 2;
+            if (PeInfo.exportAsCppName)
+                return 3;
+
+            return 0;
+        }
+    }
     public int Hint { get { return PeInfo.hint; } }
     public int? Ordinal { get { if (PeInfo.exportByOrdinal) { return PeInfo.ordinal; } return null; } }
     public string Name
@@ -116,8 +169,8 @@ public class DisplayPeExport
 public struct PeExportInfo
 {
     public Boolean exportByOrdinal;
+    public Boolean exportAsCppName;
     public Boolean forwardedExport;
-    public int index;
     public int ordinal;
     public int hint;
     public long virtualAddress;
