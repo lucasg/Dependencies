@@ -278,7 +278,7 @@ namespace System
 		// Delayed Imports
 		if (NT_SUCCESS(PhGetMappedImageDelayImports(&m_Impl->m_PvDelayImports, &m_Impl->m_PvMappedImage)))
 		{
-			for (size_t IndexDll = 0; IndexDll< m_Impl->m_PvImports.NumberOfDlls; IndexDll++)
+			for (size_t IndexDll = 0; IndexDll< m_Impl->m_PvDelayImports.NumberOfDlls; IndexDll++)
 			{
 				Imports->Add(gcnew PeImportDll(&m_Impl->m_PvDelayImports, IndexDll));
 			}
