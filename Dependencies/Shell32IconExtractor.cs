@@ -116,9 +116,11 @@ namespace Dependencies
         {
             TreeViewItemContext childTreeContext = (TreeViewItemContext)value;
 
-            if (!childTreeContext.PeProperties.LoadSuccessful)
+            if (childTreeContext.PeProperties == null)
                 return "Images/Question.png";
 
+            if (!childTreeContext.PeProperties.LoadSuccessful)
+                return "Images/Question.png";
 
             string Filename = (string) childTreeContext.PeProperties.Filepath;
             Icon icon = ExtractIcon.GetIcon(Filename, true);

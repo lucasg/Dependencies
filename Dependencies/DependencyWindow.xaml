@@ -92,34 +92,34 @@
                 
                 <ListView.View>
                     <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Header="Index" Width="40" util:GridViewSort.PropertyName="Index">
+                        <GridViewColumn Header="PI" Width="40" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <Image Width="30" Height="14" Source="{Binding IconUri}"/>
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal">
+                        <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint">
+                        <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Hint, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
-                        <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName"/>
-                        <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}" util:GridViewSort.PropertyName="DelayImport"/>
+                        <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                        <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                        <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}" util:GridViewSort.PropertyName="DelayImport" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                     </GridView>
                 </ListView.View>
             </ListView>
-            <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" util:GridViewSort.AutoSort="True" util:GridViewSort.SortGlyphAscending="Images/GlyphSortAscending.png" util:GridViewSort.SortGlyphDescending="Images/GlyphSortDescending.png">
+            <ListView x:Name="ExportList" Grid.Row="2" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" util:GridViewSort.AutoSort="True">
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
@@ -129,29 +129,30 @@
                 
                 <ListView.View>
                     <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Header="Index" Width="40" util:GridViewSort.PropertyName="Index">
+                        <GridViewColumn Header="E" Width="40" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding Index}" TextAlignment="Right" />
+                                    <Image Width="30" Height="14" Source="{Binding IconUri}"/>
+                                    <!--<TextBlock Text="{Binding Index}" TextAlignment="Right" />-->
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal">
+                        <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint">
+                        <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
                             <GridViewColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Hint, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
                                 </DataTemplate>
                             </GridViewColumn.CellTemplate>
                         </GridViewColumn>
-                        <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name"/>
-                        <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress, StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualAddress"/>
+                        <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                        <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress, StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualAddress" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                     </GridView>
                 </ListView.View>
             </ListView>

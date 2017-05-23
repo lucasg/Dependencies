@@ -197,11 +197,11 @@ public class DisplayErrorModuleInfo : DisplayModuleInfo
 
     public override string Cpu { get { return ""; } }
     public override string Type { get { return ""; } }
-    public override string Filesize { get { return ""; } }
-    public override string ImageBase { get { return ""; } }
-    public override string VirtualSize { get { return ""; } }
-    public override string EntryPoint { get { return ""; } }
-    public override string Subsystem { get { return ""; } }
+    public override UInt32? Filesize { get { return null; } }
+    public override UInt64? ImageBase { get { return null; } }
+    public override int? VirtualSize { get { return null; } }
+    public override UInt64? EntryPoint { get { return null; } }
+    public override int? Subsystem { get { return null; } }
     public override string SubsystemVersion { get { return ""; } }
     public override string Checksum { get { return ""; } }
 
@@ -215,27 +215,30 @@ public class DisplayModuleInfo
         Info.Name = ModuleName;
     }
 
-    public DisplayModuleInfo(uint index, PeImportDll Module, PeProperties Properties)
+    public DisplayModuleInfo(uint index, PeImportDll Module, PE Pe)
     {
         Info.index = index;
         Info.Name = Module.Name;
 
-        Info.Machine = Properties.Machine;
-        Info.Magic = Properties.Magic;
+        Info.Machine = Pe.Properties.Machine;
+        Info.Magic = Pe.Properties.Magic;
 
-        Info.ImageBase = Properties.ImageBase;
-        Info.SizeOfImage = Properties.SizeOfImage;
-        Info.EntryPoint = Properties.EntryPoint;
+        Info.ImageBase = (UInt64) Pe.Properties.ImageBase;
+        Info.SizeOfImage = Pe.Properties.SizeOfImage;
+        Info.EntryPoint = (UInt64) Pe.Properties.EntryPoint;
 
-        Info.Checksum = Properties.Checksum;
-        Info.CorrectChecksum = Properties.CorrectChecksum;
+        Info.Checksum = Pe.Properties.Checksum;
+        Info.CorrectChecksum = Pe.Properties.CorrectChecksum;
 
-        Info.Subsystem = Properties.Subsystem;
-        Info.Characteristics = Properties.Characteristics;
-        Info.DllCharacteristics = Properties.DllCharacteristics;
+        Info.Subsystem = Pe.Properties.Subsystem;
+        Info.Characteristics = Pe.Properties.Characteristics;
+        Info.DllCharacteristics = Pe.Properties.DllCharacteristics;
 
+        Info.context.ImportProperties = Module;
+        Info.context.PeProperties = Pe;
     }
 
+    public virtual TreeViewItemContext Context { get { return Info.context; } }
     public virtual uint Index { get { return Info.index; } }
     public virtual string Name { get { return Info.Name; } }
     public virtual string Cpu
@@ -280,11 +283,11 @@ public class DisplayModuleInfo
             return String.Join("; ", TypeList.ToArray());
         }
     }
-    public virtual string Filesize { get { return String.Format("0x{0:x8}", 0x00); } }
-    public virtual string ImageBase { get { return String.Format("0x{0:x8}", Info.ImageBase); } }
-    public virtual string VirtualSize { get { return String.Format("0x{0:x8}", Info.SizeOfImage); } }
-    public virtual string EntryPoint { get { return String.Format("0x{0:x8}", Info.EntryPoint); } }
-    public virtual string Subsystem { get { return String.Format("{0:x}", Info.Subsystem); } }
+    public virtual UInt32? Filesize { get { return 0x00; } }
+    public virtual UInt64? ImageBase { get { return Info.ImageBase; } }
+    public virtual int? VirtualSize { get { return Info.SizeOfImage; } }
+    public virtual UInt64? EntryPoint { get { return Info.EntryPoint; } }
+    public virtual int? Subsystem { get { return Info.Subsystem; } }
     public virtual string SubsystemVersion { get { return ""; } }
     public virtual string Checksum
     {
@@ -304,14 +307,17 @@ public class DisplayModuleInfo
 
 public struct ModuleInfo
 {
+    // @TODO(Hack: refactor correctly for image generation)
+    public TreeViewItemContext context;
+
     public uint index;
     public string Name;
     public Int16 Machine;
     public Int16 Magic;
 
-    public IntPtr ImageBase;
+    public UInt64 ImageBase;
     public Int32 SizeOfImage;
-    public IntPtr EntryPoint;
+    public UInt64 EntryPoint;
 
 
     public Int32 Checksum;
@@ -370,9 +376,9 @@ namespace Dependencies
                         this.ModulesList.Items.Add(new DisplayErrorModuleInfo(0xdeadbeef, DllImport));
                     else
                     {
-                        this.ModulesList.Items.Add(new DisplayModuleInfo(0xdeadbeef, DllImport, ImportPe.Properties));
-                        this.ModulesFound.Add(PeFilePath);
+                        this.ModulesList.Items.Add(new DisplayModuleInfo(0xdeadbeef, DllImport, ImportPe));
                     }
+                    this.ModulesFound.Add(PeFilePath);
 
                     // do not process twice the same PE in order to lessen memory pressure
                     BacklogPeToProcess.Add(new Tuple<TreeViewItem, PE>(childTreeNode, ImportPe));
@@ -433,21 +439,18 @@ namespace Dependencies
             this.ImportList.Items.Clear();
             this.ExportList.Items.Clear();
 
-            int i = 0;
+            
             foreach (PeImportDll DllImport in PeImports)
             {
                 foreach (PeImport Import in DllImport.ImportList)
                 {
-                    this.ImportList.Items.Add(new DisplayPeImport(i, Import, SymPrv));
-                    i++;
+                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv));
                 }
             }
 
-            i = 0;
             foreach (PeExport Export in PeExports)
             {
-                this.ExportList.Items.Add(new DisplayPeExport(i, Export, SymPrv));
-                i++;
+                this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
             }
         }
     }
