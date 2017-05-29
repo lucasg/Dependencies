@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
         xmlns:mdi="clr-namespace:WPF.MDI;assembly=WPF.MDI"
+        xmlns:properties="clr-namespace:Dependencies.Properties"
         mc:Ignorable="d"
         Title="Dependencies" HorizontalContentAlignment="Stretch" Height="900" Width="1600" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom">
     <Window.CommandBindings>
@@ -17,6 +18,12 @@
         <KeyBinding Key="O" Modifiers="Control" Command="Open"></KeyBinding>
         <KeyBinding Key="Q" Modifiers="Control" Command="Close"></KeyBinding>
     </Window.InputBindings>
+
+    <Window.Resources>
+        <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
+        
+    </Window.Resources>
+    
     <Grid x:Name="MainGrid" Margin="0,0,0,0" Background="#FF5C8F88">
         <Grid.RowDefinitions>
             <RowDefinition Height="26"/>
@@ -38,10 +45,10 @@
                 <Separator Height="3" Margin="0"/>
                 <MenuItem x:Name="_AutoExpandItem" Header="Auto Expand" Height="25" InputGestureText="F8" Margin="0"/>
                 <Separator Height="3" Margin="0"/>
-                <MenuItem x:Name="_FullPathItem" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="True" Margin="0,0,0.2,0"/>
-                <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True"/>
+                <MenuItem x:Name="_FullPathItem" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=FullPath, Mode=TwoWay}" Margin="0,0,0.2,0"/>
+                <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
                 <Separator Height="3" Margin="0"/>
-                <MenuItem x:Name="_StatusBarItem" Header="Status Bar" Height="25" IsChecked="True" IsCheckable="True" Margin="0"/>
+                <MenuItem x:Name="_StatusBarItem" Header="Status Bar" Height="25" IsCheckable="True" Margin="0" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=TwoWay}"/>
             </MenuItem>
             <MenuItem x:Name="OptionsItem" Header="_Options" Height="25" Width="54">
                 <MenuItem x:Name="ConfModuleItem" Header="Configure _Module search order" Height="25" Margin="0" AutomationProperties.AccessKey="Configure Module &amp;search order"/>
@@ -58,6 +65,6 @@
             <mdi:MdiContainer Name="Container" Grid.ColumnSpan="1"/>
         </Grid>
 
-        <StatusBar x:Name="AppStatusBar" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Grid.Row="2" MinHeight="28" Panel.ZIndex="1" Margin="0" VerticalAlignment="Bottom"/>
+        <StatusBar x:Name="AppStatusBar" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Grid.Row="2" MinHeight="28" Panel.ZIndex="1" Margin="0" VerticalAlignment="Bottom" Visibility="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}"/>
     </Grid>
 </Window>
