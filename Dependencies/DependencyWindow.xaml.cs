@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -41,17 +42,22 @@ public class DisplayPeImport : UndecorateSymbolBinding
     
     public DisplayPeImport(
         /*_In_*/ PeImport PeImport,
-        /*_In_*/ PhSymbolProvider SymPrv
+        /*_In_*/ PhSymbolProvider SymPrv,
+        /*_In_*/ bool FoundModule
     )
     {
        Info.ordinal = PeImport.Ordinal;
        Info.hint = PeImport.Hint;
        Info.name = PeImport.Name;
        Info.moduleName = PeImport.ModuleName;
+       Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
+
        Info.delayedImport = PeImport.DelayImport;
        Info.importAsCppName = (PeImport.Name.Length > 0 && PeImport.Name[0] == '?');
        Info.importByOrdinal = PeImport.ImportByOrdinal;
-       Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
+       Info.importNotFound = !FoundModule;
+
+
 
        _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate);
     }
@@ -61,8 +67,8 @@ public class DisplayPeImport : UndecorateSymbolBinding
     {
         get
         {
-            //if (Info.importNotFound)
-            //     return "Images/import_err.gif";
+            if (Info.importNotFound)
+                 return "Images/import_err.gif";
             if (Info.importByOrdinal)
                 return "Images/import_ord.gif";
             if (Info.importAsCppName)
@@ -75,8 +81,8 @@ public class DisplayPeImport : UndecorateSymbolBinding
     {
         get
         {
-            //if (Info.importNotFound)
-            //    return 1;
+            if (Info.importNotFound)
+                return 1;
             if (Info.importByOrdinal)
                 return 2;
             if (Info.importAsCppName)
@@ -116,12 +122,16 @@ public struct PeImportInfo
 {
    public int ordinal;
    public int hint;
+
    public string name;
    public string moduleName;
+   public string UndecoratedName;
+
    public Boolean delayedImport;
    public Boolean importByOrdinal;
    public Boolean importAsCppName;
-   public string UndecoratedName;
+   public Boolean importNotFound;
+
 }
 
 public class DisplayPeExport : UndecorateSymbolBinding
@@ -230,8 +240,8 @@ public enum PeTypes
 
 public class DisplayErrorModuleInfo : DisplayModuleInfo
 {
-    public DisplayErrorModuleInfo(uint Index, PeImportDll Module)
-    : base(Index, Module.Name)
+    public DisplayErrorModuleInfo(PeImportDll Module)
+    : base(Module.Name)
     {
     }
 
@@ -249,15 +259,13 @@ public class DisplayErrorModuleInfo : DisplayModuleInfo
 
 public class DisplayModuleInfo
 {
-    public DisplayModuleInfo(uint index, string ModuleName)
+    public DisplayModuleInfo(string ModuleName)
     {
-        Info.index = index;
         Info.Name = ModuleName;
     }
 
-    public DisplayModuleInfo(uint index, PeImportDll Module, PE Pe)
-    {
-        Info.index = index;
+    public DisplayModuleInfo(PeImportDll Module, PE Pe)
+    {   
         Info.Name = Module.Name;
 
         Info.Machine = Pe.Properties.Machine;
@@ -279,7 +287,6 @@ public class DisplayModuleInfo
     }
 
     public virtual TreeViewItemContext Context { get { return Info.context; } }
-    public virtual uint Index { get { return Info.index; } }
     public virtual string Name { get { return Info.Name; } }
     public virtual string Cpu
     {
@@ -350,7 +357,6 @@ public struct ModuleInfo
     // @TODO(Hack: refactor correctly for image generation)
     public TreeViewItemContext context;
 
-    public uint index;
     public string Name;
     public Int16 Machine;
     public Int16 Magic;
@@ -383,46 +389,62 @@ namespace Dependencies
     public partial class DependencyWindow : UserControl
     {
         PE Pe;
+        string RootFolder;
         PhSymbolProvider SymPrv;
         HashSet<String> ModulesFound;
+        HashSet<String> ModulesNotFound;
 
 
         public Boolean ProcessPe(int level,  TreeViewItem currentNode, PE newPe)
         {
-            
+          
             List<PeImportDll> PeImports = newPe.GetImports();
-
             List<Tuple<TreeViewItem, PE>> BacklogPeToProcess = new List<Tuple<TreeViewItem, PE>>();
+
             foreach (PeImportDll DllImport in PeImports)
             {
-                // Find Dll in "paths"
-                String PeFilePath = "C:\\Windows\\System32\\" + DllImport.Name;
-                PE ImportPe = new PE(PeFilePath);
-
-                // Add to tree view
                 TreeViewItem childTreeNode = new TreeViewItem();
                 TreeViewItemContext childTreeContext = new TreeViewItemContext();
+
+                // Find Dll in "paths"
+                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder);
+                PE ImportPe = null;
+
+                if (PeFilePath != null)
+                {
+                    ImportPe = new PE(PeFilePath);
+
+                    if (!this.ModulesFound.Contains(PeFilePath))
+                    {
+                        
+                        this.ModulesFound.Add(PeFilePath);
+
+                        // do not process twice the same PE in order to lessen memory pressure
+                        BacklogPeToProcess.Add(new Tuple<TreeViewItem, PE>(childTreeNode, ImportPe));
+
+                        this.ModulesList.Items.Add(new DisplayModuleInfo(DllImport, ImportPe));
+                    }       
+                }
+                else
+                {
+                    if (!this.ModulesNotFound.Contains(DllImport.Name))
+                    {
+
+                        this.ModulesNotFound.Add(DllImport.Name);
+
+                    
+                        this.ModulesList.Items.Add(new DisplayErrorModuleInfo(DllImport));
+                    }
+                }
+                
+
+                // Add to tree view
                 childTreeContext.PeProperties = ImportPe;
                 childTreeContext.ImportProperties = DllImport;
 
                 childTreeNode.Header = DllImport.Name;
                 childTreeNode.DataContext = childTreeContext;
                 currentNode.Items.Add(childTreeNode);
-
-                
-                if (!this.ModulesFound.Contains(PeFilePath))
-                {
-                    if (!ImportPe.LoadSuccessful)
-                        this.ModulesList.Items.Add(new DisplayErrorModuleInfo(0xdeadbeef, DllImport));
-                    else
-                    {
-                        this.ModulesList.Items.Add(new DisplayModuleInfo(0xdeadbeef, DllImport, ImportPe));
-                    }
-                    this.ModulesFound.Add(PeFilePath);
-
-                    // do not process twice the same PE in order to lessen memory pressure
-                    BacklogPeToProcess.Add(new Tuple<TreeViewItem, PE>(childTreeNode, ImportPe));
-                }                    
             }
 
 
@@ -442,8 +464,10 @@ namespace Dependencies
             InitializeComponent();
 
             this.Pe = new PE(FileName);
+            this.RootFolder = Path.GetDirectoryName(FileName);
             this.SymPrv = new PhSymbolProvider();
             this.ModulesFound = new HashSet<String>();
+            this.ModulesNotFound = new HashSet<String>();
 
             this.ModulesList.Items.Clear();
             this.DllTreeView.Items.Clear();
@@ -472,25 +496,29 @@ namespace Dependencies
             TreeViewItemContext childTreeContext = (TreeViewItemContext) (this.DllTreeView.SelectedItem as TreeViewItem).DataContext;
             PE SelectedPE = childTreeContext.PeProperties;
 
-            List<PeExport> PeExports = SelectedPE.GetExports();
-            List<PeImportDll> PeImports = SelectedPE.GetImports();
-
-
             this.ImportList.Items.Clear();
             this.ExportList.Items.Clear();
 
+            if (SelectedPE != null)
+            {
+                List<PeExport> PeExports = SelectedPE.GetExports();
+                List<PeImportDll> PeImports = SelectedPE.GetImports();
             
-            foreach (PeImportDll DllImport in PeImports)
-            {
-                foreach (PeImport Import in DllImport.ImportList)
+                foreach (PeImportDll DllImport in PeImports)
                 {
-                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv));
-                }
-            }
+                    String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder);
 
-            foreach (PeExport Export in PeExports)
-            {
-                this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
+                    foreach (PeImport Import in DllImport.ImportList)
+                    {
+                        this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath != null));
+                    }
+                }
+
+                foreach (PeExport Export in PeExports)
+                {
+                    this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
+                }
+
             }
         }
     }
