@@ -28,7 +28,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="26"/>
             <RowDefinition Height="785*"/>
-            <RowDefinition Height="28"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <Menu x:Name="MainMenu" HorizontalContentAlignment="Stretch" MinHeight="26" Panel.ZIndex="1" Grid.Row="0" VerticalContentAlignment="Top" VerticalAlignment="Top">
