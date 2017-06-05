@@ -3,12 +3,42 @@ using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.ClrPh;
+using System.ComponentModel;
 
 
-
-
-public class DisplayPeImport
+public class UndecorateSymbolBinding : INotifyPropertyChanged
 {
+    public event PropertyChangedEventHandler PropertyChanged;
+    public string _DisplayName;
+
+    public UndecorateSymbolBinding()
+    {
+        Dependencies.Properties.Settings.Default.PropertyChanged += this.Undecorate_PropertyChanged;
+    }
+
+    public virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected virtual string GetDisplayName(bool UndecorateName)
+    {
+        return "";
+    }
+
+    private void Undecorate_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == "Undecorate")
+        {
+            _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate);
+            OnPropertyChanged("Name");
+        }
+    }
+}
+
+public class DisplayPeImport : UndecorateSymbolBinding
+{
+    
     public DisplayPeImport(
         /*_In_*/ PeImport PeImport,
         /*_In_*/ PhSymbolProvider SymPrv
@@ -21,12 +51,11 @@ public class DisplayPeImport
        Info.delayedImport = PeImport.DelayImport;
        Info.importAsCppName = (PeImport.Name.Length > 0 && PeImport.Name[0] == '?');
        Info.importByOrdinal = PeImport.ImportByOrdinal;
+       Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
 
-        if (Info.importAsCppName)
-            Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
-        else
-            Info.UndecoratedName = "";
+       _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate);
     }
+
 
     public string IconUri
     {
@@ -59,17 +88,24 @@ public class DisplayPeImport
     public int Hint { get { return Info.hint; } }
     public int? Ordinal { get { if (Info.importByOrdinal) { return Info.ordinal; } return null; } }
 
-    public string Name { get {
+    public string Name
+    {
+        get { return _DisplayName; }
+        set { _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate); }
+    }
 
-            if (Info.UndecoratedName.Length > 0)
-                return Info.UndecoratedName;
+    protected override string GetDisplayName(bool UndecorateName)
+    {
+        if ((UndecorateName) && (Info.UndecoratedName.Length > 0))
+            return Info.UndecoratedName;
 
-            if (Info.importByOrdinal)
-                return String.Format("Ordinal_{0:d}", Info.ordinal);
+        else if (Info.importByOrdinal)
+            return String.Format("Ordinal_{0:d}", Info.ordinal);
 
-            return Info.name;
-    } }
-   public string ModuleName { get { return Info.moduleName; } }
+        return Info.name;
+    }
+
+    public string ModuleName { get { return Info.moduleName; } }
    public Boolean DelayImport { get { return Info.delayedImport; } }
 
    private
@@ -88,7 +124,7 @@ public struct PeImportInfo
    public string UndecoratedName;
 }
 
-public class DisplayPeExport
+public class DisplayPeExport : UndecorateSymbolBinding
 {
    public DisplayPeExport(
         /*_In_*/ PeExport PeExport,
@@ -103,11 +139,9 @@ public class DisplayPeExport
         PeInfo.forwardedExport = PeExport.ForwardedName.Length > 0;
         PeInfo.exportAsCppName = (PeExport.Name.Length > 0 && PeExport.Name[0] == '?');
         PeInfo.virtualAddress = PeExport.VirtualAddress;
+        PeInfo.UndecoratedName = SymPrv.UndecorateName(PeExport.Name);
 
-        if (PeInfo.exportAsCppName)
-            PeInfo.UndecoratedName = SymPrv.UndecorateName(PeExport.Name);
-        else
-            PeInfo.UndecoratedName = "";
+        _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate);
     }
 
     public string IconUri
@@ -141,23 +175,29 @@ public class DisplayPeExport
     }
     public int Hint { get { return PeInfo.hint; } }
     public int? Ordinal { get { if (PeInfo.exportByOrdinal) { return PeInfo.ordinal; } return null; } }
+
     public string Name
     {
-        get
-        {
-            if (PeInfo.forwardedExport)
-                return PeInfo.ForwardName;
-
-            if (PeInfo.exportByOrdinal)
-                return String.Format("Ordinal_{0:d}", PeInfo.ordinal);
-
-
-            if (PeInfo.UndecoratedName.Length > 0)
-                return PeInfo.UndecoratedName;
-
-            return PeInfo.name;
-        }
+        get { return _DisplayName; }
+        set { _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate); }
     }
+   
+    protected override string GetDisplayName(bool Undecorate)
+    { 
+        if (PeInfo.forwardedExport)
+            return PeInfo.ForwardName;
+
+        if (PeInfo.exportByOrdinal)
+            return String.Format("Ordinal_{0:d}", PeInfo.ordinal);
+
+
+        if ((Undecorate) && (PeInfo.UndecoratedName.Length > 0))
+            return PeInfo.UndecoratedName;
+
+        return PeInfo.name;
+        
+    }
+
     public string VirtualAddress { get { return String.Format("0x{0:x8}", PeInfo.virtualAddress); } }
 
 
