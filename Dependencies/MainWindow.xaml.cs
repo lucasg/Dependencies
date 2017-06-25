@@ -26,6 +26,7 @@ namespace Dependencies
     /// </summary>
     public partial class MainWindow : Window
     {
+
         public MainWindow()
         {
             Phlib.InitializePhLib();
@@ -54,7 +55,8 @@ namespace Dependencies
                 Width = ChildWith,
                 Height = ChildHeight,
                 //Margin = new System.Windows.Thickness(15,15,15,15)
-                //Icon = new BitmapImage(new Uri("OriginalLogo.png", UriKind.Relative))
+                //Icon = new BitmapImage(uriSource: new Uri(@"Images/dependencies_16x.png", UriKind.RelativeOrAbsolute)),
+                //ShowIcon = true
             });
 
             // Invalidate size in order to trigger resize for internal elements.
@@ -67,7 +69,6 @@ namespace Dependencies
         {
             System.Windows.Application.Current.Shutdown();
         }
-        
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {

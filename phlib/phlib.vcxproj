@@ -235,6 +235,7 @@
     <ClInclude Include="include\refp.h" />
     <ClInclude Include="include\secedit.h" />
     <ClInclude Include="include\seceditp.h" />
+    <ClInclude Include="include\settings.h" />
     <ClInclude Include="include\svcsup.h" />
     <ClInclude Include="include\symprv.h" />
     <ClInclude Include="include\symprvp.h" />

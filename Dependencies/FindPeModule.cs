@@ -24,6 +24,8 @@ namespace Dependencies
 
         }
 
+        // default search order : 
+        // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682586(v=vs.85).aspx
         public static string FindPeFromDefault(string ModuleName, string RootPeFolder)
         {
             string FoundPePath = null;

@@ -43,19 +43,20 @@ public class DisplayPeImport : UndecorateSymbolBinding
     public DisplayPeImport(
         /*_In_*/ PeImport PeImport,
         /*_In_*/ PhSymbolProvider SymPrv,
-        /*_In_*/ bool FoundModule
+        /*_In_*/ string ModuleFilePath
     )
     {
        Info.ordinal = PeImport.Ordinal;
        Info.hint = PeImport.Hint;
        Info.name = PeImport.Name;
        Info.moduleName = PeImport.ModuleName;
+       Info.modulePath = ModuleFilePath;
        Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
 
        Info.delayedImport = PeImport.DelayImport;
        Info.importAsCppName = (PeImport.Name.Length > 0 && PeImport.Name[0] == '?');
        Info.importByOrdinal = PeImport.ImportByOrdinal;
-       Info.importNotFound = !FoundModule;
+       Info.importNotFound = ModuleFilePath == null;
 
 
 
@@ -125,6 +126,7 @@ public struct PeImportInfo
 
    public string name;
    public string moduleName;
+   public string modulePath;
    public string UndecoratedName;
 
    public Boolean delayedImport;
@@ -266,7 +268,7 @@ public class DisplayModuleInfo
 
     public DisplayModuleInfo(PeImportDll Module, PE Pe)
     {   
-        Info.Name = Module.Name;
+        Info.Name = Pe.Filepath;
 
         Info.Machine = Pe.Properties.Machine;
         Info.Magic = Pe.Properties.Magic;
@@ -376,8 +378,13 @@ public struct ModuleInfo
 
 public struct TreeViewItemContext
 {
-    public PE PeProperties;
+    // union-like
+    public PE PeProperties; // null if not found
     public PeImportDll ImportProperties;
+
+    public string PeFilePath; // null if not found
+    public List<PeExport> PeExports; // null if not found
+    public List<PeImportDll> PeImports; // null if not found
 }
 
 namespace Dependencies
@@ -441,8 +448,9 @@ namespace Dependencies
                 // Add to tree view
                 childTreeContext.PeProperties = ImportPe;
                 childTreeContext.ImportProperties = DllImport;
+                childTreeContext.PeFilePath = PeFilePath;
 
-                childTreeNode.Header = DllImport.Name;
+                childTreeNode.Header = (Dependencies.Properties.Settings.Default.FullPath) ? PeFilePath : DllImport.Name;
                 childTreeNode.DataContext = childTreeContext;
                 currentNode.Items.Add(childTreeNode);
             }
@@ -499,27 +507,31 @@ namespace Dependencies
             this.ImportList.Items.Clear();
             this.ExportList.Items.Clear();
 
-            if (SelectedPE != null)
-            {
-                List<PeExport> PeExports = SelectedPE.GetExports();
-                List<PeImportDll> PeImports = SelectedPE.GetImports();
+            // Selected Pe has not been found on disk
+            if (SelectedPE == null)
+                return;
+
+            // Process imports and exports on first load
+            if (childTreeContext.PeExports == null) { childTreeContext.PeExports = SelectedPE.GetExports(); }
+            if (childTreeContext.PeImports == null) { childTreeContext.PeImports = SelectedPE.GetImports(); }
+
+                
             
-                foreach (PeImportDll DllImport in PeImports)
+            foreach (PeImportDll DllImport in childTreeContext.PeImports)
+            {
+                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder);
+
+                foreach (PeImport Import in DllImport.ImportList)
                 {
-                    String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder);
-
-                    foreach (PeImport Import in DllImport.ImportList)
-                    {
-                        this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath != null));
-                    }
+                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath));
                 }
-
-                foreach (PeExport Export in PeExports)
-                {
-                    this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
-                }
-
             }
+
+            foreach (PeExport Export in childTreeContext.PeExports)
+            {
+                this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
+            }
+
         }
     }
 }
