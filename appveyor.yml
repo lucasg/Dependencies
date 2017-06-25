@@ -17,8 +17,4 @@ configuration:
 
 
 build:
-  project: C:/projects/dependencies/Dependencies/Dependencies.csproj
-
-
-before_build:
-  powershell Get-ChildItem -Recurse
+  project: C:/projects/dependencies/Dependencies.sln
