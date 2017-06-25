@@ -24,13 +24,29 @@ artifacts:
   - path: output/Dependencies.zip
     name: Dependencies
 
+deploy:
+  # Deploy to GitHub Releases
+  - provider: GitHub
+    artifact: Dependencies
+    draft: false
+    prerelease: false
+    on:
+      branch: master                # release from master branch only
+      platform: Any CPU
+      appveyor_repo_tag: true       # deploy on tag push only
+
+
 build:
   project: C:/projects/dependencies/Dependencies.sln
 
 
-test_script:
-  - mkdir output
-  - cd output
-  - set BINPATH=C:/projects/dependencies/Dependencies/bin/%configuration%
-  - 7z a Dependencies.zip %BINPATH%/*.dll %BINPATH%/*.exe
-  - powershell Get-ChildItem -Recurse
+test_script: # should be on_finish, but it need to be executed before artifacts is
+  - ps: |
+      if ( $($env:platform) -eq "Any CPU") {
+        New-Item -ItemType Directory -Force -Path "output";
+        cd output;
+
+        set $BINPATH="C:/projects/dependencies/Dependencies/bin/$($env:CONFIGURATION)";
+        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe
+      }
+  - ps: Write-Host "Building artifact done"
