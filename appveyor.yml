@@ -15,6 +15,10 @@ configuration:
   - Release
   - Debug
 
+platform:
+  - x86
+  - x64
+  - Any CPU
 
 build:
   project: C:/projects/dependencies/Dependencies.sln
