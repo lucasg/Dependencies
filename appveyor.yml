@@ -20,9 +20,17 @@ platform:
   - x64
   - Any CPU
 
+artifacts:
+  - path: output/Dependencies.zip
+    name: Dependencies
+
 build:
   project: C:/projects/dependencies/Dependencies.sln
 
 
 test_script:
+  - mkdir output
+  - cd output
+  - set BINPATH=C:/projects/dependencies/Dependencies/bin/%configuration%
+  - 7z a Dependencies.zip %BINPATH%/*.dll %BINPATH%/*.exe
   - powershell Get-ChildItem -Recurse
