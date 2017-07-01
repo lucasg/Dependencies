@@ -46,7 +46,7 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         New-Item -ItemType Directory -Force -Path "output";
         cd output;
 
-        set $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)AnyCPU";
-        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.xml
+        $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)AnyCPU";
+        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe
       }
   - ps: Write-Host "Building artifact done"
