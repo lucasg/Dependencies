@@ -1,0 +1,12 @@
+.vs/
+obj/
+bin/
+
+
+*.obj
+*.log
+*.tlog
+*.VC.db
+*.cache
+*.pdb
+*.pch
