@@ -9,9 +9,28 @@ namespace ClrPhTester
 {
     class Program
     {
+        static void PrintKnownDlls()
+        {
+            Console.WriteLine("64-bit KnownDlls : ");
+            foreach (String KnownDll in Phlib.GetKnownDlls(false))
+            {
+                Console.WriteLine("\t{0:s}", KnownDll);
+            }
+            Console.WriteLine("");
+
+            Console.WriteLine("32-bit KnownDlls : ");
+            foreach (String KnownDll in Phlib.GetKnownDlls(true))
+            {
+                Console.WriteLine("\t{0:s}", KnownDll);
+            }
+            Console.WriteLine("");
+        }
+
         static void Main(string[] args)
         {
             Phlib.InitializePhLib();
+            PrintKnownDlls();
+
 
             //String FileName = "F:\\Dev\\processhacker2\\TestBt\\ClangDll\\Release\\ClangDll.dll";
             String FileName = "C:\\Windows\\System32\\kernelbase.dll";

@@ -5,15 +5,26 @@
 #include <UnmanagedPh.h>
 
 
-#using <System.dll>  
+#using <System.dll>
 
 namespace System {
+
+	using namespace Collections::Generic;
 
     namespace ClrPh {
 
         public ref class Phlib {
         public:
+
+        	// Imitialize Process Hacker's phlib internal data
+        	// Must be called before any other API (kinda like OleInitialize).
             static bool InitializePhLib();
+
+            // Return the list of knwown dll for this system
+            static List<String^>^ GetKnownDlls(_In_ bool Wow64Dlls);
+
+			static List<String^>^ KnownDll64List;
+			static List<String^>^ KnownDll32List;
         };
 
 
@@ -38,7 +49,7 @@ namespace System {
             String ^Name;
             Int64 NumberOfEntries;
 
-            Collections::Generic::List<PeImport^>^ ImportList;
+            List<PeImport^>^ ImportList;
 
             PeImportDll(const PPH_MAPPED_IMAGE_IMPORTS &PvMappedImports, size_t ImportDllIndex);
             PeImportDll(const PeImportDll ^ other);
@@ -90,8 +101,8 @@ namespace System {
 
             ~PE();
 
-            Collections::Generic::List<PeExport ^>^ GetExports();
-            Collections::Generic::List<PeImportDll ^>^ GetImports();
+            List<PeExport ^>^ GetExports();
+            List<PeImportDll ^>^ GetImports();
 
             PeProperties ^Properties;
             Boolean LoadSuccessful;
