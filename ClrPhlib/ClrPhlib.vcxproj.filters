@@ -13,15 +13,21 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Fichiers sources\Managed">
+      <UniqueIdentifier>{e9536ddc-3c30-4ef3-99fa-0e7f44736ebb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\Unmanaged">
+      <UniqueIdentifier>{e79a5a25-1203-4753-8c5a-644629cfac1a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ClrPhlib.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
-    <ClInclude Include="Stdafx.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ClrPhlib.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UnmanagedPh.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,8 +38,26 @@
     <ClCompile Include="AssemblyInfo.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Stdafx.cpp">
-      <Filter>Fichiers sources</Filter>
+    <ClCompile Include="src\unmanaged\UnmanagedPE.cpp">
+      <Filter>Fichiers sources\Unmanaged</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unmanaged\UnmanagedSymPrv.cpp">
+      <Filter>Fichiers sources\Unmanaged</Filter>
+    </ClCompile>
+    <ClCompile Include="src\managed\PE.cpp">
+      <Filter>Fichiers sources\Managed</Filter>
+    </ClCompile>
+    <ClCompile Include="src\managed\PeExport.cpp">
+      <Filter>Fichiers sources\Managed</Filter>
+    </ClCompile>
+    <ClCompile Include="src\managed\PeImport.cpp">
+      <Filter>Fichiers sources\Managed</Filter>
+    </ClCompile>
+    <ClCompile Include="src\managed\Phlib.cpp">
+      <Filter>Fichiers sources\Managed</Filter>
+    </ClCompile>
+    <ClCompile Include="src\managed\PhSymbolProvider.cpp">
+      <Filter>Fichiers sources\Managed</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
