@@ -7,14 +7,35 @@ using System.ClrPh;
 using System.ComponentModel;
 
 
-public class UndecorateSymbolBinding : INotifyPropertyChanged
+public class DefaultSettingsBindingHandler : INotifyPropertyChanged
 {
-    public event PropertyChangedEventHandler PropertyChanged;
-    public string _DisplayName;
-
-    public UndecorateSymbolBinding()
+    public delegate string CallbackEventHandler(bool settingValue);
+    public struct EventHandlerInfo
     {
-        Dependencies.Properties.Settings.Default.PropertyChanged += this.Undecorate_PropertyChanged;
+        public string Property;
+        public string Settings;
+        public string MemberBindingName;
+        public CallbackEventHandler Handler;
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    private List<EventHandlerInfo> Handlers;
+
+    public DefaultSettingsBindingHandler()
+    {
+        Dependencies.Properties.Settings.Default.PropertyChanged += this.Handler_PropertyChanged;
+        Handlers = new List<EventHandlerInfo>();
+    }
+
+    public void AddNewEventHandler(string PropertyName, string SettingsName, string MemberBindingName, CallbackEventHandler Handler )
+    {
+        EventHandlerInfo info = new EventHandlerInfo();
+        info.Property = PropertyName;
+        info.Settings = SettingsName;
+        info.MemberBindingName = MemberBindingName;
+        info.Handler = Handler;
+
+        Handlers.Add(info);
     }
 
     public virtual void OnPropertyChanged(string propertyName)
@@ -22,24 +43,22 @@ public class UndecorateSymbolBinding : INotifyPropertyChanged
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    protected virtual string GetDisplayName(bool UndecorateName)
+    private void Handler_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        return "";
-    }
-
-    private void Undecorate_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == "Undecorate")
+        foreach (EventHandlerInfo Handler in Handlers.FindAll(x => x.Property == e.PropertyName))
         {
-            _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate);
-            OnPropertyChanged("Name");
+            Handler.Handler(((bool)Dependencies.Properties.Settings.Default[Handler.Settings]));
+            OnPropertyChanged(Handler.MemberBindingName);
         }
+
+        
     }
 }
 
-public class DisplayPeImport : UndecorateSymbolBinding
+
+public class DisplayPeImport : DefaultSettingsBindingHandler
 {
-    
+
     public DisplayPeImport(
         /*_In_*/ PeImport PeImport,
         /*_In_*/ PhSymbolProvider SymPrv,
@@ -59,8 +78,8 @@ public class DisplayPeImport : UndecorateSymbolBinding
        Info.importNotFound = ModuleFilePath == null;
 
 
-
-       _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate);
+        AddNewEventHandler("Undecorate", "Undecorate", "Name", this.GetDisplayName);
+        AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
     }
 
 
@@ -97,26 +116,41 @@ public class DisplayPeImport : UndecorateSymbolBinding
 
     public string Name
     {
-        get { return _DisplayName; }
-        set { _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate); }
+        get { return GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate); }
     }
 
-    protected override string GetDisplayName(bool UndecorateName)
+    public string ModuleName
     {
+        get { return GetPathDisplayName(Dependencies.Properties.Settings.Default.FullPath); }
+    }
+
+    public Boolean DelayImport { get { return Info.delayedImport; } }
+
+
+    protected string GetDisplayName(bool UndecorateName)
+    {
+        
         if ((UndecorateName) && (Info.UndecoratedName.Length > 0))
             return Info.UndecoratedName;
-
+        
         else if (Info.importByOrdinal)
             return String.Format("Ordinal_{0:d}", Info.ordinal);
-
-        return Info.name;
+       
+       return Info.name;
     }
 
-    public string ModuleName { get { return Info.moduleName; } }
-   public Boolean DelayImport { get { return Info.delayedImport; } }
+    protected string GetPathDisplayName(bool FullPath)
+    {
+        if ((FullPath) && (Info.modulePath.Length > 0))
+            return Info.modulePath;
 
-   private
-       PeImportInfo Info;
+        return Info.moduleName;
+    }
+
+    
+
+
+    private PeImportInfo Info;
 }
 
 public struct PeImportInfo
@@ -136,7 +170,7 @@ public struct PeImportInfo
 
 }
 
-public class DisplayPeExport : UndecorateSymbolBinding
+public class DisplayPeExport : DefaultSettingsBindingHandler
 {
    public DisplayPeExport(
         /*_In_*/ PeExport PeExport,
@@ -153,7 +187,7 @@ public class DisplayPeExport : UndecorateSymbolBinding
         PeInfo.virtualAddress = PeExport.VirtualAddress;
         PeInfo.UndecoratedName = SymPrv.UndecorateName(PeExport.Name);
 
-        _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate);
+        AddNewEventHandler("Undecorate", "Undecorate", "Name", this.GetDisplayName);
     }
 
     public string IconUri
@@ -190,11 +224,14 @@ public class DisplayPeExport : UndecorateSymbolBinding
 
     public string Name
     {
-        get { return _DisplayName; }
-        set { _DisplayName = GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate); }
+        get { return GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate); }
     }
-   
-    protected override string GetDisplayName(bool Undecorate)
+
+    public string VirtualAddress { get { return String.Format("0x{0:x8}", PeInfo.virtualAddress); } }
+
+
+
+    protected string GetDisplayName(bool Undecorate)
     { 
         if (PeInfo.forwardedExport)
             return PeInfo.ForwardName;
@@ -210,12 +247,8 @@ public class DisplayPeExport : UndecorateSymbolBinding
         
     }
 
-    public string VirtualAddress { get { return String.Format("0x{0:x8}", PeInfo.virtualAddress); } }
 
-
-
-    private
-        PeExportInfo PeInfo;
+    private PeExportInfo PeInfo;
 }
 
 public struct PeExportInfo
@@ -259,16 +292,20 @@ public class DisplayErrorModuleInfo : DisplayModuleInfo
 
 }
 
-public class DisplayModuleInfo
+public class DisplayModuleInfo : DefaultSettingsBindingHandler
 {
     public DisplayModuleInfo(string ModuleName)
     {
         Info.Name = ModuleName;
+        Info.Filepath = "";
+
+        AddNewEventHandler("FullPath", "FullPath", "Name", this.GetPathDisplayName);
     }
 
     public DisplayModuleInfo(PeImportDll Module, PE Pe)
     {   
-        Info.Name = Pe.Filepath;
+        Info.Name = Module.Name;
+        Info.Filepath = Pe.Filepath;
 
         Info.Machine = Pe.Properties.Machine;
         Info.Magic = Pe.Properties.Magic;
@@ -286,10 +323,18 @@ public class DisplayModuleInfo
 
         Info.context.ImportProperties = Module;
         Info.context.PeProperties = Pe;
+
+        AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
     }
 
     public virtual TreeViewItemContext Context { get { return Info.context; } }
-    public virtual string Name { get { return Info.Name; } }
+
+    public string ModuleName
+    {
+        get { return GetPathDisplayName(Dependencies.Properties.Settings.Default.FullPath); }
+    }
+
+    //public virtual string Name { get { return Info.Name; } }
     public virtual string Cpu
     {
         get
@@ -349,8 +394,16 @@ public class DisplayModuleInfo
         }
     }
 
-    private
-        ModuleInfo Info;
+
+    protected string GetPathDisplayName(bool FullPath)
+    {
+        if ((FullPath) && (Info.Filepath.Length > 0))
+            return Info.Filepath;
+
+        return Info.Name;
+    }
+
+    private ModuleInfo Info;
 }
 
 
@@ -360,6 +413,8 @@ public struct ModuleInfo
     public TreeViewItemContext context;
 
     public string Name;
+    public string Filepath;
+
     public Int16 Machine;
     public Int16 Magic;
 

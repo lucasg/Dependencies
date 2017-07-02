@@ -44,7 +44,7 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                     <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}" util:GridViewSort.PropertyName="Cpu" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                     <GridViewColumn Header="Type" Width="150" DisplayMemberBinding="{Binding Type}" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                     <!--<GridViewColumn Header="File Size" Width="100" DisplayMemberBinding="{Binding FileSize, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="FileSize" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>-->
