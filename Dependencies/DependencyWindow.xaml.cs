@@ -414,7 +414,7 @@ namespace Dependencies
                 TreeViewItemContext childTreeContext = new TreeViewItemContext();
 
                 // Find Dll in "paths"
-                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder);
+                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder, this.Pe.IsWow64Dll() );
                 PE ImportPe = null;
 
                 if (PeFilePath != null)
@@ -450,7 +450,15 @@ namespace Dependencies
                 childTreeContext.ImportProperties = DllImport;
                 childTreeContext.PeFilePath = PeFilePath;
 
-                childTreeNode.Header = (Dependencies.Properties.Settings.Default.FullPath) ? PeFilePath : DllImport.Name;
+                if ((Dependencies.Properties.Settings.Default.FullPath) && (PeFilePath != null))
+                {
+                    childTreeNode.Header = PeFilePath;
+                }
+                else
+                {
+                    childTreeNode.Header = DllImport.Name;
+                }
+                    
                 childTreeNode.DataContext = childTreeContext;
                 currentNode.Items.Add(childTreeNode);
             }
@@ -519,7 +527,7 @@ namespace Dependencies
             
             foreach (PeImportDll DllImport in childTreeContext.PeImports)
             {
-                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder);
+                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder, this.Pe.IsWow64Dll());
 
                 foreach (PeImport Import in DllImport.ImportList)
                 {

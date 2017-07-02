@@ -7,7 +7,7 @@ namespace Dependencies
 {
     public class FindPe
     {
-        static string FindPeFromPath(string ModuleName, List<string> CandidateFolders)
+        static string FindPeFromPath(string ModuleName, List<string> CandidateFolders, bool Wow64Dll = false)
         {
             string PeFilePath = null;
 
@@ -16,7 +16,7 @@ namespace Dependencies
                 PeFilePath = Path.Combine(CandidatePath, ModuleName);
                 PE TestPe = new PE(PeFilePath);
 
-                if (TestPe.LoadSuccessful)
+                if ((TestPe.LoadSuccessful) && (TestPe.IsWow64Dll() == Wow64Dll))
                     return PeFilePath;
             }
 
