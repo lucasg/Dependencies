@@ -105,3 +105,9 @@ Collections::Generic::List<PeImportDll^> ^ PE::GetImports()
 
 	return Imports;
 }
+
+
+bool PE::IsWow64Dll() 
+{
+	return ((Properties->Machine & 0xffff ) == IMAGE_FILE_MACHINE_I386);
+}

@@ -101,8 +101,14 @@ namespace System {
 
             ~PE();
 
+            // Return the list of functions exported by the PE
             List<PeExport ^>^ GetExports();
+
+            // Return the list of functions imported by the PE, bundled by Dll name
             List<PeImportDll ^>^ GetImports();
+
+            // Check if the PE is 32-bit
+            bool IsWow64Dll();
 
             PeProperties ^Properties;
             Boolean LoadSuccessful;
