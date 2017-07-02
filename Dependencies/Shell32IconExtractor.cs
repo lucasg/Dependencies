@@ -147,7 +147,7 @@ namespace Dependencies
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            TreeViewItemContext childTreeContext = (TreeViewItemContext) value;
+            TreeViewItemContext childTreeContext = (TreeViewItemContext)value;
 
             if ((childTreeContext.ImportProperties != null) && ((childTreeContext.ImportProperties.Flags & 0x01) == 0x01))
             {
@@ -162,4 +162,5 @@ namespace Dependencies
             throw new NotImplementedException();
         }
     }
+
 }

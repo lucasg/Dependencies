@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
         <local:DelayedImageToHeaderConverter x:Key="imgdelayed"/>
+
         <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
         </Style>
@@ -60,14 +61,13 @@
         <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
         <TreeView x:Name="DllTreeView"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0" SelectedItemChanged="OnTreeViewSelectedItemChanged">
             <TreeView.Resources>
-                <Style TargetType="TreeViewItem">
+                <Style TargetType="local:ModuleTreeViewItem">
                     <Setter Property="HeaderTemplate">
                         <Setter.Value>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <!--<Image Width="25" Height="15" Source="{Binding Path=Tag,RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor},Converter={StaticResource img}}"></Image>-->
-                                    <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding  Path=DataContext,RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor},Converter={StaticResource imgdelayed} }"></Image>
-                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding  Path=DataContext,RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor},Converter={StaticResource img} }"></Image>
+                                    <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource imgdelayed} }"></Image>
+                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
                                     <TextBlock Text="{Binding}"></TextBlock>
                                 </StackPanel>
                             </DataTemplate>

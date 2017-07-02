@@ -141,7 +141,7 @@ public class DisplayPeImport : DefaultSettingsBindingHandler
 
     protected string GetPathDisplayName(bool FullPath)
     {
-        if ((FullPath) && (Info.modulePath.Length > 0))
+        if ((FullPath) && (Info.modulePath != null))
             return Info.modulePath;
 
         return Info.moduleName;
@@ -437,13 +437,54 @@ public struct TreeViewItemContext
     public PE PeProperties; // null if not found
     public PeImportDll ImportProperties;
 
+    public string ModuleName;
     public string PeFilePath; // null if not found
+
     public List<PeExport> PeExports; // null if not found
     public List<PeImportDll> PeImports; // null if not found
 }
 
 namespace Dependencies
 {
+    public class ModuleTreeViewItem : TreeViewItem, INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public ModuleTreeViewItem()
+        {
+            Dependencies.Properties.Settings.Default.PropertyChanged += this.ModuleTreeViewItem_PropertyChanged;
+        }
+
+        public virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public string GetTreeNodeHeaderName(bool FullPath)
+        {
+            TreeViewItemContext Context = ((TreeViewItemContext)DataContext);
+
+            if ((FullPath) && (Context.PeFilePath != null))
+            {
+                return Context.PeFilePath;
+            }
+            else
+            {
+                return Context.ModuleName;
+            }
+        }
+
+    
+        private void ModuleTreeViewItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "FullPath")
+            {
+                this.Header = (object) GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
+            }
+        }
+    }
+
+
 
     /// <summary>
     /// Logique d'interaction pour DependencyWindow.xaml
@@ -461,12 +502,11 @@ namespace Dependencies
         {
           
             List<PeImportDll> PeImports = newPe.GetImports();
-            List<Tuple<TreeViewItem, PE>> BacklogPeToProcess = new List<Tuple<TreeViewItem, PE>>();
+            List<Tuple<ModuleTreeViewItem, PE>> BacklogPeToProcess = new List<Tuple<ModuleTreeViewItem, PE>>();
 
             foreach (PeImportDll DllImport in PeImports)
             {
-                TreeViewItem childTreeNode = new TreeViewItem();
-                TreeViewItemContext childTreeContext = new TreeViewItemContext();
+                ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
 
                 // Find Dll in "paths"
                 String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder, this.Pe.IsWow64Dll() );
@@ -482,7 +522,7 @@ namespace Dependencies
                         this.ModulesFound.Add(PeFilePath);
 
                         // do not process twice the same PE in order to lessen memory pressure
-                        BacklogPeToProcess.Add(new Tuple<TreeViewItem, PE>(childTreeNode, ImportPe));
+                        BacklogPeToProcess.Add(new Tuple<ModuleTreeViewItem, PE>(childTreeNode, ImportPe));
 
                         this.ModulesList.Items.Add(new DisplayModuleInfo(DllImport, ImportPe));
                     }       
@@ -498,29 +538,23 @@ namespace Dependencies
                         this.ModulesList.Items.Add(new DisplayErrorModuleInfo(DllImport));
                     }
                 }
-                
+
 
                 // Add to tree view
-                childTreeContext.PeProperties = ImportPe;
-                childTreeContext.ImportProperties = DllImport;
-                childTreeContext.PeFilePath = PeFilePath;
+                TreeViewItemContext childTreeInfoContext = new TreeViewItemContext();
+                childTreeInfoContext.PeProperties = ImportPe;
+                childTreeInfoContext.ImportProperties = DllImport;
+                childTreeInfoContext.PeFilePath = PeFilePath;
+                childTreeInfoContext.ModuleName = DllImport.Name;
 
-                if ((Dependencies.Properties.Settings.Default.FullPath) && (PeFilePath != null))
-                {
-                    childTreeNode.Header = PeFilePath;
-                }
-                else
-                {
-                    childTreeNode.Header = DllImport.Name;
-                }
-                    
-                childTreeNode.DataContext = childTreeContext;
+                childTreeNode.DataContext = childTreeInfoContext;
+                childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
                 currentNode.Items.Add(childTreeNode);
             }
 
 
             // Process next batch of dll imports
-            foreach (Tuple<TreeViewItem, PE> NewPeNode in BacklogPeToProcess)
+            foreach (Tuple<ModuleTreeViewItem, PE> NewPeNode in BacklogPeToProcess)
             {
                 ProcessPe(level+1, NewPeNode.Item1, NewPeNode.Item2); // warning : recursive call
             }
@@ -542,15 +576,17 @@ namespace Dependencies
 
             this.ModulesList.Items.Clear();
             this.DllTreeView.Items.Clear();
-            
-            TreeViewItem treeNode = new TreeViewItem();
-            TreeViewItemContext childTreeContext = new TreeViewItemContext();
 
-            childTreeContext.PeProperties = this.Pe;
-            childTreeContext.ImportProperties = null;
+            ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
+            TreeViewItemContext childTreeInfoContext = new TreeViewItemContext();
 
-            treeNode.Header = FileName;
-            treeNode.DataContext = childTreeContext;
+            childTreeInfoContext.PeProperties = this.Pe;
+            childTreeInfoContext.ImportProperties = null;
+            childTreeInfoContext.PeFilePath = this.Pe.Filepath;
+            childTreeInfoContext.ModuleName = FileName;
+
+            treeNode.DataContext = childTreeInfoContext;
+            treeNode.Header = treeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
             treeNode.IsExpanded = true;
             
             this.DllTreeView.Items.Add(treeNode);
@@ -564,7 +600,9 @@ namespace Dependencies
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            TreeViewItemContext childTreeContext = (TreeViewItemContext) (this.DllTreeView.SelectedItem as TreeViewItem).DataContext;
+            // TreeViewItemContext childTreeContext = ((TreeViewItemContext) (this.DllTreeView.SelectedItem as TreeViewItem).DataContext);
+            TreeViewItemContext childTreeContext = ((TreeViewItemContext)(this.DllTreeView.SelectedItem as ModuleTreeViewItem).DataContext);
+
             PE SelectedPE = childTreeContext.PeProperties;
 
             this.ImportList.Items.Clear();
