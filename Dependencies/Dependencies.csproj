@@ -67,6 +67,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="FindPeModule.cs" />
+    <Compile Include="Models\ModuleInfo.cs" />
+    <Compile Include="Models\PeExport.cs" />
+    <Compile Include="Models\PeImport.cs" />
     <Compile Include="Shell32IconExtractor.cs" />
     <Page Include="DependencyWindow.xaml">
       <SubType>Designer</SubType>
