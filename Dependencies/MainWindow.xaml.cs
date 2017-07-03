@@ -30,8 +30,90 @@ namespace Dependencies
         public MainWindow()
         {
             Phlib.InitializePhLib();
+
             InitializeComponent();
-            
+            PopulateRecentFilesMenuItems(true);
+        }
+
+
+        // Populate "recent entries"
+        private void PopulateRecentFilesMenuItems(bool InializeMenuEntries = false)
+        { 
+
+            System.Windows.Controls.MenuItem FileMenuItem = (System.Windows.Controls.MenuItem)this.MainMenu.Items[0];
+            System.Windows.Controls.MenuItem RecentFilesItem = (System.Windows.Controls.MenuItem)FileMenuItem.Items[2];
+
+            byte RecentFilesCount = (byte)Properties.Settings.Default.RecentFiles.Count;
+            byte RecentFilesIndex = (byte)Properties.Settings.Default.RecentFilesIndex;
+
+            byte Index = (byte)((RecentFilesIndex + RecentFilesCount - 1) % RecentFilesCount);
+            int IndexEntry = 0;
+
+            do
+            {
+                String RecentFilePath = Properties.Settings.Default.RecentFiles[Index];
+
+                System.Windows.Controls.MenuItem newRecentFileItem = new System.Windows.Controls.MenuItem();
+                newRecentFileItem.Header = System.IO.Path.GetFileName(RecentFilePath);
+                newRecentFileItem.DataContext = RecentFilePath;
+                newRecentFileItem.Click += new RoutedEventHandler(RecentFileCommandBinding_Clicked);
+
+                // application initialization
+                if (InializeMenuEntries)
+                {
+                    FileMenuItem.Items.Insert(3, newRecentFileItem);
+                }
+                else // update elem
+                {
+                    FileMenuItem.Items[FileMenuItem.Items.Count - 1 -  IndexEntry] = newRecentFileItem;
+                }
+                
+
+                Index = (byte)((Index - 1 + RecentFilesCount) % RecentFilesCount);
+                IndexEntry = IndexEntry + 1;
+
+            } while (Index != Properties.Settings.Default.RecentFilesIndex);
+
+
+        }
+
+        public void OpenNewDependencyWindow(String Filename)
+        {
+            DependencyWindow nw = new DependencyWindow(Filename);
+
+            double ChildWith = Math.Min((double)nw.GetValue(WidthProperty), Container.ActualWidth);
+            double ChildHeight = Math.Min((double)nw.GetValue(HeightProperty), Container.ActualHeight);
+
+            Container.Children.Add(new MdiChild
+            {
+                Title = Filename,
+                Content = nw,
+                Width = ChildWith,
+                Height = ChildHeight,
+                //Margin = new System.Windows.Thickness(15,15,15,15)
+                //Icon = new BitmapImage(uriSource: new Uri(@"Images/dependencies_16x.png", UriKind.RelativeOrAbsolute)),
+                //ShowIcon = true
+            });
+
+            // Invalidate size in order to trigger resize for internal elements.
+            nw.Width = double.NaN;
+            nw.Height = double.NaN;
+
+            // Update recent files entries
+            App.AddToRecentDocuments(Filename);
+            PopulateRecentFilesMenuItems();
+        }
+
+        private void RecentFileCommandBinding_Clicked(object sender, RoutedEventArgs e)
+        {
+            System.Windows.Controls.MenuItem RecentFile = sender as System.Windows.Controls.MenuItem;
+            String RecentFilePath = RecentFile.DataContext as String;
+
+            if (RecentFilePath.Length != 0 )
+            {
+                OpenNewDependencyWindow(RecentFilePath);
+            }
+
         }
 
         private void OpenCommandBinding_Executed(object sender, RoutedEventArgs e)
@@ -44,24 +126,7 @@ namespace Dependencies
             if (InputFileNameDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
 
-            DependencyWindow nw = new DependencyWindow(InputFileNameDlg.FileName);
-            double ChildWith = Math.Min((double)nw.GetValue(WidthProperty), Container.ActualWidth);
-            double ChildHeight = Math.Min((double)nw.GetValue(HeightProperty), Container.ActualHeight);
-
-            Container.Children.Add(new MdiChild
-            {
-                Title = InputFileNameDlg.FileName,
-                Content = nw,
-                Width = ChildWith,
-                Height = ChildHeight,
-                //Margin = new System.Windows.Thickness(15,15,15,15)
-                //Icon = new BitmapImage(uriSource: new Uri(@"Images/dependencies_16x.png", UriKind.RelativeOrAbsolute)),
-                //ShowIcon = true
-            });
-
-            // Invalidate size in order to trigger resize for internal elements.
-            nw.Width = double.NaN;
-            nw.Height = double.NaN;
+            OpenNewDependencyWindow(InputFileNameDlg.FileName);
 
         }
 

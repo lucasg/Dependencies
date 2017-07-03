@@ -7,6 +7,8 @@ using System.ClrPh;
 using System.ComponentModel;
 
 
+
+
 public class DefaultSettingsBindingHandler : INotifyPropertyChanged
 {
     public delegate string CallbackEventHandler(bool settingValue);
@@ -110,6 +112,8 @@ namespace Dependencies
     }
 
 
+  
+
 
     /// <summary>
     /// Logique d'interaction pour DependencyWindow.xaml
@@ -121,7 +125,6 @@ namespace Dependencies
         PhSymbolProvider SymPrv;
         HashSet<String> ModulesFound;
         HashSet<String> ModulesNotFound;
-
 
         public Boolean ProcessPe(int level,  TreeViewItem currentNode, PE newPe)
         {
@@ -188,6 +191,7 @@ namespace Dependencies
 
         }
 
+
         public DependencyWindow(String FileName)
         {
 
@@ -219,8 +223,6 @@ namespace Dependencies
 
             // Recursively construct tree of dll imports
             ProcessPe(0, treeNode, this.Pe);
-            
-
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

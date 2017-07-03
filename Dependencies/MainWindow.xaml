@@ -35,7 +35,7 @@
             <MenuItem x:Name="FileItem" Header="_File" Height="25" Width="39" VerticalAlignment="Top">
                 <MenuItem x:Name="OpenItem" Header="_Open" Height="25" Command="Open" InputGestureText="Ctrl+O"/>
                 <Separator Height="3"/>
-                <MenuItem x:Name="RecentItem" Header="Recents" Height="100"/>
+                <MenuItem x:Name="RecentItem" Header="Recents" Height="0"/>
                 <Separator Height="3" Margin="-1,0,0,0"/>
                 <MenuItem x:Name="ExitItem" Header="E_xit" Height="25"  InputGestureText="Ctrl+Q" Command="Close"/>
 
