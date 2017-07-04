@@ -65,7 +65,7 @@ namespace Dependencies
                 }
                 else // update elem
                 {
-                    FileMenuItem.Items[FileMenuItem.Items.Count - 1 -  IndexEntry] = newRecentFileItem;
+                    FileMenuItem.Items[FileMenuItem.Items.Count - 3 -  IndexEntry] = newRecentFileItem;
                 }
                 
 
