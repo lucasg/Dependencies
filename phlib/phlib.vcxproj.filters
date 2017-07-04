@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="mxml">
+      <UniqueIdentifier>{0e3fc056-7690-4cf5-8c2d-e90e503467e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -146,6 +149,39 @@
     </ClCompile>
     <ClCompile Include="src\workqueue.c">
       <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\settings.c">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-string.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-attr.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-entity.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-file.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-get.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-index.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-node.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-private.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-search.c">
+      <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-set.c">
+      <Filter>mxml</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -325,6 +361,15 @@
     </ClInclude>
     <ClInclude Include="include\settings.h">
       <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ProcessHacker2\phlib\mxml\config.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ProcessHacker2\phlib\mxml\mxml.h">
+      <Filter>mxml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ProcessHacker2\phlib\mxml\mxml-private.h">
+      <Filter>mxml</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

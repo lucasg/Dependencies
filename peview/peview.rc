@@ -1,0 +1,295 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "winres.h"
+#include "resources/phappres.h"
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (Australia) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENA)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_AUS
+#pragma code_page(1252)
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""winres.h""\r\n"
+    "#include ""../../ProcessHacker/include/phappres.h""\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_PEGENERAL, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 293
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 273
+    END
+
+    IDD_PEIMPORTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 297
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 277
+    END
+
+    IDD_PEEXPORTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 297
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 277
+    END
+
+    IDD_LIBEXPORTS, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 297
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 277
+    END
+
+    IDD_PECLR, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 293
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 273
+    END
+
+    IDD_PELOADCONFIG, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 297
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 277
+    END
+
+    IDD_PECFG, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 296
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 277
+    END
+
+    IDD_PESYMBOLS, DIALOG
+    BEGIN
+        LEFTMARGIN, 3
+        RIGHTMARGIN, 298
+        TOPMARGIN, 3
+        BOTTOMMARGIN, 277
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_PEGENERAL DIALOGEX 0, 0, 300, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "General"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Target machine:",IDC_STATIC,7,57,53,8
+    LTEXT           "Static",IDC_TARGETMACHINE,78,57,215,8
+    LTEXT           "Checksum:",IDC_STATIC,7,100,36,8
+    LTEXT           "Static",IDC_CHECKSUM,78,100,215,8
+    LTEXT           "Subsystem:",IDC_STATIC,7,111,38,8
+    LTEXT           "Subsystem version:",IDC_STATIC,7,122,64,8
+    LTEXT           "Characteristics:",IDC_STATIC,7,133,51,8
+    LTEXT           "Static",IDC_SUBSYSTEM,78,111,215,8
+    LTEXT           "Static",IDC_SUBSYSTEMVERSION,78,122,215,8
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,156,286,116
+    LTEXT           "Sections:",IDC_STATIC,7,146,30,8
+    EDITTEXT        IDC_CHARACTERISTICS,76,133,217,23,ES_MULTILINE | ES_READONLY | NOT WS_BORDER
+    LTEXT           "Time stamp:",IDC_STATIC,7,68,40,8
+    LTEXT           "Static",IDC_TIMESTAMP,78,68,215,8
+    LTEXT           "Entry point:",IDC_STATIC,7,90,39,8
+    LTEXT           "Static",IDC_ENTRYPOINT,78,90,215,8
+    LTEXT           "Image base:",IDC_STATIC,7,79,41,8
+    LTEXT           "Static",IDC_IMAGEBASE,78,79,215,8
+    ICON            "",IDC_FILEICON,14,18,20,20
+    GROUPBOX        "File",IDC_FILE,7,7,286,48
+    EDITTEXT        IDC_NAME,44,17,242,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    EDITTEXT        IDC_COMPANYNAME,44,29,242,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    LTEXT           "Version:",IDC_STATIC,15,41,27,8
+    EDITTEXT        IDC_VERSION,44,41,242,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    CONTROL         "<a>Company Name Link</a>",IDC_COMPANYNAME_LINK,"SysLink",LWS_NOPREFIX | NOT WS_VISIBLE | WS_TABSTOP,46,29,240,9
+END
+
+IDD_PEIMPORTS DIALOGEX 0, 0, 300, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Imports"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,3,3,294,274
+END
+
+IDD_PEEXPORTS DIALOGEX 0, 0, 300, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Exports"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,3,3,294,274
+END
+
+IDD_LIBEXPORTS DIALOGEX 0, 0, 300, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Exports"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,3,3,294,274
+END
+
+IDD_PECLR DIALOGEX 0, 0, 300, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "CLR"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Runtime Version:",IDC_STATIC,7,7,55,8
+    LTEXT           "Static",IDC_RUNTIMEVERSION,78,7,215,8
+    LTEXT           "Flags:",IDC_STATIC,7,19,20,8
+    EDITTEXT        IDC_FLAGS,76,19,217,12,ES_AUTOHSCROLL | ES_READONLY | NOT WS_BORDER
+    LTEXT           "Version String:",IDC_STATIC,7,31,48,8
+    LTEXT           "Static",IDC_VERSIONSTRING,78,31,215,8
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,57,286,85
+    LTEXT           "Sections:",IDC_STATIC,7,47,30,8
+    CONTROL         "",IDC_SECTION,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,7,145,286,128
+END
+
+IDD_PELOADCONFIG DIALOGEX 0, 0, 300, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Load config"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,3,3,294,274
+END
+
+IDD_PECFG DIALOGEX 0, 0, 299, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "CFG"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_LIST,"SysListView32",LVS_REPORT | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | WS_BORDER | WS_TABSTOP,3,3,293,274
+END
+
+IDD_PESYMBOLS DIALOGEX 0, 0, 301, 280
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Symbols"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_SYMBOLTREE,"PhTreeNew",WS_CLIPSIBLINGS | WS_CLIPCHILDREN | 0x2,3,21,295,256,WS_EX_CLIENTEDGE
+    EDITTEXT        IDC_SYMSEARCH,157,3,141,14,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_PESYMBOLS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PELOADCONFIG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PEIMPORTS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PEEXPORTS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_PECFG AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_LIBEXPORTS AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_SEARCH_ACTIVE_BMP   BITMAP                  "resources\\active_search.bmp"
+
+IDB_SEARCH_INACTIVE_BMP BITMAP                  "resources\\inactive_search.bmp"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// PNG
+//
+
+IDB_SEARCH_ACTIVE       PNG                     "resources\\active_search.png"
+
+IDB_SEARCH_INACTIVE     PNG                     "resources\\inactive_search.png"
+
+#endif    // English (Australia) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

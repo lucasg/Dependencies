@@ -19,6 +19,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClrPhTester", "ClrPhTester\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.MDI", "Wpf.Mdi\WPF.MDI.csproj", "{BE1ED569-5E0B-4DF0-8964-33AD2AAE4C4A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "peview", "peview\peview.vcxproj", "{72C124A2-3C80-41C6-ABA1-C4948B713204}"
+	ProjectSection(ProjectDependencies) = postProject
+		{39C57BE1-23E6-4DB4-A4A5-8F0FD994445B} = {39C57BE1-23E6-4DB4-A4A5-8F0FD994445B}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +94,16 @@ Global
 		{BE1ED569-5E0B-4DF0-8964-33AD2AAE4C4A}.Release|x64.Build.0 = Release|Any CPU
 		{BE1ED569-5E0B-4DF0-8964-33AD2AAE4C4A}.Release|x86.ActiveCfg = Release|Any CPU
 		{BE1ED569-5E0B-4DF0-8964-33AD2AAE4C4A}.Release|x86.Build.0 = Release|Any CPU
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Debug|x64.ActiveCfg = Debug|x64
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Debug|x64.Build.0 = Debug|x64
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Debug|x86.ActiveCfg = Debug|Win32
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Debug|x86.Build.0 = Debug|Win32
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Release|Any CPU.ActiveCfg = Release|Win32
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Release|x64.ActiveCfg = Release|x64
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Release|x64.Build.0 = Release|x64
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Release|x86.ActiveCfg = Release|Win32
+		{72C124A2-3C80-41C6-ABA1-C4948B713204}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

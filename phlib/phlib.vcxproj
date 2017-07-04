@@ -88,15 +88,15 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_PHLIB_;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;_PHLIB_;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <CallingConvention>StdCall</CallingConvention>
       <AdditionalIncludeDirectories>$(ProjectDir)phnt\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -104,8 +104,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_PHLIB_;%(PreprocessorDefinitions);</PreprocessorDefinitions>
@@ -113,6 +112,7 @@
       <CallingConvention>StdCall</CallingConvention>
       <AdditionalIncludeDirectories>$(ProjectDir)phnt\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -122,12 +122,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_PHLIB_;%(PreprocessorDefinitions);</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_PHLIB_;%(PreprocessorDefinitions);</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <CallingConvention>StdCall</CallingConvention>
       <AdditionalIncludeDirectories>$(ProjectDir)phnt\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -141,12 +140,11 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>WIN64;NDEBUG;_PHLIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;_PHLIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <CallingConvention>StdCall</CallingConvention>
       <AdditionalIncludeDirectories>$(ProjectDir)phnt\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -162,6 +160,17 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-attr.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-entity.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-file.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-get.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-index.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-node.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-private.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-search.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-set.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\mxml\mxml-string.c" />
+    <ClCompile Include="..\..\ProcessHacker2\phlib\settings.c" />
     <ClCompile Include="src\apiimport.c" />
     <ClCompile Include="src\avltree.c" />
     <ClCompile Include="src\basesup.c" />
@@ -207,6 +216,9 @@
     <ClCompile Include="src\workqueue.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\ProcessHacker2\phlib\mxml\config.h" />
+    <ClInclude Include="..\..\ProcessHacker2\phlib\mxml\mxml-private.h" />
+    <ClInclude Include="..\..\ProcessHacker2\phlib\mxml\mxml.h" />
     <ClInclude Include="include\apiimport.h" />
     <ClInclude Include="include\circbuf.h" />
     <ClInclude Include="include\circbuf_h.h" />
