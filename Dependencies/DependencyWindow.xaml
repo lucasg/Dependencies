@@ -13,6 +13,7 @@
 
         <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
+            <Setter Property="Padding" Value="5,0,0,0"></Setter>
         </Style>
     </UserControl.Resources>
     
