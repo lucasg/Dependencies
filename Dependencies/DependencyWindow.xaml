@@ -87,9 +87,25 @@
                 </GridView>
             </ListView.View>
         </ListView>
+        
         <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
+        
         <TreeView x:Name="DllTreeView"  HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Padding="0" SelectedItemChanged="OnTreeViewSelectedItemChanged">
             <TreeView.Resources>
+                <ContextMenu x:Key="TreeItemContextMenu">
+                    <MenuItem Header="Highlight Matching Module In List" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+M" IsEnabled="False" />
+                    <Separator Height="3" Margin="-1,0,0,0"/>
+                    <MenuItem Header="Copy File Path" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+C" IsEnabled="False"  />
+                    <Separator Height="3" Margin="-1,0,0,0"/>
+                    <MenuItem Header="Expand All" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+A" IsEnabled="False"  />
+                    <MenuItem Header="Collapse All" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+A" IsEnabled="False"  />
+                    <Separator Height="3" Margin="-1,0,0,0"/>
+                    <MenuItem x:Name="_FullPathItem" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=FullPath, Mode=TwoWay}" Margin="0,0,0.2,0"/>
+                    <Separator Height="3" Margin="-1,0,0,0"/>
+                    <MenuItem Header="View Module in separate window" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Enter" IsEnabled="False"  />
+                    <MenuItem Header="View Module in Peviewer" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Alt+Enter"  IsEnabled="False" />
+                </ContextMenu>
+                
                 <Style TargetType="local:ModuleTreeViewItem">
                     <Setter Property="HeaderTemplate">
                         <Setter.Value>
@@ -102,7 +118,10 @@
                             </DataTemplate>
                         </Setter.Value>
                     </Setter>
+
+                    <Setter Property="ContextMenu" Value="{StaticResource TreeItemContextMenu}" />
                 </Style>
+
             </TreeView.Resources>
         </TreeView>
         
@@ -121,8 +140,6 @@
             >
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem Header="Highlight Matching Export Function" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+M" IsEnabled="False"  />
-                        <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="Copy Value" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+C" IsEnabled="False" />
                         <MenuItem Header="Select All" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+A" IsEnabled="False"  />
                         <Separator Height="3" Margin="-1,0,0,0"/>
@@ -179,8 +196,6 @@
 
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem Header="Highlight Matching Import Function" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+M" IsEnabled="False" />
-                        <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="Copy Value" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+C" IsEnabled="False" />
                         <MenuItem Header="Select All" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+A" IsEnabled="False" />
                         <Separator Height="3" Margin="-1,0,0,0"/>
