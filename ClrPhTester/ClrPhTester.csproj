@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>$(SolutionDir)bin\$(Configuration)$(Platform)</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)obj\$(Configuration)$(Platform)</IntermediateOutputPath>
+    <IntermediateOutputPath>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(Platform)</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>$(SolutionDir)bin\$(Configuration)$(Platform)</OutputPath>
-    <IntermediateOutputPath>$(SolutionDir)obj\$(Configuration)$(Platform)</IntermediateOutputPath>
+    <IntermediateOutputPath>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(Platform)</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
