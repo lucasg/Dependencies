@@ -126,69 +126,76 @@ namespace Dependencies
         HashSet<String> ModulesFound;
         HashSet<String> ModulesNotFound;
 
-        public Boolean ProcessPe(int level,  TreeViewItem currentNode, PE newPe)
+        public List<TreeViewItemContext> ProcessPe(PE newPe)
         {
-          
+            List<TreeViewItemContext> NewTreeContexts = new List<TreeViewItemContext>();
             List<PeImportDll> PeImports = newPe.GetImports();
-            List<Tuple<ModuleTreeViewItem, PE>> BacklogPeToProcess = new List<Tuple<ModuleTreeViewItem, PE>>();
 
             foreach (PeImportDll DllImport in PeImports)
             {
-                ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
 
                 // Find Dll in "paths"
-                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder, this.Pe.IsWow64Dll() );
-                PE ImportPe = null;
+                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder, this.Pe.IsWow64Dll());
+                PE ImportPe = (PeFilePath != null) ? new PE(PeFilePath) : null;
 
-                if (PeFilePath != null)
+
+                if (PeFilePath == null)
                 {
-                    ImportPe = new PE(PeFilePath);
-
-                    if (!this.ModulesFound.Contains(PeFilePath))
-                    {
-                        
-                        this.ModulesFound.Add(PeFilePath);
-
-                        // do not process twice the same PE in order to lessen memory pressure
-                        BacklogPeToProcess.Add(new Tuple<ModuleTreeViewItem, PE>(childTreeNode, ImportPe));
-
-                        this.ModulesList.Items.Add(new DisplayModuleInfo(DllImport, ImportPe));
-                    }       
+                    this.ModulesNotFound.Add(DllImport.Name);
                 }
-                else
-                {
-                    if (!this.ModulesNotFound.Contains(DllImport.Name))
-                    {
-
-                        this.ModulesNotFound.Add(DllImport.Name);
-
-                    
-                        this.ModulesList.Items.Add(new DisplayErrorModuleInfo(DllImport));
-                    }
-                }
-
-
-                // Add to tree view
+                   
                 TreeViewItemContext childTreeInfoContext = new TreeViewItemContext();
                 childTreeInfoContext.PeProperties = ImportPe;
                 childTreeInfoContext.ImportProperties = DllImport;
                 childTreeInfoContext.PeFilePath = PeFilePath;
                 childTreeInfoContext.ModuleName = DllImport.Name;
 
-                childTreeNode.DataContext = childTreeInfoContext;
-                childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
-                currentNode.Items.Add(childTreeNode);
+                NewTreeContexts.Add(childTreeInfoContext);
             }
+            
+            return NewTreeContexts;
+
+        }
+
+        private void ConstructDependencyTree(ModuleTreeViewItem RootNode, PE CurrentPE, int RecursionLevel = 0)
+        {
+            List<Tuple<ModuleTreeViewItem, PE>> BacklogPeToProcess = new List<Tuple<ModuleTreeViewItem, PE>>();
+            
+            foreach ( TreeViewItemContext NewTreeContext in ProcessPe(CurrentPE))
+            {
+                ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
+
+                // Missing module found
+                if (this.ModulesNotFound.Contains(NewTreeContext.ModuleName))
+                {
+                    this.ModulesList.Items.Add(new DisplayErrorModuleInfo(NewTreeContext.ImportProperties));
+                }
+                else
+                {
+                    if (!this.ModulesFound.Contains(NewTreeContext.PeFilePath))
+                    {
+                        // do not process twice the same PE in order to lessen memory pressure
+                        BacklogPeToProcess.Add(new Tuple<ModuleTreeViewItem, PE>(childTreeNode, NewTreeContext.PeProperties));
+                    }
+
+
+                    this.ModulesFound.Add(NewTreeContext.PeFilePath);
+                    this.ModulesList.Items.Add(new DisplayModuleInfo(NewTreeContext.ImportProperties, NewTreeContext.PeProperties));
+                }
+
+                // Add to tree view
+                childTreeNode.DataContext = NewTreeContext;
+                childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
+                RootNode.Items.Add(childTreeNode);
+            }
+
 
 
             // Process next batch of dll imports
             foreach (Tuple<ModuleTreeViewItem, PE> NewPeNode in BacklogPeToProcess)
             {
-                ProcessPe(level+1, NewPeNode.Item1, NewPeNode.Item2); // warning : recursive call
+                ConstructDependencyTree(NewPeNode.Item1, NewPeNode.Item2, RecursionLevel + 1); // warning : recursive call
             }
-
-            return true;
-
         }
 
 
@@ -220,9 +227,8 @@ namespace Dependencies
             
             this.DllTreeView.Items.Add(treeNode);
 
-
             // Recursively construct tree of dll imports
-            ProcessPe(0, treeNode, this.Pe);
+            ConstructDependencyTree(treeNode, this.Pe);
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
