@@ -126,9 +126,14 @@ namespace Dependencies
         HashSet<String> ModulesFound;
         HashSet<String> ModulesNotFound;
 
-        public List<TreeViewItemContext> ProcessPe(PE newPe)
+        /// <summary>
+        /// Background processing of a single PE file.
+        /// It can be lengthy since there are disk access (and misses).
+        /// </summary>
+        /// <param name="NewTreeContexts"> This variable is passed as reference to be updated since this function is run in a separate thread. </param>
+        /// <param name="newPe"> Current PE file analyzed </param>
+        private void ProcessPe(List<TreeViewItemContext> NewTreeContexts, PE newPe)
         {
-            List<TreeViewItemContext> NewTreeContexts = new List<TreeViewItemContext>();
             List<PeImportDll> PeImports = newPe.GetImports();
 
             foreach (PeImportDll DllImport in PeImports)
@@ -152,50 +157,67 @@ namespace Dependencies
 
                 NewTreeContexts.Add(childTreeInfoContext);
             }
-            
-            return NewTreeContexts;
-
         }
 
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, PE CurrentPE, int RecursionLevel = 0)
         {
+            // "Closured" variables (it 's a scope hack really).
             List<Tuple<ModuleTreeViewItem, PE>> BacklogPeToProcess = new List<Tuple<ModuleTreeViewItem, PE>>();
-            
-            foreach ( TreeViewItemContext NewTreeContext in ProcessPe(CurrentPE))
-            {
-                ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
+            List<TreeViewItemContext> NewTreeContexts = new List<TreeViewItemContext>();
 
-                // Missing module found
-                if (this.ModulesNotFound.Contains(NewTreeContext.ModuleName))
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.WorkerReportsProgress = true; // useless here for now
+
+            
+            bw.DoWork += (sender, e) => { ProcessPe(NewTreeContexts, CurrentPE); };
+
+
+            bw.RunWorkerCompleted += (sender, e) =>
+            {
+                // Important !
+                // 
+                // This handler is executed in the STA (Single Thread Application)
+                // which is authorized to manipulate UI elements. The BackgroundWorker is not.
+                //
+
+                foreach (TreeViewItemContext NewTreeContext in NewTreeContexts)
                 {
-                    this.ModulesList.Items.Add(new DisplayErrorModuleInfo(NewTreeContext.ImportProperties));
-                }
-                else
-                {
-                    if (!this.ModulesFound.Contains(NewTreeContext.PeFilePath))
+                    ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
+
+                    // Missing module found
+                    if (this.ModulesNotFound.Contains(NewTreeContext.ModuleName))
                     {
-                        // do not process twice the same PE in order to lessen memory pressure
-                        BacklogPeToProcess.Add(new Tuple<ModuleTreeViewItem, PE>(childTreeNode, NewTreeContext.PeProperties));
+                        this.ModulesList.Items.Add(new DisplayErrorModuleInfo(NewTreeContext.ImportProperties));
+                    }
+                    else
+                    {
+                        if (!this.ModulesFound.Contains(NewTreeContext.PeFilePath))
+                        {
+                            // do not process twice the same PE in order to lessen memory pressure
+                            BacklogPeToProcess.Add(new Tuple<ModuleTreeViewItem, PE>(childTreeNode, NewTreeContext.PeProperties));
+                        }
+
+
+                        this.ModulesFound.Add(NewTreeContext.PeFilePath);
+                        this.ModulesList.Items.Add(new DisplayModuleInfo(NewTreeContext.ImportProperties, NewTreeContext.PeProperties));
                     }
 
-
-                    this.ModulesFound.Add(NewTreeContext.PeFilePath);
-                    this.ModulesList.Items.Add(new DisplayModuleInfo(NewTreeContext.ImportProperties, NewTreeContext.PeProperties));
+                    // Add to tree view
+                    childTreeNode.DataContext = NewTreeContext;
+                    childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
+                    RootNode.Items.Add(childTreeNode);
                 }
 
-                // Add to tree view
-                childTreeNode.DataContext = NewTreeContext;
-                childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
-                RootNode.Items.Add(childTreeNode);
-            }
 
 
+                // Process next batch of dll imports
+                foreach (Tuple<ModuleTreeViewItem, PE> NewPeNode in BacklogPeToProcess)
+                {
+                    ConstructDependencyTree(NewPeNode.Item1, NewPeNode.Item2, RecursionLevel + 1); // warning : recursive call
+                }
+            };
 
-            // Process next batch of dll imports
-            foreach (Tuple<ModuleTreeViewItem, PE> NewPeNode in BacklogPeToProcess)
-            {
-                ConstructDependencyTree(NewPeNode.Item1, NewPeNode.Item2, RecursionLevel + 1); // warning : recursive call
-            }
+            bw.RunWorkerAsync();
         }
 
 
