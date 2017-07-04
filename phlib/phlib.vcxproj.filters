@@ -150,9 +150,6 @@
     <ClCompile Include="src\workqueue.c">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\ProcessHacker2\phlib\settings.c">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
     <ClCompile Include="mxml\mxml-attr.c">
       <Filter>mxml</Filter>
     </ClCompile>
@@ -182,6 +179,9 @@
     </ClCompile>
     <ClCompile Include="mxml\mxml-string.c">
       <Filter>mxml</Filter>
+    </ClCompile>
+    <ClCompile Include="src\settings.c">
+      <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

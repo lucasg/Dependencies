@@ -160,7 +160,6 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ProcessHacker2\phlib\settings.c" />
     <ClCompile Include="mxml\mxml-attr.c" />
     <ClCompile Include="mxml\mxml-entity.c" />
     <ClCompile Include="mxml\mxml-file.c" />
@@ -205,6 +204,7 @@
     <ClCompile Include="src\ref.c" />
     <ClCompile Include="src\secdata.c" />
     <ClCompile Include="src\secedit.c" />
+    <ClCompile Include="src\settings.c" />
     <ClCompile Include="src\sha.c" />
     <ClCompile Include="src\sha256.c" />
     <ClCompile Include="src\svcsup.c" />
