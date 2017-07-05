@@ -56,6 +56,9 @@ void PE::InitProperties()
 	}
 
 	Properties->Subsystem = PvMappedImage.NtHeaders->OptionalHeader.Subsystem;
+	Properties->SubsystemVersion = gcnew Tuple<Int16, Int16>(
+		PvMappedImage.NtHeaders->OptionalHeader.MajorSubsystemVersion,
+		PvMappedImage.NtHeaders->OptionalHeader.MinorSubsystemVersion);
 	Properties->Characteristics = PvMappedImage.NtHeaders->FileHeader.Characteristics;
 	Properties->DllCharacteristics = PvMappedImage.NtHeaders->OptionalHeader.DllCharacteristics;
 }

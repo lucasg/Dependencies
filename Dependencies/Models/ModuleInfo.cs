@@ -58,6 +58,7 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
         Info.CorrectChecksum = Pe.Properties.CorrectChecksum;
 
         Info.Subsystem = Pe.Properties.Subsystem;
+        Info.SubsystemVersion = Pe.Properties.SubsystemVersion;
         Info.Characteristics = Pe.Properties.Characteristics;
         Info.DllCharacteristics = Pe.Properties.DllCharacteristics;
 
@@ -122,7 +123,7 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
     public virtual int? VirtualSize { get { return Info.SizeOfImage; } }
     public virtual UInt64? EntryPoint { get { return Info.EntryPoint; } }
     public virtual int? Subsystem { get { return Info.Subsystem; } }
-    public virtual string SubsystemVersion { get { return ""; } }
+    public virtual string SubsystemVersion { get { return String.Format("{0:d}.{1:d}" , Info.SubsystemVersion.Item1, Info.SubsystemVersion.Item2); } }
     public virtual string Checksum
     {
         get
@@ -167,6 +168,8 @@ public struct ModuleInfo
     public Boolean CorrectChecksum;
 
     public Int16 Subsystem;
+    public Tuple<Int16, Int16> SubsystemVersion;
+
     public Int16 Characteristics;
     public Int16 DllCharacteristics;
 }

@@ -88,6 +88,8 @@ namespace System {
             Boolean CorrectChecksum;
 
             Int16 Subsystem;
+            Tuple<Int16, Int16> ^SubsystemVersion;
+
             Int16 Characteristics;
             Int16 DllCharacteristics;
         };
