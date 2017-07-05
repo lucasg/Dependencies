@@ -62,6 +62,8 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
         Info.Characteristics = Pe.Properties.Characteristics;
         Info.DllCharacteristics = Pe.Properties.DllCharacteristics;
 
+        Info.Filesize = Pe.Properties.FileSize;
+
         Info.context.ImportProperties = Module;
         Info.context.PeProperties = Pe;
 
@@ -118,7 +120,7 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
             return String.Join("; ", TypeList.ToArray());
         }
     }
-    public virtual UInt32? Filesize { get { return 0x00; } }
+    public virtual UInt64? Filesize { get { return Info.Filesize; } }
     public virtual UInt64? ImageBase { get { return Info.ImageBase; } }
     public virtual int? VirtualSize { get { return Info.SizeOfImage; } }
     public virtual UInt64? EntryPoint { get { return Info.EntryPoint; } }
@@ -172,4 +174,6 @@ public struct ModuleInfo
 
     public Int16 Characteristics;
     public Int16 DllCharacteristics;
+
+    public UInt64 Filesize;
 }

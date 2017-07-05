@@ -61,6 +61,8 @@ void PE::InitProperties()
 		PvMappedImage.NtHeaders->OptionalHeader.MinorSubsystemVersion);
 	Properties->Characteristics = PvMappedImage.NtHeaders->FileHeader.Characteristics;
 	Properties->DllCharacteristics = PvMappedImage.NtHeaders->OptionalHeader.DllCharacteristics;
+
+	Properties->FileSize = PvMappedImage.Size;
 }
 
 PE::~PE()

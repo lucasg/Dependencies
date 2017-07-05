@@ -9,22 +9,22 @@
 
 namespace System {
 
-	using namespace Collections::Generic;
+    using namespace Collections::Generic;
 
     namespace ClrPh {
 
         public ref class Phlib {
         public:
 
-        	// Imitialize Process Hacker's phlib internal data
-        	// Must be called before any other API (kinda like OleInitialize).
+            // Imitialize Process Hacker's phlib internal data
+            // Must be called before any other API (kinda like OleInitialize).
             static bool InitializePhLib();
 
             // Return the list of knwown dll for this system
             static List<String^>^ GetKnownDlls(_In_ bool Wow64Dlls);
 
-			static List<String^>^ KnownDll64List;
-			static List<String^>^ KnownDll32List;
+            static List<String^>^ KnownDll64List;
+            static List<String^>^ KnownDll32List;
         };
 
 
@@ -35,7 +35,7 @@ namespace System {
             String ^ Name;
             String ^ ModuleName;
             Boolean ImportByOrdinal;
-            Boolean	DelayImport;
+            Boolean DelayImport;
 
             PeImport(const PPH_MAPPED_IMAGE_IMPORT_DLL importDll, size_t Index);
             PeImport(const PeImport ^ other);
@@ -65,7 +65,7 @@ namespace System {
             Int16 Ordinal;
             String ^  Name; // may be NULL.
             Boolean ExportByOrdinal;
-            Int64	VirtualAddress;
+            Int64   VirtualAddress;
             String ^  ForwardedName;
 
             PeExport(const UnmanagedPE &refPe, size_t Index);
@@ -92,6 +92,8 @@ namespace System {
 
             Int16 Characteristics;
             Int16 DllCharacteristics;
+
+			UInt64 FileSize;
         };
 
 
