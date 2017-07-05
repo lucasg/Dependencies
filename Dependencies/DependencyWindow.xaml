@@ -83,7 +83,13 @@
                     <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="EntryPoint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                     <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="Subsystem" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                     <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion}" util:GridViewSort.PropertyName="SubsystemVersion" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    <GridViewColumn Header="Checksum" Width="100" DisplayMemberBinding="{Binding Checksum}" util:GridViewSort.PropertyName="Checksum" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Checksum" Width="200" util:GridViewSort.PropertyName="Checksum" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Checksum, TargetNullValue='N/A' }" TextAlignment="Right" />
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>

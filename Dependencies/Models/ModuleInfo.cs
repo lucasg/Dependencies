@@ -129,9 +129,9 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
         get
         {
             if (Info.CorrectChecksum)
-                return String.Format("{0:x} (correct)", Info.Subsystem);
+                return String.Format("0x{0:x08} (correct)", Info.Checksum);
             else
-                return String.Format("{0:x} (incorrect)", Info.Subsystem);
+                return String.Format("0x{0:x08} (incorrect)", Info.Checksum);
         }
     }
 
