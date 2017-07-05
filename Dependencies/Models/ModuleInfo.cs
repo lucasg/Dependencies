@@ -20,15 +20,16 @@ public class DisplayErrorModuleInfo : DisplayModuleInfo
     {
     }
 
-    public override string Cpu { get { return ""; } }
-    public override string Type { get { return ""; } }
-    public override UInt32? Filesize { get { return null; } }
+    public override string Cpu { get { return null; } }
+    public override string Type { get { return null; } }
+    public override UInt64? Filesize { get { return null; } }
     public override UInt64? ImageBase { get { return null; } }
     public override int? VirtualSize { get { return null; } }
     public override UInt64? EntryPoint { get { return null; } }
     public override int? Subsystem { get { return null; } }
-    public override string SubsystemVersion { get { return ""; } }
-    public override string Checksum { get { return ""; } }
+    public override string SubsystemVersion { get { return null; } }
+    public override int? Checksum { get { return null; } }
+    public override bool? CorrectChecksum { get { return null; } }
 
 }
 
@@ -126,16 +127,8 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
     public virtual UInt64? EntryPoint { get { return Info.EntryPoint; } }
     public virtual int? Subsystem { get { return Info.Subsystem; } }
     public virtual string SubsystemVersion { get { return String.Format("{0:d}.{1:d}" , Info.SubsystemVersion.Item1, Info.SubsystemVersion.Item2); } }
-    public virtual string Checksum
-    {
-        get
-        {
-            if (Info.CorrectChecksum)
-                return String.Format("0x{0:x08} (correct)", Info.Checksum);
-            else
-                return String.Format("0x{0:x08} (incorrect)", Info.Checksum);
-        }
-    }
+    public virtual int? Checksum { get { return Info.Checksum; } }
+    public virtual bool? CorrectChecksum { get { return Info.CorrectChecksum; } }
 
 
     protected string GetPathDisplayName(bool FullPath)

@@ -74,19 +74,33 @@
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
-                    <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu}" util:GridViewSort.PropertyName="Cpu" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    <GridViewColumn Header="Type" Width="150" DisplayMemberBinding="{Binding Type}" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    <!--<GridViewColumn Header="File Size" Width="100" DisplayMemberBinding="{Binding FileSize, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="FileSize" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>-->
-                    <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="ImageBase" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualSize" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="EntryPoint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem, TargetNullValue='', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="Subsystem" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion}" util:GridViewSort.PropertyName="SubsystemVersion" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName, TargetNullValue='N/A'}" util:GridViewSort.PropertyName="ModuleName" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu, TargetNullValue='N/A'}" util:GridViewSort.PropertyName="Cpu" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Type" Width="150" DisplayMemberBinding="{Binding Type, TargetNullValue='N/A'}" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="File Size" Width="100" DisplayMemberBinding="{Binding Filesize, TargetNullValue='N/A', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="FileSize" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase, TargetNullValue='N/A', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="ImageBase" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Virtual Size" Width="100" DisplayMemberBinding="{Binding VirtualSize, TargetNullValue='N/A', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualSize" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Entry point" Width="100" DisplayMemberBinding="{Binding EntryPoint, TargetNullValue='N/A', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="EntryPoint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Subsystem" Width="100" DisplayMemberBinding="{Binding Subsystem, TargetNullValue='N/A', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="Subsystem" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                    <GridViewColumn Header="Subsystem Ver." Width="100" DisplayMemberBinding="{Binding SubsystemVersion, TargetNullValue='N/A'}" util:GridViewSort.PropertyName="SubsystemVersion" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
                     <GridViewColumn Header="Checksum" Width="200" util:GridViewSort.PropertyName="Checksum" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding Checksum, TargetNullValue='N/A' }" TextAlignment="Right" />
+                                <TextBlock  TextAlignment="Right">
+                                    <TextBlock.Style>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding CorrectChecksum , TargetNullValue='False'}" Value="False" >
+                                                    <Setter Property="Text" Value="{Binding Checksum, StringFormat={}0x{0:x08} (incorrect), TargetNullValue='N/A' }"/>
+                                                </DataTrigger>
+
+                                                <DataTrigger Binding="{Binding CorrectChecksum}" Value="True" >
+                                                    <Setter Property="Text" Value="{Binding Checksum, StringFormat={}0x{0:x08} (correct), TargetNullValue='N/A' }"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
                             </DataTemplate>
                         </GridViewColumn.CellTemplate>
                     </GridViewColumn>
