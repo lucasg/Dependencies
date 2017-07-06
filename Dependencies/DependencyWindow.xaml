@@ -39,6 +39,8 @@
             util:GridViewSort.AutoSort="True"
         >
             <ListView.Resources>
+                
+                
                 <ContextMenu x:Key="ItemContextMenu">
                     <MenuItem Header="Highlight Matching Module In Tree" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+M" IsEnabled="False" />
                     <Separator Height="3" Margin="-1,0,0,0"/>
@@ -47,8 +49,16 @@
                     <Separator Height="3" Margin="-1,0,0,0"/>
                     <MenuItem x:Name="_FullPathItem" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=FullPath, Mode=TwoWay}" Margin="0,0,0.2,0"/>
                     <Separator Height="3" Margin="-1,0,0,0"/>
-                    <MenuItem Header="View Module in separate window" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Enter" IsEnabled="False"  />
-                    <MenuItem Header="View Module in Peviewer" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Alt+Enter"  IsEnabled="False" />
+                    <MenuItem Header="View Module in separate application" 
+                                Command="{Binding Path=DataContext.OpenNewAppCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
+                    <MenuItem Header="View Module in Peviewer" 
+                                Command="{Binding Path=DataContext.OpenPeviewerCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
                 </ContextMenu>
             </ListView.Resources>
             
@@ -122,8 +132,20 @@
                     <Separator Height="3" Margin="-1,0,0,0"/>
                     <MenuItem x:Name="_FullPathItem" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=FullPath, Mode=TwoWay}" Margin="0,0,0.2,0"/>
                     <Separator Height="3" Margin="-1,0,0,0"/>
-                    <MenuItem Header="View Module in separate window" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Enter" IsEnabled="False"  />
-                    <MenuItem Header="View Module in Peviewer" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Alt+Enter"  IsEnabled="False" />
+                    
+                    <MenuItem Header="View Module in separate application" 
+                                Command="{Binding  Path=OpenNewAppCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
+                                CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
+                    
+                    <MenuItem Header="View Module in Peviewer" 
+                                Command="{Binding  Path=OpenPeviewerCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
+                                CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
+                    
+                    <!--AncestorType=Grid To get the current context feel like magic to me -->
                 </ContextMenu>
                 
                 <Style TargetType="local:ModuleTreeViewItem">
@@ -163,9 +185,15 @@
                         <MenuItem Header="Copy Value" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+C" IsEnabled="False" />
                         <MenuItem Header="Select All" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+A" IsEnabled="False"  />
                         <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
+                        <MenuItem Header="_Undecorate C++ Functions" 
+                                  Height="26" InputGestureText="F10" 
+                                  IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
                         <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="Lookup Import function in MSDN" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Enter" IsEnabled="False"  />
+                        <MenuItem Header="Lookup Import function on MSDN"  
+                                Command="{Binding Path=DataContext.QueryImportApi, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
                     </ContextMenu>
                 </ListView.Resources>
 
@@ -221,7 +249,11 @@
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
                         <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="Lookup Export function in MSDN" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Enter" IsEnabled="False" />
+                        <MenuItem Header="Lookup Export function on MSDN"  
+                                Command="{Binding Path=DataContext.QueryExportApi, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
                     </ContextMenu>
                 </ListView.Resources>
 

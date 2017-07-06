@@ -1,6 +1,9 @@
 using System;
 using System.ClrPh;
 using System.Collections.Generic;
+using System.Windows.Forms;
+using System.Diagnostics;
+using System.IO;
 
 [Flags]
 public enum PeTypes
@@ -35,8 +38,10 @@ public class DisplayErrorModuleInfo : DisplayModuleInfo
 
 public class DisplayModuleInfo : DefaultSettingsBindingHandler
 {
+    #region Constructors 
     public DisplayModuleInfo(string ModuleName)
     {
+
         Info.Name = ModuleName;
         Info.Filepath = "";
 
@@ -44,7 +49,8 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
     }
 
     public DisplayModuleInfo(PeImportDll Module, PE Pe)
-    {   
+    {
+
         Info.Name = Module.Name;
         Info.Filepath = Pe.Filepath;
 
@@ -70,6 +76,7 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
 
         AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
     }
+    #endregion // Constructors 
 
     public virtual TreeViewItemContext Context { get { return Info.context; } }
 
@@ -78,7 +85,16 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
         get { return GetPathDisplayName(Dependencies.Properties.Settings.Default.FullPath); }
     }
 
-    //public virtual string Name { get { return Info.Name; } }
+
+    protected string GetPathDisplayName(bool FullPath)
+    {
+        if ((FullPath) && (Info.Filepath.Length > 0))
+            return Info.Filepath;
+
+        return Info.Name;
+    }
+
+    
     public virtual string Cpu
     {
         get
@@ -130,16 +146,77 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
     public virtual int? Checksum { get { return Info.Checksum; } }
     public virtual bool? CorrectChecksum { get { return Info.CorrectChecksum; } }
 
-
-    protected string GetPathDisplayName(bool FullPath)
+    #region Commands 
+    public RelayCommand OpenPeviewerCommand
     {
-        if ((FullPath) && (Info.Filepath.Length > 0))
-            return Info.Filepath;
+        get
+        {
+            if (_OpenPeviewerCommand == null)
+            {
+                _OpenPeviewerCommand = new RelayCommand((param) => this.OpenPeviewer((object)param));
+            }
 
-        return Info.Name;
+            return _OpenPeviewerCommand;
+        }
     }
 
+    public bool OpenPeviewer(object Module)
+    {
+        string programPath = @".\peview.exe";
+        Process PeviewerProcess = new Process();
+        
+        if ((Module == null))
+        {
+            return false;
+        }
+
+        if (!File.Exists(programPath))
+        {
+            MessageBox.Show("peview.exe file could not be found !");
+            return false;
+        }
+
+        string Filepath = (Module as DisplayModuleInfo).GetPathDisplayName(true);
+        if (Filepath == null)
+        {
+            return false;
+        }
+
+        PeviewerProcess.StartInfo.FileName = programPath;
+        PeviewerProcess.StartInfo.Arguments = Filepath;
+        return PeviewerProcess.Start();
+    }
+
+    public RelayCommand OpenNewAppCommand
+    {
+        get
+        {
+            if (_OpenPeviewerCommand == null)
+            {
+                _OpenNewAppCommand = new RelayCommand((param) =>
+                {
+                    string Filepath = (param as DisplayModuleInfo).GetPathDisplayName(true);
+                    if (Filepath == null)
+                    {
+                        return;
+                    }
+
+                    Process PeviewerProcess = new Process();
+                    PeviewerProcess.StartInfo.FileName = Application.ExecutablePath;
+                    PeviewerProcess.StartInfo.Arguments = Filepath;
+                    PeviewerProcess.Start();
+                });
+            }
+
+            return _OpenNewAppCommand;
+        }
+    }
+    #endregion // Commands 
+
+
     private ModuleInfo Info;
+    private RelayCommand _OpenPeviewerCommand;
+    private RelayCommand _OpenNewAppCommand;
 }
 
 

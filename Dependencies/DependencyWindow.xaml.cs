@@ -5,8 +5,63 @@ using System.Windows;
 using System.Windows.Controls;
 using System.ClrPh;
 using System.ComponentModel;
+using System.Windows.Input;
+using System.Diagnostics;
 
+namespace Dependencies
+{ 
+    public class BindingProxy : Freezable
+    {
+        #region Overrides of Freezable
 
+        protected override Freezable CreateInstanceCore()
+        {
+            return new BindingProxy();
+        }
+
+        #endregion
+
+        public object Data
+        {
+            get { return (object)GetValue(DataProperty); }
+            set { SetValue(DataProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Data.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DataProperty =
+            DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new UIPropertyMetadata(null));
+    }
+}
+
+public class RelayCommand : ICommand
+{
+    #region Fields 
+    readonly Action<object> _execute;
+    readonly Predicate<object> _canExecute;
+    #endregion // Fields 
+    #region Constructors 
+    public RelayCommand(Action<object> execute) : this(execute, null) { }
+    public RelayCommand(Action<object> execute, Predicate<object> canExecute)
+    {
+        if (execute == null)
+            throw new ArgumentNullException("execute");
+        _execute = execute; _canExecute = canExecute;
+    }
+    #endregion // Constructors 
+    #region ICommand Members 
+    [DebuggerStepThrough]
+    public bool CanExecute(object parameter)
+    {
+        return _canExecute == null ? true : _canExecute(parameter);
+    }
+    public event EventHandler CanExecuteChanged
+    {
+        add { CommandManager.RequerySuggested += value; }
+        remove { CommandManager.RequerySuggested -= value; }
+    }
+    public void Execute(object parameter) { _execute(parameter); }
+    #endregion // ICommand Members 
+}
 
 
 public class DefaultSettingsBindingHandler : INotifyPropertyChanged
@@ -109,6 +164,76 @@ namespace Dependencies
                 this.Header = (object) GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
             }
         }
+
+        #region Commands 
+        public RelayCommand OpenPeviewerCommand
+        {
+            get
+            {
+                if (_OpenPeviewerCommand == null)
+                {
+                    _OpenPeviewerCommand = new RelayCommand((param) => this.OpenPeviewer((object)param));
+                }
+
+                return _OpenPeviewerCommand;
+            }
+        }
+
+        public bool OpenPeviewer(object Context)
+        {
+            string programPath = @".\peview.exe";
+            Process PeviewerProcess = new Process();
+
+            if (Context == null)
+            {
+                return false;
+            }
+
+            if (!File.Exists(programPath))
+            {
+                MessageBox.Show("peview.exe file could not be found !");
+                return false;
+            }
+
+            string Filepath = ((TreeViewItemContext)Context).PeProperties.Filepath;
+            if (Filepath == null)
+            {
+                return false;
+            }
+
+            PeviewerProcess.StartInfo.FileName = programPath;
+            PeviewerProcess.StartInfo.Arguments = Filepath;
+            return PeviewerProcess.Start();
+        }
+
+        public RelayCommand OpenNewAppCommand
+        {
+            get
+            {
+                if (_OpenPeviewerCommand == null)
+                {
+                    _OpenNewAppCommand = new RelayCommand((param) =>
+                    {
+                        string Filepath = ((TreeViewItemContext)param).PeProperties.Filepath;
+                        if (Filepath == null)
+                        {
+                            return;
+                        }
+
+                        Process PeviewerProcess = new Process();
+                        PeviewerProcess.StartInfo.FileName = System.Windows.Forms.Application.ExecutablePath;
+                        PeviewerProcess.StartInfo.Arguments = Filepath;
+                        PeviewerProcess.Start();
+                    });
+                }
+
+                return _OpenNewAppCommand;
+            }
+        }
+        #endregion // Commands 
+
+        private RelayCommand _OpenPeviewerCommand;
+        private RelayCommand _OpenNewAppCommand;
     }
 
 

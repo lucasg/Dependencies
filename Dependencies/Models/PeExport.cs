@@ -1,5 +1,6 @@
 using System;
 using System.ClrPh;
+using System.Diagnostics;
 
 public class DisplayPeExport : DefaultSettingsBindingHandler
 {
@@ -78,8 +79,38 @@ public class DisplayPeExport : DefaultSettingsBindingHandler
         
     }
 
+    #region Commands 
+    public RelayCommand QueryExportApi
+    {
+        get
+        {
+            if (_QueryExportApi == null)
+            {
+                _QueryExportApi = new RelayCommand((param) =>
+                {
+                    if ((param == null))
+                    {
+                        return;
+                    }
+
+                    string ExportName = (param as DisplayPeExport).Name;
+                    if (ExportName == null)
+                    {
+                        return;
+                    }
+
+                    Process.Start(@"http://search.msdn.microsoft.com/search/default.aspx?query=" + ExportName);
+                });
+            }
+
+            return _QueryExportApi;
+        }
+    }
+    #endregion // Commands 
+
 
     private PeExportInfo PeInfo;
+    private RelayCommand _QueryExportApi;
 }
 
 public struct PeExportInfo
