@@ -244,11 +244,6 @@ namespace Dependencies
                 String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder, this.Pe.IsWow64Dll());
                 PE ImportPe = (PeFilePath != null) ? new PE(PeFilePath) : null;
 
-
-                if (PeFilePath == null)
-                {
-                    this.ModulesNotFound.Add(DllImport.Name);
-                }
                    
                 TreeViewItemContext childTreeInfoContext = new TreeViewItemContext();
                 childTreeInfoContext.PeProperties = ImportPe;
@@ -286,9 +281,15 @@ namespace Dependencies
                     ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
 
                     // Missing module found
-                    if (this.ModulesNotFound.Contains(NewTreeContext.ModuleName))
+                    if (NewTreeContext.PeFilePath == null)
                     {
-                        this.ModulesList.Items.Add(new DisplayErrorModuleInfo(NewTreeContext.ImportProperties));
+                        if (!this.ModulesNotFound.Contains(NewTreeContext.ModuleName))
+                        {
+                            this.ModulesList.Items.Add(new DisplayErrorModuleInfo(NewTreeContext.ImportProperties));
+                        }
+                            
+
+                        this.ModulesNotFound.Add(NewTreeContext.ModuleName);
                     }
                     else
                     {
@@ -296,11 +297,12 @@ namespace Dependencies
                         {
                             // do not process twice the same PE in order to lessen memory pressure
                             BacklogPeToProcess.Add(new Tuple<ModuleTreeViewItem, PE>(childTreeNode, NewTreeContext.PeProperties));
+
+                            this.ModulesList.Items.Add(new DisplayModuleInfo(NewTreeContext.ImportProperties, NewTreeContext.PeProperties));
                         }
 
 
                         this.ModulesFound.Add(NewTreeContext.PeFilePath);
-                        this.ModulesList.Items.Add(new DisplayModuleInfo(NewTreeContext.ImportProperties, NewTreeContext.PeProperties));
                     }
 
                     // Add to tree view
