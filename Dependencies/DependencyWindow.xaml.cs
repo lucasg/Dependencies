@@ -428,6 +428,35 @@ namespace Dependencies
 
         }
 
+        /// <summary>
+        /// Reentrant version of Collapse/Expand Node
+        /// </summary>
+        /// <param name="Item"></param>
+        /// <param name="ExpandNode"></param>
+        private void CollapseOrExpandAllNodes(ModuleTreeViewItem Item, bool ExpandNode)
+        {
+            Item.IsExpanded = ExpandNode;
+            foreach(ModuleTreeViewItem ChildItem in Item.Items)
+            {
+                CollapseOrExpandAllNodes(ChildItem, ExpandNode);
+            }
+        }
+
+        private void ExpandAllNodes_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            // Expanding all nodes tends to slow down the application (massive allocations for node DataContext)
+            // TODO : Reduce memory pressure by storing tree nodes data context in a HashSet and find an async trick
+            // to improve the command responsiveness.
+            System.Windows.Controls.TreeView TreeNode = sender as System.Windows.Controls.TreeView;
+            CollapseOrExpandAllNodes((TreeNode.Items[0] as ModuleTreeViewItem), true);
+        }
+
+        private void CollapseAllNodes_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            System.Windows.Controls.TreeView TreeNode = sender as System.Windows.Controls.TreeView;
+            CollapseOrExpandAllNodes((TreeNode.Items[0] as ModuleTreeViewItem), false);
+        }
+
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
