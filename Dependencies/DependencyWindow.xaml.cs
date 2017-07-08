@@ -356,6 +356,7 @@ namespace Dependencies
             ConstructDependencyTree(treeNode, this.Pe);
         }
 
+        #region Commands
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
@@ -426,5 +427,13 @@ namespace Dependencies
             }
 
         }
+
+        private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
+            ListView.SelectAll();
+        }
+        #endregion // Commands 
+
     }
 }

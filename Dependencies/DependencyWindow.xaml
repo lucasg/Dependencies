@@ -39,12 +39,13 @@
             util:GridViewSort.AutoSort="True"
             KeyDown ="OnListViewKeyDown"
         >
+            <ListView.CommandBindings>
+                <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
+            </ListView.CommandBindings>
+            
             <ListView.Resources>
-
-
                 <ContextMenu x:Key="ItemContextMenu">
-      
-                    
+
                     <MenuItem Header="Highlight Matching Module In Tree" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+M" IsEnabled="False" />
                     <Separator Height="3" Margin="-1,0,0,0"/>
                     <MenuItem HeaderStringFormat= "Copy {0:s}"
@@ -201,6 +202,10 @@
                       VerticalContentAlignment="Stretch" 
                       util:GridViewSort.AutoSort="True"
                       KeyDown ="OnListViewKeyDown" >
+                <ListView.CommandBindings>
+                    <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
+                </ListView.CommandBindings>
+                
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem HeaderStringFormat= "Copy {0:s}"
@@ -270,7 +275,10 @@
                       util:GridViewSort.AutoSort="True"
                       KeyDown ="OnListViewKeyDown" 
                       >
-
+                <ListView.CommandBindings>
+                    <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
+                </ListView.CommandBindings>
+                
                 <ListView.Resources>
                     <ContextMenu x:Key="ItemContextMenu">
                         <MenuItem HeaderStringFormat= "Copy {0:s}"
