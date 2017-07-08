@@ -7,7 +7,6 @@ using System.ClrPh;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
-using System.Windows.Forms;
 
 
 public class RelayCommand : ICommand
@@ -460,18 +459,73 @@ namespace Dependencies
         private void DoFindModuleInList_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             ModuleTreeViewItem Source = e.Source as ModuleTreeViewItem;
-            String SelectedModuleName = ((TreeViewItemContext) Source.DataContext).PeFilePath;
+            String SelectedModuleName = Source.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
 
             foreach (DisplayModuleInfo item in this.ModulesList.Items)
             {
                 if (item.ModuleName == SelectedModuleName)
                 {
-                    
+
                     this.ModulesList.SelectedItem = item;
                     this.ModulesList.ScrollIntoView(item);
                     return;
                 }
             }
+        }
+
+        private void ExpandAllParentNode(ModuleTreeViewItem Item)
+        {
+            if (Item != null)
+            {
+                ExpandAllParentNode(Item.Parent as ModuleTreeViewItem);
+                Item.IsExpanded = true;
+            }
+        }
+
+        /// <summary>
+        /// Reentrant version of Collapse/Expand Node
+        /// </summary>
+        /// <param name="Item"></param>
+        /// <param name="ExpandNode"></param>
+        private bool FindModuleInTree(ModuleTreeViewItem Item, DisplayModuleInfo Module)
+        {
+            
+            if (Item.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath) == Module.ModuleName)
+            {
+                ExpandAllParentNode(Item.Parent as ModuleTreeViewItem);
+                Item.IsSelected = true;
+                Item.BringIntoView();
+
+                return true;
+            }
+
+            // BFS style search -> return the first matching node with the lowest "depth"
+            foreach (ModuleTreeViewItem ChildItem in Item.Items)
+            {
+                if(ChildItem.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath) == Module.ModuleName)
+                {
+                    ExpandAllParentNode(Item);
+                    ChildItem.IsSelected = true;
+                    ChildItem.BringIntoView();
+                    return true;
+                }
+            }
+
+            foreach (ModuleTreeViewItem ChildItem in Item.Items)
+            {
+                // early exit as soon as we find a matching node
+                if (FindModuleInTree(ChildItem, Module))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void DoFindModuleInTree_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            DisplayModuleInfo item = this.ModulesList.SelectedItem as DisplayModuleInfo;
+            ModuleTreeViewItem TreeRootItem = this.DllTreeView.Items[0] as ModuleTreeViewItem;
+            FindModuleInTree(TreeRootItem, item);
         }
 
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)

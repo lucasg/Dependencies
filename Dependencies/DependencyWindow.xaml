@@ -40,14 +40,16 @@
             KeyDown ="OnListViewKeyDown"
            
         >
-            <ListView.CommandBindings>
-                <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
-            </ListView.CommandBindings>
-            
+
             <ListView.Resources>
+                <RoutedUICommand x:Key="DoFindModuleInTree" Text="Highlight Matching Module In Tree" />
+                
                 <ContextMenu x:Key="ItemContextMenu">
 
-                    <MenuItem Header="Highlight Matching Module In Tree" Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" Background="WhiteSmoke" InputGestureText="Ctrl+M" IsEnabled="False" />
+                    <MenuItem Header="Highlight Matching Module In Tree"
+                              Command="{StaticResource DoFindModuleInTree}"
+                              InputGestureText="Ctrl+M"
+                              IsEnabled="True" />
                     <Separator Height="3" Margin="-1,0,0,0"/>
                     <MenuItem HeaderStringFormat= "Copy {0:s}"
                                   Header = "{Binding DataContext.ModuleName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
@@ -74,6 +76,11 @@
                                 IsEnabled="True" />
                 </ContextMenu>
             </ListView.Resources>
+
+            <ListView.CommandBindings>
+                <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
+                <CommandBinding Command="{StaticResource DoFindModuleInTree}" Executed="DoFindModuleInTree_Executed"/>
+            </ListView.CommandBindings>
 
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
