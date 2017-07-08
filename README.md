@@ -36,4 +36,4 @@ Special thanks to :
   * `phlib`, which does the heavy lifting for processing PE informations.
   * `peview`, a powerful and lightweight PE informations viewer.
 * [wpfmdi](http://wpfmdi.codeplex.com/) a C# library which recreate the [MDI programming model](https://en.wikipedia.org/wiki/Multiple_document_interface) in `WPF`
-* [https://www.thomaslevesque.com/](Thomas levesque's blog) which pretty much solved all my `WPF` programming issues. His [`AutoGridSort`](http://www.thomaslevesque.com/2009/08/04/wpf-automatically-sort-a-gridview-continued/) is used in this project 
+* [Thomas levesque's blog](https://www.thomaslevesque.com) which pretty much solved all my `WPF` programming issues. His [`AutoGridSort`](http://www.thomaslevesque.com/2009/08/04/wpf-automatically-sort-a-gridview-continued/) is used in this project 
