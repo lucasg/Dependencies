@@ -364,24 +364,30 @@ namespace Dependencies
             Debug.WriteLine("Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
             if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
             {
-                
-                if (ListView.Name == "ModulesList")
+                List<string> StrToCopy = new List<string>();
+                foreach (object SelectItem in ListView.SelectedItems)
                 {
-                    DisplayModuleInfo ModuleInfo = ListView.SelectedItem as DisplayModuleInfo;
-                    
-                    System.Windows.Clipboard.Clear();
-                    System.Windows.Clipboard.SetText(ModuleInfo.ModuleName, System.Windows.TextDataFormat.Text);
+                    if (ListView.Name == "ModulesList")
+                    {
+                        DisplayModuleInfo ModuleInfo = SelectItem as DisplayModuleInfo;
+                        StrToCopy.Add(ModuleInfo.ModuleName);
+                        
+                    }
+                    else if (ListView.Name == "ImportList")
+                    {
+                        DisplayPeImport PeInfo = SelectItem as DisplayPeImport;
+                        StrToCopy.Add(PeInfo.Name);
+                    }
+                    else if (ListView.Name == "ExportList")
+                    {
+                        DisplayPeExport PeInfo = SelectItem as DisplayPeExport;
+                        StrToCopy.Add(PeInfo.Name);
+                    }
                 }
-                else if (ListView.Name == "ImportList")
-                {
-                    DisplayPeImport PeInfo = ListView.SelectedItem as DisplayPeImport;
-                    PeInfo.CopyValue.Execute(PeInfo.Name);
-                }
-                else if (ListView.Name == "ExportList")
-                {
-                    DisplayPeExport PeInfo = ListView.SelectedItem as DisplayPeExport;
-                    PeInfo.CopyValue.Execute(PeInfo.Name);
-                }
+
+                System.Windows.Clipboard.Clear();
+                System.Windows.Clipboard.SetText(String.Join("\n", StrToCopy.ToArray()), System.Windows.TextDataFormat.Text);
+
             }
         }
 
