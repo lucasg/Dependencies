@@ -1,5 +1,9 @@
 # Dependencies - An open-source modern Depency Walker
 
+<p align="center">
+<img alt="Usage Exemple" src="screenshots/UsageExemple.gif"/>
+</p>
+
 
 ## Overview
 `Dependencies` is a rewrite of the old legacy software [Dependency Walker](http://www.dependencywalker.com/) which was shipped along Windows SDKs, but whose developement stopped around 2006.
