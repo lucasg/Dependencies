@@ -457,6 +457,23 @@ namespace Dependencies
             CollapseOrExpandAllNodes((TreeNode.Items[0] as ModuleTreeViewItem), false);
         }
 
+        private void DoFindModuleInList_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ModuleTreeViewItem Source = e.Source as ModuleTreeViewItem;
+            String SelectedModuleName = ((TreeViewItemContext) Source.DataContext).PeFilePath;
+
+            foreach (DisplayModuleInfo item in this.ModulesList.Items)
+            {
+                if (item.ModuleName == SelectedModuleName)
+                {
+                    
+                    this.ModulesList.SelectedItem = item;
+                    this.ModulesList.ScrollIntoView(item);
+                    return;
+                }
+            }
+        }
+
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;

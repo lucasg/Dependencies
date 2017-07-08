@@ -38,6 +38,7 @@
             Grid.Row="2" 
             util:GridViewSort.AutoSort="True"
             KeyDown ="OnListViewKeyDown"
+           
         >
             <ListView.CommandBindings>
                 <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
@@ -141,11 +142,14 @@
             <TreeView.Resources>
                 <RoutedUICommand x:Key="DoExpandAllNodes" Text="Expand All" />
                 <RoutedUICommand x:Key="DoCollapseAllNodes" Text="Collapse All" />
+                <RoutedUICommand x:Key="DoFindModuleInList" Text="Highlight Matching Module In List" />
 
                 <ContextMenu x:Key="TreeItemContextMenu">
                     <MenuItem Header="Highlight Matching Module In List" 
-                              Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}"
-                              Background="WhiteSmoke" InputGestureText="Ctrl+M" IsEnabled="False" />
+                              Command="{StaticResource DoFindModuleInList}"
+                              CommandParameter="{Binding RelativeSource={RelativeSource  AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
+                              InputGestureText="Ctrl+M" 
+                              IsEnabled="True" />
                     <Separator Height="3" Margin="-1,0,0,0"/>
                     <MenuItem Header="Copy File Path" 
                               Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
@@ -199,6 +203,7 @@
             <TreeView.CommandBindings>
                 <CommandBinding Command="{StaticResource DoExpandAllNodes}" Executed="ExpandAllNodes_Executed"/>
                 <CommandBinding Command="{StaticResource DoCollapseAllNodes}" Executed="CollapseAllNodes_Executed"/>
+                <CommandBinding Command="{StaticResource DoFindModuleInList}" Executed="DoFindModuleInList_Executed"/>
             </TreeView.CommandBindings>
         </TreeView>
 
