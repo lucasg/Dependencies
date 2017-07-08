@@ -7,31 +7,8 @@ using System.ClrPh;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
+using System.Windows.Forms;
 
-namespace Dependencies
-{ 
-    public class BindingProxy : Freezable
-    {
-        #region Overrides of Freezable
-
-        protected override Freezable CreateInstanceCore()
-        {
-            return new BindingProxy();
-        }
-
-        #endregion
-
-        public object Data
-        {
-            get { return (object)GetValue(DataProperty); }
-            set { SetValue(DataProperty, value); }
-        }
-
-        // Using a DependencyProperty as the backing store for Data.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty DataProperty =
-            DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new UIPropertyMetadata(null));
-    }
-}
 
 public class RelayCommand : ICommand
 {
@@ -191,7 +168,7 @@ namespace Dependencies
 
             if (!File.Exists(programPath))
             {
-                MessageBox.Show("peview.exe file could not be found !");
+                System.Windows.MessageBox.Show("peview.exe file could not be found !");
                 return false;
             }
 
@@ -243,7 +220,7 @@ namespace Dependencies
     /// <summary>
     /// Logique d'interaction pour DependencyWindow.xaml
     /// </summary>
-    public partial class DependencyWindow : UserControl
+    public partial class DependencyWindow : System.Windows.Controls.UserControl
     {
         PE Pe;
         string RootFolder;
@@ -351,6 +328,7 @@ namespace Dependencies
 
             InitializeComponent();
 
+
             this.Pe = new PE(FileName);
             this.RootFolder = Path.GetDirectoryName(FileName);
             this.SymPrv = new PhSymbolProvider();
@@ -376,6 +354,35 @@ namespace Dependencies
 
             // Recursively construct tree of dll imports
             ConstructDependencyTree(treeNode, this.Pe);
+        }
+
+        private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
+            bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
+
+            Debug.WriteLine("Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
+            if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
+            {
+                
+                if (ListView.Name == "ModulesList")
+                {
+                    DisplayModuleInfo ModuleInfo = ListView.SelectedItem as DisplayModuleInfo;
+                    
+                    System.Windows.Clipboard.Clear();
+                    System.Windows.Clipboard.SetText(ModuleInfo.ModuleName, System.Windows.TextDataFormat.Text);
+                }
+                else if (ListView.Name == "ImportList")
+                {
+                    DisplayPeImport PeInfo = ListView.SelectedItem as DisplayPeImport;
+                    PeInfo.CopyValue.Execute(PeInfo.Name);
+                }
+                else if (ListView.Name == "ExportList")
+                {
+                    DisplayPeExport PeInfo = ListView.SelectedItem as DisplayPeExport;
+                    PeInfo.CopyValue.Execute(PeInfo.Name);
+                }
+            }
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)

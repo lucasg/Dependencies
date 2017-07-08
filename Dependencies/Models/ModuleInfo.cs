@@ -211,12 +211,37 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
             return _OpenNewAppCommand;
         }
     }
+
+    public RelayCommand CopyValue
+    {
+        get
+        {
+            if (_CopyValue == null)
+            {
+                _CopyValue = new RelayCommand((param) =>
+                {
+
+                    if ((param == null))
+                    {
+                        return;
+                    }
+
+                    Clipboard.Clear();
+                    Clipboard.SetText((string)param, TextDataFormat.Text);
+                });
+            }
+
+            return _CopyValue;
+        }
+    }
     #endregion // Commands 
 
 
     private ModuleInfo Info;
     private RelayCommand _OpenPeviewerCommand;
     private RelayCommand _OpenNewAppCommand;
+    private RelayCommand _CopyValue;
+    
 }
 
 

@@ -1,6 +1,7 @@
 using System;
 using System.ClrPh;
 using System.Diagnostics;
+using System.Windows;
 
 public class DisplayPeExport : DefaultSettingsBindingHandler
 {
@@ -106,11 +107,35 @@ public class DisplayPeExport : DefaultSettingsBindingHandler
             return _QueryExportApi;
         }
     }
+    public RelayCommand CopyValue
+    {
+        get
+        {
+            if (_CopyValue == null)
+            {
+                _CopyValue = new RelayCommand((param) =>
+                {
+
+                    if ((param == null))
+                    {
+                        return;
+                    }
+
+                    Clipboard.Clear();
+                    Clipboard.SetText((string)param, TextDataFormat.Text);
+                });
+            }
+
+            return _CopyValue;
+        }
+    }
+
     #endregion // Commands 
 
 
     private PeExportInfo PeInfo;
     private RelayCommand _QueryExportApi;
+    private RelayCommand _CopyValue;
 }
 
 public struct PeExportInfo

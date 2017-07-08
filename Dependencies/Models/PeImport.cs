@@ -1,6 +1,7 @@
 using System;
 using System.ClrPh;
 using System.Diagnostics;
+using System.Windows;
 
 public class DisplayPeImport : DefaultSettingsBindingHandler
 {
@@ -120,11 +121,35 @@ public class DisplayPeImport : DefaultSettingsBindingHandler
             return _QueryImportApi;
         }
     }
+
+    public RelayCommand CopyValue
+    {
+        get
+        {
+            if (_CopyValue == null)
+            {
+                _CopyValue = new RelayCommand((param) =>
+                {
+
+                    if ((param == null))
+                    {
+                        return;
+                    }
+
+                    Clipboard.Clear();
+                    Clipboard.SetText((string)param, TextDataFormat.Text);
+                });
+            }
+
+            return _CopyValue;
+        }
+    }
     #endregion // Commands 
 
 
     private PeImportInfo Info;
     private RelayCommand _QueryImportApi;
+    private RelayCommand _CopyValue;
 }
 
 public struct PeImportInfo
