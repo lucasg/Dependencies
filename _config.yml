@@ -20,8 +20,8 @@ project:
 author:
   name: lucasg
   site: https://lucasg.github.io
-  email: lucasg@gituhb
-  github: [Repository metadata]
+  email: lucasg@github
+  github: lucasg
 
 # image: assets/img/whispernote-github-banner.jpg
 navbar: false
