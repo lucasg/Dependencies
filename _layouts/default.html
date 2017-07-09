@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <title>{{ site.project.name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="Description" content="" />
+    <meta name="author" content="{{ site.author.name }}" />
+    <link type="text/css" rel="stylesheet" href="assets/css/bootstrap.less.css" />
+    <!--
+    Include jquery at top so the $ variable can be used in the body.
+    When using templates like this, you can't always wait for the doc
+    to fully load.
+    -->
+    <script src="http://code.jquery.com/jquery-latest.js"></script>
+</head>
+<body>
+    <!-- These top sections are not put in a container because we want them
+    to take up the entire width of the page with no gutters or padding. -->
+
+    <!-- Navigation -->
+    {% if site.navbar %}
+        {% include navbar.html %}
+    {% endif %}
+
+    <!-- Banner -->
+    <div class="jumbotron">
+
+        <!-- Masthead -->
+        <div class="masthead">
+            <div class="container">
+                <p>
+                    <h1>{{ site.project.name }}</h1>
+
+                    <a class="btn btn-primary btn-primary"
+                        href="{{ site.project.download }}">Download {{ site.project.name }}</a>
+                    <a class="btn btn-success success btn-primary"
+                        href="{{ site.project.fork }}">Get sources on Github</a>
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="container-fluid">
+        {{ content }}
+
+        <!--Footer -->
+        <div class="row-fluid">
+            <div class="span1"></div>
+            <footer class="span10">
+                <a href="{{ site.author.site }}">lucasg.github.io</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="https://github.com/{{ site.author.github }}"><i class="icon-github-alt"></i> GitHub</a>&nbsp;&nbsp;
+            </footer>
+            <div class="span1"></div>
+        </div>.
+
+    </div>
+</body>
+
+<!-- Scripts -->
+<script src="assets/js/bootstrap.min.js"></script>
+{% include js-functions.html %}
+</html>

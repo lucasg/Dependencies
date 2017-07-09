@@ -1,23 +1,67 @@
 /*!
- * Bootstrap v2.3.0
- *
- * Copyright 2012 Twitter, Inc
- * Licensed under the Apache License v2.0
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Designed and built with all the love in the world @twitter by @mdo and @fat.
- *
- * Styles customized using this method:
- *   http://stackoverflow.com/a/10505295/154065
- * Author: Matt Norris @mattnorrisme
+ * Bootstrap v3.3.7 (http://getbootstrap.com)
+ * Copyright 2011-2016 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
  */
 
-// Mixins ----------------------------------------------------------------------
+// Core variables and mixins
+@import "variables.less";
+@import "../../lib/bootstrap/less/mixins.less";
+
+// Reset and dependencies
+@import "../../lib/bootstrap/less/normalize.less";
+@import "../../lib/bootstrap/less/print.less";
+@import "../../lib/bootstrap/less/glyphicons.less";
+
+// Core CSS
+@import "../../lib/bootstrap/less/scaffolding.less";
+@import "../../lib/bootstrap/less/type.less";
+@import "../../lib/bootstrap/less/code.less";
+@import "../../lib/bootstrap/less/grid.less";
+@import "../../lib/bootstrap/less/tables.less";
+@import "../../lib/bootstrap/less/forms.less";
+@import "../../lib/bootstrap/less/buttons.less";
+
+// Components
+@import "../../lib/bootstrap/less/component-animations.less";
+@import "../../lib/bootstrap/less/dropdowns.less";
+@import "../../lib/bootstrap/less/button-groups.less";
+@import "../../lib/bootstrap/less/input-groups.less";
+@import "../../lib/bootstrap/less/navs.less";
+@import "../../lib/bootstrap/less/navbar.less";
+@import "../../lib/bootstrap/less/breadcrumbs.less";
+@import "../../lib/bootstrap/less/pagination.less";
+@import "../../lib/bootstrap/less/pager.less";
+@import "../../lib/bootstrap/less/labels.less";
+@import "../../lib/bootstrap/less/badges.less";
+@import "../../lib/bootstrap/less/jumbotron.less";
+@import "../../lib/bootstrap/less/thumbnails.less";
+@import "../../lib/bootstrap/less/alerts.less";
+@import "../../lib/bootstrap/less/progress-bars.less";
+@import "../../lib/bootstrap/less/media.less";
+@import "../../lib/bootstrap/less/list-group.less";
+@import "../../lib/bootstrap/less/panels.less";
+@import "../../lib/bootstrap/less/responsive-embed.less";
+@import "../../lib/bootstrap/less/wells.less";
+@import "../../lib/bootstrap/less/close.less";
+
+// Components w/ JavaScript
+@import "../../lib/bootstrap/less/modals.less";
+@import "../../lib/bootstrap/less/tooltip.less";
+@import "../../lib/bootstrap/less/popovers.less";
+@import "../../lib/bootstrap/less/carousel.less";
+
+// Utility classes
+@import "../../lib/bootstrap/less/utilities.less";
+@import "../../lib/bootstrap/less/responsive-utilities.less";
+
+
+// Custom styles ---------------------------------------------------------------
 
 // Shadow for elements like quotes and images.
 .shadow {
-  margin: @baseLineHeight*2 0;
-  .box-shadow(0 0 16px 3px @grayLight);
+  margin: @line-height-base*2 0;
+  .box-shadow(0 0 16px 3px @gray-light);
 }
 
 // Padding for mobile viewports.
@@ -26,23 +70,11 @@
   padding-right: @padding;
 }
 
-// Core variables and mixins ---------------------------------------------------
-@import "variables.less"; // Modify this for custom colors, font-sizes, etc
-@import "../../lib/bootstrap/less/mixins.less";
-
-// CSS Reset
-@import "../../lib/bootstrap/less/reset.less";
-
-// Grid system and page structure
-@import "../../lib/bootstrap/less/scaffolding.less";
-@import "../../lib/bootstrap/less/grid.less";
-@import "../../lib/bootstrap/less/layouts.less";
-
-// Base CSS
-@import "../../lib/bootstrap/less/type.less";
-h1 {
-  color: @orange;
-}
+// // Base CSS
+// @import "../../lib/bootstrap/less/type.less";
+// h1 {
+//   color: @orange;
+// }
 
 blockquote {
   .shadow;
@@ -50,57 +82,15 @@ blockquote {
   border: 0; // remove the left thick, gray border
   p {
     // Put natural margins back in paragraphs.
-    margin-bottom: @baseLineHeight;
+    margin-bottom: @line-height-base;
   }
 }
 
-@import "../../lib/bootstrap/less/code.less";
 code {
-  color: @grayDark;
+  color: @gray-dark;
 }
 
-@import "../../lib/bootstrap/less/forms.less";
-@import "../../lib/bootstrap/less/tables.less";
 
-// Components: common
-
-// Replace sprites with font-awesome.
-//@import "bootstrap/less/sprites.less";
-@import "font-awesome.less";
-
-@import "../../lib/bootstrap/less/dropdowns.less";
-@import "../../lib/bootstrap/less/wells.less";
-@import "../../lib/bootstrap/less/component-animations.less";
-@import "../../lib/bootstrap/less/close.less";
-
-// Components: Buttons & Alerts
-@import "../../lib/bootstrap/less/buttons.less";
-@import "../../lib/bootstrap/less/button-groups.less";
-@import "../../lib/bootstrap/less/alerts.less"; // Note: alerts share common CSS with buttons and thus have styles in buttons.less
-
-// Components: Nav
-@import "../../lib/bootstrap/less/navs.less";
-@import "../../lib/bootstrap/less/navbar.less";
-@import "../../lib/bootstrap/less/breadcrumbs.less";
-@import "../../lib/bootstrap/less/pagination.less";
-@import "../../lib/bootstrap/less/pager.less";
-
-// Components: Popovers
-@import "../../lib/bootstrap/less/modals.less";
-@import "../../lib/bootstrap/less/tooltip.less";
-@import "../../lib/bootstrap/less/popovers.less";
-
-// Components: Misc
-@import "../../lib/bootstrap/less/thumbnails.less";
-@import "../../lib/bootstrap/less/media.less";
-@import "../../lib/bootstrap/less/labels-badges.less";
-@import "../../lib/bootstrap/less/progress-bars.less";
-@import "../../lib/bootstrap/less/accordion.less";
-@import "../../lib/bootstrap/less/carousel.less";
-@import "../../lib/bootstrap/less/hero-unit.less";
-
-// Optional components: responsive features
-@import "../../lib/bootstrap/less/responsive.less";
 //Remove the bottom margin from the nav so there is no gap
 //between it and the banner image.
 //.navbar-fixed-top {
@@ -110,7 +100,6 @@ code {
 //  margin: 0 0 0;
 //}
 
-// Custom styles ---------------------------------------------------------------
 
 // Give a shadow to images in the main body only (screenshots).
 div.row-fluid {
@@ -120,34 +109,34 @@ div.row-fluid {
 }
 
 footer {
-  border-top: 1px dotted @grayLight;
+  border-top: 1px dotted @gray-light;
   margin-top: 36px;
   padding: 2px 4px;
 }
 
 // Custom components: Jumbotron
-@import "bootstrap-extended.less";
+// @import "bootstrap-extended.less";
 .jumbotron {
   text-align: left;
   #gradient > .directional(@blue, @black, 135deg);
-  background-image: url("../img/dependencies-banner.jpg");
+  background-image: url("../img/dependencies-banner.png");
   background-repeat: no-repeat;
   background-position: center center;
-  margin-bottom: @baseLineHeight;
+  margin-bottom: @line-height-base;
 
   .masthead {
     h1 {
       font-weight: normal;
-      font-family: @baseFontFamily;
+      font-family: @font-family-base;
       font-size: 60px;
     }
     p {
-      font-family: @baseFontFamily;
+      font-family: @font-family-base;
       font-size: 30px;
     }
     // Overwrite to be orange.
     .btn-primary {
-      .buttonBackground(@btnWarningBackground, @btnWarningBackgroundHighlight);
+      //.buttonBackground(@btn-warning-bg, @btn-warning-bgHighlight);
     }
   }
 }
@@ -172,7 +161,7 @@ footer {
   .jumbotron {
   // Shrink the banner image and the font
   // to accommodate smaller screens.
-    background-image: url("../img/dependencies-banner-tablet.jpg");
+    background-image: url("../img/dependencies-banner-tablet.png");
     background-position:top center;
 
     .masthead {
@@ -210,12 +199,12 @@ footer {
 }
 
 // Github ribbon
-@import "gh-fork-ribbon.less";
-.github-fork-ribbon {
-  background-color: @orange;
-}
+// @import "gh-fork-ribbon.less";
+// .github-fork-ribbon {
+//  background-color: @orange;
+//}
 // End custom styles -----------------------------------------------------------
 
 // Utility classes
 // Has to be last to override when necessary
-@import "../../lib/bootstrap/less/utilities.less";
+//@import "../../lib/bootstrap/less/utilities.less";
