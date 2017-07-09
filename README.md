@@ -6,8 +6,8 @@
 
 
 ## Overview
-`Dependencies` is a rewrite of the old legacy software [Dependency Walker](http://www.dependencywalker.com/) which was shipped along Windows SDKs, but whose developement stopped around 2006.
-`Dependencies` can help Windows developers to troubleshooting their dll load dependencies issues.
+`Dependencies` is a rewrite of the legacy software [Dependency Walker](http://www.dependencywalker.com/) which was shipped along Windows SDKs, but whose developement stopped around 2006.
+`Dependencies` can help Windows developers troubleshooting their dll load dependencies issues.
 
 ## Releases
 
