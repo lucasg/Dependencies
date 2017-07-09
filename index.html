@@ -1,0 +1,37 @@
+---
+layout: default
+---
+<div class="row-fluid">
+    <div class="span1"></div>
+    <div class="span10">
+        <!-- DO NOT INDENT JEKYLL SYNTAX.
+        It will render as code because of the indentations. -->
+
+{% capture README %}
+{% include README.md %}
+{% endcapture %}
+{{ README | markdownify }}
+
+    </div>
+    <div class="span1"></div>
+</div>
+
+<script>
+    $(function() {
+        // Make the README file's initial intro a hero unit.
+        // http://stackoverflow.com/a/2698303/154065
+        $('h1#dependencies').nextUntil('h1').andSelf()
+                .wrapAll('<div class="hero-unit" />');
+
+        // Highlight the "Read the rationale" sections.
+        $('a:contains("Read the rationale.")').each(function() {
+            $(this).parent().addClass("alert alert-info");
+        }).parent().prepend('<i class="icon-question-sign"></i>&nbsp;');
+
+        // Fix the double-dashes being printed as a single dash.
+        $('h2:contains("-")').each(function() {
+            var html = $(this).html();
+            $(this).html(html.replace(", ", ", &ndash;"));
+        });
+    });
+</script>

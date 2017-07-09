@@ -1,0 +1,29 @@
+# Options used by GitHub
+highlighter: rouge
+markdown: kramdown
+
+# Exclude project-specific and source files when generating the site.
+# TODO: Ignore .less files
+exclude: [docs/, lib/, scripts/]
+
+
+################################################################################
+# Global variables used site-wide
+################################################################################
+
+project:
+  name: Dependencies
+  description: a modern Dependency Walker
+  download: https://github.com/lucasg/Dependencies/releases/download/v1.0/Dependencies.zip
+  fork: https://github.com/lucasg/Dependencies
+
+author:
+  name: lucasg
+  site: https://lucasg.github.io
+  email: lucasg@gituhb
+  github: [Repository metadata]
+
+# image: assets/img/whispernote-github-banner.jpg
+navbar: false
+
+gems: [jekyll-paginate]
