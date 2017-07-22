@@ -49,6 +49,9 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)AnyCPU";
         $PEVIEW_BIN="C:/projects/dependencies/bin/$($env:CONFIGURATION)64";
 
+        # Test the binary actually works
+        &"$BINPATH/ClrPhTester.exe"
+
         &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $PEVIEW_BIN/*.exe
       }
   - ps: Write-Host "Building artifact done"
