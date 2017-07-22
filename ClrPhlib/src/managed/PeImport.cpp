@@ -91,7 +91,7 @@ PeImportDll::PeImportDll(
 
 	for (size_t IndexImport = 0; IndexImport < (size_t)NumberOfEntries; IndexImport++)
 	{
-		ImportList->Add(gcnew PeImport(other->ImportList[IndexImport]));
+		ImportList->Add(gcnew PeImport(other->ImportList[(int) IndexImport]));
 	}
 
 }

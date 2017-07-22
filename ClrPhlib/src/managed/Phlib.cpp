@@ -16,7 +16,7 @@ bool Phlib::InitializePhLib()
 {
 	if (!bInitializedPhLib)
 	{
-		bInitializedPhLib = NT_SUCCESS(PhInitializePhLibEx(0, 0, 0));
+		bInitializedPhLib = NT_SUCCESS(PhInitializePhLib());
 	}
 
 	KnownDll64List = BuildKnownDllList(false);
