@@ -73,4 +73,7 @@
       <Filter>Fichiers de ressources</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <Manifest Include="ClrPhlib.manifest" />
+  </ItemGroup>
 </Project>
