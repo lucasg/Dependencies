@@ -172,14 +172,14 @@ typedef enum _PROCESSINFOCLASS
     ProcessIumChallengeResponse,
     ProcessChildProcessInformation, // PROCESS_CHILD_PROCESS_INFORMATION
     ProcessHighGraphicsPriorityInformation,
-    ProcessSubsystemInformation, // since REDSTONE2
-    ProcessEnergyValues,
-    ProcessActivityThrottleState,
-    ProcessActivityThrottlePolicy,
+    ProcessSubsystemInformation, // q: SUBSYSTEM_INFORMATION_TYPE // since REDSTONE2
+    ProcessEnergyValues, // PROCESS_ENERGY_VALUES, PROCESS_EXTENDED_ENERGY_VALUES
+    ProcessActivityThrottleState, // PROCESS_ACTIVITY_THROTTLE_STATE
+    ProcessActivityThrottlePolicy, // PROCESS_ACTIVITY_THROTTLE_POLICY
     ProcessWin32kSyscallFilterInformation,
     ProcessDisableSystemAllowedCpuSets,
-    ProcessWakeInformation,
-    ProcessEnergyTrackingState,
+    ProcessWakeInformation, // PROCESS_WAKE_INFORMATION
+    ProcessEnergyTrackingState, // PROCESS_ENERGY_TRACKING_STATE
     MaxProcessInfoClass
 } PROCESSINFOCLASS;
 #endif
@@ -232,7 +232,7 @@ typedef enum _THREADINFOCLASS
     ThreadDynamicCodePolicyInfo,
     ThreadExplicitCaseSensitivity,
     ThreadWorkOnBehalfTicket,
-    ThreadSubsystemInformation, // since REDSTONE2
+    ThreadSubsystemInformation, // q: SUBSYSTEM_INFORMATION_TYPE // since REDSTONE2
     ThreadDbgkWerReportActive,
     ThreadAttachContainer,
     MaxThreadInfoClass
@@ -439,21 +439,27 @@ typedef struct _PROCESS_SESSION_INFORMATION
     ULONG SessionId;
 } PROCESS_SESSION_INFORMATION, *PPROCESS_SESSION_INFORMATION;
 
+#define PROCESS_HANDLE_RAISE_EXCEPTION_ON_INVALID_HANDLE_CLOSE_DISABLED 0x00000000
+#define PROCESS_HANDLE_RAISE_EXCEPTION_ON_INVALID_HANDLE_CLOSE_ENABLED 0x00000001
+
 typedef struct _PROCESS_HANDLE_TRACING_ENABLE
 {
-    ULONG Flags; // 0 to disable, 1 to enable
+    ULONG Flags;
 } PROCESS_HANDLE_TRACING_ENABLE, *PPROCESS_HANDLE_TRACING_ENABLE;
+
+#define PROCESS_HANDLE_TRACING_MAX_SLOTS 0x20000
 
 typedef struct _PROCESS_HANDLE_TRACING_ENABLE_EX
 {
-    ULONG Flags; // 0 to disable, 1 to enable
+    ULONG Flags;
     ULONG TotalSlots;
 } PROCESS_HANDLE_TRACING_ENABLE_EX, *PPROCESS_HANDLE_TRACING_ENABLE_EX;
 
 #define PROCESS_HANDLE_TRACING_MAX_STACKS 16
-#define HANDLE_TRACE_DB_OPEN 1
-#define HANDLE_TRACE_DB_CLOSE 2
-#define HANDLE_TRACE_DB_BADREF 3
+
+#define PROCESS_HANDLE_TRACE_TYPE_OPEN 1
+#define PROCESS_HANDLE_TRACE_TYPE_CLOSE 2
+#define PROCESS_HANDLE_TRACE_TYPE_BADREF 3
 
 typedef struct _PROCESS_HANDLE_TRACING_ENTRY
 {
@@ -624,6 +630,24 @@ typedef enum _PS_PROTECTED_SIGNER
     PsProtectedSignerMax
 } PS_PROTECTED_SIGNER;
 
+#define PS_PROTECTED_SIGNER_MASK 0xFF
+#define PS_PROTECTED_AUDIT_MASK 0x08
+#define PS_PROTECTED_TYPE_MASK 0x07
+
+// vProtectionLevel.Level = PsProtectedValue(PsProtectedSignerCodeGen, FALSE, PsProtectedTypeProtectedLight)
+#define PsProtectedValue(aSigner, aAudit, aType) ( \
+    ((aSigner & PS_PROTECTED_SIGNER_MASK) << 4) | \
+    ((aAudit & PS_PROTECTED_AUDIT_MASK) << 3) | \
+    (aType & PS_PROTECTED_TYPE_MASK)\
+    )
+
+// InitializePsProtection(&vProtectionLevel, PsProtectedSignerCodeGen, FALSE, PsProtectedTypeProtectedLight)
+#define InitializePsProtection(aProtectionLevelPtr, aSigner, aAudit, aType) { \
+    (aProtectionLevelPtr)->Signer = aSigner; \
+    (aProtectionLevelPtr)->Audit = aAudit; \
+    (aProtectionLevelPtr)->Type = aType; \
+    }
+
 typedef struct _PS_PROTECTION
 {
     union
@@ -694,6 +718,22 @@ typedef struct _PROCESS_CHILD_PROCESS_INFORMATION
     BOOLEAN ProhibitChildProcesses;
     BOOLEAN EnableAutomaticOverride;
 } PROCESS_CHILD_PROCESS_INFORMATION, *PPROCESS_CHILD_PROCESS_INFORMATION;
+
+typedef struct _PROCESS_WAKE_INFORMATION
+{
+    ULONGLONG NotificationChannel;
+    ULONG WakeCounters[7];
+    struct _JOBOBJECT_WAKE_FILTER* WakeFilter;
+} PROCESS_WAKE_INFORMATION, *PPROCESS_WAKE_INFORMATION;
+
+typedef struct _PROCESS_ENERGY_TRACKING_STATE
+{
+    ULONG StateUpdateMask;
+    ULONG StateDesiredValue;
+    ULONG StateSequence;
+    ULONG UpdateTag : 1;
+    WCHAR Tag[64];
+} PROCESS_ENERGY_TRACKING_STATE, *PPROCESS_ENERGY_TRACKING_STATE;
 
 // end_private
 
@@ -1200,15 +1240,15 @@ typedef enum _PS_ATTRIBUTE_NUM
     PsAttributeIdealProcessor, // in PPROCESSOR_NUMBER
     PsAttributeUmsThread, // ? in PUMS_CREATE_THREAD_ATTRIBUTES
     PsAttributeMitigationOptions, // in UCHAR
-    PsAttributeProtectionLevel,
+    PsAttributeProtectionLevel, // in ULONG
     PsAttributeSecureProcess, // since THRESHOLD
     PsAttributeJobList,
     PsAttributeChildProcessPolicy, // since THRESHOLD2
     PsAttributeAllApplicationPackagesPolicy, // since REDSTONE
     PsAttributeWin32kFilter,
     PsAttributeSafeOpenPromptOriginClaim,
-    PsAttributeBnoIsolation,
-    PsAttributeDesktopAppPolicy,
+    PsAttributeBnoIsolation, // PS_BNO_ISOLATION_PARAMETERS
+    PsAttributeDesktopAppPolicy, // in ULONG
     PsAttributeMax
 } PS_ATTRIBUTE_NUM;
 
@@ -1221,11 +1261,11 @@ typedef enum _PS_ATTRIBUTE_NUM
     ((Additive) ? PS_ATTRIBUTE_ADDITIVE : 0))
 
 #define PS_ATTRIBUTE_PARENT_PROCESS \
-    PsAttributeValue(PsAttributeParentProcess, FALSE, TRUE, FALSE)
+    PsAttributeValue(PsAttributeParentProcess, FALSE, TRUE, TRUE)
 #define PS_ATTRIBUTE_DEBUG_PORT \
-    PsAttributeValue(PsAttributeDebugPort, FALSE, TRUE, FALSE)
+    PsAttributeValue(PsAttributeDebugPort, FALSE, TRUE, TRUE)
 #define PS_ATTRIBUTE_TOKEN \
-    PsAttributeValue(PsAttributeToken, FALSE, TRUE, FALSE)
+    PsAttributeValue(PsAttributeToken, FALSE, TRUE, TRUE)
 #define PS_ATTRIBUTE_CLIENT_ID \
     PsAttributeValue(PsAttributeClientId, TRUE, FALSE, FALSE)
 #define PS_ATTRIBUTE_TEB_ADDRESS \
@@ -1250,8 +1290,28 @@ typedef enum _PS_ATTRIBUTE_NUM
     PsAttributeValue(PsAttributePreferredNode, FALSE, TRUE, FALSE)
 #define PS_ATTRIBUTE_IDEAL_PROCESSOR \
     PsAttributeValue(PsAttributeIdealProcessor, TRUE, TRUE, FALSE)
+#define PS_ATTRIBUTE_UMS_THREAD \
+    PsAttributeValue(PsAttributeUmsThread, TRUE, TRUE, FALSE)
 #define PS_ATTRIBUTE_MITIGATION_OPTIONS \
     PsAttributeValue(PsAttributeMitigationOptions, FALSE, TRUE, TRUE)
+#define PS_ATTRIBUTE_PROTECTION_LEVEL \
+    PsAttributeValue(PsAttributeProtectionLevel, FALSE, TRUE, TRUE)
+#define PS_ATTRIBUTE_SECURE_PROCESS \
+    PsAttributeValue(PsAttributeSecureProcess, FALSE, TRUE, FALSE)
+#define PS_ATTRIBUTE_JOB_LIST \
+    PsAttributeValue(PsAttributeJobList, FALSE, TRUE, FALSE)
+#define PS_ATTRIBUTE_CHILD_PROCESS_POLICY \
+    PsAttributeValue(PsAttributeChildProcessPolicy, FALSE, TRUE, FALSE)
+#define PS_ATTRIBUTE_ALL_APPLICATION_PACKAGES_POLICY \
+    PsAttributeValue(PsAttributeAllApplicationPackagesPolicy, FALSE, TRUE, FALSE)
+#define PS_ATTRIBUTE_WIN32K_FILTER \
+    PsAttributeValue(PsAttributeWin32kFilter, FALSE, TRUE, FALSE)
+#define PS_ATTRIBUTE_SAFE_OPEN_PROMPT_ORIGIN_CLAIM \
+    PsAttributeValue(PsAttributeSafeOpenPromptOriginClaim, FALSE, TRUE, FALSE)
+#define PS_ATTRIBUTE_BNO_ISOLATION \
+    PsAttributeValue(PsAttributeBnoIsolation, FALSE, TRUE, FALSE)
+#define PS_ATTRIBUTE_DESKTOP_APP_POLICY \
+    PsAttributeValue(PsAttributeDesktopAppPolicy, FALSE, TRUE, FALSE)
 
 // end_rev
 
@@ -1309,18 +1369,14 @@ typedef struct _PS_STD_HANDLE_INFO
     ULONG StdHandleSubsystemType;
 } PS_STD_HANDLE_INFO, *PPS_STD_HANDLE_INFO;
 
-// windows-internals-book:"Chapter 5"
-typedef enum _PS_CREATE_STATE
+// private
+typedef struct _PS_BNO_ISOLATION_PARAMETERS
 {
-    PsCreateInitialState,
-    PsCreateFailOnFileOpen,
-    PsCreateFailOnSectionCreate,
-    PsCreateFailExeFormat,
-    PsCreateFailMachineMismatch,
-    PsCreateFailExeName, // Debugger specified
-    PsCreateSuccess,
-    PsCreateMaximumStates
-} PS_CREATE_STATE;
+    UNICODE_STRING IsolationPrefix;
+    ULONG HandleCount;
+    PVOID *Handles;
+    BOOLEAN IsolationEnabled;
+} PS_BNO_ISOLATION_PARAMETERS, *PPS_BNO_ISOLATION_PARAMETERS;
 
 // private
 typedef enum _PS_MITIGATION_OPTION
@@ -1346,6 +1402,19 @@ typedef enum _PS_MITIGATION_OPTION
     PS_MITIGATION_OPTION_STRICT_CONTROL_FLOW_GUARD,
     PS_MITIGATION_OPTION_RESTRICT_SET_THREAD_CONTEXT
 } PS_MITIGATION_OPTION;
+
+// windows-internals-book:"Chapter 5"
+typedef enum _PS_CREATE_STATE
+{
+    PsCreateInitialState,
+    PsCreateFailOnFileOpen,
+    PsCreateFailOnSectionCreate,
+    PsCreateFailExeFormat,
+    PsCreateFailMachineMismatch,
+    PsCreateFailExeName, // Debugger specified
+    PsCreateSuccess,
+    PsCreateMaximumStates
+} PS_CREATE_STATE;
 
 typedef struct _PS_CREATE_INFO
 {
@@ -1424,12 +1493,19 @@ typedef struct _PS_CREATE_INFO
 
 // end_private
 
-// Extended PROCESS_CREATE_FLAGS_*
 // begin_rev
+#define PROCESS_CREATE_FLAGS_BREAKAWAY 0x00000001
+#define PROCESS_CREATE_FLAGS_NO_DEBUG_INHERIT 0x00000002
+#define PROCESS_CREATE_FLAGS_INHERIT_HANDLES 0x00000004
+#define PROCESS_CREATE_FLAGS_OVERRIDE_ADDRESS_SPACE 0x00000008
+#define PROCESS_CREATE_FLAGS_LARGE_PAGES 0x00000010
 #define PROCESS_CREATE_FLAGS_LARGE_PAGE_SYSTEM_DLL 0x00000020
+// Extended PROCESS_CREATE_FLAGS_*
 #define PROCESS_CREATE_FLAGS_PROTECTED_PROCESS 0x00000040
 #define PROCESS_CREATE_FLAGS_CREATE_SESSION 0x00000080 // ?
 #define PROCESS_CREATE_FLAGS_INHERIT_FROM_PARENT 0x00000100
+#define PROCESS_CREATE_FLAGS_SUSPENDED 0x00000200
+#define PROCESS_CREATE_FLAGS_EXTENDED_UNKNOWN 0x00000400
 // end_rev
 
 #if (PHNT_VERSION >= PHNT_VISTA)

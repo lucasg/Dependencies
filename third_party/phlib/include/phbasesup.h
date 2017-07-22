@@ -40,6 +40,14 @@ PhCreateThread(
     _In_opt_ PVOID Parameter
     );
 
+PHLIBAPI
+VOID
+NTAPI
+PhCreateThread2(
+    _In_ PUSER_THREAD_START_ROUTINE StartAddress,
+    _In_opt_ PVOID Parameter
+    );
+
 // DLLs
 
 FORCEINLINE
@@ -95,6 +103,23 @@ PhGetProcedureAddress(
         return NULL;
 
     return procedureAddress;
+}
+
+FORCEINLINE
+PVOID
+PhGetModuleProcAddress(
+    _In_ PWSTR ModuleName,
+    _In_ PSTR ProcName
+    )
+{
+    HMODULE module;
+
+    module = (HMODULE) PhGetDllHandle(ModuleName);
+
+    if (module)
+        return PhGetProcedureAddress(module, ProcName, 0);
+    else
+        return NULL;
 }
 
 // Misc. system

@@ -66,7 +66,7 @@ BOOLEAN PhTreeNewInitialization(
     c.lpfnWndProc = PhTnpWndProc;
     c.cbClsExtra = 0;
     c.cbWndExtra = sizeof(PVOID);
-    c.hInstance = PhLibImageBase;
+    c.hInstance = PhInstanceHandle;
     c.hIcon = NULL;
     c.hCursor = LoadCursor(NULL, IDC_ARROW);
     c.hbrBackground = NULL;
@@ -77,7 +77,7 @@ BOOLEAN PhTreeNewInitialization(
     if (!RegisterClassEx(&c))
         return FALSE;
 
-    ComCtl32Handle = GetModuleHandle(L"comctl32.dll");
+    ComCtl32Handle = PhGetDllHandle(L"comctl32.dll");
     SmallIconWidth = GetSystemMetrics(SM_CXSMICON);
     SmallIconHeight = GetSystemMetrics(SM_CYSMICON);
 
@@ -340,6 +340,8 @@ VOID PhTnpCreateTreeNewContext(
     context->TooltipId = -1;
     context->TooltipColumnId = -1;
     context->EnableRedraw = 1;
+    context->DefaultBackColor = GetSysColor(COLOR_WINDOW); // RGB(0xff, 0xff, 0xff)
+    context->DefaultForeColor = GetSysColor(COLOR_WINDOWTEXT); // RGB(0x00, 0x00, 0x00)
 
     *Context = context;
 }
@@ -450,7 +452,7 @@ BOOLEAN PhTnpOnCreate(
     }
 
     if (!(Context->VScrollHandle = CreateWindow(
-        L"SCROLLBAR",
+        WC_SCROLLBAR,
         NULL,
         WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SBS_VERT,
         0,
@@ -467,7 +469,7 @@ BOOLEAN PhTnpOnCreate(
     }
 
     if (!(Context->HScrollHandle = CreateWindow(
-        L"SCROLLBAR",
+        WC_SCROLLBAR,
         NULL,
         WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE | SBS_HORZ,
         0,
@@ -484,7 +486,7 @@ BOOLEAN PhTnpOnCreate(
     }
 
     if (!(Context->FillerBoxHandle = CreateWindow(
-        L"STATIC",
+        WC_STATIC,
         NULL,
         WS_CHILD | WS_CLIPSIBLINGS | WS_VISIBLE,
         0,
@@ -2049,13 +2051,13 @@ VOID PhTnpUpdateTextMetrics(
             }
             else
             {
-                if (WindowsVersion >= WINDOWS_VISTA && !(Context->Style & TN_STYLE_THIN_ROWS))
+                if (!(Context->Style & TN_STYLE_THIN_ROWS))
                     Context->RowHeight += 1; // HACK
             }
 
             Context->RowHeight += 1; // HACK
 
-            if (WindowsVersion >= WINDOWS_VISTA && !(Context->Style & TN_STYLE_THIN_ROWS))
+            if (!(Context->Style & TN_STYLE_THIN_ROWS))
                 Context->RowHeight += 2; // HACK
         }
 
@@ -5183,8 +5185,8 @@ VOID PhTnpPrepareRowForDraw(
 
         getNodeColor.Flags = 0;
         getNodeColor.Node = Node;
-        getNodeColor.BackColor = RGB(0xff, 0xff, 0xff);
-        getNodeColor.ForeColor = RGB(0x00, 0x00, 0x00);
+        getNodeColor.BackColor = Context->DefaultBackColor;
+        getNodeColor.ForeColor = Context->DefaultForeColor;
 
         if (Context->Callback(
             Context->Handle,

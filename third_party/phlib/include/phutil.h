@@ -222,28 +222,25 @@ PhShowMessage(
     ...
     );
 
-PHLIBAPI
-INT
-NTAPI
-PhShowMessage_V(
-    _In_ HWND hWnd,
-    _In_ ULONG Type,
-    _In_ PWSTR Format,
-    _In_ va_list ArgPtr
-    );
-
 #define PhShowError(hWnd, Format, ...) PhShowMessage(hWnd, MB_OK | MB_ICONERROR, Format, __VA_ARGS__)
 #define PhShowWarning(hWnd, Format, ...) PhShowMessage(hWnd, MB_OK | MB_ICONWARNING, Format, __VA_ARGS__)
 #define PhShowInformation(hWnd, Format, ...) PhShowMessage(hWnd, MB_OK | MB_ICONINFORMATION, Format, __VA_ARGS__)
 
 PHLIBAPI
-INT
+INT 
 NTAPI
-PhShowError2(
-    _In_ HWND hWnd, 
-    _In_opt_ PWSTR Title, 
-    _In_opt_ PWSTR Message
+PhShowMessage2(
+    _In_ HWND hWnd,
+    _In_ ULONG Buttons,
+    _In_opt_ PWSTR Icon,
+    _In_opt_ PWSTR Title,
+    _In_ PWSTR Format,
+    ...
     );
+
+#define PhShowError2(hWnd, Format, ...) PhShowMessage2(hWnd, TDCBF_CLOSE_BUTTON, TD_ERROR_ICON, Format, __VA_ARGS__)
+#define PhShowWarning2(hWnd, Format, ...) PhShowMessage2(hWnd, TDCBF_CLOSE_BUTTON, TD_WARNING_ICON, Format, __VA_ARGS__)
+#define PhShowInformation2(hWnd, Format, ...) PhShowMessage2(hWnd, TDCBF_CLOSE_BUTTON, TD_INFORMATION_ICON, Format, __VA_ARGS__)
 
 PHLIBAPI
 PPH_STRING
@@ -1051,6 +1048,41 @@ PhParseCommandLineFuzzy(
     _Out_ PPH_STRINGREF Arguments,
     _Out_opt_ PPH_STRING *FullFileName
     );
+
+FORCEINLINE
+HANDLE 
+NTAPI
+PhGetNamespaceHandle(
+    VOID
+    )
+{
+    static PH_INITONCE initOnce = PH_INITONCE_INIT;
+    static UNICODE_STRING namespacePathUs = RTL_CONSTANT_STRING(L"\\BaseNamedObjects\\ProcessHacker");
+    static HANDLE directory = NULL;
+
+    if (PhBeginInitOnce(&initOnce))
+    {
+        OBJECT_ATTRIBUTES objectAttributes;
+
+        InitializeObjectAttributes(
+            &objectAttributes,
+            &namespacePathUs,
+            OBJ_OPENIF,
+            NULL,
+            NULL
+            );
+
+        NtCreateDirectoryObject(
+            &directory,
+            MAXIMUM_ALLOWED,
+            &objectAttributes
+            );
+
+        PhEndInitOnce(&initOnce);
+    }
+
+    return directory;
+}
 
 #ifdef __cplusplus
 }

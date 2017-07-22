@@ -41,9 +41,6 @@
 #include "sha.h"
 #include "sha256.h"
 
-// We may want to change this for debugging purposes.
-#define PHP_USE_IFILEDIALOG (WINDOWS_HAS_IFILEDIALOG)
-
 typedef BOOLEAN (NTAPI *_WinStationQueryInformationW)(
     _In_opt_ HANDLE ServerHandle,
     _In_ ULONG LogonId,
@@ -304,7 +301,7 @@ PPH_STRING PhGetNtMessage(
     PPH_STRING message;
 
     if (!NT_NTWIN32(Status))
-        message = PhGetMessage(GetModuleHandle(L"ntdll.dll"), 0xb, GetUserDefaultLangID(), (ULONG)Status);
+        message = PhGetMessage(PhGetDllHandle(L"ntdll.dll"), 0xb, GetUserDefaultLangID(), (ULONG)Status);
     else
         message = PhGetWin32Message(WIN32_FROM_NTSTATUS(Status));
 
@@ -346,7 +343,7 @@ PPH_STRING PhGetWin32Message(
 {
     PPH_STRING message;
 
-    message = PhGetMessage(GetModuleHandle(L"kernel32.dll"), 0xb, GetUserDefaultLangID(), Result);
+    message = PhGetMessage(PhGetDllHandle(L"kernel32.dll"), 0xb, GetUserDefaultLangID(), Result);
 
     if (message)
         PhTrimToNullTerminatorString(message);
@@ -378,24 +375,14 @@ INT PhShowMessage(
     ...
     )
 {
-    va_list argptr;
-
-    va_start(argptr, Format);
-
-    return PhShowMessage_V(hWnd, Type, Format, argptr);
-}
-
-INT PhShowMessage_V(
-    _In_ HWND hWnd,
-    _In_ ULONG Type,
-    _In_ PWSTR Format,
-    _In_ va_list ArgPtr
-    )
-{
     INT result;
+    va_list argptr;
     PPH_STRING message;
 
-    message = PhFormatString_V(Format, ArgPtr);
+    va_start(argptr, Format);
+    va_start(argptr, Format);
+    message = PhFormatString_V(Format, argptr);
+    va_end(argptr);
 
     if (!message)
         return -1;
@@ -406,48 +393,50 @@ INT PhShowMessage_V(
     return result;
 }
 
-INT PhShowError2(
+INT PhShowMessage2(
     _In_ HWND hWnd,
+    _In_ ULONG Buttons,
+    _In_opt_ PWSTR Icon,
     _In_opt_ PWSTR Title,
-    _In_opt_ PWSTR Message
+    _In_ PWSTR Format,
+    ...
     )
 {
-    if (TaskDialogIndirect_Import())
-    {
-        INT button;
-        TASKDIALOGCONFIG config = { sizeof(config) };
+    INT result;
+    va_list argptr;
+    PPH_STRING message;
+    TASKDIALOGCONFIG config = { sizeof(config) };
 
-        config.hwndParent = hWnd;
-        config.hInstance = PhLibImageBase;
-        config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | (IsWindowVisible(hWnd) ? TDF_POSITION_RELATIVE_TO_WINDOW : 0);
-        config.dwCommonButtons = TDCBF_CLOSE_BUTTON;
-        config.pszWindowTitle = PhApplicationName;
-        config.pszMainIcon = TD_ERROR_ICON;
-        config.pszMainInstruction = Title;
-        config.pszContent = Message;
-        
-        if (TaskDialogIndirect_Import()(
-            &config,
-            &button,
-            NULL,
-            NULL
-            ) == S_OK)
-        {
-            return button == IDCLOSE;
-        }
-        else
-        {
-            return FALSE;
-        }
+    va_start(argptr, Format);
+    message = PhFormatString_V(Format, argptr);
+    va_end(argptr);
+
+    if (!message)
+        return -1;
+
+    config.hwndParent = hWnd;
+    config.hInstance = PhInstanceHandle;
+    config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | (IsWindowVisible(hWnd) ? TDF_POSITION_RELATIVE_TO_WINDOW : 0);
+    config.dwCommonButtons = Buttons;
+    config.pszWindowTitle = PhApplicationName;
+    config.pszMainIcon = Icon;
+    config.pszMainInstruction = Title;
+    config.pszContent = message->Buffer;
+
+    if (TaskDialogIndirect(
+        &config,
+        &result,
+        NULL,
+        NULL
+        ) == S_OK)
+    {
+        PhDereferenceObject(message);
+        return result;
     }
     else
     {
-        return PhShowMessage(
-            hWnd,
-            MB_OK | MB_ICONERROR,
-            Title,
-            Message
-            ) == IDOK;
+        PhDereferenceObject(message);
+        return -1;
     }
 }
 
@@ -615,7 +604,7 @@ BOOLEAN PhShowConfirmMessage(
         INT button;
 
         config.hwndParent = hWnd;
-        config.hInstance = PhLibImageBase;
+        config.hInstance = PhInstanceHandle;
         config.dwFlags = TDF_ALLOW_DIALOG_CANCELLATION | (IsWindowVisible(hWnd) ? TDF_POSITION_RELATIVE_TO_WINDOW : 0);
         config.pszWindowTitle = PhApplicationName;
         config.pszMainIcon = Warning ? TD_WARNING_ICON : NULL;
@@ -2200,6 +2189,14 @@ PPH_STRING PhGetApplicationFileName(
     VOID
     )
 {
+    PPH_STRING fileName;
+
+    if (NT_SUCCESS(PhGetProcessImageFileNameWin32(NtCurrentProcess(), &fileName)))
+    {
+        PhMoveReference(&fileName, PhGetFileName(fileName));
+        return fileName;
+    }
+
     return PhGetDllFileName(NtCurrentPeb()->ImageBaseAddress, NULL);
 }
 
@@ -2211,13 +2208,20 @@ PPH_STRING PhGetApplicationDirectory(
     )
 {
     PPH_STRING fileName;
-    ULONG indexOfFileName;
+    ULONG_PTR indexOfFileName;
     PPH_STRING path = NULL;
 
-    fileName = PhGetDllFileName(NtCurrentPeb()->ImageBaseAddress, &indexOfFileName);
+    fileName = PhGetApplicationFileName();
 
     if (fileName)
     {
+        indexOfFileName = PhFindLastCharInString(fileName, 0, '\\');
+
+        if (indexOfFileName != -1)
+            indexOfFileName++;
+        else
+            indexOfFileName = 0;
+
         if (indexOfFileName != 0)
         {
             // Remove the file name from the path.
@@ -2584,6 +2588,7 @@ NTSTATUS PhCreateProcessWin32Ex(
     )
 {
     NTSTATUS status;
+    PPH_STRING fileName = NULL;
     PPH_STRING commandLine = NULL;
     STARTUPINFO startupInfo;
     PROCESS_INFORMATION processInfo;
@@ -2591,6 +2596,21 @@ NTSTATUS PhCreateProcessWin32Ex(
 
     if (CommandLine) // duplicate because CreateProcess modifies the string
         commandLine = PhCreateString(CommandLine);
+
+    if (FileName)
+        fileName = PhCreateString(FileName);
+    else
+    {
+        INT cmdlineArgCount;
+        PWSTR* cmdlineArgList;
+
+        // (dmex) Try extract the filename or CreateProcess might execute the wrong executable.
+        if (commandLine && (cmdlineArgList = CommandLineToArgvW(commandLine->Buffer, &cmdlineArgCount)))
+        {
+            PhMoveReference(&fileName, PhCreateString(cmdlineArgList[0]));
+            LocalFree(cmdlineArgList);
+        }
+    }
 
     newFlags = 0;
     PhMapFlags1(&newFlags, Flags, PhpCreateProcessMappings, sizeof(PhpCreateProcessMappings) / sizeof(PH_FLAG_MAPPING));
@@ -2608,7 +2628,7 @@ NTSTATUS PhCreateProcessWin32Ex(
     if (!TokenHandle)
     {
         if (CreateProcess(
-            FileName,
+            PhGetString(fileName),
             PhGetString(commandLine),
             NULL,
             NULL,
@@ -2627,7 +2647,7 @@ NTSTATUS PhCreateProcessWin32Ex(
     {
         if (CreateProcessAsUser(
             TokenHandle,
-            FileName,
+            PhGetString(fileName),
             PhGetString(commandLine),
             NULL,
             NULL,
@@ -2643,6 +2663,8 @@ NTSTATUS PhCreateProcessWin32Ex(
             status = PhGetLastWin32ErrorAsNtStatus();
     }
 
+    if (fileName)
+        PhDereferenceObject(fileName);
     if (commandLine)
         PhDereferenceObject(commandLine);
 
@@ -2847,15 +2869,8 @@ NTSTATUS PhCreateProcessAsUser(
             // Check if this is a service logon.
             if (PhEqualStringZ(Information->DomainName, L"NT AUTHORITY", TRUE))
             {
-                if (PhEqualStringZ(Information->UserName, L"SYSTEM", TRUE))
-                {
-                    if (WindowsVersion >= WINDOWS_VISTA)
-                        logonType = LOGON32_LOGON_SERVICE;
-                    else
-                        logonType = LOGON32_LOGON_NEW_CREDENTIALS; // HACK
-                }
-
-                if (PhEqualStringZ(Information->UserName, L"LOCAL SERVICE", TRUE) ||
+                if (PhEqualStringZ(Information->UserName, L"SYSTEM", TRUE) ||
+                    PhEqualStringZ(Information->UserName, L"LOCAL SERVICE", TRUE) ||
                     PhEqualStringZ(Information->UserName, L"NETWORK SERVICE", TRUE))
                 {
                     logonType = LOGON32_LOGON_SERVICE;
@@ -3152,7 +3167,6 @@ NTSTATUS PhFilterTokenForLimitedUser(
         return status;
 
     // Set the integrity level to Low if we're on Vista and above.
-    if (WINDOWS_HAS_UAC)
     {
         lowMandatoryLevelSid = (PSID)lowMandatoryLevelSidBuffer;
         RtlInitializeSid(lowMandatoryLevelSid, &mandatoryLabelAuthority, 1);
@@ -3285,7 +3299,7 @@ BOOLEAN PhShellExecuteEx(
     info.nShow = ShowWindowType;
     info.hwnd = hWnd;
 
-    if ((Flags & PH_SHELL_EXECUTE_ADMIN) && WINDOWS_HAS_UAC)
+    if (Flags & PH_SHELL_EXECUTE_ADMIN)
         info.lpVerb = L"runas";
 
     if (ShellExecuteEx(&info))
@@ -3416,11 +3430,7 @@ PPH_STRING PhExpandKeyName(
 
     if (Computer)
     {
-        if (WindowsVersion >= WINDOWS_VISTA)
-            tempString = PhConcatStrings2(L"Computer\\", keyName->Buffer);
-        else
-            tempString = PhConcatStrings2(L"My Computer\\", keyName->Buffer);
-
+        tempString = PhConcatStrings2(L"Computer\\", keyName->Buffer);
         PhDereferenceObject(keyName);
         keyName = tempString;
     }
@@ -3731,31 +3741,21 @@ PVOID PhCreateOpenFileDialog(
     VOID
     )
 {
-    OPENFILENAME *ofn;
-    PVOID ofnFileDialog;
+    IFileDialog *fileDialog;
 
-    if (PHP_USE_IFILEDIALOG)
+    if (SUCCEEDED(CoCreateInstance(
+        &CLSID_FileOpenDialog,
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        &IID_IFileDialog,
+        &fileDialog
+        )))
     {
-        IFileDialog *fileDialog;
-
-        if (SUCCEEDED(CoCreateInstance(
-            &CLSID_FileOpenDialog,
-            NULL,
-            CLSCTX_INPROC_SERVER,
-            &IID_IFileDialog,
-            &fileDialog
-            )))
-        {
-            // The default options are fine.
-            return PhpCreateFileDialog(FALSE, NULL, fileDialog);
-        }
+        // The default options are fine.
+        return PhpCreateFileDialog(FALSE, NULL, fileDialog);
     }
 
-    ofn = PhpCreateOpenFileName();
-    ofnFileDialog = PhpCreateFileDialog(FALSE, ofn, NULL);
-    PhSetFileDialogOptions(ofnFileDialog, PH_FILEDIALOG_PATHMUSTEXIST | PH_FILEDIALOG_FILEMUSTEXIST | PH_FILEDIALOG_STRICTFILETYPES);
-
-    return ofnFileDialog;
+    return NULL;
 }
 
 /**
@@ -3768,31 +3768,21 @@ PVOID PhCreateSaveFileDialog(
     VOID
     )
 {
-    OPENFILENAME *ofn;
-    PVOID ofnFileDialog;
+    IFileDialog *fileDialog;
 
-    if (PHP_USE_IFILEDIALOG)
+    if (SUCCEEDED(CoCreateInstance(
+        &CLSID_FileSaveDialog,
+        NULL,
+        CLSCTX_INPROC_SERVER,
+        &IID_IFileDialog,
+        &fileDialog
+        )))
     {
-        IFileDialog *fileDialog;
-
-        if (SUCCEEDED(CoCreateInstance(
-            &CLSID_FileSaveDialog,
-            NULL,
-            CLSCTX_INPROC_SERVER,
-            &IID_IFileDialog,
-            &fileDialog
-            )))
-        {
-            // The default options are fine.
-            return PhpCreateFileDialog(TRUE, NULL, fileDialog);
-        }
+        // The default options are fine.
+        return PhpCreateFileDialog(TRUE, NULL, fileDialog);
     }
 
-    ofn = PhpCreateOpenFileName();
-    ofnFileDialog = PhpCreateFileDialog(TRUE, ofn, NULL);
-    PhSetFileDialogOptions(ofnFileDialog, PH_FILEDIALOG_PATHMUSTEXIST | PH_FILEDIALOG_OVERWRITEPROMPT | PH_FILEDIALOG_STRICTFILETYPES);
-
-    return ofnFileDialog;
+    return NULL;
 }
 
 /**

@@ -1,0 +1,469 @@
+From 145ca600a56127e22b4f1e9d78a4663f94c4db31 Mon Sep 17 00:00:00 2001
+From: lucasg <lucas.georges@outlook.com>
+Date: Sat, 22 Jul 2017 13:20:59 +0200
+Subject: [PATCH] Fix __acrt_fp_format bug and specify CLR compilation
+
+---
+ phlib/format.c                    |  5 ++++-
+ phlib/format_i.h                  |  9 --------
+ phlib/include/phbase.h            | 12 +++++++---
+ phlib/include/phbasesup.h         |  2 +-
+ phlib/phlib.vcxproj               | 26 +++++++++++-----------
+ phnt/include/ntexapi.h            |  9 ++++++--
+ phnt/include/phnt_ntdef.h         |  4 +++-
+ tools/peview/peview.rc            |  2 +-
+ tools/peview/peview.vcxproj       | 46 +++++++++++++++++++--------------------
+ tools/peview/resources/phappres.h | 34 +++++++++++++++++++++++++++++
+ tools/peview/resources/phapprev.h |  6 +++++
+ tools/peview/version.rc           | 35 +++++++++++++++++++++++++++++
+ 12 files changed, 136 insertions(+), 54 deletions(-)
+ create mode 100644 tools/peview/resources/phappres.h
+ create mode 100644 tools/peview/resources/phapprev.h
+ create mode 100644 tools/peview/version.rc
+
+diff --git a/phlib/format.c b/phlib/format.c
+index b45fd38..b705370 100644
+--- a/phlib/format.c
++++ b/phlib/format.c
+@@ -45,9 +45,10 @@ extern ULONG PhMaxSizeUnit;
+ #define PHP_FORMAT_PAD 0x4
+ 
+ // Internal CRT routine needed for floating-point conversion
+-
++#if 0
+ errno_t __cdecl _cfltcvt_l(double *arg, char *buffer, size_t sizeInBytes,
+     int format, int precision, int caps, _locale_t plocinfo);
++#endif
+ 
+ // Keep in sync with PhSizeUnitNames
+ static PH_STRINGREF PhpSizeUnitNamesCounted[7] =
+@@ -66,6 +67,7 @@ static WCHAR PhpFormatDecimalSeparator = '.';
+ static WCHAR PhpFormatThousandSeparator = ',';
+ static _locale_t PhpFormatUserLocale = NULL;
+ 
++#if 0
+ #if (_MSC_VER >= 1900)
+ 
+ // See Source\10.0.10150.0\ucrt\convert\cvt.cpp in SDK v10.
+@@ -94,6 +96,7 @@ static errno_t __cdecl _cfltcvt_l(double *arg, char *buffer, size_t sizeInBytes,
+ }
+ 
+ #endif
++#endif
+ 
+ // From Source\10.0.10150.0\ucrt\inc\corecrt_internal_stdio_output.h in SDK v10.
+ VOID PhpCropZeros(
+diff --git a/phlib/format_i.h b/phlib/format_i.h
+index 31a5771..e98d3a0 100644
+--- a/phlib/format_i.h
++++ b/phlib/format_i.h
+@@ -311,15 +311,6 @@ CommonInt64Format:
+         \
+         value = (Format)->u.Double; \
+         temp = (PSTR)tempBuffer + 1; /* leave one character so we can insert a prefix if needed */ \
+-        _cfltcvt_l( \
+-            &value, \
+-            temp, \
+-            sizeof(tempBuffer) - 1, \
+-            c, \
+-            precision, \
+-            !!((Format)->Type & FormatUpperCase), \
+-            PhpFormatUserLocale \
+-            ); \
+         \
+         /* if (((Format)->Type & FormatForceDecimalPoint) && precision == 0) */ \
+              /* _forcdecpt_l(tempBufferAnsi, PhpFormatUserLocale); */ \
+diff --git a/phlib/include/phbase.h b/phlib/include/phbase.h
+index 15ad67e..3a40f2a 100644
+--- a/phlib/include/phbase.h
++++ b/phlib/include/phbase.h
+@@ -17,11 +17,17 @@
+ #define _CRT_SECURE_NO_WARNINGS
+ #endif
+ 
+-#if !defined(_PHLIB_)
++#if defined(_PHLIB_)
++#define PHLIBAPI
++#elif defined(_PHDLL_)
++#define PHLIBAPI __declspec(dllexport)
++#else
++#if defined(__cplusplus)
+ #define PHLIBAPI __declspec(dllimport)
+ #else
+-#define PHLIBAPI
+-#endif
++#define PHLIBAPI 
++#endif //  defined(__cplusplus)
++#endif //  defined(_PHLIB_)
+ 
+ #include <phnt_windows.h>
+ #include <phnt.h>
+diff --git a/phlib/include/phbasesup.h b/phlib/include/phbasesup.h
+index b2c6a18..6cbafe7 100644
+--- a/phlib/include/phbasesup.h
++++ b/phlib/include/phbasesup.h
+@@ -114,7 +114,7 @@ PhGetModuleProcAddress(
+ {
+     HMODULE module;
+ 
+-    module = PhGetDllHandle(ModuleName);
++    module = (HMODULE) PhGetDllHandle(ModuleName);
+ 
+     if (module)
+         return PhGetProcedureAddress(module, ProcName, 0);
+diff --git a/phlib/phlib.vcxproj b/phlib/phlib.vcxproj
+index e395b22..6a120e2 100644
+--- a/phlib/phlib.vcxproj
++++ b/phlib/phlib.vcxproj
+@@ -1,4 +1,4 @@
+-<?xml version="1.0" encoding="utf-8"?>
++﻿<?xml version="1.0" encoding="utf-8"?>
+ <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+   <ItemGroup Label="ProjectConfigurations">
+     <ProjectConfiguration Include="Debug|Win32">
+@@ -64,19 +64,19 @@
+   </ImportGroup>
+   <PropertyGroup Label="UserMacros" />
+   <PropertyGroup>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
+-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
++    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
+   </PropertyGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+     <ClCompile>
+       <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>$(SolutionDir)phnt\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>DEBUG;_PHLIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <StringPooling>true</StringPooling>
+       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+@@ -91,7 +91,7 @@
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+     <ClCompile>
+       <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>$(SolutionDir)phnt\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>DEBUG;_PHLIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <StringPooling>true</StringPooling>
+       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+@@ -107,7 +107,7 @@
+     <ClCompile>
+       <Optimization>MaxSpeed</Optimization>
+       <IntrinsicFunctions>true</IntrinsicFunctions>
+-      <AdditionalIncludeDirectories>$(SolutionDir)phnt\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_PHLIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <StringPooling>true</StringPooling>
+       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+@@ -125,7 +125,7 @@
+     <ClCompile>
+       <Optimization>MaxSpeed</Optimization>
+       <IntrinsicFunctions>true</IntrinsicFunctions>
+-      <AdditionalIncludeDirectories>$(SolutionDir)phnt\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>WIN64;NDEBUG;_WINDOWS;_PHLIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <StringPooling>true</StringPooling>
+       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+diff --git a/phnt/include/ntexapi.h b/phnt/include/ntexapi.h
+index 5a42dbf..80821b3 100644
+--- a/phnt/include/ntexapi.h
++++ b/phnt/include/ntexapi.h
+@@ -3438,7 +3438,9 @@ FORCEINLINE ULONGLONG NtGetTickCount64()
+         if (tickCount.HighPart == (ULONG)USER_SHARED_DATA->TickCount.High2Time)
+             break;
+ 
+-        YieldProcessor();
++#ifndef _MANAGED
++		YieldProcessor();
++#endif // !_MANAGED
+     }
+ 
+ #endif
+@@ -3465,7 +3467,10 @@ FORCEINLINE ULONG NtGetTickCount()
+         if (tickCount.HighPart == (ULONG)USER_SHARED_DATA->TickCount.High2Time)
+             break;
+ 
+-        YieldProcessor();
++#ifndef _MANAGED
++		YieldProcessor();
++#endif // !_MANAGED
++        
+     }
+ 
+     return (ULONG)((UInt32x32To64(tickCount.LowPart, USER_SHARED_DATA->TickCountMultiplier) >> 24) +
+diff --git a/phnt/include/phnt_ntdef.h b/phnt/include/phnt_ntdef.h
+index 36cc781..93f911d 100644
+--- a/phnt/include/phnt_ntdef.h
++++ b/phnt/include/phnt_ntdef.h
+@@ -71,7 +71,9 @@ typedef LARGE_INTEGER PHYSICAL_ADDRESS, *PPHYSICAL_ADDRESS;
+ 
+ // Functions
+ 
+-#ifndef _WIN64
++#ifdef _MANAGED
++#define FASTCALL __stdcall
++#elif !defined(_WIN64)
+ #define FASTCALL __fastcall
+ #else
+ #define FASTCALL
+diff --git a/tools/peview/peview.rc b/tools/peview/peview.rc
+index c9dd19a..318adce 100644
+--- a/tools/peview/peview.rc
++++ b/tools/peview/peview.rc
+@@ -8,7 +8,7 @@
+ // Generated from the TEXTINCLUDE 2 resource.
+ //
+ #include "winres.h"
+-#include "../../ProcessHacker/include/phappres.h"
++#include "resources/phappres.h"
+ /////////////////////////////////////////////////////////////////////////////
+ #undef APSTUDIO_READONLY_SYMBOLS
+ 
+diff --git a/tools/peview/peview.vcxproj b/tools/peview/peview.vcxproj
+index a5a6ae5..20114a8 100644
+--- a/tools/peview/peview.vcxproj
++++ b/tools/peview/peview.vcxproj
+@@ -65,16 +65,16 @@
+   <PropertyGroup Label="UserMacros" />
+   <PropertyGroup>
+     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
+     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</LinkIncremental>
+     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
+     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkIncremental>
+     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
+     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
++    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
+     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+   </PropertyGroup>
+   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+@@ -84,8 +84,8 @@
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+     <ClCompile>
+       <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN32;DEBUG;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
++      <AdditionalIncludeDirectories>$(SolutionDir)phlib\phnt\include;$(SolutionDir)phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN32;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+       <WarningLevel>Level3</WarningLevel>
+@@ -96,8 +96,8 @@
+       <StringPooling>true</StringPooling>
+     </ClCompile>
+     <Link>
+-      <AdditionalDependencies>noarg.obj;noenv.obj;phlib.lib;ntdll.lib;uxtheme.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+-      <AdditionalLibraryDirectories>..\..\phlib\bin\$(Configuration)$(PlatformArchitecture);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>noarg.obj;noenv.obj;$(OutputPath)phlib.lib;ntdll.lib;uxtheme.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalManifestDependencies>
+       </AdditionalManifestDependencies>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+@@ -106,15 +106,15 @@
+       <MinimumRequiredVersion>6.01</MinimumRequiredVersion>
+     </Link>
+     <ResourceCompile>
+-      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
+     </ResourceCompile>
+   </ItemDefinitionGroup>
+   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+     <ClCompile>
+       <Optimization>Disabled</Optimization>
+-      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN64;DEBUG;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN64;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+       <WarningLevel>Level3</WarningLevel>
+@@ -125,8 +125,8 @@
+       <StringPooling>true</StringPooling>
+     </ClCompile>
+     <Link>
+-      <AdditionalDependencies>noarg.obj;noenv.obj;phlib.lib;ntdll.lib;uxtheme.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+-      <AdditionalLibraryDirectories>..\..\phlib\bin\$(Configuration)$(PlatformArchitecture);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>noarg.obj;noenv.obj;$(OutputPath)phlib.lib;ntdll.lib;uxtheme.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalManifestDependencies>
+       </AdditionalManifestDependencies>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+@@ -143,8 +143,8 @@
+     <ClCompile>
+       <Optimization>MaxSpeed</Optimization>
+       <IntrinsicFunctions>true</IntrinsicFunctions>
+-      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN32;NDEBUG;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+       <FunctionLevelLinking>true</FunctionLevelLinking>
+       <WarningLevel>Level3</WarningLevel>
+@@ -157,8 +157,8 @@
+       <SDLCheck>true</SDLCheck>
+     </ClCompile>
+     <Link>
+-      <AdditionalDependencies>noarg.obj;noenv.obj;phlib.lib;ntdll.lib;uxtheme.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+-      <AdditionalLibraryDirectories>..\..\phlib\bin\$(Configuration)$(PlatformArchitecture);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>noarg.obj;noenv.obj;$(OutputPath)phlib.lib;ntdll.lib;uxtheme.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalManifestDependencies>
+       </AdditionalManifestDependencies>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+@@ -178,8 +178,8 @@
+     <ClCompile>
+       <Optimization>MaxSpeed</Optimization>
+       <IntrinsicFunctions>true</IntrinsicFunctions>
+-      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+-      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN64;DEBUG;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN64;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+       <FunctionLevelLinking>true</FunctionLevelLinking>
+       <WarningLevel>Level3</WarningLevel>
+@@ -191,8 +191,8 @@
+       <SDLCheck>true</SDLCheck>
+     </ClCompile>
+     <Link>
+-      <AdditionalDependencies>noarg.obj;noenv.obj;phlib.lib;ntdll.lib;uxtheme.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
+-      <AdditionalLibraryDirectories>..\..\phlib\bin\$(Configuration)$(PlatformArchitecture);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
++      <AdditionalDependencies>noarg.obj;noenv.obj;$(OutputPath)phlib.lib;ntdll.lib;uxtheme.lib;windowscodecs.lib;%(AdditionalDependencies)</AdditionalDependencies>
++      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+       <AdditionalManifestDependencies>
+       </AdditionalManifestDependencies>
+       <GenerateDebugInformation>true</GenerateDebugInformation>
+@@ -204,7 +204,7 @@
+       <MinimumRequiredVersion>6.01</MinimumRequiredVersion>
+     </Link>
+     <ResourceCompile>
+-      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
+     </ResourceCompile>
+   </ItemDefinitionGroup>
+@@ -236,7 +236,7 @@
+     <ResourceCompile Include="peview.rc" />
+   </ItemGroup>
+   <ItemGroup>
+-    <ProjectReference Include="..\..\phlib\phlib.vcxproj">
++    <ProjectReference Include="..\phlib\phlib.vcxproj">
+       <Project>{477d0215-f252-41a1-874b-f27e3ea1ed17}</Project>
+       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+     </ProjectReference>
+diff --git a/tools/peview/resources/phappres.h b/tools/peview/resources/phappres.h
+new file mode 100644
+index 0000000..3f8215d
+--- /dev/null
++++ b/tools/peview/resources/phappres.h
+@@ -0,0 +1,34 @@
++// Notes:
++// * Do not use /* comments */ since ISPP is buggy and it will throw an error.
++
++#ifndef PH_PHAPPRES_H
++#define PH_PHAPPRES_H
++
++#include "phapprev.h"
++
++#define PHAPP_VERSION_MAJOR 3
++#define PHAPP_VERSION_MINOR 0
++#define PHAPP_VERSION_BUILD 0
++
++#if (PHAPP_VERSION_BUILD == 0)
++#define TWO_DIGIT_VER   1
++#else
++#define THREE_DIGIT_VER 1
++#endif
++
++#define DO_MAKE_STR(x) #x
++#define MAKE_STR(x)    DO_MAKE_STR(x)
++
++#ifndef ISPP_INVOKED
++
++#if defined(TWO_DIGIT_VER)
++#define PHAPP_VERSION_STRING MAKE_STR(PHAPP_VERSION_MAJOR) "." MAKE_STR(PHAPP_VERSION_MINOR) ".0" "." MAKE_STR(PHAPP_VERSION_REVISION)
++#elif defined(THREE_DIGIT_VER)
++#define PHAPP_VERSION_STRING MAKE_STR(PHAPP_VERSION_MAJOR) "." MAKE_STR(PHAPP_VERSION_MINOR) "." MAKE_STR(PHAPP_VERSION_BUILD) "." MAKE_STR(PHAPP_VERSION_REVISION)
++#endif
++
++#define PHAPP_VERSION_NUMBER PHAPP_VERSION_MAJOR,PHAPP_VERSION_MINOR,PHAPP_VERSION_BUILD,PHAPP_VERSION_REVISION
++
++#endif // ISPP_INVOKED
++
++#endif // PHAPPRES_H
+diff --git a/tools/peview/resources/phapprev.h b/tools/peview/resources/phapprev.h
+new file mode 100644
+index 0000000..fc00f3f
+--- /dev/null
++++ b/tools/peview/resources/phapprev.h
+@@ -0,0 +1,6 @@
++#ifndef PHAPPREV_H 
++#define PHAPPREV_H 
++
++#define PHAPP_VERSION_REVISION 618
++
++#endif // PHAPPREV_H
+diff --git a/tools/peview/version.rc b/tools/peview/version.rc
+new file mode 100644
+index 0000000..47b7ac7
+--- /dev/null
++++ b/tools/peview/version.rc
+@@ -0,0 +1,35 @@
++#include "winres.h"
++#include "resources/phappres.h"
++
++VS_VERSION_INFO VERSIONINFO
++ FILEVERSION PHAPP_VERSION_NUMBER
++ PRODUCTVERSION PHAPP_VERSION_NUMBER
++ FILEFLAGSMASK 0x17L
++#ifdef _DEBUG
++ FILEFLAGS 0x1L
++#else
++ FILEFLAGS 0x0L
++#endif
++ FILEOS 0x4L
++ FILETYPE 0x1L
++ FILESUBTYPE 0x0L
++BEGIN
++    BLOCK "StringFileInfo"
++    BEGIN
++        BLOCK "0c0904b0"
++        BEGIN
++            VALUE "CompanyName", "wj32"
++            VALUE "FileDescription", "PE Viewer"
++            VALUE "FileVersion", PHAPP_VERSION_STRING
++            VALUE "InternalName", "peview"
++            VALUE "LegalCopyright", "Licensed under the GNU GPL, v3."
++            VALUE "OriginalFilename", "peview.exe"
++            VALUE "ProductName", "Process Hacker"
++            VALUE "ProductVersion", PHAPP_VERSION_STRING
++        END
++    END
++    BLOCK "VarFileInfo"
++    BEGIN
++        VALUE "Translation", 0xc09, 1200
++    END
++END
+-- 
+2.9.3.windows.1
+

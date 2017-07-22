@@ -14,11 +14,11 @@ Push-Location
 Write-Host -ForegroundColor Blue "Checkout out ProcessHackerSources";
 &git clone https://github.com/processhacker2/processhacker2.git "tmp"
 &cd tmp;
-&git checkout -b "Dependencies" dc6a8a94f7e4b381090b46eb8e1b9fd7de052dbe
+&git checkout -b "Dependencies" d7342929f1426e597b95e0c20a9b9651d406f410
 Write-Host -ForegroundColor Green "Checkout out ProcessHackerSources OK";
 
 Write-Host -ForegroundColor Blue "Pathching ProcessHackerSources";
-&git apply "../ProcessHacker-Fix-__acrt_fp_format-bug-and-specify-CLR-compilation.patch"
+&git am -3  "../Ph-d7342929f1426e597b95e0c20a9b9651d406f410-__acrt_fp_format-bug-and-specify-CLR-compilation.patch"
 Write-Host -ForegroundColor Green "Pathching ProcessHackerSources OK";
 
 Write-Host -ForegroundColor Blue "Exporting src folders";

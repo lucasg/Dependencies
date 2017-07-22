@@ -1,3 +1,26 @@
+/*
+ * Process Hacker -
+ *   PE viewer
+ *
+ * Copyright (C) 2010-2011 wj32
+ * Copyright (C) 2017 dmex
+ *
+ * This file is part of Process Hacker.
+ *
+ * Process Hacker is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Process Hacker is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Process Hacker.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef PEVIEW_H
 #define PEVIEW_H
 
@@ -135,7 +158,7 @@ typedef struct _PH_TN_COLUMN_MENU_DATA
 #define PH_TN_COLUMN_MENU_SIZE_ALL_COLUMNS_TO_FIT_ID ((ULONG)-4)
 #define PH_TN_COLUMN_MENU_RESET_SORT_ID ((ULONG)-5)
 
- VOID PhInitializeTreeNewColumnMenu(
+VOID PhInitializeTreeNewColumnMenu(
     _Inout_ PPH_TN_COLUMN_MENU_DATA Data
     );
 
@@ -209,8 +232,9 @@ typedef struct _PDB_SYMBOL_CONTEXT
     HWND SearchHandle;
     HWND TreeNewHandle;
     HWND ParentWindowHandle;
-    HANDLE SearchThreadHandle;
-    HANDLE UpdateTimer;
+
+    HANDLE TimerQueueHandle;
+    HANDLE UpdateTimerHandle;
 
     ULONG64 BaseAddress;
     PPH_STRING FileName;
@@ -238,6 +262,11 @@ INT_PTR CALLBACK PvpSymbolsDlgProc(
 
 NTSTATUS PeDumpFileSymbols(
     _In_ PPDB_SYMBOL_CONTEXT Context
+    );
+
+VOID PdbDumpAddress(
+    _In_ PPDB_SYMBOL_CONTEXT Context,
+    _In_ ULONG64 Address
     );
 
 VOID PvPdbProperties(

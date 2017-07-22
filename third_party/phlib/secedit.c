@@ -25,7 +25,7 @@
 
 #include <guisup.h>
 #include <hndlinfo.h>
-
+#include <settings.h>
 #include <seceditp.h>
 
 static ISecurityInformationVtbl PhSecurityInformation_VTable =
@@ -118,7 +118,10 @@ VOID PhEditSecurity(
         FALSE
         );
 
-    EditSecurity(hWnd, info);
+    if (WindowsVersion >= WINDOWS_8_1 && PhGetIntegerSetting(L"EnableSecurityAdvancedDialog"))
+        EditSecurityAdvanced(hWnd, info, COMBINE_PAGE_ACTIVATION(SI_PAGE_PERM, SI_SHOW_PERM_ACTIVATED));
+    else
+        EditSecurity(hWnd, info);
 
     PhSecurityInformation_Release(info);
 }

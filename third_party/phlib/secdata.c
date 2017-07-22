@@ -256,6 +256,7 @@ ACCESS_ENTRIES(Process60)
     { L"Query limited information", PROCESS_QUERY_LIMITED_INFORMATION, TRUE, TRUE },
     { L"Query information", PROCESS_QUERY_INFORMATION | PROCESS_QUERY_LIMITED_INFORMATION, TRUE, TRUE },
     { L"Set information", PROCESS_SET_INFORMATION, TRUE, TRUE },
+    { L"Set limited information", PROCESS_SET_LIMITED_INFORMATION, TRUE, TRUE },
     { L"Set quotas", PROCESS_SET_QUOTA, TRUE, TRUE },
     { L"Set session ID", PROCESS_SET_SESSIONID, TRUE, TRUE },
     { L"Create threads", PROCESS_CREATE_THREAD, TRUE, TRUE },
@@ -644,13 +645,11 @@ BOOLEAN PhGetAccessEntries(
     }
     else if (PhEqualStringZ(Type, L"Process", TRUE))
     {
-        if (WindowsVersion >= WINDOWS_VISTA)
-            Type = L"Process60";
+        Type = L"Process60";
     }
     else if (PhEqualStringZ(Type, L"Thread", TRUE))
     {
-        if (WindowsVersion >= WINDOWS_VISTA)
-            Type = L"Thread60";
+        Type = L"Thread60";
     }
 
     // Find the specific type.

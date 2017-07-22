@@ -31,7 +31,6 @@
 
 #define SCALE_DPI(Value) PhMultiplyDivide(Value, PhGlobalDpi, 96)
 
-_ChangeWindowMessageFilter ChangeWindowMessageFilter_I;
 _IsImmersiveProcess IsImmersiveProcess_I;
 _RunFileDlg RunFileDlg;
 _SHAutoComplete SHAutoComplete_I;
@@ -50,8 +49,6 @@ VOID PhGuiSupportInitialization(
     shell32Handle = LoadLibrary(L"shell32.dll");
     shlwapiHandle = LoadLibrary(L"shlwapi.dll");
 
-    if (WINDOWS_HAS_UAC)
-        ChangeWindowMessageFilter_I = PhGetModuleProcAddress(L"user32.dll", "ChangeWindowMessageFilter");
     if (WINDOWS_HAS_IMMERSIVE)
         IsImmersiveProcess_I = PhGetModuleProcAddress(L"user32.dll", "IsImmersiveProcess");
     RunFileDlg = PhGetProcedureAddress(shell32Handle, NULL, 61);
@@ -63,10 +60,7 @@ VOID PhSetControlTheme(
     _In_ PWSTR Theme
     )
 {
-    if (WindowsVersion >= WINDOWS_VISTA)
-    {
-        SetWindowTheme(Handle, Theme, NULL);
-    }
+    SetWindowTheme(Handle, Theme, NULL);
 }
 
 INT PhAddListViewColumn(
@@ -694,15 +688,10 @@ VOID PhGetStockApplicationIcon(
                 PhInitializeStringRef(&dllBaseName, L"\\imageres.dll");
                 index = 11;
             }
-            else if (WindowsVersion >= WINDOWS_VISTA)
+            else
             {
                 PhInitializeStringRef(&dllBaseName, L"\\user32.dll");
                 index = 0;
-            }
-            else
-            {
-                PhInitializeStringRef(&dllBaseName, L"\\shell32.dll");
-                index = 2;
             }
 
             dllFileName = PhConcatStringRef2(&systemDirectory->sr, &dllBaseName);
@@ -917,7 +906,7 @@ BOOLEAN PhModalPropertySheet(
     oldFocus = GetFocus();
     topLevelOwner = Header->hwndParent;
 
-    while (topLevelOwner && (GetWindowLong(topLevelOwner, GWL_STYLE) & WS_CHILD))
+    while (topLevelOwner && (GetWindowLongPtr(topLevelOwner, GWL_STYLE) & WS_CHILD))
         topLevelOwner = GetParent(topLevelOwner);
 
     if (topLevelOwner && (topLevelOwner == GetDesktopWindow() || EnableWindow(topLevelOwner, FALSE)))
