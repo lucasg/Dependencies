@@ -64,14 +64,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)obj\$(Configuration)$(PlatformArchitecture)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)bin\$(Configuration)$(PlatformArchitecture)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(PlatformArchitecture)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -167,12 +167,22 @@
     <ClCompile Include="mapimg.c" />
     <ClCompile Include="maplib.c" />
     <ClCompile Include="md5.c" />
+    <ClCompile Include="mxml\mxml-attr.c" />
+    <ClCompile Include="mxml\mxml-entity.c" />
+    <ClCompile Include="mxml\mxml-file.c" />
+    <ClCompile Include="mxml\mxml-index.c" />
+    <ClCompile Include="mxml\mxml-node.c" />
+    <ClCompile Include="mxml\mxml-private.c" />
+    <ClCompile Include="mxml\mxml-search.c" />
+    <ClCompile Include="mxml\mxml-set.c" />
+    <ClCompile Include="mxml\mxml-string.c" />
     <ClCompile Include="native.c" />
     <ClCompile Include="provider.c" />
     <ClCompile Include="queuedlock.c" />
     <ClCompile Include="ref.c" />
     <ClCompile Include="secdata.c" />
     <ClCompile Include="secedit.c" />
+    <ClCompile Include="settings.c" />
     <ClCompile Include="sha.c" />
     <ClCompile Include="sha256.c" />
     <ClCompile Include="util.c" />
@@ -208,6 +218,7 @@
     <ClInclude Include="include\phutil.h" />
     <ClInclude Include="include\provider.h" />
     <ClInclude Include="include\secedit.h" />
+    <ClInclude Include="include\settings.h" />
     <ClInclude Include="include\svcsup.h" />
     <ClInclude Include="include\symprvp.h" />
     <ClInclude Include="include\treenew.h" />
@@ -235,6 +246,9 @@
     <ClInclude Include="include\ref.h" />
     <ClInclude Include="include\refp.h" />
     <ClInclude Include="include\seceditp.h" />
+    <ClInclude Include="mxml\config.h" />
+    <ClInclude Include="mxml\mxml-private.h" />
+    <ClInclude Include="mxml\mxml.h" />
     <ClInclude Include="sha.h" />
     <ClInclude Include="include\symprv.h" />
     <ClInclude Include="include\templ.h" />
