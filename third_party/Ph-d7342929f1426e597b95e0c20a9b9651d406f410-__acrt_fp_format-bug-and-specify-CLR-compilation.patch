@@ -1,22 +1,22 @@
-From 145ca600a56127e22b4f1e9d78a4663f94c4db31 Mon Sep 17 00:00:00 2001
+From 2113c249617e4649a5fe42e77ba695db652f0cb6 Mon Sep 17 00:00:00 2001
 From: lucasg <lucas.georges@outlook.com>
 Date: Sat, 22 Jul 2017 13:20:59 +0200
 Subject: [PATCH] Fix __acrt_fp_format bug and specify CLR compilation
 
 ---
- phlib/format.c                    |  5 ++++-
- phlib/format_i.h                  |  9 --------
+ phlib/format.c                    |  5 +++-
+ phlib/format_i.h                  |  9 -------
  phlib/include/phbase.h            | 12 +++++++---
  phlib/include/phbasesup.h         |  2 +-
- phlib/phlib.vcxproj               | 26 +++++++++++-----------
- phnt/include/ntexapi.h            |  9 ++++++--
+ phlib/phlib.vcxproj               | 26 ++++++++++----------
+ phnt/include/ntexapi.h            |  9 +++++--
  phnt/include/phnt_ntdef.h         |  4 +++-
  tools/peview/peview.rc            |  2 +-
- tools/peview/peview.vcxproj       | 46 +++++++++++++++++++--------------------
- tools/peview/resources/phappres.h | 34 +++++++++++++++++++++++++++++
+ tools/peview/peview.vcxproj       | 50 +++++++++++++++++++--------------------
+ tools/peview/resources/phappres.h | 34 ++++++++++++++++++++++++++
  tools/peview/resources/phapprev.h |  6 +++++
- tools/peview/version.rc           | 35 +++++++++++++++++++++++++++++
- 12 files changed, 136 insertions(+), 54 deletions(-)
+ tools/peview/version.rc           | 35 +++++++++++++++++++++++++++
+ 12 files changed, 138 insertions(+), 56 deletions(-)
  create mode 100644 tools/peview/resources/phappres.h
  create mode 100644 tools/peview/resources/phapprev.h
  create mode 100644 tools/peview/version.rc
@@ -233,7 +233,7 @@ index c9dd19a..318adce 100644
  #undef APSTUDIO_READONLY_SYMBOLS
  
 diff --git a/tools/peview/peview.vcxproj b/tools/peview/peview.vcxproj
-index a5a6ae5..20114a8 100644
+index a5a6ae5..1bc3d72 100644
 --- a/tools/peview/peview.vcxproj
 +++ b/tools/peview/peview.vcxproj
 @@ -65,16 +65,16 @@
@@ -263,7 +263,7 @@ index a5a6ae5..20114a8 100644
        <Optimization>Disabled</Optimization>
 -      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 -      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN32;DEBUG;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
-+      <AdditionalIncludeDirectories>$(SolutionDir)phlib\phnt\include;$(SolutionDir)phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
 +      <PreprocessorDefinitions>_PHLIB_;_WINDOWS;WIN32;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
        <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
        <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -309,6 +309,15 @@ index a5a6ae5..20114a8 100644
        <AdditionalManifestDependencies>
        </AdditionalManifestDependencies>
        <GenerateDebugInformation>true</GenerateDebugInformation>
+@@ -135,7 +135,7 @@
+       <MinimumRequiredVersion>6.01</MinimumRequiredVersion>
+     </Link>
+     <ResourceCompile>
+-      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
+     </ResourceCompile>
+   </ItemDefinitionGroup>
 @@ -143,8 +143,8 @@
      <ClCompile>
        <Optimization>MaxSpeed</Optimization>
@@ -331,6 +340,15 @@ index a5a6ae5..20114a8 100644
        <AdditionalManifestDependencies>
        </AdditionalManifestDependencies>
        <GenerateDebugInformation>true</GenerateDebugInformation>
+@@ -170,7 +170,7 @@
+       <MinimumRequiredVersion>6.01</MinimumRequiredVersion>
+     </Link>
+     <ResourceCompile>
+-      <AdditionalIncludeDirectories>..\..\phnt\include;..\..\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
++      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <PreprocessorDefinitions>_UNICODE;UNICODE;%(PreprocessorDefinitions);$(ExternalCompilerOptions)</PreprocessorDefinitions>
+     </ResourceCompile>
+   </ItemDefinitionGroup>
 @@ -178,8 +178,8 @@
      <ClCompile>
        <Optimization>MaxSpeed</Optimization>
