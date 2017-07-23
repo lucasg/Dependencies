@@ -1,4 +1,4 @@
-# Dependencies - An open-source modern Depedency Walker
+# Dependencies - An open-source modern Dependency Walker
 
 <p align="center">
 <img alt="Usage Exemple" src="screenshots/UsageExemple.gif"/>
