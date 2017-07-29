@@ -1,4 +1,4 @@
-## An open-source modern Depedency Walker
+## An open-source modern Dependency Walker
 
 <p align="center">
 <img alt="Usage Exemple" src="http://recordit.co/tnN5yofb6U.gif"/>
