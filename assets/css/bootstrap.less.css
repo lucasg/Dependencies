@@ -6739,10 +6739,16 @@ blockquote p {
 code {
   color: #333333;
 }
+div.row-fluid {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
 div.row-fluid img {
   margin: 2.85714286 0;
   -webkit-box-shadow: 0 0 16px 3px #777777;
   box-shadow: 0 0 16px 3px #777777;
+  max-width: 900px;
 }
 footer {
   border-top: 1px dotted #777777;
