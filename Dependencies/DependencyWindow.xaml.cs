@@ -241,7 +241,7 @@ namespace Dependencies
             {
 
                 // Find Dll in "paths"
-                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder, this.Pe.IsWow64Dll());
+                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name);
                 PE ImportPe = (PeFilePath != null) ? new PE(PeFilePath) : null;
 
                    
@@ -414,7 +414,7 @@ namespace Dependencies
             
             foreach (PeImportDll DllImport in childTreeContext.PeImports)
             {
-                String PeFilePath = FindPe.FindPeFromDefault(DllImport.Name, RootFolder, this.Pe.IsWow64Dll());
+                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name);
 
                 foreach (PeImport Import in DllImport.ImportList)
                 {
