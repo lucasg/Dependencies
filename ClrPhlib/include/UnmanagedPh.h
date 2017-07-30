@@ -8,11 +8,14 @@
 class UnmanagedPE {
 
 public:
-    UnmanagedPE();
-    
-    bool LoadPE(LPWSTR Filepath);
 
-    ~UnmanagedPE();
+	UnmanagedPE();
+	~UnmanagedPE();
+    
+    
+	bool LoadPE(LPWSTR Filepath);
+	char *GetPeManifest();
+    
 
 
 	PH_MAPPED_IMAGE m_PvMappedImage;

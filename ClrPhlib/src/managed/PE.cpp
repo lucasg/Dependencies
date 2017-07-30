@@ -3,6 +3,7 @@
 #include <atlstr.h>
 
 using namespace System;
+using namespace System::Text;
 using namespace ClrPh;
 
 PE::PE(
@@ -111,6 +112,26 @@ Collections::Generic::List<PeImportDll^> ^ PE::GetImports()
 	return Imports;
 }
 
+
+
+String^ PE::GetManifest()
+{
+
+	// Extract embedded manifest
+	char *rawManifest = m_Impl->GetPeManifest();
+	int manifest_len = (int) strlen(rawManifest);
+
+	// Converting to wchar* and passing it to a C#-recognized String object
+	UTF8Encoding Utf8Decoder;	
+
+	array<byte> ^buffer = gcnew array<byte>(manifest_len);
+	for (int i = 0; i < manifest_len; i++)
+	{
+		buffer[i] = rawManifest[i];
+	}
+
+	return  Utf8Decoder.GetString(buffer, 0, manifest_len);
+}
 
 bool PE::IsWow64Dll() 
 {

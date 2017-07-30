@@ -105,14 +105,18 @@ namespace System {
 
             ~PE();
 
+            // Check if the PE is 32-bit
+            bool IsWow64Dll();
+
             // Return the list of functions exported by the PE
             List<PeExport ^>^ GetExports();
 
             // Return the list of functions imported by the PE, bundled by Dll name
             List<PeImportDll ^>^ GetImports();
 
-            // Check if the PE is 32-bit
-            bool IsWow64Dll();
+            // Retrieve the manifest embedded within the PE
+            // Return an empty string if there is none.
+            String^ GetManifest();
 
             PeProperties ^Properties;
             Boolean LoadSuccessful;
