@@ -38,26 +38,34 @@ namespace ClrPhTester
                 return;
             }
 
-            // Use a memory stream to correctly handle BOM encoding for manifest resource
-            using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
+            try
             {
-                XDocument XmlManifest = XDocument.Load(stream);
-                XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
-                Console.WriteLine(XmlManifest);
-
-                // Extracting assemblyIdentity
-                String DependencyNodeName = String.Format("{{{0}}}dependency", Namespace);
-                String AssemblyIdentityNodeName = String.Format("{{{0}}}assemblyIdentity", Namespace);
-                foreach (XElement SxsDependency in XmlManifest.Descendants(DependencyNodeName))
+                // Use a memory stream to correctly handle BOM encoding for manifest resource
+                using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
                 {
-                    Console.WriteLine("SxsDependency : \n{0}", SxsDependency);
+                    XDocument XmlManifest = XDocument.Load(stream);
+                    XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
+                    Console.WriteLine(XmlManifest);
 
-                    foreach (XElement SxsAssembly in SxsDependency.Descendants(AssemblyIdentityNodeName))
-                    {
-                        Console.WriteLine("SxsAssembly : {0}", SxsAssembly);
-                    }
+                    //// Extracting assemblyIdentity
+                    //String DependencyNodeName = String.Format("{{{0}}}dependency", Namespace);
+                    //String AssemblyIdentityNodeName = String.Format("{{{0}}}assemblyIdentity", Namespace);
+                    //foreach (XElement SxsDependency in XmlManifest.Descendants(DependencyNodeName))
+                    //{
+                    //    Console.WriteLine("SxsDependency : \n{0}", SxsDependency);
+
+                    //    foreach (XElement SxsAssembly in SxsDependency.Descendants(AssemblyIdentityNodeName))
+                    //    {
+                    //        Console.WriteLine("SxsAssembly : {0}", SxsAssembly);
+                    //    }
+                    //}
                 }
             }
+            catch (System.Xml.XmlException)
+            {
+                Console.WriteLine(" \"Malformed\" pe manifest : {0}", PeManifest);
+            }
+           
         }
 
 
