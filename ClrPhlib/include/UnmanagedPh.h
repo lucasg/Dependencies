@@ -14,7 +14,12 @@ public:
     
     
 	bool LoadPE(LPWSTR Filepath);
-	char *GetPeManifest();
+	
+	bool
+	GetPeManifest(
+			_Out_ PSTR *manifest,
+			_Out_ INT  *manfestLen
+	);
     
 
 

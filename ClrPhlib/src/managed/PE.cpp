@@ -75,6 +75,9 @@ Collections::Generic::List<PeExport^> ^ PE::GetExports()
 {
 	Collections::Generic::List<PeExport^> ^Exports = gcnew Collections::Generic::List<PeExport^>();
 
+	if (!LoadSuccessful)
+		return Exports;
+
 	if (NT_SUCCESS(PhGetMappedImageExports(&m_Impl->m_PvExports, &m_Impl->m_PvMappedImage)))
 	{
 		for (size_t Index = 0; Index < m_Impl->m_PvExports.NumberOfEntries; Index++)
@@ -90,6 +93,9 @@ Collections::Generic::List<PeExport^> ^ PE::GetExports()
 Collections::Generic::List<PeImportDll^> ^ PE::GetImports()
 {
 	Collections::Generic::List<PeImportDll^> ^Imports = gcnew Collections::Generic::List<PeImportDll^>();
+
+	if (!LoadSuccessful)
+		return Imports;
 
 	// Standard Imports
 	if (NT_SUCCESS(PhGetMappedImageImports(&m_Impl->m_PvImports, &m_Impl->m_PvMappedImage)))
@@ -116,21 +122,27 @@ Collections::Generic::List<PeImportDll^> ^ PE::GetImports()
 
 String^ PE::GetManifest()
 {
+	if (!LoadSuccessful)
+		return gcnew String("");
 
 	// Extract embedded manifest
-	char *rawManifest = m_Impl->GetPeManifest();
-	int manifest_len = (int) strlen(rawManifest);
+	INT  rawManifestLen;
+	PSTR rawManifest;
+	if (!m_Impl->GetPeManifest(&rawManifest, &rawManifestLen))
+		return gcnew String("");
+
 
 	// Converting to wchar* and passing it to a C#-recognized String object
-	UTF8Encoding Utf8Decoder;	
+	UTF8Encoding Utf8Decoder;
 
-	array<byte> ^buffer = gcnew array<byte>(manifest_len);
-	for (int i = 0; i < manifest_len; i++)
+	array<byte> ^buffer = gcnew array<byte>(rawManifestLen + 1);
+	for (int i = 0; i < rawManifestLen; i++)
 	{
 		buffer[i] = rawManifest[i];
 	}
+	buffer[rawManifestLen] = 0;
 
-	return  Utf8Decoder.GetString(buffer, 0, manifest_len);
+	return  Utf8Decoder.GetString(buffer, 0, rawManifestLen);
 }
 
 bool PE::IsWow64Dll() 

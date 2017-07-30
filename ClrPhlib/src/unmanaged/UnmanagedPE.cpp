@@ -165,8 +165,10 @@ NTSTATUS PhGetMappedImageResourceDirectoryEntry(
 	);
 }
 
-char* 
+bool
 UnmanagedPE::GetPeManifest(
+	_Out_ PSTR *manifest,
+	_Out_ INT  *manfestLen 
 )
 {
 	NTSTATUS status;
@@ -175,10 +177,10 @@ UnmanagedPE::GetPeManifest(
 	PIMAGE_RESOURCE_DIRECTORY_ENTRY ManifestEntry;
 
 	if (!m_bImageLoaded)
-		return NULL;
+		return false;
 
 	if (!NT_SUCCESS(status = PhGetMappedImageResourceRoot(&m_PvMappedImage, &ResourceRootDir)))
-		return NULL;
+		return false;
 
 	
 
@@ -192,12 +194,12 @@ UnmanagedPE::GetPeManifest(
 		&ManifestDirEntry
 	)))
 	{
-		return NULL;
+		return false;
 	}
 
 	// RT_MANIFEST is a directory entry with only one LANG_ID entry 
 	if (!ManifestDirEntry->DataIsDirectory)
-		return NULL;
+		return false;
 
 	PIMAGE_RESOURCE_DIRECTORY ManifestDir = (PIMAGE_RESOURCE_DIRECTORY)((ULONG_PTR)ResourceRootDir + ManifestDirEntry->OffsetToDirectory);
 	if (!NT_SUCCESS(status = PhGetMappedImageResourceDirectoryEntry(
@@ -208,11 +210,11 @@ UnmanagedPE::GetPeManifest(
 		&ManifestEntry
 	)))
 	{
-		return NULL;
+		return false;
 	}
 
 	if (!ManifestEntry->DataIsDirectory)
-		return NULL;
+		return false;
 
 	PIMAGE_RESOURCE_DIRECTORY SubManifestDir = (PIMAGE_RESOURCE_DIRECTORY)((ULONG_PTR)ResourceRootDir + ManifestEntry->OffsetToDirectory);
 	if (!NT_SUCCESS(status = PhGetMappedImageResourceDirectoryEntry(
@@ -223,11 +225,11 @@ UnmanagedPE::GetPeManifest(
 		&ManifestEntry
 	)))
 	{
-		return NULL;
+		return false;
 	}
 
 	if (ManifestEntry->DataIsDirectory)
-		return NULL;
+		return false;
 
 	
 	/*PULONG ManifestDataPtr  = (PULONG) PhMappedImageRvaToVa(
@@ -246,11 +248,15 @@ UnmanagedPE::GetPeManifest(
 	}
 	__except (EXCEPTION_EXECUTE_HANDLER)
 	{
-		return NULL;
+		return false;
 	}
 
 
 	// Manifest entry is utf-8 only
 	PIMAGE_RESOURCE_DATA_ENTRY ManifestData = (PIMAGE_RESOURCE_DATA_ENTRY) ManifestDataPtr;
-	return (char*) PhMappedImageRvaToVa(&m_PvMappedImage, ManifestData->OffsetToData, NULL);
+	
+	*manifest = (char*) PhMappedImageRvaToVa(&m_PvMappedImage, ManifestData->OffsetToData, NULL);
+	*manfestLen = ManifestData->Size;
+
+	return true;
 }
