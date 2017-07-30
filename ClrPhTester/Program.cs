@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
+using System.IO;
 using System.ClrPh;
 
 namespace ClrPhTester
@@ -26,17 +26,57 @@ namespace ClrPhTester
             Console.WriteLine("");
         }
 
+
+
+        static void PrintApplicationManifest(PE Application)
+        {
+            String PeManifest = Application.GetManifest();
+            if (PeManifest.Length == 0)
+            {
+                return;
+            }
+
+            // Use a memory stream to correctly handle BOM encoding for manifest resource
+            using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
+            {
+                XDocument XmlManifest = XDocument.Load(stream);
+                XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
+                Console.WriteLine(XmlManifest);
+
+                // Extracting assemblyIdentity
+                String DependencyNodeName = String.Format("{{{0}}}dependency", Namespace);
+                String AssemblyIdentityNodeName = String.Format("{{{0}}}assemblyIdentity", Namespace);
+                foreach (XElement SxsDependency in XmlManifest.Descendants(DependencyNodeName))
+                {
+                    Console.WriteLine("SxsDependency : \n{0}", SxsDependency);
+
+                    foreach (XElement SxsAssembly in SxsDependency.Descendants(AssemblyIdentityNodeName))
+                    {
+                        Console.WriteLine("SxsAssembly : {0}", SxsAssembly);
+                    }
+                }
+            }
+        }
+
+
         static void Main(string[] args)
         {
             Phlib.InitializePhLib();
+            
+
+            Console.WriteLine("Printing system KnownDll");
             PrintKnownDlls();
 
 
             //String FileName = "F:\\Dev\\processhacker2\\TestBt\\ClangDll\\Release\\ClangDll.dll";
-            String FileName = "C:\\Windows\\System32\\kernelbase.dll";
+            //String FileName = "C:\\Windows\\System32\\kernelbase.dll";
+            String FileName = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
             PE Pe = new PE(FileName);
             List<PeExport> Exports = Pe.GetExports();
             List<PeImportDll> Imports = Pe.GetImports();
+
+            Console.WriteLine("Printing selected Pe manifest");
+            PrintApplicationManifest(Pe);
 
 
             Console.WriteLine("Export listing for file : {0}" , FileName);
