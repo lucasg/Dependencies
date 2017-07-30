@@ -9,7 +9,7 @@ namespace ClrPhTester
 {
     class Program
     {
-        static void PrintKnownDlls()
+        public static void DumpKnownDlls()
         {
             Console.WriteLine("64-bit KnownDlls : ");
             foreach (String KnownDll in Phlib.GetKnownDlls(false))
@@ -28,9 +28,11 @@ namespace ClrPhTester
 
 
 
-        static void PrintApplicationManifest(PE Application)
+        public static void DumpManifest(PE Application)
         {
             String PeManifest = Application.GetManifest();
+            Console.WriteLine("Manifest for file : {0}", Application.Filepath);
+
             if (PeManifest.Length == 0)
             {
                 return;
@@ -59,39 +61,28 @@ namespace ClrPhTester
         }
 
 
-        static void Main(string[] args)
+        public static void DumpExports(PE Pe)
         {
-            Phlib.InitializePhLib();
-            
-
-            Console.WriteLine("Printing system KnownDll");
-            PrintKnownDlls();
-
-
-            //String FileName = "F:\\Dev\\processhacker2\\TestBt\\ClangDll\\Release\\ClangDll.dll";
-            //String FileName = "C:\\Windows\\System32\\kernelbase.dll";
-            String FileName = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
-            PE Pe = new PE(FileName);
             List<PeExport> Exports = Pe.GetExports();
-            List<PeImportDll> Imports = Pe.GetImports();
+            Console.WriteLine("Export listing for file : {0}", Pe.Filepath);
 
-            Console.WriteLine("Printing selected Pe manifest");
-            PrintApplicationManifest(Pe);
-
-
-            Console.WriteLine("Export listing for file : {0}" , FileName);
-            foreach(PeExport Export in Exports)
+            foreach (PeExport Export in Exports)
             {
                 Console.WriteLine("Export {0:d} :", Export.Ordinal);
                 Console.WriteLine("\t Name : {0:s}", Export.Name);
-                Console.WriteLine("\t VA : 0x{0:X}", (int) Export.VirtualAddress);
+                Console.WriteLine("\t VA : 0x{0:X}", (int)Export.VirtualAddress);
                 if (Export.ForwardedName.Length > 0)
                     Console.WriteLine("\t ForwardedName : {0:s}", Export.ForwardedName);
             }
 
             Console.WriteLine("Export listing done");
+        }
 
-            Console.WriteLine("Import listing for file : {0}", FileName);
+        public static void DumpImports(PE Pe)
+        {
+            List<PeImportDll> Imports = Pe.GetImports();
+            Console.WriteLine("Import listing for file : {0}", Pe.Filepath);
+
             foreach (PeImportDll DllImport in Imports)
             {
                 Console.WriteLine("Import from module {0:s} :", DllImport.Name);
@@ -106,7 +97,7 @@ namespace ClrPhTester
                     {
                         Console.Write("\t Function {0:s}", Import.Name);
                     }
-                    if (Import.DelayImport)                        
+                    if (Import.DelayImport)
                         Console.WriteLine(" (Delay Import)");
                     else
                         Console.WriteLine("");
@@ -114,7 +105,52 @@ namespace ClrPhTester
             }
 
             Console.WriteLine("Import listing done");
+        }
 
+
+        static void Main(string[] args)
+        {
+
+            Phlib.InitializePhLib();
+            var ProgramArgs = ParseArgs(args);
+
+            //String FileName = "F:\\Dev\\processhacker2\\TestBt\\ClangDll\\Release\\ClangDll.dll";
+            //String FileName = "C:\\Windows\\System32\\kernelbase.dll";
+            //String FileName = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
+            String FileName = ProgramArgs["file"];
+            PE Pe = new PE(FileName);
+
+            if (ProgramArgs.ContainsKey("-knowndll"))
+                DumpKnownDlls();
+            if (ProgramArgs.ContainsKey("-manifest"))
+                DumpManifest(Pe);
+            if (ProgramArgs.ContainsKey("-imports"))
+                DumpImports(Pe);
+            if (ProgramArgs.ContainsKey("-exports"))
+                DumpExports(Pe);
+
+
+        }
+
+        private static Dictionary<string, string> ParseArgs(string[] args)
+        {
+            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (string s in args)
+            {
+                if (s.StartsWith("-", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (!dict.ContainsKey(s))
+                        dict.Add(s, string.Empty);
+
+                }
+                else
+                {
+                    dict.Add("file", s);
+                }
+            }
+
+            return dict;
         }
     }
 }
