@@ -226,6 +226,7 @@ namespace Dependencies
         PhSymbolProvider SymPrv;
         HashSet<String> ModulesFound;
         HashSet<String> ModulesNotFound;
+        SxsEntries SxsEntriesCache;
 
         /// <summary>
         /// Background processing of a single PE file.
@@ -241,7 +242,7 @@ namespace Dependencies
             {
 
                 // Find Dll in "paths"
-                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name);
+                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name, this.SxsEntriesCache);
                 PE ImportPe = (PeFilePath != null) ? new PE(PeFilePath) : null;
 
                    
@@ -329,12 +330,13 @@ namespace Dependencies
 
             InitializeComponent();
 
-
-            this.Pe = new PE(FileName);
-            this.RootFolder = Path.GetDirectoryName(FileName);
             this.SymPrv = new PhSymbolProvider();
             this.ModulesFound = new HashSet<String>();
             this.ModulesNotFound = new HashSet<String>();
+            
+            this.Pe = new PE(FileName);
+            this.RootFolder = Path.GetDirectoryName(FileName);
+            this.SxsEntriesCache = FindPe.GetSxsEntries(this.Pe);
 
             this.ModulesList.Items.Clear();
             this.DllTreeView.Items.Clear();
@@ -414,7 +416,7 @@ namespace Dependencies
             
             foreach (PeImportDll DllImport in childTreeContext.PeImports)
             {
-                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name);
+                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name, this.SxsEntriesCache);
 
                 foreach (PeImport Import in DllImport.ImportList)
                 {

@@ -6,6 +6,10 @@ using System.Xml.Linq;
 
 namespace Dependencies
 {
+    // C# typedefs
+    using SxsEntry = Tuple<string, string>;
+    public class SxsEntries : List<SxsEntry> { }
+
     public class FindPe
     {
         static string FindPeFromPath(string ModuleName, List<string> CandidateFolders, bool Wow64Dll = false)
@@ -25,34 +29,65 @@ namespace Dependencies
         }
 
 
-        static List<Tuple<string, string>> ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder)
+        static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder)
         {
-            List<Tuple<string, string>> AdditionnalDependencies = new List<Tuple<string, string>>();
+            SxsEntries AdditionnalDependencies = new SxsEntries();
 
             // Use a memory stream to correctly handle BOM encoding for manifest resource
             using (var stream = ManifestStream ) // new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
             {
                 XDocument XmlManifest = XDocument.Load(stream);
                 XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
-                Console.WriteLine(XmlManifest);
 
                 // Extracting assemblyIdentity and file names
                 String DependencyNodeName = String.Format("{{{0}}}dependency", Namespace);
                 String AssemblyIdentityNodeName = String.Format("{{{0}}}assemblyIdentity", Namespace);
+                String AssemblyNodeName = String.Format("{{{0}}}assembly", Namespace);
                 String FileNodeName = String.Format("{{{0}}}file", Namespace);
 
+
+                // Find any declared dll
+                //< assembly xmlns = 'urn:schemas-microsoft-com:asm.v1' manifestVersion = '1.0' >
+                //    < assemblyIdentity name = 'additional_dll' version = 'XXX.YY.ZZ' type = 'win32' />
+                //    < file name = 'additional_dll.dll' />
+                //</ assembly >
+                foreach (XElement SxsAssembly in XmlManifest.Descendants(AssemblyNodeName))
+                {
+                    foreach (XElement SxsFileEntry in SxsAssembly.Descendants(FileNodeName))
+                    {
+                        string SxsDllName = SxsFileEntry.Attribute("name").Value.ToString();
+                        string SxsDllPath = Path.Combine(Folder, SxsDllName);
+                        AdditionnalDependencies.Add(new SxsEntry(SxsDllName, SxsDllPath));
+                    }
+                }
+
+                // Find any dependencies
                 foreach (XElement SxsDependency in XmlManifest.Descendants(DependencyNodeName))
                 {
-                    foreach (XElement SxsFileEntry in SxsDependency.Descendants(FileNodeName))
-                    {
-                        string SxsDllName = SxsFileEntry.Name.ToString();
-                        string SxsDllPath = Path.Combine(Folder, SxsDllName);
-                        AdditionnalDependencies.Add(new Tuple<string, string>(SxsDllName, SxsDllPath));
-                    }
-
                     foreach (XElement SxsAssembly in SxsDependency.Descendants(AssemblyIdentityNodeName))
                     {
-                        // find publisher manifest in current dir and %WINDIR%/WinSxs/Manifest
+                        if (SxsAssembly.Attribute("publicKeyToken") != null)
+                        {
+                            // find publisher manifest in %WINDIR%/WinSxs/Manifest
+                        }
+                        else
+                        {
+                            // find manifest in current dir and %WINDIR%/WinSxs/Manifest
+                            string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
+                            string SxsManifestDir = Path.Combine(Folder, SxsManifestName);
+                            string TargetSxsManifestpath = Path.Combine(SxsManifestDir, String.Format("{0:s}.manifest", SxsManifestName));
+                            if (Directory.Exists(SxsManifestDir) && File.Exists(TargetSxsManifestpath))
+                            {
+                                using (FileStream fs = new FileStream(TargetSxsManifestpath, FileMode.Open, FileAccess.Read))
+                                {
+                                    foreach (SxsEntry Entry in ExtractDependenciesFromSxsManifest(fs, SxsManifestDir))
+                                    {
+                                        AdditionnalDependencies.Add(Entry);
+                                    }
+                                }
+                                    
+                            } 
+                        }
                     }
                 }
             }
@@ -60,7 +95,7 @@ namespace Dependencies
             return AdditionnalDependencies;
         }
 
-        static List<Tuple<string, string>> GetAdditionnalDependencies(PE Pe)
+        public static SxsEntries GetSxsEntries(PE Pe)
         {
             string RootPeFolder = Path.GetDirectoryName(Pe.Filepath);
             string PeManifest = Pe.GetManifest();
@@ -84,7 +119,7 @@ namespace Dependencies
         //      5. %pwd%
         //      6. AppDatas
         //      7. Sxs manifests
-        public static string FindPeFromDefault(PE RootPe, string ModuleName)
+        public static string FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache )
         {
             bool Wow64Dll = RootPe.IsWow64Dll();
             string RootPeFolder = Path.GetDirectoryName(RootPe.Filepath);
@@ -95,8 +130,6 @@ namespace Dependencies
                 Environment.SpecialFolder.System;
             String WindowsSystemFolderPath = Environment.GetFolderPath(WindowsSystemFolder);
 
-            // Load additionnal dll from sxs entries in root pe.
-            List<Tuple<string, string>> SxsEntries = GetAdditionnalDependencies(RootPe);
 
             // 0. Look in well-known dlls list
             // HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\KnownDLLs
@@ -132,11 +165,17 @@ namespace Dependencies
             // 6. Look in local app data (check for python for exemple)
 
             // 7. Look in Sxs manifest (copious reversing needed)
-            Tuple<string, string> SxsEntry = SxsEntries.Find(t => t.Item1 == ModuleName);
-            if (SxsEntry != null)
+            if (SxsCache.Count != 0)
             {
-                return SxsEntry.Item2;
+                SxsEntry Entry = SxsCache.Find(t => t.Item1 == ModuleName);
+                if (Entry != null)
+                {
+                    return Entry.Item2;
+                }
             }
+            
+
+            // 8. Find in PATH
 
             return null;
         }
