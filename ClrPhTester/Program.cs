@@ -46,26 +46,30 @@ namespace ClrPhTester
                     XDocument XmlManifest = XDocument.Load(stream);
                     XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
                     Console.WriteLine(XmlManifest);
-
-                    //// Extracting assemblyIdentity
-                    //String DependencyNodeName = String.Format("{{{0}}}dependency", Namespace);
-                    //String AssemblyIdentityNodeName = String.Format("{{{0}}}assemblyIdentity", Namespace);
-                    //foreach (XElement SxsDependency in XmlManifest.Descendants(DependencyNodeName))
-                    //{
-                    //    Console.WriteLine("SxsDependency : \n{0}", SxsDependency);
-
-                    //    foreach (XElement SxsAssembly in SxsDependency.Descendants(AssemblyIdentityNodeName))
-                    //    {
-                    //        Console.WriteLine("SxsAssembly : {0}", SxsAssembly);
-                    //    }
-                    //}
                 }
             }
             catch (System.Xml.XmlException)
             {
                 Console.WriteLine(" \"Malformed\" pe manifest : {0}", PeManifest);
             }
-           
+        }
+
+        public static void DumpSxsEntries(PE Application)
+        {
+            SxsEntries SxsDependencies = SxsManifest.GetSxsEntries(Application);
+
+            Console.WriteLine("sxs dependencies for executable : {0}", Application.Filepath);
+            foreach (var entry in SxsDependencies)
+            {
+                if (entry.Item2.Contains("???"))
+                {
+                    Console.WriteLine("  [x] {0:s} : {1:s}", entry.Item1, entry.Item2);
+                }
+                else
+                {
+                    Console.WriteLine("  [+] {0:s} : {1:s}", entry.Item1, entry.Item2);
+                }
+            }
         }
 
 
@@ -132,6 +136,8 @@ namespace ClrPhTester
                 DumpKnownDlls();
             if (ProgramArgs.ContainsKey("-manifest"))
                 DumpManifest(Pe);
+            if (ProgramArgs.ContainsKey("-sxsentries"))
+                DumpSxsEntries(Pe);
             if (ProgramArgs.ContainsKey("-imports"))
                 DumpImports(Pe);
             if (ProgramArgs.ContainsKey("-exports"))
