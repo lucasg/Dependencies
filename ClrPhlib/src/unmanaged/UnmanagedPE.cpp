@@ -53,7 +53,13 @@ NTSTATUS PhGetMappedImageResourceRoot(
 	if (!NT_SUCCESS(status))
 		return status;
 
+	if (!entry->VirtualAddress)
+		return STATUS_RESOURCE_DATA_NOT_FOUND;
+
 	resourceRootDir = PhMappedImageRvaToVa(MappedImage, entry->VirtualAddress, NULL);
+	if (!resourceRootDir)
+		return STATUS_RESOURCE_DATA_NOT_FOUND;
+
 	__try
 	{
 		//	PhpMappedImageProbe(&m_PvMappedImage, resourceRootDir, sizeof(IMAGE_RESOURCE_DIRECTORY));
