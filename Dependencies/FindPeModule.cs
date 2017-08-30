@@ -213,7 +213,7 @@ namespace Dependencies
             // 0. Look in well-known dlls list
             // HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\KnownDLLs
             // https://blogs.msdn.microsoft.com/larryosterman/2004/07/19/what-are-known-dlls-anyway/
-            String KnownDll = Phlib.GetKnownDlls(Wow64Dll).Find(x => x == ModuleName);
+            String KnownDll = Phlib.GetKnownDlls(Wow64Dll).Find(x => string.Equals(x, ModuleName, StringComparison.OrdinalIgnoreCase));
             if (KnownDll != null)
             {
                 return Path.Combine(WindowsSystemFolderPath, KnownDll);
