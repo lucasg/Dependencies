@@ -199,6 +199,17 @@ namespace Dependencies
             String WindowsSystemFolderPath = Environment.GetFolderPath(WindowsSystemFolder);
 
 
+            // -1. Look in Sxs manifest (copious reversing needed)
+            // TODO : find dll search order
+            if (SxsCache.Count != 0)
+            {
+                SxsEntry Entry = SxsCache.Find(t => string.Equals(t.Item1, ModuleName, StringComparison.OrdinalIgnoreCase));
+                if (Entry != null)
+                {
+                    return Entry.Item2;
+                }
+            }
+
             // 0. Look in well-known dlls list
             // HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\Session Manager\KnownDLLs
             // https://blogs.msdn.microsoft.com/larryosterman/2004/07/19/what-are-known-dlls-anyway/
@@ -207,6 +218,7 @@ namespace Dependencies
             {
                 return Path.Combine(WindowsSystemFolderPath, KnownDll);
             }
+
 
             // 1. Look in application folder
             FoundPePath = FindPeFromPath(ModuleName, new List<string>(new string[] { RootPeFolder }), Wow64Dll);
@@ -232,15 +244,6 @@ namespace Dependencies
 
             // 6. Look in local app data (check for python for exemple)
 
-            // 7. Look in Sxs manifest (copious reversing needed)
-            if (SxsCache.Count != 0)
-            {
-                SxsEntry Entry = SxsCache.Find(t => t.Item1 == ModuleName);
-                if (Entry != null)
-                {
-                    return Entry.Item2;
-                }
-            }
             
 
             // 8. Find in PATH
