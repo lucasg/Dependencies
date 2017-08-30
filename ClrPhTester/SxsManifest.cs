@@ -43,6 +43,8 @@ namespace ClrPhTester
                 return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir);
             }
 
+            // find "{name}.local" dir ?
+
             // Could not find the dependency
             {
                 SxsEntries EntriesFromElement = new SxsEntries();
@@ -64,27 +66,27 @@ namespace ClrPhTester
         {
             SxsEntries AdditionnalDependencies = new SxsEntries();
 
-            // Use a memory stream to correctly handle BOM encoding for manifest resource
-            using (var stream = ManifestStream ) // new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
-            {
-                XDocument XmlManifest = XDocument.Load(stream);
+
+            // Hardcode namespaces for manifests since they are no always specified in the embedded manifests.
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
+            nsmgr.AddNamespace(String.Empty, "urn:schemas-microsoft-com:asm.v1"); //default namespace : manifest V1
+            nsmgr.AddNamespace("asmv3", "urn:schemas-microsoft-com:asm.v3");      // sometimes missing from manifests : V3
+            XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.Preserve);
+
+    
+            using (XmlTextReader xReader = new XmlTextReader(ManifestStream, XmlNodeType.Document, context) )
+            { 
+                XDocument XmlManifest = XDocument.Load(xReader);
                 XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
-
-                // Extracting assemblyIdentity and file names
-                String DependencyNodeName = String.Format("{{{0}}}dependency", Namespace);
-                String AssemblyIdentityNodeName = String.Format("{{{0}}}assemblyIdentity", Namespace);
-                String AssemblyNodeName = String.Format("{{{0}}}assembly", Namespace);
-                String FileNodeName = String.Format("{{{0}}}file", Namespace);
-
 
                 // Find any declared dll
                 //< assembly xmlns = 'urn:schemas-microsoft-com:asm.v1' manifestVersion = '1.0' >
                 //    < assemblyIdentity name = 'additional_dll' version = 'XXX.YY.ZZ' type = 'win32' />
                 //    < file name = 'additional_dll.dll' />
                 //</ assembly >
-                foreach (XElement SxsAssembly in XmlManifest.Descendants(AssemblyNodeName))
+                foreach (XElement SxsAssembly in XmlManifest.Descendants(Namespace + "assembly"))
                 {
-                    foreach (XElement SxsFileEntry in SxsAssembly.Descendants(FileNodeName))
+                    foreach (XElement SxsFileEntry in SxsAssembly.Elements(Namespace + "file"))
                     {
                         string SxsDllName = SxsFileEntry.Attribute("name").Value.ToString();
                         string SxsDllPath = Path.Combine(Folder, SxsDllName);
@@ -93,22 +95,25 @@ namespace ClrPhTester
                 }
 
                 // Find any dependencies
-                foreach (XElement SxsDependency in XmlManifest.Descendants(DependencyNodeName))
+                foreach (XElement SxsDependency in XmlManifest.Descendants(Namespace + "dependency"))
                 {
-                    foreach (XElement SxsAssembly in SxsDependency.Descendants(AssemblyIdentityNodeName))
+                    foreach (XElement SxsDependentAssembly in SxsDependency.Elements(Namespace + "dependentAssembly"))
                     {
-                        if (SxsAssembly.Attribute("publicKeyToken") != null)
+                        foreach (XElement SxsAssembly in SxsDependentAssembly.Elements(Namespace + "assemblyIdentity"))
                         {
-                            // find publisher manifest in %WINDIR%/WinSxs/Manifest
-                            string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
-                            AdditionnalDependencies.Add(new SxsEntry(SxsManifestName, "publisher ???"));
-                        }
-                        else
-                        {
-                            // find target PE
-                            foreach(var SxsTarget in ExtractDependenciesFromSxsElement(SxsAssembly, Folder))
+                            if (SxsAssembly.Attribute("publicKeyToken") != null)
                             {
-                                AdditionnalDependencies.Add(SxsTarget);
+                                // find publisher manifest in %WINDIR%/WinSxs/Manifest
+                                string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
+                                AdditionnalDependencies.Add(new SxsEntry(SxsManifestName, "publisher ???"));
+                            }
+                            else
+                            {
+                                // find target PE
+                                foreach (var SxsTarget in ExtractDependenciesFromSxsElement(SxsAssembly, Folder))
+                                {
+                                    AdditionnalDependencies.Add(SxsTarget);
+                                }
                             }
                         }
                     }

@@ -32,7 +32,7 @@ namespace Dependencies
         static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder)
         {
             SxsEntries AdditionnalDependencies = new SxsEntries();
-
+            
             // Use a memory stream to correctly handle BOM encoding for manifest resource
             using (var stream = ManifestStream ) // new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
             {
