@@ -128,6 +128,18 @@ namespace ClrPhTester
             SxsEntries Entries = new SxsEntries();
 
             string RootPeFolder = Path.GetDirectoryName(Pe.Filepath);
+
+            // Look for overriding manifest file (named "{$name}.manifest)
+            string OverridingManifest = String.Format("{0:s}.manifest", Pe.Filepath);
+            if (File.Exists(OverridingManifest))
+            {
+                return ExtractDependenciesFromSxsManifestFile(
+                    OverridingManifest,
+                    RootPeFolder
+                );
+            }
+
+            // Retrieve embedded manifest
             string PeManifest = Pe.GetManifest();
             if (PeManifest.Length == 0)
                 return Entries;
