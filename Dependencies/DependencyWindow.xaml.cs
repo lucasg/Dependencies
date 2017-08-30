@@ -336,7 +336,7 @@ namespace Dependencies
             
             this.Pe = new PE(FileName);
             this.RootFolder = Path.GetDirectoryName(FileName);
-            this.SxsEntriesCache = FindPe.GetSxsEntries(this.Pe);
+            this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
 
             this.ModulesList.Items.Clear();
             this.DllTreeView.Items.Clear();
