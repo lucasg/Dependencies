@@ -1,29 +1,45 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
 using System.Xml.Linq;
-using System.IO;
 using System.ClrPh;
+using System.Diagnostics;
 
 namespace ClrPhTester
 {
     class Program
     {
+        static bool VerboseOutput = false;
+
+        public static void VerboseWriteLine(string format, params object[] args)
+        {
+            if (VerboseOutput)
+            {
+                Console.WriteLine(format, args);
+            }
+        }
+
         public static void DumpKnownDlls()
         {
-            Console.WriteLine("64-bit KnownDlls : ");
+            VerboseWriteLine("[-] 64-bit KnownDlls : ");
+            
             foreach (String KnownDll in Phlib.GetKnownDlls(false))
             {
-                Console.WriteLine("\t{0:s}", KnownDll);
+                string System32Folder = Environment.GetFolderPath(Environment.SpecialFolder.System);
+                Console.WriteLine("  {0:s}\\{1:s}", System32Folder, KnownDll);
             }
-            Console.WriteLine("");
 
-            Console.WriteLine("32-bit KnownDlls : ");
+            VerboseWriteLine("");
+
+            VerboseWriteLine("[-] 32-bit KnownDlls : ");
+            
             foreach (String KnownDll in Phlib.GetKnownDlls(true))
             {
-                Console.WriteLine("\t{0:s}", KnownDll);
+                string SysWow64Folder = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+                Console.WriteLine("  {0:s}\\{1:s}", SysWow64Folder, KnownDll);
             }
-            Console.WriteLine("");
+
+
+            VerboseWriteLine("");
         }
 
 
@@ -31,7 +47,7 @@ namespace ClrPhTester
         public static void DumpManifest(PE Application)
         {
             String PeManifest = Application.GetManifest();
-            Console.WriteLine("Manifest for file : {0}", Application.Filepath);
+            VerboseWriteLine("[-] Manifest for file : {0}", Application.Filepath);
 
             if (PeManifest.Length == 0)
             {
@@ -58,7 +74,7 @@ namespace ClrPhTester
         {
             SxsEntries SxsDependencies = SxsManifest.GetSxsEntries(Application);
 
-            Console.WriteLine("sxs dependencies for executable : {0}", Application.Filepath);
+            VerboseWriteLine("[-] sxs dependencies for executable : {0}", Application.Filepath);
             foreach (var entry in SxsDependencies)
             {
                 if (entry.Item2.Contains("???"))
@@ -76,7 +92,7 @@ namespace ClrPhTester
         public static void DumpExports(PE Pe)
         {
             List<PeExport> Exports = Pe.GetExports();
-            Console.WriteLine("Export listing for file : {0}", Pe.Filepath);
+            VerboseWriteLine("[-] Export listing for file : {0}", Pe.Filepath);
 
             foreach (PeExport Export in Exports)
             {
@@ -87,13 +103,13 @@ namespace ClrPhTester
                     Console.WriteLine("\t ForwardedName : {0:s}", Export.ForwardedName);
             }
 
-            Console.WriteLine("Export listing done");
+            VerboseWriteLine("[-] Export listing done");
         }
 
         public static void DumpImports(PE Pe)
         {
             List<PeImportDll> Imports = Pe.GetImports();
-            Console.WriteLine("Import listing for file : {0}", Pe.Filepath);
+            VerboseWriteLine("[-] Import listing for file : {0}", Pe.Filepath);
 
             foreach (PeImportDll DllImport in Imports)
             {
@@ -116,7 +132,7 @@ namespace ClrPhTester
                 }
             }
 
-            Console.WriteLine("Import listing done");
+            VerboseWriteLine("[-] Import listing done");
         }
 
 
@@ -126,14 +142,29 @@ namespace ClrPhTester
             Phlib.InitializePhLib();
             var ProgramArgs = ParseArgs(args);
 
-            //String FileName = "F:\\Dev\\processhacker2\\TestBt\\ClangDll\\Release\\ClangDll.dll";
-            //String FileName = "C:\\Windows\\System32\\kernelbase.dll";
-            //String FileName = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe";
-            String FileName = ProgramArgs["file"];
-            PE Pe = new PE(FileName);
+            String FileName = null;
+            if (ProgramArgs.ContainsKey("file"))
+                FileName = ProgramArgs["file"];
 
+            if (ProgramArgs.ContainsKey("-verbose"))
+                VerboseOutput = true;
+
+            // no need to load PE for it
             if (ProgramArgs.ContainsKey("-knowndll"))
+            {
                 DumpKnownDlls();
+                return;
+            }
+                
+            VerboseWriteLine("[-] Loading file {0:s} ", FileName);
+            PE Pe = new PE(FileName);
+            if (!Pe.LoadSuccessful)
+            {
+                Console.Error.WriteLine("[x] Could not load file {0:s} as a PE", FileName);
+                return;
+            }
+
+            
             if (ProgramArgs.ContainsKey("-manifest"))
                 DumpManifest(Pe);
             if (ProgramArgs.ContainsKey("-sxsentries"))
