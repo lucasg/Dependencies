@@ -59,14 +59,16 @@ namespace ClrPhTester
                 // Use a memory stream to correctly handle BOM encoding for manifest resource
                 using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
                 {
-                    XDocument XmlManifest = XDocument.Load(stream);
-                    XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
+                    XDocument XmlManifest = SxsManifest.ParseSxsManifest(stream);
                     Console.WriteLine(XmlManifest);
                 }
+                
+
             }
-            catch (System.Xml.XmlException)
+            catch (System.Xml.XmlException e)
             {
-                Console.WriteLine(" \"Malformed\" pe manifest : {0}", PeManifest);
+                Console.Error.WriteLine("[x] \"Malformed\" pe manifest for file {0:s} : {1:s}", Application.Filepath, PeManifest);
+                Console.Error.WriteLine("[x] Exception : {0:s}", e.ToString());
             }
         }
 

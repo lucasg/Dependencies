@@ -67,61 +67,79 @@ namespace ClrPhTester
             SxsEntries AdditionnalDependencies = new SxsEntries();
 
 
-            // Hardcode namespaces for manifests since they are no always specified in the embedded manifests.
-            XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
-            nsmgr.AddNamespace(String.Empty, "urn:schemas-microsoft-com:asm.v1"); //default namespace : manifest V1
-            nsmgr.AddNamespace("asmv3", "urn:schemas-microsoft-com:asm.v3");      // sometimes missing from manifests : V3
-            XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.Preserve);
+            //// Hardcode namespaces for manifests since they are no always specified in the embedded manifests.
+            //XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
+            //nsmgr.AddNamespace(String.Empty, "urn:schemas-microsoft-com:asm.v1"); //default namespace : manifest V1
+            //nsmgr.AddNamespace("asmv3", "urn:schemas-microsoft-com:asm.v3");      // sometimes missing from manifests : V3
+            //XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.Preserve);
 
     
-            using (XmlTextReader xReader = new XmlTextReader(ManifestStream, XmlNodeType.Document, context) )
-            { 
-                XDocument XmlManifest = XDocument.Load(xReader);
-                XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
+            
+            XDocument XmlManifest = ParseSxsManifest(ManifestStream);
+            XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
 
-                // Find any declared dll
-                //< assembly xmlns = 'urn:schemas-microsoft-com:asm.v1' manifestVersion = '1.0' >
-                //    < assemblyIdentity name = 'additional_dll' version = 'XXX.YY.ZZ' type = 'win32' />
-                //    < file name = 'additional_dll.dll' />
-                //</ assembly >
-                foreach (XElement SxsAssembly in XmlManifest.Descendants(Namespace + "assembly"))
+            // Find any declared dll
+            //< assembly xmlns = 'urn:schemas-microsoft-com:asm.v1' manifestVersion = '1.0' >
+            //    < assemblyIdentity name = 'additional_dll' version = 'XXX.YY.ZZ' type = 'win32' />
+            //    < file name = 'additional_dll.dll' />
+            //</ assembly >
+            foreach (XElement SxsAssembly in XmlManifest.Descendants(Namespace + "assembly"))
+            {
+                foreach (XElement SxsFileEntry in SxsAssembly.Elements(Namespace + "file"))
                 {
-                    foreach (XElement SxsFileEntry in SxsAssembly.Elements(Namespace + "file"))
-                    {
-                        string SxsDllName = SxsFileEntry.Attribute("name").Value.ToString();
-                        string SxsDllPath = Path.Combine(Folder, SxsDllName);
-                        AdditionnalDependencies.Add(new SxsEntry(SxsDllName, SxsDllPath));
-                    }
+                    string SxsDllName = SxsFileEntry.Attribute("name").Value.ToString();
+                    string SxsDllPath = Path.Combine(Folder, SxsDllName);
+                    AdditionnalDependencies.Add(new SxsEntry(SxsDllName, SxsDllPath));
                 }
+            }
 
-                // Find any dependencies
-                foreach (XElement SxsDependency in XmlManifest.Descendants(Namespace + "dependency"))
+            // Find any dependencies
+            foreach (XElement SxsDependency in XmlManifest.Descendants(Namespace + "dependency"))
+            {
+                foreach (XElement SxsDependentAssembly in SxsDependency.Elements(Namespace + "dependentAssembly"))
                 {
-                    foreach (XElement SxsDependentAssembly in SxsDependency.Elements(Namespace + "dependentAssembly"))
+                    foreach (XElement SxsAssembly in SxsDependentAssembly.Elements(Namespace + "assemblyIdentity"))
                     {
-                        foreach (XElement SxsAssembly in SxsDependentAssembly.Elements(Namespace + "assemblyIdentity"))
+                        if (SxsAssembly.Attribute("publicKeyToken") != null)
                         {
-                            if (SxsAssembly.Attribute("publicKeyToken") != null)
+                            // find publisher manifest in %WINDIR%/WinSxs/Manifest
+                            string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
+                            AdditionnalDependencies.Add(new SxsEntry(SxsManifestName, "publisher ???"));
+                        }
+                        else
+                        {
+                            // find target PE
+                            foreach (var SxsTarget in ExtractDependenciesFromSxsElement(SxsAssembly, Folder))
                             {
-                                // find publisher manifest in %WINDIR%/WinSxs/Manifest
-                                string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
-                                AdditionnalDependencies.Add(new SxsEntry(SxsManifestName, "publisher ???"));
-                            }
-                            else
-                            {
-                                // find target PE
-                                foreach (var SxsTarget in ExtractDependenciesFromSxsElement(SxsAssembly, Folder))
-                                {
-                                    AdditionnalDependencies.Add(SxsTarget);
-                                }
+                                AdditionnalDependencies.Add(SxsTarget);
                             }
                         }
                     }
                 }
+                
             }
 
             return AdditionnalDependencies;
         }
+
+        public static XDocument ParseSxsManifest(System.IO.Stream ManifestStream)
+        {
+            XDocument XmlManifest = null;
+            // Hardcode namespaces for manifests since they are no always specified in the embedded manifests.
+            XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
+            nsmgr.AddNamespace(String.Empty, "urn:schemas-microsoft-com:asm.v1"); //default namespace : manifest V1
+            nsmgr.AddNamespace("asmv3", "urn:schemas-microsoft-com:asm.v3");      // sometimes missing from manifests : V3
+            nsmgr.AddNamespace("asmv3", "http://schemas.microsoft.com/SMI/2005/WindowsSettings");      // sometimes missing from manifests : V3
+            XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.Preserve);
+
+            using (XmlTextReader xReader = new XmlTextReader(ManifestStream, XmlNodeType.Document, context))
+            {
+                XmlManifest = XDocument.Load(xReader);
+            }
+
+            return XmlManifest;
+        }
+
 
         public static SxsEntries GetSxsEntries(PE Pe)
         {
