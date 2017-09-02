@@ -45,6 +45,15 @@ namespace ClrPhTester
 
             // find "{name}.local" dir ?
 
+            // find publisher manifest in %WINDIR%/WinSxs/Manifest
+            if (SxsAssembly.Attribute("publicKeyToken") != null)
+            {
+                SxsEntries EntriesFromElement = new SxsEntries();
+                EntriesFromElement.Add(new SxsEntry(SxsManifestName, String.Format("publisher {0:s} ???", SxsAssembly.Attribute("publicKeyToken")) ));
+                return EntriesFromElement;
+            }
+                       
+
             // Could not find the dependency
             {
                 SxsEntries EntriesFromElement = new SxsEntries();
@@ -65,15 +74,6 @@ namespace ClrPhTester
         public static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder)
         {
             SxsEntries AdditionnalDependencies = new SxsEntries();
-
-
-            //// Hardcode namespaces for manifests since they are no always specified in the embedded manifests.
-            //XmlNamespaceManager nsmgr = new XmlNamespaceManager(new NameTable());
-            //nsmgr.AddNamespace(String.Empty, "urn:schemas-microsoft-com:asm.v1"); //default namespace : manifest V1
-            //nsmgr.AddNamespace("asmv3", "urn:schemas-microsoft-com:asm.v3");      // sometimes missing from manifests : V3
-            //XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.Preserve);
-
-    
             
             XDocument XmlManifest = ParseSxsManifest(ManifestStream);
             XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
@@ -93,30 +93,29 @@ namespace ClrPhTester
                 }
             }
 
-            // Find any dependencies
-            foreach (XElement SxsDependency in XmlManifest.Descendants(Namespace + "dependency"))
+            // Find any dependencies :
+            // <dependency>
+            //     <dependentAssembly>
+            //         <assemblyIdentity
+            //             type="win32"
+            //             name="Microsoft.Windows.Common-Controls"
+            //             version="6.0.0.0"
+            //             processorArchitecture="amd64" 
+            //             publicKeyToken="6595b64144ccf1df"
+            //             language="*"
+            //         />
+            //     </dependentAssembly>
+            // </dependency>
+            foreach (XElement SxsAssembly in XmlManifest.Descendants(Namespace + "dependency")
+                                                        .Elements(Namespace + "dependentAssembly")
+                                                        .Elements(Namespace + "assemblyIdentity")
+            )
             {
-                foreach (XElement SxsDependentAssembly in SxsDependency.Elements(Namespace + "dependentAssembly"))
+                // find target PE
+                foreach (var SxsTarget in ExtractDependenciesFromSxsElement(SxsAssembly, Folder))
                 {
-                    foreach (XElement SxsAssembly in SxsDependentAssembly.Elements(Namespace + "assemblyIdentity"))
-                    {
-                        if (SxsAssembly.Attribute("publicKeyToken") != null)
-                        {
-                            // find publisher manifest in %WINDIR%/WinSxs/Manifest
-                            string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
-                            AdditionnalDependencies.Add(new SxsEntry(SxsManifestName, "publisher ???"));
-                        }
-                        else
-                        {
-                            // find target PE
-                            foreach (var SxsTarget in ExtractDependenciesFromSxsElement(SxsAssembly, Folder))
-                            {
-                                AdditionnalDependencies.Add(SxsTarget);
-                            }
-                        }
-                    }
+                    AdditionnalDependencies.Add(SxsTarget);
                 }
-                
             }
 
             return AdditionnalDependencies;
