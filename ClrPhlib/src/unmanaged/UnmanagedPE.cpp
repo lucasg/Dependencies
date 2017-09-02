@@ -207,16 +207,20 @@ UnmanagedPE::GetPeManifest(
 	if (!ManifestDirEntry->DataIsDirectory)
 		return false;
 
+	ULONG FirstResourceIndex = 1;
 	PIMAGE_RESOURCE_DIRECTORY ManifestDir = (PIMAGE_RESOURCE_DIRECTORY)((ULONG_PTR)ResourceRootDir + ManifestDirEntry->OffsetToDirectory);
-	if (!NT_SUCCESS(status = PhGetMappedImageResourceDirectoryEntry(
+	while (!NT_SUCCESS(status = PhGetMappedImageResourceDirectoryEntry(
 		&m_PvMappedImage,
 		ManifestDir,
-		1,
+		FirstResourceIndex,
 		NULL,
 		&ManifestEntry
 	)))
 	{
-		return false;
+		FirstResourceIndex++;
+
+		if (FirstResourceIndex == 65535) // we need to stop at some point in order to avoid an infinite loop
+			return false;
 	}
 
 	if (!ManifestEntry->DataIsDirectory)

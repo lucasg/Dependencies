@@ -51,6 +51,7 @@ namespace ClrPhTester
 
             if (PeManifest.Length == 0)
             {
+                VerboseWriteLine("[x] No embedded pe manifest for file {0:s}", Application.Filepath);
                 return;
             }
 
