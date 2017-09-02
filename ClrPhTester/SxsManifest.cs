@@ -210,13 +210,10 @@ namespace ClrPhTester
             //</ assembly >
             foreach (XElement SxsAssembly in XmlManifest.Descendants(Namespace + "assembly"))
             {
-                foreach (XElement SxsFileEntry in SxsAssembly.Elements(Namespace + "file"))
-                {
-                    string SxsDllName = SxsFileEntry.Attribute("name").Value.ToString();
-                    string SxsDllPath = Path.Combine(Folder, SxsDllName);
-                    AdditionnalDependencies.Add(new SxsEntry(SxsDllName, SxsDllPath));
-                }
+                AdditionnalDependencies.AddRange(SxsEntries.FromSxsAssembly(SxsAssembly, Namespace, Folder));
             }
+
+           
 
             // Find any dependencies :
             // <dependency>
@@ -237,10 +234,7 @@ namespace ClrPhTester
             )
             {
                 // find target PE
-                foreach (var SxsTarget in ExtractDependenciesFromSxsElement(SxsAssembly, Folder, Wow64Pe))
-                {
-                    AdditionnalDependencies.Add(SxsTarget);
-                }
+                AdditionnalDependencies.AddRange(ExtractDependenciesFromSxsElement(SxsAssembly, Folder, Wow64Pe));
             }
 
             return AdditionnalDependencies;
