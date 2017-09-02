@@ -277,9 +277,12 @@ namespace Dependencies
                 // which is authorized to manipulate UI elements. The BackgroundWorker is not.
                 //
 
+                List<ModuleTreeViewItem> PeWithDummyEntries = new List<ModuleTreeViewItem>();
+
                 foreach (TreeViewItemContext NewTreeContext in NewTreeContexts)
                 {
                     ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
+                    
 
                     // Missing module found
                     if (NewTreeContext.PeFilePath == null)
@@ -301,6 +304,10 @@ namespace Dependencies
 
                             this.ModulesList.Items.Add(new DisplayModuleInfo(NewTreeContext.ImportProperties, NewTreeContext.PeProperties));
                         }
+                        else
+                        {
+                            PeWithDummyEntries.Add(childTreeNode);
+                        }
 
 
                         this.ModulesFound.Add(NewTreeContext.PeFilePath);
@@ -315,10 +322,30 @@ namespace Dependencies
 
 
                 // Process next batch of dll imports
-                foreach (Tuple<ModuleTreeViewItem, PE> NewPeNode in BacklogPeToProcess)
+                foreach (var NewPeNode in BacklogPeToProcess)
                 {
                     ConstructDependencyTree(NewPeNode.Item1, NewPeNode.Item2, RecursionLevel + 1); // warning : recursive call
                 }
+
+
+                // dummy entry to set the "[+]" button
+                // the dll dependencies are actually resolved on user action
+                // TODO : Resolve and copy tree on expand action
+                foreach (var NeedDummyPeNode in PeWithDummyEntries)
+                {
+                    ModuleTreeViewItem DummyEntry = new ModuleTreeViewItem();
+                    TreeViewItemContext DummyContext = new TreeViewItemContext()
+                    {
+                        ModuleName = "Dummy",
+                        PeFilePath = "Dummy"
+                    };
+                    DummyEntry.DataContext = DummyContext;
+                    DummyEntry.Header = "@Dummy : if you see this header, it's a bug.";
+                    DummyEntry.IsExpanded = true;
+
+                    NeedDummyPeNode.Items.Add(DummyEntry);
+                }
+
             };
 
             bw.RunWorkerAsync();
@@ -333,7 +360,7 @@ namespace Dependencies
             this.SymPrv = new PhSymbolProvider();
             this.ModulesFound = new HashSet<String>();
             this.ModulesNotFound = new HashSet<String>();
-            
+
             this.Pe = new PE(FileName);
             this.RootFolder = Path.GetDirectoryName(FileName);
             this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
@@ -342,13 +369,13 @@ namespace Dependencies
             this.DllTreeView.Items.Clear();
 
             ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
-            TreeViewItemContext childTreeInfoContext = new TreeViewItemContext();
-
-            childTreeInfoContext.PeProperties = this.Pe;
-            childTreeInfoContext.ImportProperties = null;
-            childTreeInfoContext.PeFilePath = this.Pe.Filepath;
-            childTreeInfoContext.ModuleName = FileName;
-
+            TreeViewItemContext childTreeInfoContext = new TreeViewItemContext()
+            {
+                PeProperties = this.Pe,
+                ImportProperties = null,
+                PeFilePath = this.Pe.Filepath,
+                ModuleName = FileName
+            };
             treeNode.DataContext = childTreeInfoContext;
             treeNode.Header = treeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
             treeNode.IsExpanded = true;
