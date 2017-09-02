@@ -80,13 +80,13 @@ namespace ClrPhTester
             VerboseWriteLine("[-] sxs dependencies for executable : {0}", Application.Filepath);
             foreach (var entry in SxsDependencies)
             {
-                if (entry.Item2.Contains("???"))
+                if (entry.Path.Contains("???"))
                 {
-                    Console.WriteLine("  [x] {0:s} : {1:s}", entry.Item1, entry.Item2);
+                    Console.WriteLine("  [x] {0:s} : {1:s}", entry.Name, entry.Path);
                 }
                 else
                 {
-                    Console.WriteLine("  [+] {0:s} : {1:s}", entry.Item1, entry.Item2);
+                    Console.WriteLine("  [+] {0:s} : {1:s}", entry.Name, entry.Path);
                 }
             }
         }

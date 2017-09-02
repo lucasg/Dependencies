@@ -9,8 +9,69 @@ using System.Text.RegularExpressions;
 namespace ClrPhTester
 {
     // C# typedefs
-    using SxsEntry = Tuple<string, string>;
-    public class SxsEntries : List<SxsEntry> { }
+    //using SxsEntry = Tuple<string, string>;
+    public class SxsEntry 
+    {
+        public SxsEntry(string _Name, string _Path, string _Version="", string _Type="", string _PublicKeyToken = "")
+        {
+            Name = _Name;
+            Path = _Path;
+            Version = _Version;
+            Type = _Type;
+            PublicKeyToken = _PublicKeyToken;
+        }
+
+        public SxsEntry(SxsEntry OtherSxsEntry)
+        {
+            Name = OtherSxsEntry.Name;
+            Path = OtherSxsEntry.Path;
+            Version = OtherSxsEntry.Version;
+            Type = OtherSxsEntry.Type;
+            PublicKeyToken = OtherSxsEntry.PublicKeyToken;
+        }
+
+        public SxsEntry(XElement SxsAssemblyIdentity, XElement SxsFile, string Folder)
+        {
+            Name = SxsFile.Attribute("name").Value.ToString();
+            Path = System.IO.Path.Combine(Folder, Name);
+            Version = SxsAssemblyIdentity.Attribute("version") != null ?
+                SxsAssemblyIdentity.Attribute("version").Value.ToString() : "";
+            Type = SxsAssemblyIdentity.Attribute("type") != null ?
+                SxsAssemblyIdentity.Attribute("type").Value.ToString() : "";
+            PublicKeyToken = SxsAssemblyIdentity.Attribute("publicKeyToken") != null ? 
+                SxsAssemblyIdentity.Attribute("publicKeyToken").Value.ToString() : "";
+
+
+            // TODO : DLL search order ?
+            if (!File.Exists(Path))
+            {
+                Path = "???";
+            }
+
+        }
+
+        public string Name;
+        public string Path;
+        public string Version;
+        public string Type;
+        public string PublicKeyToken;
+    }
+
+    public class SxsEntries : List<SxsEntry> 
+    {
+        public static SxsEntries FromSxsAssembly(XElement SxsAssembly, XNamespace Namespace, string Folder)
+        {
+            SxsEntries Entries =  new SxsEntries();
+
+            XElement SxsAssemblyIdentity = SxsAssembly.Element(Namespace + "assemblyIdentity");
+            foreach (XElement SxsFile in SxsAssembly.Elements(Namespace + "file"))
+            {
+                Entries.Add(new SxsEntry(SxsAssemblyIdentity, SxsFile, Folder));
+            }
+
+            return Entries;
+        }
+    }
 
     public class SxsManifest
     { 
