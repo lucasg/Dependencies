@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 namespace ClrPhTester
 {
     // C# typedefs
-    //using SxsEntry = Tuple<string, string>;
+    #region Sxs Classes
     public class SxsEntry 
     {
         public SxsEntry(string _Name, string _Path, string _Version="", string _Type="", string _PublicKeyToken = "")
@@ -72,7 +72,9 @@ namespace ClrPhTester
             return Entries;
         }
     }
+    #endregion Sxs Classes
 
+    #region SxsManifest
     public class SxsManifest
     { 
         public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, bool Wow64Pe = false)
@@ -292,4 +294,5 @@ namespace ClrPhTester
             return Entries;
         }
     }
+    #endregion SxsManifest
 }
