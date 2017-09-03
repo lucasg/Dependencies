@@ -387,24 +387,11 @@ namespace Dependencies
             {
                 return;
             }
-                
-            
-            string CachedPe = ((TreeViewItemContext)NeedDummyPeNode.DataContext).PeFilePath;
-            if (this.PeProcessedCache.ContainsKey(CachedPe))
-            {
-                NeedDummyPeNode.Items.Clear();
 
-                foreach (ModuleTreeViewItem children in this.PeProcessedCache[CachedPe].Items)
-                {
-                    //TODO: Recursively resolve all children nodes
-                    TreeViewItemContext CopyChildren = new TreeViewItemContext((TreeViewItemContext)children.DataContext);
-                    ModuleTreeViewItem CopyEntry = new ModuleTreeViewItem();
+            NeedDummyPeNode.Items.Clear();
+            PE CachedPe = ((TreeViewItemContext)NeedDummyPeNode.DataContext).PeProperties;
 
-                    CopyEntry.DataContext = CopyChildren;
-                    CopyEntry.Header = CopyEntry.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
-                    NeedDummyPeNode.Items.Add(CopyEntry);
-                }
-            }      
+            ConstructDependencyTree(NeedDummyPeNode, CachedPe);     
         }
 
         public DependencyWindow(String FileName)
