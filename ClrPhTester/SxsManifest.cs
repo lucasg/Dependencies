@@ -261,9 +261,23 @@ namespace ClrPhTester
             nsmgr.AddNamespace("asmv3", "http://schemas.microsoft.com/SMI/2005/WindowsSettings");      // sometimes missing from manifests : V3
             XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.Preserve);
 
-            using (XmlTextReader xReader = new XmlTextReader(ManifestStream, XmlNodeType.Document, context))
+
+            
+            
+            using (StreamReader xStream = new StreamReader(ManifestStream))
             {
-                XmlManifest = XDocument.Load(xReader);
+                // Trim double quotes in manifest attributes
+                // Exemple :
+                //      * Before : <assemblyIdentity name=""Microsoft.Windows.Shell.DevicePairingFolder"" processorArchitecture=""amd64"" version=""5.1.0.0"" type="win32" />
+                //      * After  : <assemblyIdentity name="Microsoft.Windows.Shell.DevicePairingFolder" processorArchitecture="amd64" version="5.1.0.0" type="win32" />
+
+                string PeManifest = xStream.ReadToEnd();
+                PeManifest = new Regex("\\\"\\\"([\\w\\d\\.]*)\\\"\\\"").Replace(PeManifest, "\"$1\""); // Regex magic here
+
+                using (XmlTextReader xReader = new XmlTextReader(PeManifest, XmlNodeType.Document, context))
+                {
+                    XmlManifest = XDocument.Load(xReader);
+                }
             }
 
             return XmlManifest;

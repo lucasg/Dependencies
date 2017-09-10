@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 using System.ClrPh;
-using System.Diagnostics;
+using System.IO;
 
 namespace ClrPhTester
 {
@@ -86,7 +86,7 @@ namespace ClrPhTester
                 }
                 else
                 {
-                    Console.WriteLine("  [+] {0:s} : {1:s}", entry.Name, entry.Path);
+                    Console.WriteLine("  [+] {0:s} : {1:s}", entry.Name, Path.GetFullPath(entry.Path));
                 }
             }
         }
