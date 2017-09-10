@@ -77,7 +77,7 @@ namespace ClrPhTester
     #region SxsManifest
     public class SxsManifest
     { 
-        public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, bool Wow64Pe = false)
+        public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, string ExecutableName = "", bool Wow64Pe = false)
         {
             // TODO : find search order 
             string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
@@ -95,7 +95,7 @@ namespace ClrPhTester
             string TargetSxsManifestPath = Path.Combine(Folder, String.Format("{0:s}.manifest", SxsManifestName));
             if (File.Exists(TargetSxsManifestPath))
             {
-                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, Folder, Wow64Pe);
+                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, Folder, ExecutableName, Wow64Pe);
             }
 
             // find manifest in sub directory
@@ -103,15 +103,12 @@ namespace ClrPhTester
             TargetSxsManifestPath = Path.Combine(SxsManifestDir, String.Format("{0:s}.manifest", SxsManifestName));
             if (Directory.Exists(SxsManifestDir) && File.Exists(TargetSxsManifestPath))
             {
-                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, Wow64Pe);
+                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, Wow64Pe);
             }
-
-            // find "{name}.local" dir ?
 
             // find publisher manifest in %WINDIR%/WinSxs/Manifest
             if (SxsAssembly.Attribute("publicKeyToken") != null)
             {
-                SxsEntries EntriesFromElement = new SxsEntries();
 
                 string WinSxsDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.Windows),
@@ -173,7 +170,19 @@ namespace ClrPhTester
                         TargetSxsManifestPath = Path.Combine(WinSxsManifestDir, FileName);
                         SxsManifestDir = Path.Combine(WinSxsDir, MatchingSxsFile.Groups[1].Value);
 
-                        return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, Wow64Pe);
+                        // "{name}.local" local sxs directory hijack ( really used for UAC bypasses )
+                        if (ExecutableName != "")
+                        {
+                            string LocalSxsDir = Path.Combine(Folder, String.Format("{0:s}.local", ExecutableName));
+                            string MatchingLocalSxsDir = Path.Combine(LocalSxsDir, MatchingSxsFile.Groups[1].Value);
+
+                            if (Directory.Exists(LocalSxsDir) && Directory.Exists(MatchingLocalSxsDir))
+                            {
+                                SxsManifestDir = MatchingLocalSxsDir;
+                            }
+                        }
+
+                        return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, Wow64Pe);
                     }
                 }
             }
@@ -187,18 +196,18 @@ namespace ClrPhTester
             }
         }
 
-        public static SxsEntries ExtractDependenciesFromSxsManifestFile(string ManifestFile, string Folder, bool Wow64Pe = false)
+        public static SxsEntries ExtractDependenciesFromSxsManifestFile(string ManifestFile, string Folder, string ExecutableName = "", bool Wow64Pe = false)
         {
             // Console.WriteLine("Extracting deps from file {0:s}", ManifestFile);
 
             using (FileStream fs = new FileStream(ManifestFile, FileMode.Open, FileAccess.Read))
             {
-                return ExtractDependenciesFromSxsManifest(fs, Folder, Wow64Pe);
+                return ExtractDependenciesFromSxsManifest(fs, Folder, ExecutableName, Wow64Pe);
             }
         }
 
 
-        public static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder, bool Wow64Pe = false)
+        public static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder, string ExecutableName = "", bool Wow64Pe = false)
         {
             SxsEntries AdditionnalDependencies = new SxsEntries();
             
@@ -236,7 +245,7 @@ namespace ClrPhTester
             )
             {
                 // find target PE
-                AdditionnalDependencies.AddRange(ExtractDependenciesFromSxsElement(SxsAssembly, Folder, Wow64Pe));
+                AdditionnalDependencies.AddRange(ExtractDependenciesFromSxsElement(SxsAssembly, Folder, ExecutableName, Wow64Pe));
             }
 
             return AdditionnalDependencies;
@@ -266,6 +275,7 @@ namespace ClrPhTester
             SxsEntries Entries = new SxsEntries();
 
             string RootPeFolder = Path.GetDirectoryName(Pe.Filepath);
+            string RootPeFilename = Path.GetFileName(Pe.Filepath);
 
             // Look for overriding manifest file (named "{$name}.manifest)
             string OverridingManifest = String.Format("{0:s}.manifest", Pe.Filepath);
@@ -274,6 +284,7 @@ namespace ClrPhTester
                 return ExtractDependenciesFromSxsManifestFile(
                     OverridingManifest,
                     RootPeFolder,
+                    RootPeFilename,
                     Pe.IsWow64Dll()
                 );
             }
@@ -283,12 +294,14 @@ namespace ClrPhTester
             if (PeManifest.Length == 0)
                 return Entries;
 
+
             byte[] RawManifest = System.Text.Encoding.UTF8.GetBytes(PeManifest);
             System.IO.Stream ManifestStream = new System.IO.MemoryStream(RawManifest);
 
             Entries = ExtractDependenciesFromSxsManifest(
                 ManifestStream, 
                 RootPeFolder,
+                RootPeFilename,
                 Pe.IsWow64Dll()
             );
             return Entries;
