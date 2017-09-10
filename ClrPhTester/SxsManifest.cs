@@ -13,7 +13,8 @@ namespace ClrPhTester
     public class SxsEntry 
     {
         public SxsEntry(string _Name, string _Path, string _Version="", string _Type="", string _PublicKeyToken = "")
-        {
+        { 
+
             Name = _Name;
             Path = _Path;
             Version = _Version;
@@ -32,14 +33,25 @@ namespace ClrPhTester
 
         public SxsEntry(XElement SxsAssemblyIdentity, XElement SxsFile, string Folder)
         {
-            Name = SxsFile.Attribute("name").Value.ToString();
-            Path = System.IO.Path.Combine(Folder, Name);
-            Version = SxsAssemblyIdentity.Attribute("version") != null ?
-                SxsAssemblyIdentity.Attribute("version").Value.ToString() : "";
-            Type = SxsAssemblyIdentity.Attribute("type") != null ?
-                SxsAssemblyIdentity.Attribute("type").Value.ToString() : "";
-            PublicKeyToken = SxsAssemblyIdentity.Attribute("publicKeyToken") != null ? 
-                SxsAssemblyIdentity.Attribute("publicKeyToken").Value.ToString() : "";
+            var RelPath = SxsFile.Attribute("name").Value.ToString();
+
+            Name = System.IO.Path.GetFileName(RelPath);
+            Path = System.IO.Path.Combine(Folder, RelPath);
+            Version = "";
+            Type = "";
+            PublicKeyToken = "";
+
+            if (SxsAssemblyIdentity != null)
+            {
+                if (SxsAssemblyIdentity.Attribute("version") != null)
+                    Version = SxsAssemblyIdentity.Attribute("version").Value.ToString();
+
+                if (SxsAssemblyIdentity.Attribute("type") != null)
+                    Type = SxsAssemblyIdentity.Attribute("type").Value.ToString();
+
+                if (SxsAssemblyIdentity.Attribute("publicKeyToken") != null)
+                    PublicKeyToken = SxsAssemblyIdentity.Attribute("publicKeyToken").Value.ToString();
+            }
 
 
             // TODO : DLL search order ?
@@ -83,11 +95,25 @@ namespace ClrPhTester
             string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
 
             // find dll with same name in same directory
+            string TargetFilePath = Path.Combine(Folder, SxsManifestName);
+            if (File.Exists(TargetFilePath))
+            {
+                SxsEntries EntriesFromElement = new SxsEntries();
+                var Name = System.IO.Path.GetFileName(TargetFilePath);
+                var Path = TargetFilePath;
+
+                EntriesFromElement.Add(new SxsEntry(Name, Path));
+                return EntriesFromElement;
+            }
+
             string TargetDllPath = Path.Combine(Folder, String.Format("{0:s}.dll", SxsManifestName));
             if (File.Exists(TargetDllPath))
             {
                 SxsEntries EntriesFromElement =  new SxsEntries();
-                EntriesFromElement.Add(new SxsEntry(SxsManifestName, TargetDllPath));
+                var Name = System.IO.Path.GetFileName(TargetDllPath);
+                var Path = TargetDllPath;
+
+                EntriesFromElement.Add(new SxsEntry(Name, Path));
                 return EntriesFromElement;
             }
 
@@ -267,7 +293,7 @@ namespace ClrPhTester
             using (StreamReader xStream = new StreamReader(ManifestStream))
             {
                 // Trim double quotes in manifest attributes
-                // Exemple :
+                // Example :
                 //      * Before : <assemblyIdentity name=""Microsoft.Windows.Shell.DevicePairingFolder"" processorArchitecture=""amd64"" version=""5.1.0.0"" type="win32" />
                 //      * After  : <assemblyIdentity name="Microsoft.Windows.Shell.DevicePairingFolder" processorArchitecture="amd64" version="5.1.0.0" type="win32" />
 
