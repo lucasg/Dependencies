@@ -88,17 +88,15 @@ namespace ClrPhTester
 
     #region SxsManifest
     public class SxsManifest
-    { 
-        public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, string ExecutableName = "", bool Wow64Pe = false)
+    {
+        // find dll with same name as sxs assembly in target directory
+        public static SxsEntries SxsFindTargetDll(string AssemblyName, string Folder)
         {
-            // TODO : find search order 
-            string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
+            SxsEntries EntriesFromElement = new SxsEntries();
 
-            // find dll with same name in same directory
-            string TargetFilePath = Path.Combine(Folder, SxsManifestName);
+            string TargetFilePath = Path.Combine(Folder, AssemblyName);
             if (File.Exists(TargetFilePath))
             {
-                SxsEntries EntriesFromElement = new SxsEntries();
                 var Name = System.IO.Path.GetFileName(TargetFilePath);
                 var Path = TargetFilePath;
 
@@ -106,10 +104,9 @@ namespace ClrPhTester
                 return EntriesFromElement;
             }
 
-            string TargetDllPath = Path.Combine(Folder, String.Format("{0:s}.dll", SxsManifestName));
+            string TargetDllPath = Path.Combine(Folder, String.Format("{0:s}.dll", AssemblyName));
             if (File.Exists(TargetDllPath))
             {
-                SxsEntries EntriesFromElement =  new SxsEntries();
                 var Name = System.IO.Path.GetFileName(TargetDllPath);
                 var Path = TargetDllPath;
 
@@ -117,22 +114,33 @@ namespace ClrPhTester
                 return EntriesFromElement;
             }
 
-            // find manifest with same name in same directory
-            string TargetSxsManifestPath = Path.Combine(Folder, String.Format("{0:s}.manifest", SxsManifestName));
-            if (File.Exists(TargetSxsManifestPath))
-            {
-                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, Folder, ExecutableName, Wow64Pe);
-            }
+            return EntriesFromElement;
+        }
 
-            // find manifest in sub directory
+        public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, string ExecutableName = "", bool Wow64Pe = false)
+        {
+            // Private assembly search sequence : https://msdn.microsoft.com/en-us/library/windows/desktop/aa374224(v=vs.85).aspx
+            // 
+            // * In the application's folder. Typically, this is the folder containing the application's executable file.
+            // * In a subfolder in the application's folder. The subfolder must have the same name as the assembly.
+            // * In a language-specific subfolder in the application's folder. 
+            //      -> The name of the subfolder is a string of DHTML language codes indicating a language-culture or language.
+            // * In a subfolder of a language-specific subfolder in the application's folder.
+            //      -> The name of the higher subfolder is a string of DHTML language codes indicating a language-culture or language. The deeper subfolder has the same name as the assembly.
+            //
+            // 
+            // 0.   Side-by-side searches the WinSxS folder.
+            // 1.   \\<appdir>\<assemblyname>.DLL
+            // 2.   \\<appdir>\<assemblyname>.manifest
+            // 3.   \\<appdir>\<assemblyname>\<assemblyname>.DLL
+            // 4.   \\<appdir>\<assemblyname>\<assemblyname>.manifest
+
+            string TargetSxsManifestPath;
+            string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
             string SxsManifestDir = Path.Combine(Folder, SxsManifestName);
-            TargetSxsManifestPath = Path.Combine(SxsManifestDir, String.Format("{0:s}.manifest", SxsManifestName));
-            if (Directory.Exists(SxsManifestDir) && File.Exists(TargetSxsManifestPath))
-            {
-                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, Wow64Pe);
-            }
 
-            // find publisher manifest in %WINDIR%/WinSxs/Manifest
+
+            // 0. find publisher manifest in %WINDIR%/WinSxs/Manifest
             if (SxsAssembly.Attribute("publicKeyToken") != null)
             {
 
@@ -212,7 +220,51 @@ namespace ClrPhTester
                     }
                 }
             }
-                       
+
+            // 1. \\<appdir>\<assemblyname>.DLL
+            // find dll with same assembly name in same directory
+            SxsEntries EntriesFromMatchingDll = SxsFindTargetDll(SxsManifestName, Folder);
+            if (EntriesFromMatchingDll.Count > 0) 
+            {
+                return EntriesFromMatchingDll;
+            }
+
+
+            // 2. \\<appdir>\<assemblyname>.manifest
+            // find manifest with same assembly name in same directory
+            TargetSxsManifestPath = Path.Combine(Folder, String.Format("{0:s}.manifest", SxsManifestName));
+            if (File.Exists(TargetSxsManifestPath))
+            {
+                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, Folder, ExecutableName, Wow64Pe);
+            }
+
+
+            // 3. \\<appdir>\<assemblyname>\<assemblyname>.DLL
+            // find matching dll in sub directory
+            SxsEntries EntriesFromMatchingDllSub = SxsFindTargetDll(SxsManifestName, SxsManifestDir);
+            if (EntriesFromMatchingDllSub.Count > 0) 
+            {
+                return EntriesFromMatchingDllSub;
+            }
+
+            // 4. \<appdir>\<assemblyname>\<assemblyname>.manifest
+            // find manifest in sub directory
+            TargetSxsManifestPath = Path.Combine(SxsManifestDir, String.Format("{0:s}.manifest", SxsManifestName));
+            if (Directory.Exists(SxsManifestDir) && File.Exists(TargetSxsManifestPath))
+            {
+                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, Wow64Pe);
+            }
+
+            // TODO : do the same thing for localization
+            // 
+            // 0. Side-by-side searches the WinSxS folder.
+            // 1. \\<appdir>\<language-culture>\<assemblyname>.DLL
+            // 2. \\<appdir>\<language-culture>\<assemblyname>.manifest
+            // 3. \\<appdir>\<language-culture>\<assemblyname>\<assemblyname>.DLL
+            // 4. \\<appdir>\<language-culture>\<assemblyname>\<assemblyname>.manifest
+
+            // TODO : also take into account Multilanguage User Interface (MUI) when
+            // scanning manifests and WinSxs dll. God this is horrendously complicated.
 
             // Could not find the dependency
             {

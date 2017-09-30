@@ -10,10 +10,11 @@ namespace Dependencies
 {
     // C# typedefs
     #region Sxs Classes
-    public class SxsEntry
+    public class SxsEntry 
     {
-        public SxsEntry(string _Name, string _Path, string _Version = "", string _Type = "", string _PublicKeyToken = "")
-        {
+        public SxsEntry(string _Name, string _Path, string _Version="", string _Type="", string _PublicKeyToken = "")
+        { 
+
             Name = _Name;
             Path = _Path;
             Version = _Version;
@@ -32,14 +33,25 @@ namespace Dependencies
 
         public SxsEntry(XElement SxsAssemblyIdentity, XElement SxsFile, string Folder)
         {
-            Name = SxsFile.Attribute("name").Value.ToString();
-            Path = System.IO.Path.Combine(Folder, Name);
-            Version = SxsAssemblyIdentity.Attribute("version") != null ?
-                SxsAssemblyIdentity.Attribute("version").Value.ToString() : "";
-            Type = SxsAssemblyIdentity.Attribute("type") != null ?
-                SxsAssemblyIdentity.Attribute("type").Value.ToString() : "";
-            PublicKeyToken = SxsAssemblyIdentity.Attribute("publicKeyToken") != null ?
-                SxsAssemblyIdentity.Attribute("publicKeyToken").Value.ToString() : "";
+            var RelPath = SxsFile.Attribute("name").Value.ToString();
+
+            Name = System.IO.Path.GetFileName(RelPath);
+            Path = System.IO.Path.Combine(Folder, RelPath);
+            Version = "";
+            Type = "";
+            PublicKeyToken = "";
+
+            if (SxsAssemblyIdentity != null)
+            {
+                if (SxsAssemblyIdentity.Attribute("version") != null)
+                    Version = SxsAssemblyIdentity.Attribute("version").Value.ToString();
+
+                if (SxsAssemblyIdentity.Attribute("type") != null)
+                    Type = SxsAssemblyIdentity.Attribute("type").Value.ToString();
+
+                if (SxsAssemblyIdentity.Attribute("publicKeyToken") != null)
+                    PublicKeyToken = SxsAssemblyIdentity.Attribute("publicKeyToken").Value.ToString();
+            }
 
 
             // TODO : DLL search order ?
@@ -57,11 +69,11 @@ namespace Dependencies
         public string PublicKeyToken;
     }
 
-    public class SxsEntries : List<SxsEntry>
+    public class SxsEntries : List<SxsEntry> 
     {
         public static SxsEntries FromSxsAssembly(XElement SxsAssembly, XNamespace Namespace, string Folder)
         {
-            SxsEntries Entries = new SxsEntries();
+            SxsEntries Entries =  new SxsEntries();
 
             XElement SxsAssemblyIdentity = SxsAssembly.Element(Namespace + "assemblyIdentity");
             foreach (XElement SxsFile in SxsAssembly.Elements(Namespace + "file"))
@@ -74,44 +86,63 @@ namespace Dependencies
     }
     #endregion Sxs Classes
 
-    #region SxsManifest 
+    #region SxsManifest
     public class SxsManifest
     {
-        public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, bool Wow64Pe = false)
+        // find dll with same name as sxs assembly in target directory
+        public static SxsEntries SxsFindTargetDll(string AssemblyName, string Folder)
         {
-            // TODO : find search order 
-            string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
+            SxsEntries EntriesFromElement = new SxsEntries();
 
-            // find dll with same name in same directory
-            string TargetDllPath = Path.Combine(Folder, String.Format("{0:s}.dll", SxsManifestName));
-            if (File.Exists(TargetDllPath))
+            string TargetFilePath = Path.Combine(Folder, AssemblyName);
+            if (File.Exists(TargetFilePath))
             {
-                SxsEntries EntriesFromElement = new SxsEntries();
-                EntriesFromElement.Add(new SxsEntry(SxsManifestName, TargetDllPath));
+                var Name = System.IO.Path.GetFileName(TargetFilePath);
+                var Path = TargetFilePath;
+
+                EntriesFromElement.Add(new SxsEntry(Name, Path));
                 return EntriesFromElement;
             }
 
-            // find manifest with same name in same directory
-            string TargetSxsManifestPath = Path.Combine(Folder, String.Format("{0:s}.manifest", SxsManifestName));
-            if (File.Exists(TargetSxsManifestPath))
+            string TargetDllPath = Path.Combine(Folder, String.Format("{0:s}.dll", AssemblyName));
+            if (File.Exists(TargetDllPath))
             {
-                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, Folder, Wow64Pe);
+                var Name = System.IO.Path.GetFileName(TargetDllPath);
+                var Path = TargetDllPath;
+
+                EntriesFromElement.Add(new SxsEntry(Name, Path));
+                return EntriesFromElement;
             }
 
-            // find manifest in sub directory
+            return EntriesFromElement;
+        }
+
+        public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, string ExecutableName = "", bool Wow64Pe = false)
+        {
+            // Private assembly search sequence : https://msdn.microsoft.com/en-us/library/windows/desktop/aa374224(v=vs.85).aspx
+            // 
+            // * In the application's folder. Typically, this is the folder containing the application's executable file.
+            // * In a subfolder in the application's folder. The subfolder must have the same name as the assembly.
+            // * In a language-specific subfolder in the application's folder. 
+            //      -> The name of the subfolder is a string of DHTML language codes indicating a language-culture or language.
+            // * In a subfolder of a language-specific subfolder in the application's folder.
+            //      -> The name of the higher subfolder is a string of DHTML language codes indicating a language-culture or language. The deeper subfolder has the same name as the assembly.
+            //
+            // 
+            // 0.   Side-by-side searches the WinSxS folder.
+            // 1.   \\<appdir>\<assemblyname>.DLL
+            // 2.   \\<appdir>\<assemblyname>.manifest
+            // 3.   \\<appdir>\<assemblyname>\<assemblyname>.DLL
+            // 4.   \\<appdir>\<assemblyname>\<assemblyname>.manifest
+
+            string TargetSxsManifestPath;
+            string SxsManifestName = SxsAssembly.Attribute("name").Value.ToString();
             string SxsManifestDir = Path.Combine(Folder, SxsManifestName);
-            TargetSxsManifestPath = Path.Combine(SxsManifestDir, String.Format("{0:s}.manifest", SxsManifestName));
-            if (Directory.Exists(SxsManifestDir) && File.Exists(TargetSxsManifestPath))
-            {
-                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, Wow64Pe);
-            }
 
-            // find "{name}.local" dir ?
 
-            // find publisher manifest in %WINDIR%/WinSxs/Manifest
+            // 0. find publisher manifest in %WINDIR%/WinSxs/Manifest
             if (SxsAssembly.Attribute("publicKeyToken") != null)
             {
-                SxsEntries EntriesFromElement = new SxsEntries();
 
                 string WinSxsDir = Path.Combine(
                     Environment.GetFolderPath(Environment.SpecialFolder.Windows),
@@ -129,7 +160,7 @@ namespace Dependencies
                 string ProcessArch = SxsAssembly.Attribute("processorArchitecture") != null ? SxsAssembly.Attribute("processorArchitecture").Value : "*";
                 string Version = SxsAssembly.Attribute("version").Value;
                 string Langage = SxsAssembly.Attribute("langage") != null ? SxsAssembly.Attribute("langage").Value : "none"; // TODO : support localized sxs redirection
-
+                
 
                 switch (ProcessArch.ToLower())
                 {
@@ -154,13 +185,13 @@ namespace Dependencies
                 // Manifest filename : {ProcArch}_{Name}_{PublicKeyToken}_{FuzzyVersion}_{Langage}_{some_hash}.manifest
                 Regex ManifestFileNameRegex = new Regex(
                     String.Format(@"({0:s}_{1:s}_{2:s}_({3:s}\.[\.0-9]*)_none_([a-fA-F0-9]+))\.manifest",
-                        ProcessArch,
+                        ProcessArch, 
                         Name,
                         PublicKeyToken,
                         MajorVersion
-                    //Langage,
-                    // some hash
-                    ),
+                        //Langage,
+                        // some hash
+                    ), 
                     RegexOptions.IgnoreCase
                 );
 
@@ -173,11 +204,67 @@ namespace Dependencies
                         TargetSxsManifestPath = Path.Combine(WinSxsManifestDir, FileName);
                         SxsManifestDir = Path.Combine(WinSxsDir, MatchingSxsFile.Groups[1].Value);
 
-                        return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, Wow64Pe);
+                        // "{name}.local" local sxs directory hijack ( really used for UAC bypasses )
+                        if (ExecutableName != "")
+                        {
+                            string LocalSxsDir = Path.Combine(Folder, String.Format("{0:s}.local", ExecutableName));
+                            string MatchingLocalSxsDir = Path.Combine(LocalSxsDir, MatchingSxsFile.Groups[1].Value);
+
+                            if (Directory.Exists(LocalSxsDir) && Directory.Exists(MatchingLocalSxsDir))
+                            {
+                                SxsManifestDir = MatchingLocalSxsDir;
+                            }
+                        }
+
+                        return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, Wow64Pe);
                     }
                 }
             }
 
+            // 1. \\<appdir>\<assemblyname>.DLL
+            // find dll with same assembly name in same directory
+            SxsEntries EntriesFromMatchingDll = SxsFindTargetDll(SxsManifestName, Folder);
+            if (EntriesFromMatchingDll.Count > 0) 
+            {
+                return EntriesFromMatchingDll;
+            }
+
+
+            // 2. \\<appdir>\<assemblyname>.manifest
+            // find manifest with same assembly name in same directory
+            TargetSxsManifestPath = Path.Combine(Folder, String.Format("{0:s}.manifest", SxsManifestName));
+            if (File.Exists(TargetSxsManifestPath))
+            {
+                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, Folder, ExecutableName, Wow64Pe);
+            }
+
+
+            // 3. \\<appdir>\<assemblyname>\<assemblyname>.DLL
+            // find matching dll in sub directory
+            SxsEntries EntriesFromMatchingDllSub = SxsFindTargetDll(SxsManifestName, SxsManifestDir);
+            if (EntriesFromMatchingDllSub.Count > 0) 
+            {
+                return EntriesFromMatchingDllSub;
+            }
+
+            // 4. \<appdir>\<assemblyname>\<assemblyname>.manifest
+            // find manifest in sub directory
+            TargetSxsManifestPath = Path.Combine(SxsManifestDir, String.Format("{0:s}.manifest", SxsManifestName));
+            if (Directory.Exists(SxsManifestDir) && File.Exists(TargetSxsManifestPath))
+            {
+                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, Wow64Pe);
+            }
+
+            // TODO : do the same thing for localization
+            // 
+            // 0. Side-by-side searches the WinSxS folder.
+            // 1. \\<appdir>\<language-culture>\<assemblyname>.DLL
+            // 2. \\<appdir>\<language-culture>\<assemblyname>.manifest
+            // 3. \\<appdir>\<language-culture>\<assemblyname>\<assemblyname>.DLL
+            // 4. \\<appdir>\<language-culture>\<assemblyname>\<assemblyname>.manifest
+
+            // TODO : also take into account Multilanguage User Interface (MUI) when
+            // scanning manifests and WinSxs dll. God this is horrendously complicated.
 
             // Could not find the dependency
             {
@@ -187,21 +274,21 @@ namespace Dependencies
             }
         }
 
-        public static SxsEntries ExtractDependenciesFromSxsManifestFile(string ManifestFile, string Folder, bool Wow64Pe = false)
+        public static SxsEntries ExtractDependenciesFromSxsManifestFile(string ManifestFile, string Folder, string ExecutableName = "", bool Wow64Pe = false)
         {
             // Console.WriteLine("Extracting deps from file {0:s}", ManifestFile);
 
             using (FileStream fs = new FileStream(ManifestFile, FileMode.Open, FileAccess.Read))
             {
-                return ExtractDependenciesFromSxsManifest(fs, Folder, Wow64Pe);
+                return ExtractDependenciesFromSxsManifest(fs, Folder, ExecutableName, Wow64Pe);
             }
         }
 
 
-        public static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder, bool Wow64Pe = false)
+        public static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder, string ExecutableName = "", bool Wow64Pe = false)
         {
             SxsEntries AdditionnalDependencies = new SxsEntries();
-
+            
             XDocument XmlManifest = ParseSxsManifest(ManifestStream);
             XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
 
@@ -215,7 +302,7 @@ namespace Dependencies
                 AdditionnalDependencies.AddRange(SxsEntries.FromSxsAssembly(SxsAssembly, Namespace, Folder));
             }
 
-
+           
 
             // Find any dependencies :
             // <dependency>
@@ -236,7 +323,7 @@ namespace Dependencies
             )
             {
                 // find target PE
-                AdditionnalDependencies.AddRange(ExtractDependenciesFromSxsElement(SxsAssembly, Folder, Wow64Pe));
+                AdditionnalDependencies.AddRange(ExtractDependenciesFromSxsElement(SxsAssembly, Folder, ExecutableName, Wow64Pe));
             }
 
             return AdditionnalDependencies;
@@ -252,9 +339,23 @@ namespace Dependencies
             nsmgr.AddNamespace("asmv3", "http://schemas.microsoft.com/SMI/2005/WindowsSettings");      // sometimes missing from manifests : V3
             XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.Preserve);
 
-            using (XmlTextReader xReader = new XmlTextReader(ManifestStream, XmlNodeType.Document, context))
+
+            
+            
+            using (StreamReader xStream = new StreamReader(ManifestStream))
             {
-                XmlManifest = XDocument.Load(xReader);
+                // Trim double quotes in manifest attributes
+                // Example :
+                //      * Before : <assemblyIdentity name=""Microsoft.Windows.Shell.DevicePairingFolder"" processorArchitecture=""amd64"" version=""5.1.0.0"" type="win32" />
+                //      * After  : <assemblyIdentity name="Microsoft.Windows.Shell.DevicePairingFolder" processorArchitecture="amd64" version="5.1.0.0" type="win32" />
+
+                string PeManifest = xStream.ReadToEnd();
+                PeManifest = new Regex("\\\"\\\"([\\w\\d\\.]*)\\\"\\\"").Replace(PeManifest, "\"$1\""); // Regex magic here
+
+                using (XmlTextReader xReader = new XmlTextReader(PeManifest, XmlNodeType.Document, context))
+                {
+                    XmlManifest = XDocument.Load(xReader);
+                }
             }
 
             return XmlManifest;
@@ -266,6 +367,7 @@ namespace Dependencies
             SxsEntries Entries = new SxsEntries();
 
             string RootPeFolder = Path.GetDirectoryName(Pe.Filepath);
+            string RootPeFilename = Path.GetFileName(Pe.Filepath);
 
             // Look for overriding manifest file (named "{$name}.manifest)
             string OverridingManifest = String.Format("{0:s}.manifest", Pe.Filepath);
@@ -274,6 +376,7 @@ namespace Dependencies
                 return ExtractDependenciesFromSxsManifestFile(
                     OverridingManifest,
                     RootPeFolder,
+                    RootPeFilename,
                     Pe.IsWow64Dll()
                 );
             }
@@ -283,18 +386,20 @@ namespace Dependencies
             if (PeManifest.Length == 0)
                 return Entries;
 
+
             byte[] RawManifest = System.Text.Encoding.UTF8.GetBytes(PeManifest);
             System.IO.Stream ManifestStream = new System.IO.MemoryStream(RawManifest);
 
             Entries = ExtractDependenciesFromSxsManifest(
-                ManifestStream,
+                ManifestStream, 
                 RootPeFolder,
+                RootPeFilename,
                 Pe.IsWow64Dll()
             );
             return Entries;
         }
     }
-    #endregion SxsManifest 
+    #endregion SxsManifest
 
     #region FindPe
     public class FindPe
@@ -327,7 +432,7 @@ namespace Dependencies
         //      5. %pwd%
         //      6. AppDatas
         //      7. Sxs manifests
-        public static string FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache )
+        public static string FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache)
         {
             bool Wow64Dll = RootPe.IsWow64Dll();
             string RootPeFolder = Path.GetDirectoryName(RootPe.Filepath);
@@ -343,8 +448,8 @@ namespace Dependencies
             // TODO : find dll search order
             if (SxsCache.Count != 0)
             {
-                SxsEntry Entry = SxsCache.Find(
-                    SxsItem => string.Equals(SxsItem.Name, ModuleName, StringComparison.OrdinalIgnoreCase)
+                SxsEntry Entry = SxsCache.Find( SxsItem =>
+                    string.Equals(SxsItem.Name, ModuleName, StringComparison.OrdinalIgnoreCase)
                 );
 
                 if (Entry != null)
@@ -371,7 +476,7 @@ namespace Dependencies
             }
 
             // {2-3-4}. Look in system folders
-            List <String> SystemFolders = new List<string>(new string[] {
+            List<String> SystemFolders = new List<string>(new string[] {
                 WindowsSystemFolderPath,
                 Environment.GetFolderPath(Environment.SpecialFolder.Windows)
                 }
