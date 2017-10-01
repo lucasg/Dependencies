@@ -8,7 +8,6 @@ using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
 
-
 public class RelayCommand : ICommand
 {
     #region Fields 
@@ -239,7 +238,7 @@ namespace Dependencies
     /// <summary>
     /// Logique d'interaction pour DependencyWindow.xaml
     /// </summary>
-    public partial class DependencyWindow : System.Windows.Controls.UserControl
+    public partial class DependencyWindow : TabItem 
     {
         PE Pe;
         string RootFolder;
@@ -398,6 +397,7 @@ namespace Dependencies
         {
 
             InitializeComponent();
+            this.Header = Path.GetFileName(FileName);
 
             this.SymPrv = new PhSymbolProvider();
             this.ModulesFound = new HashSet<String>();

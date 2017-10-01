@@ -4,10 +4,12 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
-        xmlns:mdi="clr-namespace:WPF.MDI;assembly=WPF.MDI"
+        xmlns:dragablz="clr-namespace:Dragablz;assembly=Dragablz"
+        xmlns:dockablz="clr-namespace:Dragablz.Dockablz;assembly=Dragablz"
         xmlns:properties="clr-namespace:Dependencies.Properties"
         mc:Ignorable="d"
         Title="Dependencies" HorizontalContentAlignment="Stretch" Height="900" Width="1600" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom">
+
     <Window.CommandBindings>
         <!--<CommandBinding Command="Exit" Executed="ExitCommandBinding_Executed"></CommandBinding>-->
         <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
@@ -20,8 +22,25 @@
     </Window.InputBindings>
 
     <Window.Resources>
-        <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
-        
+        <ResourceDictionary>
+            <!-- Import themes for Dragablz forms -->
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Hide/Show the status bar based on a global switch -->
+            <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
+
+            <!-- Specific theme for the dockable control -->
+            <Style TargetType="{x:Type dragablz:TabablzControl}" x:Key="DependencyTabablzControlStyle">
+                <Setter Property="ShowDefaultAddButton" Value="True" />
+                <Setter Property="ShowDefaultCloseButton" Value="True" />
+                <Setter Property="NewItemFactory" Value="{x:Static local:MainWindow.Factory}" />
+                <Setter Property="Margin" Value="0 0 0 0" />
+                <Setter Property="ItemContainerStyle" Value="{StaticResource TrapezoidDragableTabItemStyle}" />
+            </Style>
+        </ResourceDictionary>
+
     </Window.Resources>
     
     <Grid x:Name="MainGrid" Margin="0,0,0,0" Background="#FF5C8F88">
@@ -56,12 +75,36 @@
             </MenuItem>
         </Menu>
 
-        <Grid x:Name="UserControlGrid" Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <mdi:MdiContainer Name="Container" Grid.ColumnSpan="1"/>
-        </Grid>
+        <!-- dockablz:Layout is part of the main grid =>  Grid.Row="1" -->
+        <!-- DependencyWindow does not support being a floating window => IsFloatDropZoneEnabled="False" -->
+        <!-- all dragablz controls need to reference  Partition="2AE89D18-F236-4D20-9605-6C03319038E6" in order to dock correctly -->
+        <dockablz:Layout Partition="2AE89D18-F236-4D20-9605-6C03319038E6" Name="DependencyRootLayout"
+                    FloatingItemHeaderMemberPath="Header"
+                    IsFloatDropZoneEnabled="False"         
+                    FloatingItemsContainerMargin="0 2 0 0"
+                    Grid.Row="1">
+
+            <dockablz:Layout.BranchTemplate>
+                <DataTemplate>
+                    <dragablz:TabablzControl Style="{StaticResource DependencyTabablzControlStyle}">
+                        <dragablz:TabablzControl.InterTabController>
+                            <dragablz:InterTabController InterTabClient="{Binding InterTabClient}" Partition="2AE89D18-F236-4D20-9605-6C03319038E6" />
+                        </dragablz:TabablzControl.InterTabController>
+                    </dragablz:TabablzControl>
+                </DataTemplate>
+            </dockablz:Layout.BranchTemplate>
+
+            <dragablz:TabablzControl
+                        Name="DockPanel"
+                        Style="{StaticResource DependencyTabablzControlStyle}"
+                        AddLocationHint="After" >
+
+                <dragablz:TabablzControl.InterTabController>
+                    <dragablz:InterTabController InterTabClient="{Binding InterTabClient}" Partition="2AE89D18-F236-4D20-9605-6C03319038E6" />
+                </dragablz:TabablzControl.InterTabController>
+            </dragablz:TabablzControl>
+
+        </dockablz:Layout>
 
         <StatusBar x:Name="AppStatusBar" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Grid.Row="2" MinHeight="28" Panel.ZIndex="1" Margin="0" VerticalAlignment="Bottom" Visibility="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}"/>
     </Grid>

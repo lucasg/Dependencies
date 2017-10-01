@@ -1,32 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using WPF.MDI;
 using System.ClrPh;
 
 namespace Dependencies
 {
-    
 
     /// <summary>
     /// Logique d'interaction pour MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             Phlib.InitializePhLib();
@@ -80,24 +65,8 @@ namespace Dependencies
         public void OpenNewDependencyWindow(String Filename)
         {
             DependencyWindow nw = new DependencyWindow(Filename);
-
-            double ChildWith = Math.Min((double)nw.GetValue(WidthProperty), Container.ActualWidth);
-            double ChildHeight = Math.Min((double)nw.GetValue(HeightProperty), Container.ActualHeight);
-
-            Container.Children.Add(new MdiChild
-            {
-                Title = Filename,
-                Content = nw,
-                Width = ChildWith,
-                Height = ChildHeight,
-                //Margin = new System.Windows.Thickness(15,15,15,15)
-                //Icon = new BitmapImage(uriSource: new Uri(@"Images/dependencies_16x.png", UriKind.RelativeOrAbsolute)),
-                //ShowIcon = true
-            });
-
-            // Invalidate size in order to trigger resize for internal elements.
-            nw.Width = double.NaN;
-            nw.Height = double.NaN;
+            this.DockPanel.AddToSource(nw);
+            this.DockPanel.SelectedItem = nw;
 
             // Update recent files entries
             App.AddToRecentDocuments(Filename);
@@ -141,8 +110,33 @@ namespace Dependencies
             base.OnClosing(e);
         }
 
-    }
+        
+        public static Func<DependencyWindow> Factory
+        {
+            get
+            {
+                return
+                    () =>
+                    {
+                        OpenFileDialog InputFileNameDlg = new OpenFileDialog();
+                        InputFileNameDlg.Filter = "exe files (*.exe, *.dll)| *.exe;*.dll; | All files (*.*)|*.*";
+                        InputFileNameDlg.FilterIndex = 0;
+                        InputFileNameDlg.RestoreDirectory = true;
 
+                        if (InputFileNameDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                            return null;
+                        var Filename = InputFileNameDlg.FileName;
+
+                        DependencyWindow nw = new DependencyWindow(Filename);
+
+                        // Update recent files entries
+                        App.AddToRecentDocuments(Filename);
+
+                        return nw;
+                    };
+            }
+        }
+    }
 
 
     public class BooleanToVisbilityConverter : IValueConverter

@@ -125,6 +125,10 @@
       <Project>{fc5ffcaf-982f-4a95-8fa6-2a95b1f7cdc8}</Project>
       <Name>ClrPhlib</Name>
     </ProjectReference>
+    <ProjectReference Include="..\third_party\Dragablz\Dragablz\Dragablz.net45.csproj">
+      <Project>{7b11011c-7fd7-4ab0-a1ad-04e940b026de}</Project>
+      <Name>Dragablz.net45</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Wpf.Mdi\WPF.MDI.csproj">
       <Project>{be1ed569-5e0b-4df0-8964-33ad2aae4c4a}</Project>
       <Name>WPF.MDI</Name>
