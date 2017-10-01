@@ -98,6 +98,8 @@ public struct TreeViewItemContext
 
         this.ModuleName = other.ModuleName;
         this.PeFilePath = other.PeFilePath;
+        this.IsApiSet = other.IsApiSet;
+        this.ApiSetModuleName = other.ApiSetModuleName;
 
         this.PeExports = other.PeExports;
         this.PeImports = other.PeImports;
@@ -109,6 +111,8 @@ public struct TreeViewItemContext
 
     public string ModuleName;
     public string PeFilePath; // null if not found
+    public bool IsApiSet;
+    public string ApiSetModuleName;
 
     public List<PeExport> PeExports; // null if not found
     public List<PeImportDll> PeImports; // null if not found
@@ -141,12 +145,21 @@ namespace Dependencies
         {
             TreeViewItemContext Context = ((TreeViewItemContext)DataContext);
 
-            if ((FullPath) && (Context.PeFilePath != null))
+            if (FullPath)
             {
-                return Context.PeFilePath;
+                if (Context.IsApiSet)
+                    return String.Format("{0:s} -> {1:s}", Context.ModuleName, Context.PeFilePath);
+
+                if (Context.PeFilePath != null)
+                    return Context.PeFilePath;
+                
+                return Context.ModuleName;
             }
             else
             {
+                if (Context.IsApiSet)
+                    return String.Format("{0:s} -> {1:s}", Context.ModuleName, Context.ApiSetModuleName);
+
                 return Context.ModuleName;
             }
         }
@@ -260,9 +273,23 @@ namespace Dependencies
             List<PeImportDll> PeImports = newPe.GetImports();
             foreach (PeImportDll DllImport in PeImports)
             {
+                bool FoundApiSet = false;
+                string ImportDllName = DllImport.Name;
+                string ImportDllNameWithoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
+
+                // Look for api set target 
+                if (this.ApiSetmapCache.ContainsKey(ImportDllNameWithoutExtension))
+                {
+                    ApiSetTarget Targets = this.ApiSetmapCache[ImportDllNameWithoutExtension];
+                    if (Targets.Count > 0)
+                    {
+                        FoundApiSet = true;
+                        ImportDllName = Targets[0];
+                    }
+                }
 
                 // Find Dll in "paths"
-                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name, this.SxsEntriesCache);
+                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, ImportDllName, this.SxsEntriesCache);
                 PE ImportPe = (PeFilePath != null) ? new PE(PeFilePath) : null;
 
 
@@ -271,6 +298,8 @@ namespace Dependencies
                 childTreeInfoContext.ImportProperties = DllImport;
                 childTreeInfoContext.PeFilePath = PeFilePath;
                 childTreeInfoContext.ModuleName = DllImport.Name;
+                childTreeInfoContext.IsApiSet = FoundApiSet;
+                childTreeInfoContext.ApiSetModuleName = ImportDllName;
 
                 NewTreeContexts.Add(childTreeInfoContext);
             }
@@ -366,7 +395,7 @@ namespace Dependencies
                 {
                     ConstructDependencyTree(NewPeNode.Item1, NewPeNode.Item2, RecursionLevel + 1); // warning : recursive call
 
-                    this.PeProcessedCache.Add(((TreeViewItemContext)NewPeNode.Item1.DataContext).PeFilePath, NewPeNode.Item1);
+                    //this.PeProcessedCache.Add(((TreeViewItemContext)NewPeNode.Item1.DataContext).PeFilePath, NewPeNode.Item1);
                 }
 
             };
