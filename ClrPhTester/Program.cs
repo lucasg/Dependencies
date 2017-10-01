@@ -42,7 +42,24 @@ namespace ClrPhTester
             VerboseWriteLine("");
         }
 
+        public static void DumpApiSets()
+        {
+            VerboseWriteLine("[-] Api Sets Map : ");
 
+            foreach (var ApiSetEntry in Phlib.GetApiSetSchema())
+            {
+                ApiSetTarget ApiSetImpl = ApiSetEntry.Value;
+                string ApiSetName = ApiSetEntry.Key;
+                string ApiSetImplStr = (ApiSetImpl.Count > 0) ? String.Join(",", ApiSetImpl.ToArray()) : "";
+
+                Console.WriteLine("{0:s} -> [ {1:s} ]", ApiSetName, ApiSetImplStr);
+            }
+
+            VerboseWriteLine("");
+
+        }
+
+        
 
         public static void DumpManifest(PE Application)
         {
@@ -158,7 +175,13 @@ namespace ClrPhTester
                 DumpKnownDlls();
                 return;
             }
-                
+
+            if (ProgramArgs.ContainsKey("-apisets"))
+            {
+                DumpApiSets();
+                return;
+            }
+
             VerboseWriteLine("[-] Loading file {0:s} ", FileName);
             PE Pe = new PE(FileName);
             if (!Pe.LoadSuccessful)

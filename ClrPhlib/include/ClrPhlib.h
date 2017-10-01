@@ -13,6 +13,12 @@ namespace System {
 
     namespace ClrPh {
 
+		public ref class ApiSetTarget : List<String^>
+		{};
+
+		public ref class ApiSetSchema : Dictionary<String^, ApiSetTarget^>
+		{};
+
         public ref class Phlib {
         public:
 
@@ -25,6 +31,11 @@ namespace System {
 
             static List<String^>^ KnownDll64List;
             static List<String^>^ KnownDll32List;
+
+			
+			// Return the Api Set schema for this application
+			// TODO : check if this is a good approximation for system-wide api set schema.
+			static ApiSetSchema^ GetApiSetSchema();
         };
 
 

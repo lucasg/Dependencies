@@ -246,6 +246,7 @@ namespace Dependencies
         HashSet<String> ModulesFound;
         HashSet<String> ModulesNotFound;
         SxsEntries SxsEntriesCache;
+        ApiSetSchema ApiSetmapCache;
         Dictionary<string, ModuleTreeViewItem> PeProcessedCache;
 
         /// <summary>
@@ -407,6 +408,7 @@ namespace Dependencies
             this.RootFolder = Path.GetDirectoryName(FileName);
             this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
             this.PeProcessedCache = new Dictionary<string, ModuleTreeViewItem>(StringComparer.OrdinalIgnoreCase);
+            this.ApiSetmapCache = Phlib.GetApiSetSchema();
 
             this.ModulesList.Items.Clear();
             this.DllTreeView.Items.Clear();
