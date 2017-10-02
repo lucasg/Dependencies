@@ -95,8 +95,8 @@
                         <GridViewColumn.CellTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding  Context, Converter={StaticResource imgdelayed} }"></Image>
-                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding  Context, Converter={StaticResource img} }"></Image>
+                                    <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding  DelayLoad, Converter={StaticResource imgdelayed} }"></Image>
+                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding  Filepath, Converter={StaticResource img} }"></Image>
                                 </StackPanel>
                                 <!--<Image Width="30" Height="14" Source="{Binding IconUri}"/>-->
                             </DataTemplate>
@@ -192,8 +192,8 @@
                         <Setter.Value>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">
-                                    <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource imgdelayed} }"></Image>
-                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
+                                    <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding Path=(local:ModuleTreeViewItem.IsModuleDelayLoad), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource imgdelayed} }"></Image>
+                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
                                     <TextBlock Text="{Binding}"></TextBlock>
                                 </StackPanel>
                             </DataTemplate>

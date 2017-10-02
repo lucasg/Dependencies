@@ -105,6 +105,7 @@ public struct TreeViewItemContext
         this.PeImports = other.PeImports;
     }
 
+
     // union-like
     public PE PeProperties; // null if not found
     public PeImportDll ImportProperties;
@@ -116,6 +117,12 @@ public struct TreeViewItemContext
 
     public List<PeExport> PeExports; // null if not found
     public List<PeImportDll> PeImports; // null if not found
+}
+
+public struct DependencyNodeContext
+{
+    public DisplayModuleInfo ModuleInfo;
+    public bool IsDummy;
 }
 
 namespace Dependencies
@@ -143,28 +150,26 @@ namespace Dependencies
 
         public string GetTreeNodeHeaderName(bool FullPath)
         {
-            TreeViewItemContext Context = ((TreeViewItemContext)DataContext);
+            return ((DependencyNodeContext)this.DataContext).ModuleInfo.ModuleName;
+        }
 
-            if (FullPath)
+        public string ModuleFilePath
+        {
+            get
             {
-                if (Context.IsApiSet)
-                    return String.Format("{0:s} -> {1:s}", Context.ModuleName, Context.PeFilePath);
-
-                if (Context.PeFilePath != null)
-                    return Context.PeFilePath;
-                
-                return Context.ModuleName;
-            }
-            else
-            {
-                if (Context.IsApiSet)
-                    return String.Format("{0:s} -> {1:s}", Context.ModuleName, Context.ApiSetModuleName);
-
-                return Context.ModuleName;
+                return ((DependencyNodeContext) this.DataContext).ModuleInfo.Filepath;
             }
         }
 
-    
+        public bool IsModuleDelayLoad
+        {
+            get
+            {
+                return ((DependencyNodeContext)this.DataContext).ModuleInfo.DelayLoad;
+            }
+        }
+
+
         private void ModuleTreeViewItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "FullPath")
@@ -246,7 +251,18 @@ namespace Dependencies
 
 
 
+    public class ModuleCacheKey : Tuple<string, string>
+    {
+        public ModuleCacheKey(string Name, string Filepath)
+        :base(Name, Filepath)
+        {
+        }
+    }
 
+    public class ModulesCache : Dictionary<ModuleCacheKey, DisplayModuleInfo>
+    {
+
+    }
 
     /// <summary>
     /// Logique d'interaction pour DependencyWindow.xaml
@@ -256,11 +272,9 @@ namespace Dependencies
         PE Pe;
         string RootFolder;
         PhSymbolProvider SymPrv;
-        HashSet<String> ModulesFound;
-        HashSet<String> ModulesNotFound;
         SxsEntries SxsEntriesCache;
         ApiSetSchema ApiSetmapCache;
-        Dictionary<string, ModuleTreeViewItem> PeProcessedCache;
+        ModulesCache ProcessedModulesCache;
 
         /// <summary>
         /// Background processing of a single PE file.
@@ -305,6 +319,11 @@ namespace Dependencies
             }
         }
 
+        private void ConstructDependencyTree(ModuleTreeViewItem RootNode, string FilePath, int RecursionLevel = 0)
+        {
+            ConstructDependencyTree(RootNode, new PE(FilePath), RecursionLevel);
+        }
+
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, PE CurrentPE, int RecursionLevel = 0)
         {
             // "Closured" variables (it 's a scope hack really).
@@ -315,7 +334,16 @@ namespace Dependencies
             bw.WorkerReportsProgress = true; // useless here for now
 
 
-            bw.DoWork += (sender, e) => { ProcessPe(NewTreeContexts, CurrentPE); };
+            bw.DoWork += (sender, e) => {
+                // Reduce cpu hogginess by imposing a sleep in order to get the
+                // STA to redraw new nodes
+                if (RecursionLevel > 0)
+                {
+                    System.Threading.Thread.Sleep(100);
+                }
+
+                ProcessPe(NewTreeContexts, CurrentPE);
+            };
 
 
             bw.RunWorkerCompleted += (sender, e) =>
@@ -331,60 +359,77 @@ namespace Dependencies
                 foreach (TreeViewItemContext NewTreeContext in NewTreeContexts)
                 {
                     ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
+                    DependencyNodeContext childTreeNodeContext = new DependencyNodeContext();
+                    childTreeNodeContext.IsDummy = false;
 
+                    string ModuleName = NewTreeContext.ModuleName;
+                    string ModuleFilePath = NewTreeContext.PeFilePath;
+                    ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilePath);
 
-                    // Missing module found
-                    if (NewTreeContext.PeFilePath == null)
+                    // Newly seen modules
+                    if (!this.ProcessedModulesCache.ContainsKey(ModuleKey))
                     {
-                        if (!this.ModulesNotFound.Contains(NewTreeContext.ModuleName))
+                        // Missing module "found"
+                        if (NewTreeContext.PeFilePath == null)
                         {
-                            this.ModulesList.Items.Add(new DisplayErrorModuleInfo(NewTreeContext.ImportProperties));
+                            this.ProcessedModulesCache[ModuleKey] = new NotFoundModuleInfo(ModuleName);
                         }
-
-
-                        this.ModulesNotFound.Add(NewTreeContext.ModuleName);
-                    }
-                    else
-                    {
-                        if (!this.ModulesFound.Contains(NewTreeContext.PeFilePath))
+                        else
                         {
-                            this.ModulesList.Items.Add(new DisplayModuleInfo(NewTreeContext.ImportProperties, NewTreeContext.PeProperties));
+                            bool DelayLoad = (NewTreeContext.ImportProperties.Flags & 0x01) == 0x01; // TODO : Use proper macros
+
+                            if (NewTreeContext.IsApiSet)
+                            {
+                                var ApiSetContractModule = new DisplayModuleInfo(NewTreeContext.ApiSetModuleName, NewTreeContext.PeProperties, DelayLoad);
+                                var NewModule = new ApiSetModuleInfo(NewTreeContext.ModuleName, ref ApiSetContractModule);
+
+                                this.ProcessedModulesCache[ModuleKey] = NewModule;
+                            }
+                            else
+                            {
+                                var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, DelayLoad);
+                                this.ProcessedModulesCache[ModuleKey] = NewModule;
+                            }
 
                             // do not process twice the same PE in order to lessen memory pressure
                             BacklogPeToProcess.Add(new Tuple<ModuleTreeViewItem, PE>(childTreeNode, NewTreeContext.PeProperties));
                         }
-                        else
+
+                        // add it to the module list
+                        this.ModulesList.Items.Add(this.ProcessedModulesCache[ModuleKey]);
+                    }
+                    else
+                    {
+                        // Since we uniquely process PE, for thoses who have already been "seen",
+                        // we set a dummy entry in order to set the "[+]" icon next to the node.
+                        // The dll dependencies are actually resolved on user double-click action
+                        // We can't do the resolution in the same time as the tree construction since
+                        // it's asynchronous (we would have to wait for all the background to finish and
+                        // use another Async worker to resolve).
+
+                        if ((NewTreeContext.PeProperties != null) && (NewTreeContext.PeProperties.GetImports().Count > 0))
                         {
-                            // Since we uniquely process PE, for thoses who have already been "seen",
-                            // we set a dummy entry in order to set the "[+]" icon next to the node.
-                            // The dll dependencies are actually resolved on user double-click action
-                            // We can't do the resolution in the same time as the tree construction since
-                            // it's asynchronous (we would have to wait for all the background to finish and
-                            // use another Async worker to resolve).
-
-                            if (NewTreeContext.PeProperties.GetImports().Count > 0)
+                            ModuleTreeViewItem DummyEntry = new ModuleTreeViewItem();
+                            DependencyNodeContext DummyContext = new DependencyNodeContext()
                             {
-                                ModuleTreeViewItem DummyEntry = new ModuleTreeViewItem();
-                                TreeViewItemContext DummyContext = new TreeViewItemContext()
-                                {
-                                    ModuleName = "Dummy",
-                                    PeFilePath = "Dummy"
-                                };
-                                DummyEntry.DataContext = DummyContext;
-                                DummyEntry.Header = "@Dummy : if you see this header, it's a bug.";
-                                DummyEntry.IsExpanded = false;
+                                ModuleInfo = new NotFoundModuleInfo("Dummy"),
+                                IsDummy = true
+                            };
 
-                                childTreeNode.Items.Add(DummyEntry);
-                                childTreeNode.Expanded += ResolveDummyEntries;
-                            }
+                            DummyEntry.DataContext = DummyContext;
+                            DummyEntry.Header = "@Dummy : if you see this header, it's a bug.";
+                            DummyEntry.IsExpanded = false;
+
+                            childTreeNode.Items.Add(DummyEntry);
+                            childTreeNode.Expanded += ResolveDummyEntries;
                         }
-
-
-                        this.ModulesFound.Add(NewTreeContext.PeFilePath);
                     }
 
+                    var Module = this.ProcessedModulesCache[ModuleKey];
+                    childTreeNodeContext.ModuleInfo = Module;
+
                     // Add to tree view
-                    childTreeNode.DataContext = NewTreeContext;
+                    childTreeNode.DataContext = childTreeNodeContext;
                     childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
                     RootNode.Items.Add(childTreeNode);
                 }
@@ -394,12 +439,9 @@ namespace Dependencies
                 foreach (var NewPeNode in BacklogPeToProcess)
                 {
                     ConstructDependencyTree(NewPeNode.Item1, NewPeNode.Item2, RecursionLevel + 1); // warning : recursive call
-
-                    //this.PeProcessedCache.Add(((TreeViewItemContext)NewPeNode.Item1.DataContext).PeFilePath, NewPeNode.Item1);
                 }
 
             };
-
 
             bw.RunWorkerAsync();
         }
@@ -408,19 +450,17 @@ namespace Dependencies
         public void ResolveDummyEntries(object sender, RoutedEventArgs e)
         {
             ModuleTreeViewItem NeedDummyPeNode = e.OriginalSource as ModuleTreeViewItem;
-
+            DependencyNodeContext Context = (DependencyNodeContext)NeedDummyPeNode.DataContext;
             //TODO: Improve resolution predicate
-            if ( (NeedDummyPeNode.Items.Count == 0 ) || 
-                 (((ModuleTreeViewItem)NeedDummyPeNode.Items[0]).Header as string != "@Dummy : if you see this header, it's a bug.")
-            )
+            if (!Context.IsDummy)
             {
                 return;
             }
 
             NeedDummyPeNode.Items.Clear();
-            PE CachedPe = ((TreeViewItemContext)NeedDummyPeNode.DataContext).PeProperties;
+            string Filepath = Context.ModuleInfo.Filepath;
 
-            ConstructDependencyTree(NeedDummyPeNode, CachedPe);     
+            ConstructDependencyTree(NeedDummyPeNode, Filepath);     
         }
 
         public DependencyWindow(String FileName)
@@ -430,26 +470,24 @@ namespace Dependencies
             this.Header = Path.GetFileName(FileName);
 
             this.SymPrv = new PhSymbolProvider();
-            this.ModulesFound = new HashSet<String>();
-            this.ModulesNotFound = new HashSet<String>();
+            
 
             this.Pe = new PE(FileName);
             this.RootFolder = Path.GetDirectoryName(FileName);
             this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
-            this.PeProcessedCache = new Dictionary<string, ModuleTreeViewItem>(StringComparer.OrdinalIgnoreCase);
+            this.ProcessedModulesCache = new ModulesCache();
             this.ApiSetmapCache = Phlib.GetApiSetSchema();
 
             this.ModulesList.Items.Clear();
             this.DllTreeView.Items.Clear();
 
             ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
-            TreeViewItemContext childTreeInfoContext = new TreeViewItemContext()
+            DependencyNodeContext childTreeInfoContext = new DependencyNodeContext()
             {
-                PeProperties = this.Pe,
-                ImportProperties = null,
-                PeFilePath = this.Pe.Filepath,
-                ModuleName = FileName
+                ModuleInfo = new DisplayModuleInfo(Path.GetFileName(FileName), this.Pe),
+                IsDummy = false
             };
+
             treeNode.DataContext = childTreeInfoContext;
             treeNode.Header = treeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
             treeNode.IsExpanded = true;
@@ -499,24 +537,25 @@ namespace Dependencies
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            TreeViewItemContext childTreeContext = ((TreeViewItemContext)(this.DllTreeView.SelectedItem as ModuleTreeViewItem).DataContext);
+            DependencyNodeContext childTreeContext = ((DependencyNodeContext)(this.DllTreeView.SelectedItem as ModuleTreeViewItem).DataContext);
+            DisplayModuleInfo SelectedModule = childTreeContext.ModuleInfo;
 
-            PE SelectedPE = childTreeContext.PeProperties;
+            //PE SelectedPE = childTreeContext.PeProperties;
 
             this.ImportList.Items.Clear();
             this.ExportList.Items.Clear();
 
             // Selected Pe has not been found on disk
-            if (SelectedPE == null)
+            if (SelectedModule == null)
                 return;
 
             // Process imports and exports on first load
-            if (childTreeContext.PeExports == null) { childTreeContext.PeExports = SelectedPE.GetExports(); }
-            if (childTreeContext.PeImports == null) { childTreeContext.PeImports = SelectedPE.GetImports(); }
+            //if (childTreeContext.PeExports == null) { childTreeContext.PeExports = SelectedPE.GetExports(); }
+            //if (childTreeContext.PeImports == null) { childTreeContext.PeImports = SelectedPE.GetImports(); }
 
-                
-            
-            foreach (PeImportDll DllImport in childTreeContext.PeImports)
+
+
+            foreach (PeImportDll DllImport in SelectedModule.Imports)
             {
                 String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name, this.SxsEntriesCache);
 
@@ -526,7 +565,7 @@ namespace Dependencies
                 }
             }
 
-            foreach (PeExport Export in childTreeContext.PeExports)
+            foreach (PeExport Export in SelectedModule.Exports)
             {
                 this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
             }

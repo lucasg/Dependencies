@@ -114,20 +114,11 @@ namespace Dependencies
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            TreeViewItemContext childTreeContext = (TreeViewItemContext)value;
+            string Filepath = (string) value;
+            Icon icon = ExtractIcon.GetIcon(Filepath, true);
 
-            if (childTreeContext.PeProperties == null)
-                return "Images/Question.png";
-
-            if (!childTreeContext.PeProperties.LoadSuccessful)
-                return "Images/Question.png";
-
-            string Filename = (string) childTreeContext.PeProperties.Filepath;
-            Icon icon = ExtractIcon.GetIcon(Filename, true);
-
-            if (icon != null)
+            if (System.IO.File.Exists(Filepath) && (icon != null))
             {
-               
                 return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                             icon.Handle,
                             new Int32Rect(0, 0, icon.Width, icon.Height),
@@ -147,9 +138,8 @@ namespace Dependencies
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            TreeViewItemContext childTreeContext = (TreeViewItemContext)value;
-
-            if ((childTreeContext.ImportProperties != null) && ((childTreeContext.ImportProperties.Flags & 0x01) == 0x01))
+            bool DelayLoadModule = (bool) value;
+            if (DelayLoadModule)
             {
                 return "Images/Hourglass.png";
             }

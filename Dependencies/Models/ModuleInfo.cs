@@ -11,17 +11,45 @@ public enum PeTypes
     None = 0,
     IMAGE_FILE_EXECUTABLE_IMAGE = 0x02,
     IMAGE_FILE_DLL = 0x2000,
+}
 
+public struct ModuleInfo
+{
+    // @TODO(Hack: refactor correctly for image generation)
+    // public TreeViewItemContext context;
+
+    public Int16 Machine;
+    public Int16 Magic;
+
+    public UInt64 ImageBase;
+    public Int32 SizeOfImage;
+    public UInt64 EntryPoint;
+
+
+    public Int32 Checksum;
+    public Boolean CorrectChecksum;
+
+    public Int16 Subsystem;
+    public Tuple<Int16, Int16> SubsystemVersion;
+
+    public Int16 Characteristics;
+    public Int16 DllCharacteristics;
+
+    public UInt64 Filesize;
 }
 
 
 
-public class DisplayErrorModuleInfo : DisplayModuleInfo
+public class NotFoundModuleInfo : DisplayModuleInfo
 {
-    public DisplayErrorModuleInfo(PeImportDll Module)
-    : base(Module.Name)
+    public NotFoundModuleInfo(string NotFoundModuleName)
+    : base(NotFoundModuleName)
     {
     }
+
+    public override string Filepath { get { return _Name; } }
+    public override List<PeImportDll> Imports { get { return new List<PeImportDll>(); } }
+    public override List<PeExport> Exports { get { return new List<PeExport>(); } }
 
     public override string Cpu { get { return null; } }
     public override string Type { get { return null; } }
@@ -36,62 +64,123 @@ public class DisplayErrorModuleInfo : DisplayModuleInfo
 
 }
 
+
+public class ApiSetModuleInfo : DisplayModuleInfo
+{
+    public ApiSetModuleInfo(string ApiSetModuleName, ref DisplayModuleInfo _UnderlyingModule)
+    : base(ApiSetModuleName)
+    {
+        UnderlyingModule = _UnderlyingModule;
+    }
+
+    public override string ModuleName { get { return String.Format("{0:s} -> {1:s}", this._Name, UnderlyingModule.ModuleName);}}
+    public override string Filepath { get { return UnderlyingModule.Filepath; } }
+
+    public override List<PeImportDll> Imports { get { return UnderlyingModule.Imports; } }
+    public override List<PeExport> Exports { get { return UnderlyingModule.Exports; } }
+
+
+    public override string Cpu { get { return UnderlyingModule.Cpu; } }
+    public override string Type { get { return UnderlyingModule.Type; } }
+    public override UInt64? Filesize { get { return UnderlyingModule.Filesize; } }
+    public override UInt64? ImageBase { get { return UnderlyingModule.ImageBase; } }
+    public override int? VirtualSize { get { return UnderlyingModule.VirtualSize; } }
+    public override UInt64? EntryPoint { get { return UnderlyingModule.EntryPoint; } }
+    public override int? Subsystem { get { return UnderlyingModule.Subsystem; } }
+    public override string SubsystemVersion { get { return UnderlyingModule.SubsystemVersion; } }
+    public override int? Checksum { get { return UnderlyingModule.Checksum; } }
+    public override bool? CorrectChecksum { get { return UnderlyingModule.CorrectChecksum; } }
+
+    /// <summary>
+    /// The pointed module which actually does implement the api set contract
+    /// TODO : there might be more than one contract modules ?
+    /// </summary>
+    private DisplayModuleInfo UnderlyingModule;
+}
+
 public class DisplayModuleInfo : DefaultSettingsBindingHandler
 {
     #region Constructors 
     public DisplayModuleInfo(string ModuleName)
     {
 
-        Info.Name = ModuleName;
-        Info.Filepath = "";
+        _Name = ModuleName;
+        _Filepath = null;
+        _DelayLoad = false;
 
-        AddNewEventHandler("FullPath", "FullPath", "Name", this.GetPathDisplayName);
+        AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
     }
 
-    public DisplayModuleInfo(PeImportDll Module, PE Pe)
+    public DisplayModuleInfo(string ModuleName, PE Pe, bool DelayLoad = false)
     {
 
-        Info.Name = Module.Name;
-        Info.Filepath = Pe.Filepath;
+        _Name = ModuleName;
+        _Filepath = Pe.Filepath;
+        _DelayLoad = DelayLoad;
 
-        Info.Machine = Pe.Properties.Machine;
-        Info.Magic = Pe.Properties.Magic;
+        _Imports = Pe.GetImports();
+        _Exports = Pe.GetExports();
 
-        Info.ImageBase = (UInt64) Pe.Properties.ImageBase;
-        Info.SizeOfImage = Pe.Properties.SizeOfImage;
-        Info.EntryPoint = (UInt64) Pe.Properties.EntryPoint;
 
-        Info.Checksum = Pe.Properties.Checksum;
-        Info.CorrectChecksum = Pe.Properties.CorrectChecksum;
 
-        Info.Subsystem = Pe.Properties.Subsystem;
-        Info.SubsystemVersion = Pe.Properties.SubsystemVersion;
-        Info.Characteristics = Pe.Properties.Characteristics;
-        Info.DllCharacteristics = Pe.Properties.DllCharacteristics;
+        _Info = new ModuleInfo()
+        {
 
-        Info.Filesize = Pe.Properties.FileSize;
+            Machine = Pe.Properties.Machine,
+            Magic = Pe.Properties.Magic,
+            Filesize = Pe.Properties.FileSize,
 
-        Info.context.ImportProperties = Module;
-        Info.context.PeProperties = Pe;
+            ImageBase = (UInt64)Pe.Properties.ImageBase,
+            SizeOfImage = Pe.Properties.SizeOfImage,
+            EntryPoint = (UInt64)Pe.Properties.EntryPoint,
+
+            Checksum = Pe.Properties.Checksum,
+            CorrectChecksum = Pe.Properties.CorrectChecksum,
+
+            Subsystem = Pe.Properties.Subsystem,
+            SubsystemVersion = Pe.Properties.SubsystemVersion,
+
+            Characteristics = Pe.Properties.Characteristics,
+            DllCharacteristics = Pe.Properties.DllCharacteristics,
+        };
 
         AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
     }
     #endregion // Constructors 
 
-    public virtual TreeViewItemContext Context { get { return Info.context; } }
+    //public virtual TreeViewItemContext Context { get { return Info.context; } }
 
-    public string ModuleName
+    public virtual string ModuleName
     {
         get { return GetPathDisplayName(Dependencies.Properties.Settings.Default.FullPath); }
+    }
+
+    public virtual string Filepath {
+        get { return _Filepath; }
+    }
+
+    public virtual bool DelayLoad
+    {
+        get { return _DelayLoad; }
+    }
+
+    public virtual List<PeImportDll> Imports
+    {
+        get { return _Imports; }
+    }
+
+    public virtual List<PeExport> Exports
+    {
+        get { return _Exports; }
     }
 
 
     protected string GetPathDisplayName(bool FullPath)
     {
-        if ((FullPath) && (Info.Filepath.Length > 0))
-            return Info.Filepath;
+        if ((FullPath) && (_Filepath != null))
+            return _Filepath;
 
-        return Info.Name;
+        return _Name;
     }
 
     
@@ -99,7 +188,7 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
     {
         get
         {
-            int machine_id = Info.Machine & 0xffff;
+            int machine_id = _Info.Machine & 0xffff;
             switch (machine_id)
             {
                 case 0x014c: /*IMAGE_FILE_MACHINE_I386*/
@@ -124,7 +213,7 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
         get
         {
             List<String> TypeList = new List<String>();
-            PeTypes Type = (PeTypes)Info.Characteristics;
+            PeTypes Type = (PeTypes)_Info.Characteristics;
 
             if ((Type & PeTypes.IMAGE_FILE_DLL) != PeTypes.None)/* IMAGE_FILE_DLL */
                 TypeList.Add("Dll");
@@ -137,14 +226,15 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
             return String.Join("; ", TypeList.ToArray());
         }
     }
-    public virtual UInt64? Filesize { get { return Info.Filesize; } }
-    public virtual UInt64? ImageBase { get { return Info.ImageBase; } }
-    public virtual int? VirtualSize { get { return Info.SizeOfImage; } }
-    public virtual UInt64? EntryPoint { get { return Info.EntryPoint; } }
-    public virtual int? Subsystem { get { return Info.Subsystem; } }
-    public virtual string SubsystemVersion { get { return String.Format("{0:d}.{1:d}" , Info.SubsystemVersion.Item1, Info.SubsystemVersion.Item2); } }
-    public virtual int? Checksum { get { return Info.Checksum; } }
-    public virtual bool? CorrectChecksum { get { return Info.CorrectChecksum; } }
+    
+    public virtual UInt64? Filesize { get { return _Info.Filesize; } }
+    public virtual UInt64? ImageBase { get { return _Info.ImageBase; } }
+    public virtual int? VirtualSize { get { return _Info.SizeOfImage; } }
+    public virtual UInt64? EntryPoint { get { return _Info.EntryPoint; } }
+    public virtual int? Subsystem { get { return _Info.Subsystem; } }
+    public virtual string SubsystemVersion { get { return String.Format("{0:d}.{1:d}" , _Info.SubsystemVersion.Item1, _Info.SubsystemVersion.Item2); } }
+    public virtual int? Checksum { get { return _Info.Checksum; } }
+    public virtual bool? CorrectChecksum { get { return _Info.CorrectChecksum; } }
 
     #region Commands 
     public RelayCommand OpenPeviewerCommand
@@ -237,38 +327,20 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
     #endregion // Commands 
 
 
-    private ModuleInfo Info;
+    /// <summary>
+    /// Name : string to identify the module.
+    /// This is the only "mandatory" data, the rest can be private.
+    /// </summary>
+    protected string _Name;
+    protected string _Filepath;
+    protected bool _DelayLoad;
+
+    private ModuleInfo _Info;
+    private List<PeImportDll> _Imports;
+    private List<PeExport> _Exports;
+
+
     private RelayCommand _OpenPeviewerCommand;
     private RelayCommand _OpenNewAppCommand;
     private RelayCommand _CopyValue;
-    
-}
-
-
-public struct ModuleInfo
-{
-    // @TODO(Hack: refactor correctly for image generation)
-    public TreeViewItemContext context;
-
-    public string Name;
-    public string Filepath;
-
-    public Int16 Machine;
-    public Int16 Magic;
-
-    public UInt64 ImageBase;
-    public Int32 SizeOfImage;
-    public UInt64 EntryPoint;
-
-
-    public Int32 Checksum;
-    public Boolean CorrectChecksum;
-
-    public Int16 Subsystem;
-    public Tuple<Int16, Int16> SubsystemVersion;
-
-    public Int16 Characteristics;
-    public Int16 DllCharacteristics;
-
-    public UInt64 Filesize;
 }
