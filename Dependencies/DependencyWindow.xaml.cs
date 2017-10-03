@@ -87,36 +87,26 @@ public class DefaultSettingsBindingHandler : INotifyPropertyChanged
     }
 }
 
-
-public struct TreeViewItemContext
+/// <summary>
+/// ImportContext : Describe an import module parsed from a PE
+/// </summary>
+public struct ImportContext
 {
-    public TreeViewItemContext(TreeViewItemContext other)
-    {
-        
-        this.PeProperties = other.PeProperties;
-        this.ImportProperties = other.ImportProperties; ;
-
-        this.ModuleName = other.ModuleName;
-        this.PeFilePath = other.PeFilePath;
-        this.IsApiSet = other.IsApiSet;
-        this.ApiSetModuleName = other.ApiSetModuleName;
-
-        this.PeExports = other.PeExports;
-        this.PeImports = other.PeImports;
-    }
-
-
-    // union-like
-    public PE PeProperties; // null if not found
-    public PeImportDll ImportProperties;
-
+    // Import "identifier" 
     public string ModuleName;
+
+    // If found, set the filepath and parsed PE, otherwise it's null
     public string PeFilePath; // null if not found
+    public PE PeProperties; // null if not found
+
+    // Some imports are from api sets
+    // ApiSetModuleName is the name of the module
+    // implementing the api set contract
     public bool IsApiSet;
     public string ApiSetModuleName;
 
-    public List<PeExport> PeExports; // null if not found
-    public List<PeImportDll> PeImports; // null if not found
+    // 
+    public bool IsDelayLoadImport;
 }
 
 public struct DependencyNodeContext
@@ -282,7 +272,7 @@ namespace Dependencies
         /// </summary>
         /// <param name="NewTreeContexts"> This variable is passed as reference to be updated since this function is run in a separate thread. </param>
         /// <param name="newPe"> Current PE file analyzed </param>
-        private void ProcessPe(List<TreeViewItemContext> NewTreeContexts, PE newPe)
+        private void ProcessPe(List<ImportContext> NewTreeContexts, PE newPe)
         {
             List<PeImportDll> PeImports = newPe.GetImports();
             foreach (PeImportDll DllImport in PeImports)
@@ -307,15 +297,15 @@ namespace Dependencies
                 PE ImportPe = (PeFilePath != null) ? new PE(PeFilePath) : null;
 
 
-                TreeViewItemContext childTreeInfoContext = new TreeViewItemContext();
-                childTreeInfoContext.PeProperties = ImportPe;
-                childTreeInfoContext.ImportProperties = DllImport;
-                childTreeInfoContext.PeFilePath = PeFilePath;
-                childTreeInfoContext.ModuleName = DllImport.Name;
-                childTreeInfoContext.IsApiSet = FoundApiSet;
-                childTreeInfoContext.ApiSetModuleName = ImportDllName;
+                ImportContext ImportModule = new ImportContext();
+                ImportModule.PeProperties = ImportPe;
+                ImportModule.PeFilePath = PeFilePath;
+                ImportModule.ModuleName = DllImport.Name;
+                ImportModule.IsApiSet = FoundApiSet;
+                ImportModule.ApiSetModuleName = ImportDllName;
+                ImportModule.IsDelayLoadImport = (DllImport.Flags & 0x01) == 0x01; // TODO : Use proper macros
 
-                NewTreeContexts.Add(childTreeInfoContext);
+                NewTreeContexts.Add(ImportModule);
             }
         }
 
@@ -327,8 +317,7 @@ namespace Dependencies
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, PE CurrentPE, int RecursionLevel = 0)
         {
             // "Closured" variables (it 's a scope hack really).
-            List<Tuple<ModuleTreeViewItem, PE>> BacklogPeToProcess = new List<Tuple<ModuleTreeViewItem, PE>>();
-            List<TreeViewItemContext> NewTreeContexts = new List<TreeViewItemContext>();
+            List<ImportContext> NewTreeContexts = new List<ImportContext>();
 
             BackgroundWorker bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true; // useless here for now
@@ -356,7 +345,7 @@ namespace Dependencies
                 // which is authorized to manipulate UI elements. The BackgroundWorker is not.
                 //
 
-                foreach (TreeViewItemContext NewTreeContext in NewTreeContexts)
+                foreach (ImportContext NewTreeContext in NewTreeContexts)
                 {
                     ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
                     DependencyNodeContext childTreeNodeContext = new DependencyNodeContext();
