@@ -110,7 +110,19 @@ namespace Dependencies
             base.OnClosing(e);
         }
 
-        
+        private void MainWindow_Drop(object sender, System.Windows.DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(System.Windows.Forms.DataFormats.FileDrop);
+                
+                foreach (var file in files)
+                {
+                    OpenNewDependencyWindow(file);
+                }
+            }
+        }
+
         public static Func<DependencyWindow> Factory
         {
             get

@@ -8,7 +8,15 @@
         xmlns:dockablz="clr-namespace:Dragablz.Dockablz;assembly=Dragablz"
         xmlns:properties="clr-namespace:Dependencies.Properties"
         mc:Ignorable="d"
-        Title="Dependencies" HorizontalContentAlignment="Stretch" Height="900" Width="1600" VerticalContentAlignment="Bottom" VerticalAlignment="Bottom">
+        
+        Title="Dependencies" 
+        HorizontalContentAlignment="Stretch" 
+        VerticalContentAlignment="Bottom"
+        VerticalAlignment="Bottom"
+        Height="900" Width="1600" 
+        AllowDrop="True"
+        Drop="MainWindow_Drop"
+        >
 
     <Window.CommandBindings>
         <!--<CommandBinding Command="Exit" Executed="ExitCommandBinding_Executed"></CommandBinding>-->
