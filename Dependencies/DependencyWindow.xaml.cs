@@ -433,7 +433,14 @@ namespace Dependencies
         public void ResolveDummyEntries(object sender, RoutedEventArgs e)
         {
             ModuleTreeViewItem NeedDummyPeNode = e.OriginalSource as ModuleTreeViewItem;
-            DependencyNodeContext Context = (DependencyNodeContext)NeedDummyPeNode.DataContext;
+
+            if (NeedDummyPeNode.Items.Count == 0)
+            {
+                return;
+            }
+            ModuleTreeViewItem MaybeDummyNode = (ModuleTreeViewItem) NeedDummyPeNode.Items[0];
+            DependencyNodeContext Context = (DependencyNodeContext)MaybeDummyNode.DataContext;
+
             //TODO: Improve resolution predicate
             if (!Context.IsDummy)
             {
