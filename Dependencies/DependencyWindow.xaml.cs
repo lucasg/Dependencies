@@ -339,12 +339,6 @@ namespace Dependencies
 
 
             bw.DoWork += (sender, e) => {
-                // Reduce cpu hogginess by imposing a sleep in order to get the
-                // STA to redraw new nodes
-                if (RecursionLevel > 0)
-                {
-                    System.Threading.Thread.Sleep(100);
-                }
 
                 ProcessPe(NewTreeContexts, CurrentPE);
             };
@@ -394,40 +388,35 @@ namespace Dependencies
                                 var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, NewTreeContext.IsDelayLoadImport);
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
                             }
-
-                            // do not process twice the same PE in order to lessen memory pressure
-                            BacklogPeToProcess.Add(new Tuple<ModuleTreeViewItem, PE>(childTreeNode, NewTreeContext.PeProperties));
                         }
 
                         // add it to the module list
                         this.ModulesList.Items.Add(this.ProcessedModulesCache[ModuleKey]);
                     }
-                    else
-                    {
-                        // Since we uniquely process PE, for thoses who have already been "seen",
-                        // we set a dummy entry in order to set the "[+]" icon next to the node.
-                        // The dll dependencies are actually resolved on user double-click action
-                        // We can't do the resolution in the same time as the tree construction since
-                        // it's asynchronous (we would have to wait for all the background to finish and
-                        // use another Async worker to resolve).
+                    
+                    // Since we uniquely process PE, for thoses who have already been "seen",
+                    // we set a dummy entry in order to set the "[+]" icon next to the node.
+                    // The dll dependencies are actually resolved on user double-click action
+                    // We can't do the resolution in the same time as the tree construction since
+                    // it's asynchronous (we would have to wait for all the background to finish and
+                    // use another Async worker to resolve).
 
-                        if ((NewTreeContext.PeProperties != null) && (NewTreeContext.PeProperties.GetImports().Count > 0))
+                    if ((NewTreeContext.PeProperties != null) && (NewTreeContext.PeProperties.GetImports().Count > 0))
+                    {
+                        ModuleTreeViewItem DummyEntry = new ModuleTreeViewItem();
+                        DependencyNodeContext DummyContext = new DependencyNodeContext()
                         {
                             ModuleInfo = new WeakReference(new NotFoundModuleInfo("Dummy")),
                             IsDummy = true
                         };
 
-                            DummyEntry.DataContext = DummyContext;
-                            DummyEntry.Header = "@Dummy : if you see this header, it's a bug.";
-                            DummyEntry.IsExpanded = false;
+                        DummyEntry.DataContext = DummyContext;
+                        DummyEntry.Header = "@Dummy : if you see this header, it's a bug.";
+                        DummyEntry.IsExpanded = false;
 
-                            childTreeNode.Items.Add(DummyEntry);
-                            childTreeNode.Expanded += ResolveDummyEntries;
-                        }
+                        childTreeNode.Items.Add(DummyEntry);
+                        childTreeNode.Expanded += ResolveDummyEntries;
                     }
-
-                    var Module = this.ProcessedModulesCache[ModuleKey];
-                    childTreeNodeContext.ModuleInfo = Module;
 
                     // Add to tree view
                     childTreeNodeContext.ModuleInfo = new WeakReference(this.ProcessedModulesCache[ModuleKey]);
@@ -435,14 +424,6 @@ namespace Dependencies
                     childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
                     RootNode.Items.Add(childTreeNode);
                 }
-
-
-                // Process next batch of dll imports
-                foreach (var NewPeNode in BacklogPeToProcess)
-                {
-                    ConstructDependencyTree(NewPeNode.Item1, NewPeNode.Item2, RecursionLevel + 1); // warning : recursive call
-                }
-
             };
 
             bw.RunWorkerAsync();
