@@ -76,12 +76,12 @@ public class DisplayPeImport : DefaultSettingsBindingHandler
 
     protected string GetDisplayName(bool UndecorateName)
     {
-        
+        if (Info.importByOrdinal)
+            return String.Format("Ordinal_{0:d}", Info.ordinal);
+
         if ((UndecorateName) && (Info.UndecoratedName.Length > 0))
             return Info.UndecoratedName;
         
-        else if (Info.importByOrdinal)
-            return String.Format("Ordinal_{0:d}", Info.ordinal);
        
        return Info.name;
     }
