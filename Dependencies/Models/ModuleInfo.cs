@@ -118,10 +118,10 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
         _Filepath = Pe.Filepath;
         _DelayLoad = DelayLoad;
 
-        _Imports = Pe.GetImports();
-        _Exports = Pe.GetExports();
-
-
+        // Do not set this variables in order to 
+        // lessen memory allocations
+        _Imports = null;
+        _Exports = null;
 
         _Info = new ModuleInfo()
         {
@@ -166,12 +166,26 @@ public class DisplayModuleInfo : DefaultSettingsBindingHandler
 
     public virtual List<PeImportDll> Imports
     {
-        get { return _Imports; }
+        get { 
+            
+            if (_Imports == null) {
+                _Imports = new PE(Filepath).GetImports();
+            }
+            
+            return _Imports;  
+        }
     }
 
     public virtual List<PeExport> Exports
     {
-        get { return _Exports; }
+        get { 
+            
+            if (_Exports == null) {
+                _Exports = new PE(Filepath).GetExports();
+            }
+
+            return _Exports;
+        }
     }
 
 

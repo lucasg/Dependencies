@@ -549,11 +549,6 @@ namespace Dependencies
             if (SelectedModule == null)
                 return;
 
-            // Process imports and exports on first load
-            //if (childTreeContext.PeExports == null) { childTreeContext.PeExports = SelectedPE.GetExports(); }
-            //if (childTreeContext.PeImports == null) { childTreeContext.PeImports = SelectedPE.GetImports(); }
-
-
 
             foreach (PeImportDll DllImport in SelectedModule.Imports)
             {
