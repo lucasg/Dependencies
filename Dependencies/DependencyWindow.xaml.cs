@@ -109,9 +109,18 @@ public struct ImportContext
     public bool IsDelayLoadImport;
 }
 
+/// <summary>
+/// User context of every dependency tree node
+/// </summary>
 public struct DependencyNodeContext
 {
-    public DisplayModuleInfo ModuleInfo;
+    public DependencyNodeContext(DependencyNodeContext other)
+    {
+        ModuleInfo = other.ModuleInfo;
+        IsDummy = other.IsDummy;
+    }
+
+    public WeakReference ModuleInfo;
     public bool IsDummy;
 }
 
@@ -130,24 +139,36 @@ namespace Dependencies
         {
             Dependencies.Properties.Settings.Default.PropertyChanged += this.ModuleTreeViewItem_PropertyChanged;
 
-            this.DataContext = new TreeViewItemContext( (TreeViewItemContext) Other.DataContext );
+            this.DataContext = new DependencyNodeContext( (DependencyNodeContext) Other.DataContext );
         }
 
+        #region PropertyEventHandlers 
         public virtual void OnPropertyChanged(string propertyName)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private void ModuleTreeViewItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "FullPath")
+            {
+                this.Header = (object)GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
+            }
+        }
+        #endregion PropertyEventHandlers
+
+        #region Getters
+
         public string GetTreeNodeHeaderName(bool FullPath)
         {
-            return ((DependencyNodeContext)this.DataContext).ModuleInfo.ModuleName;
+            return (((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo).ModuleName;
         }
 
         public string ModuleFilePath
         {
             get
             {
-                return ((DependencyNodeContext) this.DataContext).ModuleInfo.Filepath;
+                return (((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo).Filepath;
             }
         }
 
@@ -155,18 +176,12 @@ namespace Dependencies
         {
             get
             {
-                return ((DependencyNodeContext)this.DataContext).ModuleInfo.DelayLoad;
+                return (((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo).DelayLoad;
             }
         }
 
+        #endregion Getters
 
-        private void ModuleTreeViewItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "FullPath")
-            {
-                this.Header = (object) GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
-            }
-        }
 
         #region Commands 
         public RelayCommand OpenPeviewerCommand
@@ -198,7 +213,7 @@ namespace Dependencies
                 return false;
             }
 
-            string Filepath = ((TreeViewItemContext)Context).PeProperties.Filepath;
+            string Filepath = ModuleFilePath;
             if (Filepath == null)
             {
                 return false;
@@ -217,7 +232,7 @@ namespace Dependencies
                 {
                     _OpenNewAppCommand = new RelayCommand((param) =>
                     {
-                        string Filepath = ((TreeViewItemContext)param).PeProperties.Filepath;
+                        string Filepath = ModuleFilePath;
                         if (Filepath == null)
                         {
                             return;
@@ -365,18 +380,18 @@ namespace Dependencies
                         }
                         else
                         {
-                            bool DelayLoad = (NewTreeContext.ImportProperties.Flags & 0x01) == 0x01; // TODO : Use proper macros
+
 
                             if (NewTreeContext.IsApiSet)
                             {
-                                var ApiSetContractModule = new DisplayModuleInfo(NewTreeContext.ApiSetModuleName, NewTreeContext.PeProperties, DelayLoad);
+                                var ApiSetContractModule = new DisplayModuleInfo(NewTreeContext.ApiSetModuleName, NewTreeContext.PeProperties, NewTreeContext.IsDelayLoadImport);
                                 var NewModule = new ApiSetModuleInfo(NewTreeContext.ModuleName, ref ApiSetContractModule);
 
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
                             }
                             else
                             {
-                                var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, DelayLoad);
+                                var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, NewTreeContext.IsDelayLoadImport);
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
                             }
 
@@ -398,12 +413,9 @@ namespace Dependencies
 
                         if ((NewTreeContext.PeProperties != null) && (NewTreeContext.PeProperties.GetImports().Count > 0))
                         {
-                            ModuleTreeViewItem DummyEntry = new ModuleTreeViewItem();
-                            DependencyNodeContext DummyContext = new DependencyNodeContext()
-                            {
-                                ModuleInfo = new NotFoundModuleInfo("Dummy"),
-                                IsDummy = true
-                            };
+                            ModuleInfo = new WeakReference(new NotFoundModuleInfo("Dummy")),
+                            IsDummy = true
+                        };
 
                             DummyEntry.DataContext = DummyContext;
                             DummyEntry.Header = "@Dummy : if you see this header, it's a bug.";
@@ -418,6 +430,7 @@ namespace Dependencies
                     childTreeNodeContext.ModuleInfo = Module;
 
                     // Add to tree view
+                    childTreeNodeContext.ModuleInfo = new WeakReference(this.ProcessedModulesCache[ModuleKey]);
                     childTreeNode.DataContext = childTreeNodeContext;
                     childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
                     RootNode.Items.Add(childTreeNode);
@@ -447,7 +460,7 @@ namespace Dependencies
             }
 
             NeedDummyPeNode.Items.Clear();
-            string Filepath = Context.ModuleInfo.Filepath;
+            string Filepath = NeedDummyPeNode.ModuleFilePath;
 
             ConstructDependencyTree(NeedDummyPeNode, Filepath);     
         }
@@ -470,10 +483,14 @@ namespace Dependencies
             this.ModulesList.Items.Clear();
             this.DllTreeView.Items.Clear();
 
+            var RootFilename = Path.GetFileName(FileName);
+            var RootModule = new DisplayModuleInfo(RootFilename, this.Pe);
+            this.ProcessedModulesCache.Add(new ModuleCacheKey(RootFilename, FileName), RootModule);
+
             ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
             DependencyNodeContext childTreeInfoContext = new DependencyNodeContext()
             {
-                ModuleInfo = new DisplayModuleInfo(Path.GetFileName(FileName), this.Pe),
+                ModuleInfo = new WeakReference(RootModule),
                 IsDummy = false
             };
 
@@ -527,9 +544,7 @@ namespace Dependencies
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             DependencyNodeContext childTreeContext = ((DependencyNodeContext)(this.DllTreeView.SelectedItem as ModuleTreeViewItem).DataContext);
-            DisplayModuleInfo SelectedModule = childTreeContext.ModuleInfo;
-
-            //PE SelectedPE = childTreeContext.PeProperties;
+            DisplayModuleInfo SelectedModule = childTreeContext.ModuleInfo.Target as DisplayModuleInfo;
 
             this.ImportList.Items.Clear();
             this.ExportList.Items.Clear();
