@@ -107,10 +107,16 @@ List<String^>^ Phlib::GetKnownDlls(_In_ bool Wow64Dlls)
 ApiSetSchema^ Phlib::GetApiSetSchema()
 {
 	// Api set schema resolution adapted from https://github.com/zodiacon/WindowsInternals/blob/master/APISetMap/APISetMap.cpp
-	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
-
+	// References :
+	// 		* Windows Internals v7
+	// 		* @aionescu's slides on "Hooking Nirvana" (RECON 2015)
+	//		* Quarkslab blog posts : 
+	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-i.html
+	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-ii.html
+	
 	ULONG	ReturnLength;
 	PROCESS_BASIC_INFORMATION ProcessInformation;
+	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
 
 	//	Retrieve PEB address
 	if (!NT_SUCCESS(NtQueryInformationProcess(
@@ -132,53 +138,24 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
 
 	auto ApiSetEntryIterator = reinterpret_cast<PAPI_SET_NAMESPACE_ENTRY>((apiSetMap->EntryOffset + apiSetMapAsNumber));
 	for (ULONG i = 0; i < apiSetMap->Count; i++) {
-		//
-		// Build a UNICODE_STRING for this contract
-		//
-		/*nameString.MaximumLength = static_cast<USHORT>(ApiSetEntryIterator->NameLength);
-		nameString.Length = static_cast<USHORT>(ApiSetEntryIterator->NameLength);
-		nameString.Buffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + ApiSetEntryIterator->NameOffset);
-		printf("%56wZ.dll -> {", &nameString);*/
 
+		// Retrieve api min-win contract name
 		PWCHAR ApiSetEntryNameBuffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + ApiSetEntryIterator->NameOffset);
-
 		String^ ApiSetEntryName = gcnew String(ApiSetEntryNameBuffer, 0, ApiSetEntryIterator->NameLength/sizeof(WCHAR));
+
 		ApiSetTarget^ ApiSetEntryTargets = gcnew ApiSetTarget();
 
-		//
-		// Iterate the values (i.e.: the hosts for this set)
-		//
+		// Iterqte over all the host dll for this contract
 		auto valueEntry = reinterpret_cast<PAPI_SET_VALUE_ENTRY>(apiSetMapAsNumber + ApiSetEntryIterator->ValueOffset);
 		for (ULONG j = 0; j < ApiSetEntryIterator->ValueCount; j++) {
-			//
-			// Build a UNICODE_STRING for this host
-			//
-			/*valueString.Buffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + valueEntry->ValueOffset);
-			valueString.MaximumLength = static_cast<USHORT>(valueEntry->ValueLength);
-			valueString.Length = static_cast<USHORT>(valueEntry->ValueLength);
-			printf("%wZ", &valueString);*/
-
+			
+			// Retrieve dll name implementing the contract
 			PWCHAR ApiSetEntryTargetBuffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + valueEntry->ValueOffset);
 			ApiSetEntryTargets->Add(gcnew String(ApiSetEntryTargetBuffer, 0, valueEntry->ValueLength / sizeof(WCHAR)));
 
-			//
-			// If there's more than one, add a comma
-			//
-			/*if ((j + 1) != ApiSetEntryIterator->ValueCount) {
-				printf(", ");
-			}*/
 
-			//
 			// If there's an alias...
-			//
 			if (valueEntry->NameLength != 0) {
-				//
-				// Build a UNICODE_STRING for it
-				//
-				/*nameString.MaximumLength = static_cast<USHORT>(valueEntry->NameLength);
-				nameString.Length = static_cast<USHORT>(valueEntry->NameLength);
-				nameString.Buffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + valueEntry->NameOffset);
-				printf(" [%wZ]", &nameString);*/
 				PWCHAR ApiSetEntryAliasBuffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + valueEntry->NameOffset);
 				ApiSetEntryTargets->Add(gcnew String(ApiSetEntryAliasBuffer, 0, valueEntry->NameLength / sizeof(WCHAR)));
 			}
@@ -186,9 +163,7 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
 			valueEntry++;
 		}
 
-		//
-		// Next contract
-		//
+
 		ApiSets->Add(ApiSetEntryName, ApiSetEntryTargets);
 		ApiSetEntryIterator++;
 	}

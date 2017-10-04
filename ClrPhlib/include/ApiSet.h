@@ -1,12 +1,6 @@
 #pragma once
 #include <ph.h>
 
-//LONG
-//RtlCompareUnicodeString(
-//	_In_ PUNICODE_STRING Src1,
-//	_In_ PUNICODE_STRING Src2,
-//	_In_ BOOLEAN CaseInSensitive
-//);
 
 typedef struct _API_SET_NAMESPACE {
 	ULONG Version;
