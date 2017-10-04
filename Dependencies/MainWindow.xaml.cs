@@ -64,9 +64,9 @@ namespace Dependencies
 
         public void OpenNewDependencyWindow(String Filename)
         {
-            DependencyWindow nw = new DependencyWindow(Filename);
-            this.DockPanel.AddToSource(nw);
-            this.DockPanel.SelectedItem = nw;
+
+            this.DependencyRootLayout.FloatingItems.Add(new DependencyWindow(Filename));
+
 
             // Update recent files entries
             App.AddToRecentDocuments(Filename);

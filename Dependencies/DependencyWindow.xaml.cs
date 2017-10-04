@@ -272,8 +272,10 @@ namespace Dependencies
     /// <summary>
     /// Logique d'interaction pour DependencyWindow.xaml
     /// </summary>
-    public partial class DependencyWindow : TabItem 
-    {
+    public partial class DependencyWindow : UserControl
+    { 
+        public string Filename;
+
         PE Pe;
         string RootFolder;
         PhSymbolProvider SymPrv;
@@ -457,11 +459,10 @@ namespace Dependencies
         {
 
             InitializeComponent();
-            this.Header = Path.GetFileName(FileName);
 
             this.SymPrv = new PhSymbolProvider();
-            
 
+            this.Filename = FileName;
             this.Pe = new PE(FileName);
             this.RootFolder = Path.GetDirectoryName(FileName);
             this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
@@ -491,6 +492,11 @@ namespace Dependencies
       
             // Recursively construct tree of dll imports
             ConstructDependencyTree(treeNode, this.Pe);
+        }
+
+        public string Header
+        {
+            get { return this.Filename; }
         }
 
         #region Commands

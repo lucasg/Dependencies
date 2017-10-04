@@ -13,7 +13,7 @@
         HorizontalContentAlignment="Stretch" 
         VerticalContentAlignment="Bottom"
         VerticalAlignment="Bottom"
-        Height="900" Width="1600" 
+        Height="950" Width="1600" 
         AllowDrop="True"
         Drop="MainWindow_Drop"
         >
@@ -87,30 +87,13 @@
         <!-- DependencyWindow does not support being a floating window => IsFloatDropZoneEnabled="False" -->
         <!-- all dragablz controls need to reference  Partition="2AE89D18-F236-4D20-9605-6C03319038E6" in order to dock correctly -->
         <dockablz:Layout Partition="2AE89D18-F236-4D20-9605-6C03319038E6" Name="DependencyRootLayout"
+                    IsFloatDropZoneEnabled="False"
                     FloatingItemHeaderMemberPath="Header"
-                    IsFloatDropZoneEnabled="False"         
-                    FloatingItemsContainerMargin="0 2 0 0"
+                    FloatingItemsContainerMargin="0 0 0 0"
                     Grid.Row="1">
 
-            <dockablz:Layout.BranchTemplate>
-                <DataTemplate>
-                    <dragablz:TabablzControl Style="{StaticResource DependencyTabablzControlStyle}">
-                        <dragablz:TabablzControl.InterTabController>
-                            <dragablz:InterTabController InterTabClient="{Binding InterTabClient}" Partition="2AE89D18-F236-4D20-9605-6C03319038E6" />
-                        </dragablz:TabablzControl.InterTabController>
-                    </dragablz:TabablzControl>
-                </DataTemplate>
-            </dockablz:Layout.BranchTemplate>
-
-            <dragablz:TabablzControl
-                        Name="DockPanel"
-                        Style="{StaticResource DependencyTabablzControlStyle}"
-                        AddLocationHint="After" >
-
-                <dragablz:TabablzControl.InterTabController>
-                    <dragablz:InterTabController InterTabClient="{Binding InterTabClient}" Partition="2AE89D18-F236-4D20-9605-6C03319038E6" />
-                </dragablz:TabablzControl.InterTabController>
-            </dragablz:TabablzControl>
+            <dockablz:Layout.FloatingItems>
+            </dockablz:Layout.FloatingItems>
 
         </dockablz:Layout>
 
