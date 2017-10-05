@@ -20,21 +20,261 @@
     <Grid x:Name="ResizeElemGrid" Margin="0,0,0,0">
         <Grid.RowDefinitions>
             <RowDefinition Height="146*"/>
-            <RowDefinition Height="3*"/>
+            <RowDefinition Height="5"/>
             <RowDefinition Height="46*"/>
         </Grid.RowDefinitions>
-        
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300*"/>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="600*"/>
-        </Grid.ColumnDefinitions>
 
+        <Grid x:Name="TreeImportExportGrid" 
+              Margin="0,0,0,0"
+              Grid.Row="0">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="600*"/>
+            </Grid.ColumnDefinitions>
+
+            <TreeView x:Name="DllTreeView"  
+                    HorizontalContentAlignment="Stretch" 
+                    VerticalContentAlignment="Stretch" 
+                    Padding="0" 
+                    SelectedItemChanged="OnTreeViewSelectedItemChanged"
+                    >
+
+                <TreeView.Resources>
+                    <RoutedUICommand x:Key="DoExpandAllNodes" Text="Expand All" />
+                    <RoutedUICommand x:Key="DoCollapseAllNodes" Text="Collapse All" />
+                    <RoutedUICommand x:Key="DoFindModuleInList" Text="Highlight Matching Module In List" />
+
+                    <ContextMenu x:Key="TreeItemContextMenu">
+                        <MenuItem Header="Highlight Matching Module In List" 
+                                Command="{StaticResource DoFindModuleInList}"
+                                CommandParameter="{Binding RelativeSource={RelativeSource  AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
+                                InputGestureText="Ctrl+M" 
+                                IsEnabled="True" />
+                        <Separator Height="3" Margin="-1,0,0,0"/>
+                        <MenuItem Header="Copy File Path" 
+                                Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
+                                Background="WhiteSmoke" 
+                                InputGestureText="Ctrl+C" 
+                                IsEnabled="False"  />
+                        <Separator Height="3" Margin="-1,0,0,0"/>
+                        <MenuItem Header="Expand All" 
+                                Command="{StaticResource DoExpandAllNodes}"
+                                IsEnabled="True"  />
+                        <MenuItem Header="Collapse All" 
+                                Command="{StaticResource DoCollapseAllNodes}"
+                                IsEnabled="True"  />
+                        <Separator Height="3" Margin="-1,0,0,0"/>
+                        <MenuItem Name="FullPathItemTree" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=FullPath, Mode=TwoWay}" Margin="0,0,0.2,0"/>
+                        <Separator Height="3" Margin="-1,0,0,0"/>
+
+                        <MenuItem Header="View Module in separate application" 
+                                Command="{Binding  Path=OpenNewAppCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
+                                CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
+
+                        <MenuItem Header="View Module in Peviewer" 
+                                Command="{Binding  Path=OpenPeviewerCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
+                                CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
+
+                        <!--AncestorType=Grid To get the current context feel like magic to me -->
+                    </ContextMenu>
+
+                    <Style TargetType="local:ModuleTreeViewItem">
+                        <Setter Property="HeaderTemplate">
+                            <Setter.Value>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding Path=(local:ModuleTreeViewItem.IsModuleDelayLoad), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource imgdelayed} }"></Image>
+                                        <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
+                                        <TextBlock Text="{Binding}"></TextBlock>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </Setter.Value>
+                        </Setter>
+
+                        <Setter Property="ContextMenu" Value="{StaticResource TreeItemContextMenu}" />
+                    </Style>
+
+                </TreeView.Resources>
+
+                <TreeView.CommandBindings>
+                    <CommandBinding Command="{StaticResource DoExpandAllNodes}" Executed="ExpandAllNodes_Executed"/>
+                    <CommandBinding Command="{StaticResource DoCollapseAllNodes}" Executed="CollapseAllNodes_Executed"/>
+                    <CommandBinding Command="{StaticResource DoFindModuleInList}" Executed="DoFindModuleInList_Executed"/>
+                </TreeView.CommandBindings>
+            </TreeView>
+            <GridSplitter Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <Grid x:Name="ImportExportGrid" Grid.Column="2">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="145*"/>
+                    <RowDefinition Height="5"/>
+                    <RowDefinition Height="142*"/>
+                </Grid.RowDefinitions>
+
+                <ListView x:Name="ImportList" 
+                        HorizontalContentAlignment="Stretch" 
+                        VerticalContentAlignment="Stretch" 
+                        util:GridViewSort.AutoSort="True"
+                        KeyDown ="OnListViewKeyDown" >
+                    <ListView.CommandBindings>
+                        <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
+                    </ListView.CommandBindings>
+
+                    <ListView.Resources>
+                        <ContextMenu x:Key="ItemContextMenu">
+                            <MenuItem HeaderStringFormat= "Copy {0:s}"
+                                    Header = "{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                    Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                    CommandParameter ="{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
+                                    InputGestureText="Ctrl+C"  
+                                    IsEnabled="True"/>
+                            <MenuItem Header="Select All" 
+                                    Command="ApplicationCommands.SelectAll" 
+                                    IsEnabled="True"/>
+                            <Separator Height="3" Margin="-1,0,0,0"/>
+                            <MenuItem Header="_Undecorate C++ Functions" 
+                                    Height="26" InputGestureText="F10" 
+                                    IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
+                            <Separator Height="3" Margin="-1,0,0,0"/>
+                            <MenuItem Header="Lookup Import function on MSDN"  
+                                Command="{Binding Path=DataContext.QueryImportApi, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
+                        </ContextMenu>
+                    </ListView.Resources>
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="FontFamily" Value="Courier New" />
+                            <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.View>
+                        <GridView AllowsColumnReorder="true">
+                            <GridViewColumn Header="PI" Width="40" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Width="30" Height="14" Source="{Binding IconUri}"/>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Hint, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                            <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                            <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}" util:GridViewSort.PropertyName="DelayImport" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+
+                <ListView x:Name="ExportList" 
+                        Grid.Row="2"
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch"
+                        util:GridViewSort.AutoSort="True"
+                        KeyDown ="OnListViewKeyDown" 
+                        >
+                    <ListView.CommandBindings>
+                        <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
+                    </ListView.CommandBindings>
+
+                    <ListView.Resources>
+                        <ContextMenu x:Key="ItemContextMenu">
+                            <MenuItem HeaderStringFormat= "Copy {0:s}"
+                                    Header = "{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                    Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                    CommandParameter ="{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
+                                    InputGestureText="Ctrl+C"  
+                                    IsEnabled="True"/>
+                            <MenuItem Header="Select All" 
+                                    Command="ApplicationCommands.SelectAll" 
+                                    IsEnabled="True"/>
+                            <Separator Height="3" Margin="-1,0,0,0"/>
+                            <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
+                            <Separator Height="3" Margin="-1,0,0,0"/>
+                            <MenuItem Header="Lookup Export function on MSDN"  
+                                Command="{Binding Path=DataContext.QueryExportApi, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
+                        </ContextMenu>
+                    </ListView.Resources>
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                            <Setter Property="FontFamily" Value="Courier New" />
+                            <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.View>
+                        <GridView 
+                        AllowsColumnReorder="true">
+                            <GridViewColumn Header="E" Width="40" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Image Width="30" Height="14" Source="{Binding IconUri}"/>
+                                        <!--<TextBlock Text="{Binding Index}" TextAlignment="Right" />-->
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Hint, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                            <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress, StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualAddress" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+                <GridSplitter x:Name="ImportExportSplitter" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" MinHeight="8" Grid.Row="1"/>
+            </Grid>
+
+        </Grid>
+        
+
+        <GridSplitter x:Name="LogSplitter" 
+                      HorizontalAlignment="Stretch" 
+                      HorizontalContentAlignment="Stretch" 
+                      VerticalContentAlignment="Stretch" 
+                      Grid.Row="1"/>
+        
         <Grid x:Name="ModulesGrid" 
-                Margin="0,0,0,0" 
-                Grid.ColumnSpan="3"
-                Grid.Row="2">
-            
+                    Margin="0,0,0,0" 
+                    Grid.Row="2">
+
             <Grid.RowDefinitions>
                 <RowDefinition Height="46*"/>
                 <RowDefinition  Height="auto" MaxHeight="25"/>
@@ -43,13 +283,13 @@
 
 
             <ListView x:Name="ModulesList" 
-                    HorizontalContentAlignment="Stretch" 
-                    VerticalContentAlignment="Stretch" 
-                    VerticalAlignment="Stretch"
-                    util:GridViewSort.AutoSort="True"
-                    KeyDown ="OnListViewKeyDown"
-                    PreviewMouseLeftButtonUp="OnModuleViewSelectedItemChanged"
-                    Grid.Row="0">
+                        HorizontalContentAlignment="Stretch" 
+                        VerticalContentAlignment="Stretch" 
+                        VerticalAlignment="Stretch"
+                        util:GridViewSort.AutoSort="True"
+                        KeyDown ="OnListViewKeyDown"
+                        PreviewMouseLeftButtonUp="OnModuleViewSelectedItemChanged"
+                        Grid.Row="0">
 
                 <ListView.Resources>
                     <RoutedUICommand x:Key="DoFindModuleInTree" Text="Highlight Matching Module In Tree" />
@@ -57,33 +297,33 @@
                     <ContextMenu x:Key="ItemContextMenu">
 
                         <MenuItem Header="Highlight Matching Module In Tree"
-                                    Command="{StaticResource DoFindModuleInTree}"
-                                    InputGestureText="Ctrl+M"
-                                    IsEnabled="True" />
+                                        Command="{StaticResource DoFindModuleInTree}"
+                                        InputGestureText="Ctrl+M"
+                                        IsEnabled="True" />
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem HeaderStringFormat= "Copy {0:s}"
-                                        Header = "{Binding DataContext.ModuleName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                        Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                        CommandParameter ="{Binding DataContext.ModuleName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
-                                        InputGestureText="Ctrl+C"  
-                                        IsEnabled="True"/>
+                                            Header = "{Binding DataContext.ModuleName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                            Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                            CommandParameter ="{Binding DataContext.ModuleName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
+                                            InputGestureText="Ctrl+C"  
+                                            IsEnabled="True"/>
                         <MenuItem Header="Select All" 
-                                    Command="ApplicationCommands.SelectAll" 
-                                    IsEnabled="True"
-                                    />
+                                        Command="ApplicationCommands.SelectAll" 
+                                        IsEnabled="True"
+                                        />
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem x:Name="FullPathItemModules" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=FullPath, Mode=TwoWay}" Margin="0,0,0.2,0"/>
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="View Module in separate application" 
-                                    Command="{Binding Path=DataContext.OpenNewAppCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                    CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                    InputGestureText="Alt+Enter"  
-                                    IsEnabled="True" />
+                                        Command="{Binding Path=DataContext.OpenNewAppCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                        CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                        InputGestureText="Alt+Enter"  
+                                        IsEnabled="True" />
                         <MenuItem Header="View Module in Peviewer" 
-                                    Command="{Binding Path=DataContext.OpenPeviewerCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                    CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                    InputGestureText="Alt+Enter"  
-                                    IsEnabled="True" />
+                                        Command="{Binding Path=DataContext.OpenPeviewerCommand, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                        CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                        InputGestureText="Alt+Enter"  
+                                        IsEnabled="True" />
                     </ContextMenu>
                 </ListView.Resources>
 
@@ -149,10 +389,10 @@
             </ListView>
 
             <Grid x:Name="ModulesSearchBar"
-                VerticalAlignment="Bottom"
-                Visibility="Collapsed"
-                Grid.Row="1">
-                
+                    VerticalAlignment="Bottom"
+                    Visibility="Collapsed"
+                    Grid.Row="1">
+
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="60"/>
                     <ColumnDefinition Width="60*"/>
@@ -160,257 +400,29 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Height="25" 
-                       VerticalAlignment="Center"
-                       Grid.Column="0">
+                           VerticalAlignment="Center"
+                           Grid.Column="0">
                     Search :
                 </Label>
-                
+
                 <TextBox Width="auto" 
-                         Height="20" 
-                         HorizontalContentAlignment="Stretch"
-                         HorizontalAlignment="Stretch"
-                          Grid.Column="1">
+                             Height="20" 
+                             HorizontalContentAlignment="Stretch"
+                             HorizontalAlignment="Stretch"
+                              Grid.Column="1">
                 </TextBox>
-                
+
                 <Button Height="20" 
-                        Grid.Column="2"
-                        Margin="2 0 0 0"
-                        Click="OnModuleSearchClose">
+                            Grid.Column="2"
+                            Margin="2 0 0 0"
+                            Click="OnModuleSearchClose">
                     X
                 </Button>
-                
+
             </Grid>
 
         </Grid>
 
-        <GridSplitter x:Name="LogSplitter" Grid.ColumnSpan="3" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Grid.Row="1"/>
-
-        <TreeView x:Name="DllTreeView"  
-                    HorizontalContentAlignment="Stretch" 
-                    VerticalContentAlignment="Stretch" 
-                    Padding="0" 
-                    SelectedItemChanged="OnTreeViewSelectedItemChanged">
-
-            <TreeView.Resources>
-                <RoutedUICommand x:Key="DoExpandAllNodes" Text="Expand All" />
-                <RoutedUICommand x:Key="DoCollapseAllNodes" Text="Collapse All" />
-                <RoutedUICommand x:Key="DoFindModuleInList" Text="Highlight Matching Module In List" />
-
-                <ContextMenu x:Key="TreeItemContextMenu">
-                    <MenuItem Header="Highlight Matching Module In List" 
-                                Command="{StaticResource DoFindModuleInList}"
-                                CommandParameter="{Binding RelativeSource={RelativeSource  AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
-                                InputGestureText="Ctrl+M" 
-                                IsEnabled="True" />
-                    <Separator Height="3" Margin="-1,0,0,0"/>
-                    <MenuItem Header="Copy File Path" 
-                                Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
-                                Background="WhiteSmoke" 
-                                InputGestureText="Ctrl+C" 
-                                IsEnabled="False"  />
-                    <Separator Height="3" Margin="-1,0,0,0"/>
-                    <MenuItem Header="Expand All" 
-                                Command="{StaticResource DoExpandAllNodes}"
-                                IsEnabled="True"  />
-                    <MenuItem Header="Collapse All" 
-                                Command="{StaticResource DoCollapseAllNodes}"
-                                IsEnabled="True"  />
-                    <Separator Height="3" Margin="-1,0,0,0"/>
-                    <MenuItem Name="FullPathItemTree" Header="Full Paths" Height="25" InputGestureText="F9" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=FullPath, Mode=TwoWay}" Margin="0,0,0.2,0"/>
-                    <Separator Height="3" Margin="-1,0,0,0"/>
-
-                    <MenuItem Header="View Module in separate application" 
-                                Command="{Binding  Path=OpenNewAppCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
-                                CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
-                                InputGestureText="Alt+Enter"  
-                                IsEnabled="True" />
-
-                    <MenuItem Header="View Module in Peviewer" 
-                                Command="{Binding  Path=OpenPeviewerCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
-                                CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
-                                InputGestureText="Alt+Enter"  
-                                IsEnabled="True" />
-
-                    <!--AncestorType=Grid To get the current context feel like magic to me -->
-                </ContextMenu>
-
-                <Style TargetType="local:ModuleTreeViewItem">
-                    <Setter Property="HeaderTemplate">
-                        <Setter.Value>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal">
-                                    <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding Path=(local:ModuleTreeViewItem.IsModuleDelayLoad), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource imgdelayed} }"></Image>
-                                    <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
-                                    <TextBlock Text="{Binding}"></TextBlock>
-                                </StackPanel>
-                            </DataTemplate>
-                        </Setter.Value>
-                    </Setter>
-
-                    <Setter Property="ContextMenu" Value="{StaticResource TreeItemContextMenu}" />
-                </Style>
-
-            </TreeView.Resources>
-
-            <TreeView.CommandBindings>
-                <CommandBinding Command="{StaticResource DoExpandAllNodes}" Executed="ExpandAllNodes_Executed"/>
-                <CommandBinding Command="{StaticResource DoCollapseAllNodes}" Executed="CollapseAllNodes_Executed"/>
-                <CommandBinding Command="{StaticResource DoFindModuleInList}" Executed="DoFindModuleInList_Executed"/>
-            </TreeView.CommandBindings>
-        </TreeView>
-
-        <Grid x:Name="ImportExportGrid" Grid.Column="2">
-
-            <Grid.RowDefinitions>
-                <RowDefinition Height="145*"/>
-                <RowDefinition Height="5*"/>
-                <RowDefinition Height="142*"/>
-            </Grid.RowDefinitions>
-
-            <ListView x:Name="ImportList" 
-                        HorizontalContentAlignment="Stretch" 
-                        VerticalContentAlignment="Stretch" 
-                        util:GridViewSort.AutoSort="True"
-                        KeyDown ="OnListViewKeyDown" >
-                <ListView.CommandBindings>
-                    <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
-                </ListView.CommandBindings>
-                
-                <ListView.Resources>
-                    <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem HeaderStringFormat= "Copy {0:s}"
-                                    Header = "{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                    Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                    CommandParameter ="{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
-                                    InputGestureText="Ctrl+C"  
-                                    IsEnabled="True"/>
-                        <MenuItem Header="Select All" 
-                                    Command="ApplicationCommands.SelectAll" 
-                                    IsEnabled="True"/>
-                        <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="_Undecorate C++ Functions" 
-                                    Height="26" InputGestureText="F10" 
-                                    IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
-                        <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="Lookup Import function on MSDN"  
-                                Command="{Binding Path=DataContext.QueryImportApi, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                InputGestureText="Alt+Enter"  
-                                IsEnabled="True" />
-                    </ContextMenu>
-                </ListView.Resources>
-
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="FontFamily" Value="Courier New" />
-                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-
-                <ListView.View>
-                    <GridView AllowsColumnReorder="true">
-                        <GridViewColumn Header="PI" Width="40" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Image Width="30" Height="14" Source="{Binding IconUri}"/>
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Hint, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                        <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName}" util:GridViewSort.PropertyName="ModuleName" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                        <GridViewColumn Header="Delayed" Width="100" DisplayMemberBinding="{Binding DelayImport}" util:GridViewSort.PropertyName="DelayImport" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-
-            <ListView x:Name="ExportList" 
-                        Grid.Row="2"
-                        HorizontalContentAlignment="Stretch"
-                        VerticalContentAlignment="Stretch"
-                        util:GridViewSort.AutoSort="True"
-                        KeyDown ="OnListViewKeyDown" 
-                        >
-                <ListView.CommandBindings>
-                    <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
-                </ListView.CommandBindings>
-                
-                <ListView.Resources>
-                    <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem HeaderStringFormat= "Copy {0:s}"
-                                    Header = "{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                    Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                    CommandParameter ="{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
-                                    InputGestureText="Ctrl+C"  
-                                    IsEnabled="True"/>
-                        <MenuItem Header="Select All" 
-                                    Command="ApplicationCommands.SelectAll" 
-                                    IsEnabled="True"/>
-                        <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
-                        <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="Lookup Export function on MSDN"  
-                                Command="{Binding Path=DataContext.QueryExportApi, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                InputGestureText="Alt+Enter"  
-                                IsEnabled="True" />
-                    </ContextMenu>
-                </ListView.Resources>
-
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        <Setter Property="FontFamily" Value="Courier New" />
-                        <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-
-                <ListView.View>
-                    <GridView 
-                        AllowsColumnReorder="true">
-                        <GridViewColumn Header="E" Width="40" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Image Width="30" Height="14" Source="{Binding IconUri}"/>
-                                    <!--<TextBlock Text="{Binding Index}" TextAlignment="Right" />-->
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Hint" Width="140" util:GridViewSort.PropertyName="Hint" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}">
-                            <GridViewColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Hint, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" />
-                                </DataTemplate>
-                            </GridViewColumn.CellTemplate>
-                        </GridViewColumn>
-                        <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                        <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress, StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualAddress" HeaderContainerStyle="{StaticResource LeftAlignHeaderText}"/>
-                    </GridView>
-                </ListView.View>
-            </ListView>
-            <GridSplitter x:Name="ImportExportSplitter" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Center" MinHeight="8" Grid.Row="1"/>
-        </Grid>
-        <GridSplitter Grid.Column="1" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" HorizontalAlignment="Stretch"/>
+        
     </Grid>
 </UserControl>
