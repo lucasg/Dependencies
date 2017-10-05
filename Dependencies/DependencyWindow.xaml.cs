@@ -533,6 +533,12 @@ namespace Dependencies
                 System.Windows.Clipboard.SetText(String.Join("\n", StrToCopy.ToArray()), System.Windows.TextDataFormat.Text);
 
             }
+
+        private void OnModuleViewSelectedItemChanged(object sender, RoutedEventArgs e)
+        {
+            DisplayModuleInfo SelectedModule = (sender as ListView).SelectedItem as DisplayModuleInfo;
+
+            UpdateImportExportLists(SelectedModule);
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -540,14 +546,20 @@ namespace Dependencies
             DependencyNodeContext childTreeContext = ((DependencyNodeContext)(this.DllTreeView.SelectedItem as ModuleTreeViewItem).DataContext);
             DisplayModuleInfo SelectedModule = childTreeContext.ModuleInfo.Target as DisplayModuleInfo;
 
-            this.ImportList.Items.Clear();
-            this.ExportList.Items.Clear();
-
             // Selected Pe has not been found on disk
             if (SelectedModule == null)
                 return;
 
+            UpdateImportExportLists(SelectedModule);
+        }
 
+        private void UpdateImportExportLists(DisplayModuleInfo SelectedModule)
+        {
+ 
+            this.ImportList.Items.Clear();
+            this.ExportList.Items.Clear();
+
+       
             foreach (PeImportDll DllImport in SelectedModule.Imports)
             {
                 String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name, this.SxsEntriesCache);
