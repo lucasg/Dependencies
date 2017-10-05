@@ -500,6 +500,11 @@ namespace Dependencies
         }
 
         #region Commands
+        private void OnModuleSearchClose(object sender, RoutedEventArgs e)
+        {
+            this.ModulesSearchBar.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
@@ -531,8 +536,20 @@ namespace Dependencies
 
                 System.Windows.Clipboard.Clear();
                 System.Windows.Clipboard.SetText(String.Join("\n", StrToCopy.ToArray()), System.Windows.TextDataFormat.Text);
-
+                return;
             }
+
+            if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
+            {
+                this.ModulesSearchBar.Visibility = System.Windows.Visibility.Visible;
+                return;
+            }
+
+            if (e.Key == System.Windows.Input.Key.Escape)
+            {
+                this.OnModuleSearchClose(null, null);
+            }
+        }
 
         private void OnModuleViewSelectedItemChanged(object sender, RoutedEventArgs e)
         {
