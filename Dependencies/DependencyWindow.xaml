@@ -405,11 +405,14 @@
                     Search :
                 </Label>
 
-                <TextBox Width="auto" 
-                             Height="20" 
-                             HorizontalContentAlignment="Stretch"
-                             HorizontalAlignment="Stretch"
-                              Grid.Column="1">
+                <TextBox Name = "ModuleSearchFilter"
+                         TextChanged="ModuleSearchFilter_OnTextChanged"
+                         KeyDown ="OnTextBoxKeyDown" 
+                         Width="auto" 
+                         Height="20" 
+                         HorizontalContentAlignment="Stretch"
+                         HorizontalAlignment="Stretch"
+                        Grid.Column="1">
                 </TextBox>
 
                 <Button Height="20" 

@@ -7,6 +7,8 @@ using System.ClrPh;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
+using System.Windows.Data;
 
 public class RelayCommand : ICommand
 {
@@ -457,8 +459,10 @@ namespace Dependencies
 
         public DependencyWindow(String FileName)
         {
-
             InitializeComponent();
+
+            ModulesItemsView = CollectionViewSource.GetDefaultView(this.ModulesList.Items.SourceCollection);
+
 
             this.SymPrv = new PhSymbolProvider();
 
@@ -542,18 +546,32 @@ namespace Dependencies
             if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
             {
                 this.ModulesSearchBar.Visibility = System.Windows.Visibility.Visible;
+                this.ModuleSearchFilter.Focus();
                 return;
             }
 
+        }
+
+        private void OnTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
             if (e.Key == System.Windows.Input.Key.Escape)
             {
+                // HACK : Reset filter before closing
+                this.ModuleSearchFilter.Text = null;
+                this.ModuleSearchFilter_OnTextChanged(this.ModulesList, null);
+
                 this.OnModuleSearchClose(null, null);
+                return;
             }
         }
 
         private void OnModuleViewSelectedItemChanged(object sender, RoutedEventArgs e)
         {
             DisplayModuleInfo SelectedModule = (sender as ListView).SelectedItem as DisplayModuleInfo;
+
+            // Selected Pe has not been found on disk
+            if (SelectedModule == null)
+                return;
 
             UpdateImportExportLists(SelectedModule);
         }
@@ -699,6 +717,22 @@ namespace Dependencies
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             ListView.SelectAll();
+        }
+
+        public ICollectionView ModulesItemsView { get; set; }
+
+        private bool ModulesListUserFilter(object item)
+        {
+            if (String.IsNullOrEmpty(ModuleSearchFilter.Text))
+                return true;
+            else
+                return ((item as DisplayModuleInfo).ModuleName.IndexOf(ModuleSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        }
+
+        private void ModuleSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        {
+            ModulesItemsView.Filter = ModulesListUserFilter;
+            ModulesItemsView.Refresh();
         }
         #endregion // Commands 
 
