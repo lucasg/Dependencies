@@ -39,14 +39,6 @@
             <!-- Hide/Show the status bar based on a global switch -->
             <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
 
-            <!-- Specific theme for the dockable control -->
-            <Style TargetType="{x:Type dragablz:TabablzControl}" x:Key="DependencyTabablzControlStyle">
-                <Setter Property="ShowDefaultAddButton" Value="True" />
-                <Setter Property="ShowDefaultCloseButton" Value="True" />
-                <Setter Property="NewItemFactory" Value="{x:Static local:MainWindow.Factory}" />
-                <Setter Property="Margin" Value="0 0 0 0" />
-                <Setter Property="ItemContainerStyle" Value="{StaticResource TrapezoidDragableTabItemStyle}" />
-            </Style>
         </ResourceDictionary>
 
     </Window.Resources>
