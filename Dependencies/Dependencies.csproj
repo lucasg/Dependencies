@@ -66,12 +66,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DependencyModuleList.xaml.cs">
+      <DependentUpon>DependencyModuleList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FindPeModule.cs" />
     <Compile Include="Models\ModuleInfo.cs" />
     <Compile Include="Models\PeExport.cs" />
     <Compile Include="Models\PeImport.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Shell32IconExtractor.cs" />
+    <Page Include="DependencyModuleList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DependencyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

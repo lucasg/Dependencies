@@ -40,7 +40,6 @@ public class RelayCommand : ICommand
     #endregion // ICommand Members 
 }
 
-
 public class DefaultSettingsBindingHandler : INotifyPropertyChanged
 {
     public delegate string CallbackEventHandler(bool settingValue);
@@ -395,7 +394,7 @@ namespace Dependencies
                         }
 
                         // add it to the module list
-                        this.ModulesList.Items.Add(this.ProcessedModulesCache[ModuleKey]);
+                        this.ModulesList.AddModule(this.ProcessedModulesCache[ModuleKey]);
                     }
                     
                     // Since we uniquely process PE, for thoses who have already been "seen",
@@ -461,9 +460,6 @@ namespace Dependencies
         {
             InitializeComponent();
 
-            ModulesItemsView = CollectionViewSource.GetDefaultView(this.ModulesList.Items.SourceCollection);
-
-
             this.SymPrv = new PhSymbolProvider();
 
             this.Filename = FileName;
@@ -473,7 +469,7 @@ namespace Dependencies
             this.ProcessedModulesCache = new ModulesCache();
             this.ApiSetmapCache = Phlib.GetApiSetSchema();
 
-            this.ModulesList.Items.Clear();
+            this.ModulesList.Clear();
             this.DllTreeView.Items.Clear();
 
             var RootFilename = Path.GetFileName(FileName);
@@ -504,10 +500,10 @@ namespace Dependencies
         }
 
         #region Commands
-        private void OnModuleSearchClose(object sender, RoutedEventArgs e)
-        {
-            this.ModulesSearchBar.Visibility = System.Windows.Visibility.Collapsed;
-        }
+        //private void OnModuleSearchClose(object sender, RoutedEventArgs e)
+        //{
+        //    this.ModulesSearchBar.Visibility = System.Windows.Visibility.Collapsed;
+        //}
 
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
@@ -543,31 +539,31 @@ namespace Dependencies
                 return;
             }
 
-            if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
-            {
-                this.ModulesSearchBar.Visibility = System.Windows.Visibility.Visible;
-                this.ModuleSearchFilter.Focus();
-                return;
-            }
+            //if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
+            //{
+            //    this.ModulesSearchBar.Visibility = System.Windows.Visibility.Visible;
+            //    this.ModuleSearchFilter.Focus();
+            //    return;
+            //}
 
         }
 
-        private void OnTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == System.Windows.Input.Key.Escape)
-            {
-                // HACK : Reset filter before closing
-                this.ModuleSearchFilter.Text = null;
-                this.ModuleSearchFilter_OnTextChanged(this.ModulesList, null);
+        //private void OnTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        //{
+        //    if (e.Key == System.Windows.Input.Key.Escape)
+        //    {
+        //        // HACK : Reset filter before closing
+        //        this.ModuleSearchFilter.Text = null;
+        //        this.ModuleSearchFilter_OnTextChanged(this.ModulesList, null);
 
-                this.OnModuleSearchClose(null, null);
-                return;
-            }
-        }
+        //        this.OnModuleSearchClose(null, null);
+        //        return;
+        //    }
+        //}
 
         private void OnModuleViewSelectedItemChanged(object sender, RoutedEventArgs e)
         {
-            DisplayModuleInfo SelectedModule = (sender as ListView).SelectedItem as DisplayModuleInfo;
+            DisplayModuleInfo SelectedModule = (sender as DependencyModuleList).ModulesList.SelectedItem as DisplayModuleInfo;
 
             // Selected Pe has not been found on disk
             if (SelectedModule == null)
@@ -646,13 +642,13 @@ namespace Dependencies
             ModuleTreeViewItem Source = e.Source as ModuleTreeViewItem;
             String SelectedModuleName = Source.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
 
-            foreach (DisplayModuleInfo item in this.ModulesList.Items)
+            foreach (DisplayModuleInfo item in this.ModulesList.ModulesList.Items)
             {
                 if (item.ModuleName == SelectedModuleName)
                 {
 
-                    this.ModulesList.SelectedItem = item;
-                    this.ModulesList.ScrollIntoView(item);
+                    this.ModulesList.ModulesList.SelectedItem = item;
+                    this.ModulesList.ModulesList.ScrollIntoView(item);
                     return;
                 }
             }
@@ -708,7 +704,7 @@ namespace Dependencies
 
         private void DoFindModuleInTree_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            DisplayModuleInfo item = this.ModulesList.SelectedItem as DisplayModuleInfo;
+            DisplayModuleInfo item = this.ModulesList.ModulesList.SelectedItem as DisplayModuleInfo;
             ModuleTreeViewItem TreeRootItem = this.DllTreeView.Items[0] as ModuleTreeViewItem;
             FindModuleInTree(TreeRootItem, item);
         }
@@ -719,21 +715,21 @@ namespace Dependencies
             ListView.SelectAll();
         }
 
-        public ICollectionView ModulesItemsView { get; set; }
+        //public ICollectionView ModulesItemsView { get; set; }
 
-        private bool ModulesListUserFilter(object item)
-        {
-            if (String.IsNullOrEmpty(ModuleSearchFilter.Text))
-                return true;
-            else
-                return ((item as DisplayModuleInfo).ModuleName.IndexOf(ModuleSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
-        }
+        //private bool ModulesListUserFilter(object item)
+        //{
+        //    if (String.IsNullOrEmpty(ModuleSearchFilter.Text))
+        //        return true;
+        //    else
+        //        return ((item as DisplayModuleInfo).ModuleName.IndexOf(ModuleSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        //}
 
-        private void ModuleSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            ModulesItemsView.Filter = ModulesListUserFilter;
-            ModulesItemsView.Refresh();
-        }
+        //private void ModuleSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        //{
+        //    ModulesItemsView.Filter = ModulesListUserFilter;
+        //    ModulesItemsView.Refresh();
+        //}
         #endregion // Commands 
 
     }
