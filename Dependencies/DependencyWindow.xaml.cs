@@ -489,7 +489,6 @@ namespace Dependencies
             
             this.DllTreeView.Items.Add(treeNode);
 
-      
             // Recursively construct tree of dll imports
             ConstructDependencyTree(treeNode, this.Pe);
         }
@@ -500,67 +499,7 @@ namespace Dependencies
         }
 
         #region Commands
-        //private void OnModuleSearchClose(object sender, RoutedEventArgs e)
-        //{
-        //    this.ModulesSearchBar.Visibility = System.Windows.Visibility.Collapsed;
-        //}
-
-        private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
-            bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
-
-            Debug.WriteLine("Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
-            if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
-            {
-                List<string> StrToCopy = new List<string>();
-                foreach (object SelectItem in ListView.SelectedItems)
-                {
-                    if (ListView.Name == "ModulesList")
-                    {
-                        DisplayModuleInfo ModuleInfo = SelectItem as DisplayModuleInfo;
-                        StrToCopy.Add(ModuleInfo.ModuleName);
-                        
-                    }
-                    else if (ListView.Name == "ImportList")
-                    {
-                        DisplayPeImport PeInfo = SelectItem as DisplayPeImport;
-                        StrToCopy.Add(PeInfo.Name);
-                    }
-                    else if (ListView.Name == "ExportList")
-                    {
-                        DisplayPeExport PeInfo = SelectItem as DisplayPeExport;
-                        StrToCopy.Add(PeInfo.Name);
-                    }
-                }
-
-                System.Windows.Clipboard.Clear();
-                System.Windows.Clipboard.SetText(String.Join("\n", StrToCopy.ToArray()), System.Windows.TextDataFormat.Text);
-                return;
-            }
-
-            //if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
-            //{
-            //    this.ModulesSearchBar.Visibility = System.Windows.Visibility.Visible;
-            //    this.ModuleSearchFilter.Focus();
-            //    return;
-            //}
-
-        }
-
-        //private void OnTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        //{
-        //    if (e.Key == System.Windows.Input.Key.Escape)
-        //    {
-        //        // HACK : Reset filter before closing
-        //        this.ModuleSearchFilter.Text = null;
-        //        this.ModuleSearchFilter_OnTextChanged(this.ModulesList, null);
-
-        //        this.OnModuleSearchClose(null, null);
-        //        return;
-        //    }
-        //}
-
+     
         private void OnModuleViewSelectedItemChanged(object sender, RoutedEventArgs e)
         {
             DisplayModuleInfo SelectedModule = (sender as DependencyModuleList).ModulesList.SelectedItem as DisplayModuleInfo;
@@ -587,8 +526,8 @@ namespace Dependencies
         private void UpdateImportExportLists(DisplayModuleInfo SelectedModule)
         {
  
-            this.ImportList.Items.Clear();
-            this.ExportList.Items.Clear();
+            this.ImportList.ImportList.Items.Clear();
+            this.ExportList.ExportList.Items.Clear();
 
        
             foreach (PeImportDll DllImport in SelectedModule.Imports)
@@ -597,13 +536,13 @@ namespace Dependencies
 
                 foreach (PeImport Import in DllImport.ImportList)
                 {
-                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath));
+                    this.ImportList.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath));
                 }
             }
 
             foreach (PeExport Export in SelectedModule.Exports)
             {
-                this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
+                this.ExportList.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
             }
 
         }
@@ -720,28 +659,6 @@ namespace Dependencies
         }
 
 
-
-        private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
-            ListView.SelectAll();
-        }
-
-        //public ICollectionView ModulesItemsView { get; set; }
-
-        //private bool ModulesListUserFilter(object item)
-        //{
-        //    if (String.IsNullOrEmpty(ModuleSearchFilter.Text))
-        //        return true;
-        //    else
-        //        return ((item as DisplayModuleInfo).ModuleName.IndexOf(ModuleSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
-        //}
-
-        //private void ModuleSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        //{
-        //    ModulesItemsView.Filter = ModulesListUserFilter;
-        //    ModulesItemsView.Refresh();
-        //}
         #endregion // Commands 
 
     }
