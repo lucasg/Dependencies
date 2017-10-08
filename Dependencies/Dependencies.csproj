@@ -66,6 +66,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="About.xaml.cs">
+      <DependentUpon>About.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DependencyExportList.xaml.cs">
       <DependentUpon>DependencyExportList.xaml</DependentUpon>
     </Compile>
@@ -81,6 +84,10 @@
     <Compile Include="Models\PeImport.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Shell32IconExtractor.cs" />
+    <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="DependencyExportList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

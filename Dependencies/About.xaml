@@ -1,0 +1,30 @@
+﻿<Window x:Class="Dependencies.About"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dependencies"
+        mc:Ignorable="d"
+        Title="About" Height="300" Width="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="33*"/>
+            <RowDefinition Height="33*"/>
+            <RowDefinition Height="33*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="80*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Source="Images/Dependencies.ico" Height="32" Width="32" Grid.Column="0"/>
+            <TextBlock Grid.Column="1" 
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Center">
+                Dependency tool made by lucasg@github.com
+            </TextBlock>
+        </Grid>
+    </Grid>
+</Window>

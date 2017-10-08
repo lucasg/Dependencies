@@ -22,6 +22,7 @@
         <!--<CommandBinding Command="Exit" Executed="ExitCommandBinding_Executed"></CommandBinding>-->
         <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
         <CommandBinding Command="Close" Executed="ExitCommandBinding_Executed"></CommandBinding>
+        <CommandBinding Command="local:MainWindow.OpenAboutCommand" Executed="OpenAboutCommandBinding_Executed" />
     </Window.CommandBindings>
 
     <Window.InputBindings>
@@ -71,7 +72,7 @@
                 <MenuItem x:Name="ConfModuleItem" Header="Configure _Module search order" Height="25" Margin="0" AutomationProperties.AccessKey="Configure Module &amp;search order"/>
             </MenuItem>
             <MenuItem x:Name="HelpIem" Header="_Help" Height="25" Width="49">
-                <MenuItem x:Name="HelpAboutItem" Header="About Dependencies" Height="25"/>
+                <MenuItem x:Name="HelpAboutItem" Header="About Dependencies" Height="25" Command="local:MainWindow.OpenAboutCommand"/>
             </MenuItem>
         </Menu>
 

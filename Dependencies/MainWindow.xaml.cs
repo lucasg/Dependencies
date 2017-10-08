@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Forms;
 using System.Windows.Data;
 using System.ClrPh;
@@ -12,12 +13,17 @@ namespace Dependencies
     /// </summary>
     public partial class MainWindow : Window
     {
+        public static readonly RoutedUICommand OpenAboutCommand = new RoutedUICommand();
+        private About AboutPage;
+
         public MainWindow()
         {
             Phlib.InitializePhLib();
 
             InitializeComponent();
+
             PopulateRecentFilesMenuItems(true);
+            this.AboutPage = new About();
         }
 
 
@@ -104,8 +110,14 @@ namespace Dependencies
             System.Windows.Application.Current.Shutdown();
         }
 
+        private void OpenAboutCommandBinding_Executed(object sender, RoutedEventArgs e)
+        {
+            this.AboutPage.Show();
+        }
+
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            this.AboutPage.Close();
             Properties.Settings.Default.Save();
             base.OnClosing(e);
         }
@@ -120,32 +132,6 @@ namespace Dependencies
                 {
                     OpenNewDependencyWindow(file);
                 }
-            }
-        }
-
-        public static Func<DependencyWindow> Factory
-        {
-            get
-            {
-                return
-                    () =>
-                    {
-                        OpenFileDialog InputFileNameDlg = new OpenFileDialog();
-                        InputFileNameDlg.Filter = "exe files (*.exe, *.dll)| *.exe;*.dll; | All files (*.*)|*.*";
-                        InputFileNameDlg.FilterIndex = 0;
-                        InputFileNameDlg.RestoreDirectory = true;
-
-                        if (InputFileNameDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
-                            return null;
-                        var Filename = InputFileNameDlg.FileName;
-
-                        DependencyWindow nw = new DependencyWindow(Filename);
-
-                        // Update recent files entries
-                        App.AddToRecentDocuments(Filename);
-
-                        return nw;
-                    };
             }
         }
     }
