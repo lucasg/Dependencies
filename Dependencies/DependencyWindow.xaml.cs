@@ -469,8 +469,8 @@ namespace Dependencies
             this.ProcessedModulesCache = new ModulesCache();
             this.ApiSetmapCache = Phlib.GetApiSetSchema();
 
-            this.ModulesList.Clear();
-            this.DllTreeView.Items.Clear();
+            // TODO : Find a way to properly bind commands instead of using this hack
+            this.ModulesList.DoFindModuleInTreeCommand = DoFindModuleInTree;
 
             var RootFilename = Path.GetFileName(FileName);
             var RootModule = new DisplayModuleInfo(RootFilename, this.Pe);
@@ -676,6 +676,7 @@ namespace Dependencies
                 ExpandAllParentNode(Item.Parent as ModuleTreeViewItem);
                 Item.IsSelected = true;
                 Item.BringIntoView();
+                Item.Focus();
 
                 return true;
             }
@@ -688,6 +689,7 @@ namespace Dependencies
                     ExpandAllParentNode(Item);
                     ChildItem.IsSelected = true;
                     ChildItem.BringIntoView();
+                    ChildItem.Focus();
                     return true;
                 }
             }
@@ -702,12 +704,22 @@ namespace Dependencies
             return false;
         }
 
-        private void DoFindModuleInTree_Executed(object sender, ExecutedRoutedEventArgs e)
+        
+        public  RelayCommand DoFindModuleInTree
         {
-            DisplayModuleInfo item = this.ModulesList.ModulesList.SelectedItem as DisplayModuleInfo;
-            ModuleTreeViewItem TreeRootItem = this.DllTreeView.Items[0] as ModuleTreeViewItem;
-            FindModuleInTree(TreeRootItem, item);
+            get
+            {
+                return new RelayCommand((param) =>
+                {
+                    DisplayModuleInfo SelectedModule = (param as DisplayModuleInfo);
+                    ModuleTreeViewItem TreeRootItem = this.DllTreeView.Items[0] as ModuleTreeViewItem;
+
+                    FindModuleInTree(TreeRootItem, SelectedModule);
+                });
+            }
         }
+
+
 
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         {

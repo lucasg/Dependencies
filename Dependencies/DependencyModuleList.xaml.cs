@@ -16,6 +16,20 @@ namespace Dependencies
     {
         public ICollectionView ModulesItemsView { get; set; }
 
+        public RelayCommand DoFindModuleInTreeCommand
+        {
+            get { return (RelayCommand) GetValue(DoFindModuleInTreeCommandProperty); }
+            set { SetValue(DoFindModuleInTreeCommandProperty, value);}
+        }
+
+        // Using a DependencyProperty as the backing store for DoFindModuleInTreeCommand.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty DoFindModuleInTreeCommandProperty =
+            DependencyProperty.Register("DoFindModuleInTreeCommand", typeof(RelayCommand), typeof(DependencyModuleList), new UIPropertyMetadata(null));
+
+        public static readonly RoutedEvent SelectedModuleChangedEvent
+            = EventManager.RegisterRoutedEvent("SelectedModuleChanged", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(DependencyModuleList));
+
+
         public DependencyModuleList()
         {
             InitializeComponent();
@@ -25,6 +39,9 @@ namespace Dependencies
 
         public void AddModule(DisplayModuleInfo NewModule)
         {
+            // TODO : Find a way to properly bind commands instead of using this hack
+            NewModule.DoFindModuleInTreeCommand = DoFindModuleInTreeCommand;
+
             this.ModulesList.Items.Add(NewModule);
         }
 
@@ -33,9 +50,7 @@ namespace Dependencies
             this.ModulesList.Items.Clear();
         }
 
-        public static readonly RoutedEvent SelectedModuleChangedEvent
-            = EventManager.RegisterRoutedEvent("SelectedModuleChanged", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(DependencyModuleList));
-
+        #region public events
         public event RoutedEventHandler SelectedModuleChanged
         {
             add { AddHandler(SelectedModuleChangedEvent, value); }
@@ -46,6 +61,7 @@ namespace Dependencies
         {
             RaiseEvent(new RoutedEventArgs(SelectedModuleChangedEvent));
         }
+        #endregion public events
 
 
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)

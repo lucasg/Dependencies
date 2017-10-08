@@ -271,9 +271,15 @@
                       VerticalContentAlignment="Stretch" 
                       Grid.Row="1"/>
 
+        
+        
         <local:DependencyModuleList x:Name="ModulesList"
                                     Grid.Row="2" 
-                                    SelectedModuleChanged="OnModuleViewSelectedItemChanged">
+                                    SelectedModuleChanged="OnModuleViewSelectedItemChanged"
+                                    >
+            <!--DoFindModuleInTreeCommand="{Binding Path=DoFindModuleInTree}"-->
+            <!--DoFindModuleInTreeCommand="{Binding DoFindModuleInTree}"-->
+            <!--FindModuleInTree = "DoFindModuleInTree_Executed"-->
         </local:DependencyModuleList>
         
 
