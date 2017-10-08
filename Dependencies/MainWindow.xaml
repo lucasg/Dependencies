@@ -23,6 +23,8 @@
         <CommandBinding Command="Open" Executed="OpenCommandBinding_Executed"></CommandBinding>
         <CommandBinding Command="Close" Executed="ExitCommandBinding_Executed"></CommandBinding>
         <CommandBinding Command="local:MainWindow.OpenAboutCommand" Executed="OpenAboutCommandBinding_Executed" />
+        <CommandBinding Command="local:MainWindow.OpenUserSettingsCommand" Executed="OpenUserSettingsCommandBinding_Executed" />
+        
     </Window.CommandBindings>
 
     <Window.InputBindings>
@@ -69,7 +71,9 @@
                 <MenuItem x:Name="_StatusBarItem" Header="Status Bar" Height="25" IsCheckable="True" Margin="0" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=TwoWay}"/>
             </MenuItem>
             <MenuItem x:Name="OptionsItem" Header="_Options" Height="25" Width="54">
-                <MenuItem x:Name="ConfModuleItem" Header="Configure _Module search order" Height="25" Margin="0" AutomationProperties.AccessKey="Configure Module &amp;search order"/>
+                <MenuItem x:Name="ModuleSearchOrderItem" Header="Configure _Module search order" Height="25" Margin="0"/>
+                <Separator Height="3" Margin="0"/>
+                <MenuItem x:Name="UserSettingsItem" Header="_Properties" Height="25" Margin="0" Command="local:MainWindow.OpenUserSettingsCommand"/>
             </MenuItem>
             <MenuItem x:Name="HelpIem" Header="_Help" Height="25" Width="49">
                 <MenuItem x:Name="HelpAboutItem" Header="About Dependencies" Height="25" Command="local:MainWindow.OpenAboutCommand"/>

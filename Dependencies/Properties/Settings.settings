@@ -24,5 +24,8 @@
   &lt;string /&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
+    <Setting Name="PeVewierPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">"./peviewer.exe"</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

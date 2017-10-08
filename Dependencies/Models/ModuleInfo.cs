@@ -276,7 +276,7 @@ namespace Dependencies
 
         public bool OpenPeviewer(object Module)
         {
-            string programPath = @".\peview.exe";
+            string programPath = Dependencies.Properties.Settings.Default.PeViewerPath;
             Process PeviewerProcess = new Process();
         
             if ((Module == null))

@@ -84,6 +84,9 @@
     <Compile Include="Models\PeImport.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Shell32IconExtractor.cs" />
+    <Compile Include="UserSettings.xaml.cs">
+      <DependentUpon>UserSettings.xaml</DependentUpon>
+    </Compile>
     <Page Include="About.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -120,6 +123,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="UserSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">

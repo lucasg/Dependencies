@@ -85,5 +85,17 @@ namespace Dependencies.Properties {
                 this["RecentFiles"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("peviewer.exe")]
+        public string PeViewerPath {
+            get {
+                return System.IO.Path.GetFullPath((string) this["PeViewerPath"]);
+            }
+            set {
+                this["PeViewerPath"] = value;
+            }
+        }
     }
 }

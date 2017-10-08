@@ -14,7 +14,10 @@ namespace Dependencies
     public partial class MainWindow : Window
     {
         public static readonly RoutedUICommand OpenAboutCommand = new RoutedUICommand();
+        public static readonly RoutedUICommand OpenUserSettingsCommand = new RoutedUICommand();
+
         private About AboutPage;
+        private UserSettings UserSettings;
 
         public MainWindow()
         {
@@ -23,7 +26,9 @@ namespace Dependencies
             InitializeComponent();
 
             PopulateRecentFilesMenuItems(true);
+
             this.AboutPage = new About();
+            this.UserSettings = new UserSettings();
         }
 
 
@@ -93,10 +98,14 @@ namespace Dependencies
 
         private void OpenCommandBinding_Executed(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog InputFileNameDlg = new OpenFileDialog();
-            InputFileNameDlg.Filter = "exe files (*.exe, *.dll)| *.exe;*.dll; | All files (*.*)|*.*";
-            InputFileNameDlg.FilterIndex = 0;
-            InputFileNameDlg.RestoreDirectory = true;
+            OpenFileDialog InputFileNameDlg = new OpenFileDialog
+            {
+                Filter = "exe files (*.exe, *.dll)| *.exe;*.dll; | All files (*.*)|*.*",
+                FilterIndex = 0,
+                RestoreDirectory = true,
+                
+            };
+            
 
             if (InputFileNameDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
                 return;
@@ -112,12 +121,23 @@ namespace Dependencies
 
         private void OpenAboutCommandBinding_Executed(object sender, RoutedEventArgs e)
         {
+            this.AboutPage.Close();
+            this.AboutPage = new About();
             this.AboutPage.Show();
+        }
+
+        private void OpenUserSettingsCommandBinding_Executed(object sender, RoutedEventArgs e)
+        {
+            this.UserSettings.Close();
+            this.UserSettings = new UserSettings();
+            this.UserSettings.Show();
         }
 
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
+            this.UserSettings.Close();
             this.AboutPage.Close();
+
             Properties.Settings.Default.Save();
             base.OnClosing(e);
         }
