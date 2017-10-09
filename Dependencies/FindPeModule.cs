@@ -424,6 +424,7 @@ namespace Dependencies
         // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682586(v=vs.85).aspx
         // 
         // if (SafeDllSearchMode) {
+        //      -1. Sxs manifests
         //      0. KnownDlls list
         //      1. Loaded PE folder
         //      2. C:\Windows\(System32 | SysWow64 )
@@ -431,7 +432,7 @@ namespace Dependencies
         //      4. C:\Windows
         //      5. %pwd%
         //      6. AppDatas
-        //      7. Sxs manifests
+        //      }
         public static string FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache)
         {
             bool Wow64Dll = RootPe.IsWow64Dll();
@@ -489,13 +490,24 @@ namespace Dependencies
                 return FoundPePath;
             }
 
-            // 5. Look in %pwd%
+            // 5. Look in current directory
+            // Ignored for the time being since we can't know from
+            // where the exe is run
+            // TODO : Add a user supplied path emulating %cwd%
+
 
             // 6. Look in local app data (check for python for exemple)
 
-            
 
-            // 8. Find in PATH
+
+            // 7. Find in PATH
+            string PATH = Environment.GetEnvironmentVariable("PATH");
+            List<String> PATHFolders = new List<string>(PATH.Split(';'));
+            FoundPePath = FindPeFromPath(ModuleName, PATHFolders, Wow64Dll);
+            if (FoundPePath != null)
+            {
+                return FoundPePath;
+            }
 
             return null;
         }
