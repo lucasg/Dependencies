@@ -72,7 +72,9 @@ namespace Dependencies
             if (String.IsNullOrEmpty(ImportSearchFilter.Text))
                 return true;
             else
-                return ((item as DisplayPeImport).Name.IndexOf(ImportSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+                return ((item as DisplayPeImport).Name.IndexOf(ImportSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                       ((item as DisplayPeImport).ModuleName.IndexOf(ImportSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+
         }
 
         private void ImportSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
