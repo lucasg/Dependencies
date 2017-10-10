@@ -274,15 +274,79 @@ namespace Dependencies
     /// </summary>
     public partial class DependencyWindow : UserControl
     { 
-        public string Filename;
+        
 
         PE Pe;
         string RootFolder;
+        string Filename;
         PhSymbolProvider SymPrv;
         SxsEntries SxsEntriesCache;
         ApiSetSchema ApiSetmapCache;
         ModulesCache ProcessedModulesCache;
 
+        #region PublicAPI
+
+        /// <summary>
+        /// Header's name for MDI child window
+        /// </summary>
+        public string Header
+        {
+            get { return this.Filename; }
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        public DependencyWindow(String FileName)
+        {
+            InitializeComponent();
+
+            this.Filename = FileName;
+            this.Pe = new PE(FileName);
+            
+            if (!this.Pe.LoadSuccessful)
+            {
+                MessageBox.Show(
+                    String.Format("{0:s} is not a valid PE-COFF file", this.Filename), 
+                    "Invalid PE", 
+                    MessageBoxButton.OK
+                );
+                return;
+            }
+
+            this.SymPrv = new PhSymbolProvider();
+            this.RootFolder = Path.GetDirectoryName(FileName);
+            this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
+            this.ProcessedModulesCache = new ModulesCache();
+            this.ApiSetmapCache = Phlib.GetApiSetSchema();
+
+            // TODO : Find a way to properly bind commands instead of using this hack
+            this.ModulesList.DoFindModuleInTreeCommand = DoFindModuleInTree;
+
+            var RootFilename = Path.GetFileName(FileName);
+            var RootModule = new DisplayModuleInfo(RootFilename, this.Pe);
+            this.ProcessedModulesCache.Add(new ModuleCacheKey(RootFilename, FileName), RootModule);
+
+            ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
+            DependencyNodeContext childTreeInfoContext = new DependencyNodeContext()
+            {
+                ModuleInfo = new WeakReference(RootModule),
+                IsDummy = false
+            };
+
+            treeNode.DataContext = childTreeInfoContext;
+            treeNode.Header = treeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
+            treeNode.IsExpanded = true;
+
+            this.DllTreeView.Items.Add(treeNode);
+
+            // Recursively construct tree of dll imports
+            ConstructDependencyTree(treeNode, this.Pe);
+        }
+
+        #endregion PublicAPI
+
+        #region TreeConstruction
         /// <summary>
         /// Background processing of a single PE file.
         /// It can be lengthy since there are disk access (and misses).
@@ -432,7 +496,7 @@ namespace Dependencies
         }
 
         
-        public void ResolveDummyEntries(object sender, RoutedEventArgs e)
+        private void ResolveDummyEntries(object sender, RoutedEventArgs e)
         {
             ModuleTreeViewItem NeedDummyPeNode = e.OriginalSource as ModuleTreeViewItem;
 
@@ -455,47 +519,9 @@ namespace Dependencies
             ConstructDependencyTree(NeedDummyPeNode, Filepath);     
         }
 
-        public DependencyWindow(String FileName)
-        {
-            InitializeComponent();
+        #endregion TreeConstruction
 
-            this.SymPrv = new PhSymbolProvider();
-
-            this.Filename = FileName;
-            this.Pe = new PE(FileName);
-            this.RootFolder = Path.GetDirectoryName(FileName);
-            this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
-            this.ProcessedModulesCache = new ModulesCache();
-            this.ApiSetmapCache = Phlib.GetApiSetSchema();
-
-            // TODO : Find a way to properly bind commands instead of using this hack
-            this.ModulesList.DoFindModuleInTreeCommand = DoFindModuleInTree;
-
-            var RootFilename = Path.GetFileName(FileName);
-            var RootModule = new DisplayModuleInfo(RootFilename, this.Pe);
-            this.ProcessedModulesCache.Add(new ModuleCacheKey(RootFilename, FileName), RootModule);
-
-            ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
-            DependencyNodeContext childTreeInfoContext = new DependencyNodeContext()
-            {
-                ModuleInfo = new WeakReference(RootModule),
-                IsDummy = false
-            };
-
-            treeNode.DataContext = childTreeInfoContext;
-            treeNode.Header = treeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
-            treeNode.IsExpanded = true;
-            
-            this.DllTreeView.Items.Add(treeNode);
-
-            // Recursively construct tree of dll imports
-            ConstructDependencyTree(treeNode, this.Pe);
-        }
-
-        public string Header
-        {
-            get { return this.Filename; }
-        }
+        
 
         #region Commands
      
