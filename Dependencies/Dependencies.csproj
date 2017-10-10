@@ -79,6 +79,8 @@
       <DependentUpon>DependencyModuleList.xaml</DependentUpon>
     </Compile>
     <Compile Include="FindPeModule.cs" />
+    <Compile Include="Helpers\RelayCommand.cs" />
+    <Compile Include="Helpers\SettingBindingHandler.cs" />
     <Compile Include="Models\ModuleInfo.cs" />
     <Compile Include="Models\PeExport.cs" />
     <Compile Include="Models\PeImport.cs" />

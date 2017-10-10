@@ -2,8 +2,9 @@ using System;
 using System.ClrPh;
 using System.Diagnostics;
 using System.Windows;
+using Dependencies;
 
-public class DisplayPeExport : DefaultSettingsBindingHandler
+public class DisplayPeExport : SettingBindingHandler
 {
    public DisplayPeExport(
         /*_In_*/ PeExport PeExport,

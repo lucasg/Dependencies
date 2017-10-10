@@ -2,8 +2,9 @@ using System;
 using System.ClrPh;
 using System.Diagnostics;
 using System.Windows;
+using Dependencies;
 
-public class DisplayPeImport : DefaultSettingsBindingHandler
+public class DisplayPeImport : SettingBindingHandler
 {
 
     public DisplayPeImport(

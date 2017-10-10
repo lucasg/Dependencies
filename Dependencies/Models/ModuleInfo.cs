@@ -100,7 +100,7 @@ namespace Dependencies
         private DisplayModuleInfo UnderlyingModule;
     }
 
-    public class DisplayModuleInfo : DefaultSettingsBindingHandler
+    public class DisplayModuleInfo : SettingBindingHandler
     {
         #region Constructors 
         public DisplayModuleInfo(string ModuleName)
