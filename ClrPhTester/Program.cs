@@ -157,7 +157,7 @@ namespace ClrPhTester
 
 
         static void Main(string[] args)
-        {
+        { 
 
             Phlib.InitializePhLib();
             var ProgramArgs = ParseArgs(args);

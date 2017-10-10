@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
+using System.ClrPh;
 
 namespace Dependencies
 {
@@ -19,6 +20,19 @@ namespace Dependencies
             InitializeComponent();
 
             ExportItemsView = CollectionViewSource.GetDefaultView(this.ExportList.Items.SourceCollection);
+        }
+
+        public void SetExports(List<PeExport> Exports, PhSymbolProvider SymPrv)
+        {
+            this.ExportList.Items.Clear();
+
+            foreach (PeExport Export in Exports)
+            {
+                this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
+            }
+
+            // Refresh search view
+            ExportSearchFilter_OnTextChanged(null, null);
         }
 
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)

@@ -7,8 +7,7 @@ using System.ClrPh;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
-using System.Collections.ObjectModel;
-using System.Windows.Data;
+
 
 public class RelayCommand : ICommand
 {
@@ -525,26 +524,9 @@ namespace Dependencies
 
         private void UpdateImportExportLists(DisplayModuleInfo SelectedModule)
         {
- 
-            this.ImportList.ImportList.Items.Clear();
-            this.ExportList.ExportList.Items.Clear();
 
-       
-            foreach (PeImportDll DllImport in SelectedModule.Imports)
-            {
-                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, DllImport.Name, this.SxsEntriesCache);
-
-                foreach (PeImport Import in DllImport.ImportList)
-                {
-                    this.ImportList.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath));
-                }
-            }
-
-            foreach (PeExport Export in SelectedModule.Exports)
-            {
-                this.ExportList.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
-            }
-
+            this.ImportList.SetImports(SelectedModule.Imports, this.Pe, this.SxsEntriesCache, SymPrv);
+            this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
         }
 
         /// <summary>

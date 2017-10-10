@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
+using System.ClrPh;
 
 namespace Dependencies
 {
@@ -19,6 +20,24 @@ namespace Dependencies
             InitializeComponent();
 
             ImportItemsView = CollectionViewSource.GetDefaultView(this.ImportList.Items.SourceCollection);
+        }
+
+        public void SetImports(List<PeImportDll> Imports, PE rootPe, SxsEntries SxsCache, PhSymbolProvider SymPrv)
+        {
+            this.ImportList.Items.Clear();
+
+            foreach (PeImportDll DllImport in Imports)
+            {
+                String PeFilePath = FindPe.FindPeFromDefault(rootPe, DllImport.Name, SxsCache);
+
+                foreach (PeImport Import in DllImport.ImportList)
+                {
+                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath));
+                }
+            }
+
+            // Refresh search view
+            ImportSearchFilter_OnTextChanged(null, null);
         }
 
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)

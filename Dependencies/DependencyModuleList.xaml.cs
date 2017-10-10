@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.ComponentModel;
 using System.Windows.Data;
 
+
 namespace Dependencies
 {
     /// <summary>
@@ -45,10 +46,6 @@ namespace Dependencies
             this.ModulesList.Items.Add(NewModule);
         }
 
-        public void Clear()
-        {
-            this.ModulesList.Items.Clear();
-        }
 
         #region public events
         public event RoutedEventHandler SelectedModuleChanged
