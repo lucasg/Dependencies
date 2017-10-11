@@ -10,6 +10,20 @@ using System.Windows.Data;
 
 namespace Dependencies
 {
+    public class ModuleCacheKey : Tuple<string, string>
+    {
+        public ModuleCacheKey(string Name, string Filepath)
+        : base(Name, Filepath)
+        {
+        }
+    }
+
+    public class ModulesCache : Dictionary<ModuleCacheKey, DisplayModuleInfo>
+    {
+
+    }
+
+
     /// <summary>
     /// Logique d'interaction pour DependencyModuleList.xaml
     /// </summary>

@@ -231,26 +231,11 @@ namespace Dependencies
     }
 
 
-
-    public class ModuleCacheKey : Tuple<string, string>
-    {
-        public ModuleCacheKey(string Name, string Filepath)
-        :base(Name, Filepath)
-        {
-        }
-    }
-
-    public class ModulesCache : Dictionary<ModuleCacheKey, DisplayModuleInfo>
-    {
-
-    }
-
     /// <summary>
     /// Logique d'interaction pour DependencyWindow.xaml
     /// </summary>
     public partial class DependencyWindow : UserControl
     { 
-        
 
         PE Pe;
         string RootFolder;
