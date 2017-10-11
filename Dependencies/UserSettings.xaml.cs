@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Forms;
 
 namespace Dependencies
@@ -8,6 +9,9 @@ namespace Dependencies
         public UserSettings()
         {
             InitializeComponent();
+
+            TreeBuildCombo.ItemsSource = Enum.GetValues(typeof(TreeBuildingBehaviour.DependencyTreeBehaviour));
+            //TreeBuildCombo.SelectedItem = TreeBuildingBehaviour.FromString(Dependencies.Properties.Settings.Default.TreeBuildBehaviour);
         }
 
         private void OnPeviewerPathSettingChange(object sender, RoutedEventArgs e)

@@ -91,10 +91,22 @@ namespace Dependencies.Properties {
         [global::System.Configuration.DefaultSettingValueAttribute("peviewer.exe")]
         public string PeViewerPath {
             get {
-                return System.IO.Path.GetFullPath((string) this["PeViewerPath"]);
+                return ((string)(this["PeViewerPath"]));
             }
             set {
                 this["PeViewerPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ChildOnly")]
+        public string TreeBuildBehaviour {
+            get {
+                return ((string)(this["TreeBuildBehaviour"]));
+            }
+            set {
+                this["TreeBuildBehaviour"] = value;
             }
         }
     }

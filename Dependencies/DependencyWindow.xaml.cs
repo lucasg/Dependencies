@@ -7,7 +7,7 @@ using System.ClrPh;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
-
+using System.Windows.Data;
 
 /// <summary>
 /// ImportContext : Describe an import module parsed from a PE
@@ -31,23 +31,77 @@ public struct ImportContext
     public bool IsDelayLoadImport;
 }
 
-/// <summary>
-/// User context of every dependency tree node
-/// </summary>
-public struct DependencyNodeContext
-{
-    public DependencyNodeContext(DependencyNodeContext other)
-    {
-        ModuleInfo = other.ModuleInfo;
-        IsDummy = other.IsDummy;
-    }
-
-    public WeakReference ModuleInfo;
-    public bool IsDummy;
-}
 
 namespace Dependencies
 {
+    public class TreeBuildingBehaviour : IValueConverter
+    { 
+        public enum DependencyTreeBehaviour
+        {
+            ChildOnly,
+            RecursiveOnlyOnDirectImports,
+            Recursive,
+
+        }
+
+        public static DependencyTreeBehaviour GetGlobalBehaviour()
+        {
+            return (DependencyTreeBehaviour) (new TreeBuildingBehaviour()).Convert(
+                Dependencies.Properties.Settings.Default.TreeBuildBehaviour,
+                null,// targetType
+                null,// parameter
+                null // System.Globalization.CultureInfo
+            );
+        }
+
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            string StrBehaviour = (string)value;
+
+            switch (StrBehaviour)
+            {
+                default:
+                case "ChildOnly":
+                    return DependencyTreeBehaviour.ChildOnly;
+                case "RecursiveOnlyOnDirectImports":
+                    return DependencyTreeBehaviour.RecursiveOnlyOnDirectImports;
+                case "Recursive":
+                    return DependencyTreeBehaviour.Recursive;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            DependencyTreeBehaviour Behaviour = (DependencyTreeBehaviour) value;
+
+            switch (Behaviour)
+            {
+                default:
+                case DependencyTreeBehaviour.ChildOnly:
+                    return "ChildOnly";
+                case DependencyTreeBehaviour.RecursiveOnlyOnDirectImports:
+                    return "RecursiveOnlyOnDirectImports";
+                case DependencyTreeBehaviour.Recursive:
+                    return "Recursive";
+            }
+        }
+    }
+
+    /// <summary>
+    /// User context of every dependency tree node
+    /// </summary>
+    public struct DependencyNodeContext
+    {
+        public DependencyNodeContext(DependencyNodeContext other)
+        {
+            ModuleInfo = other.ModuleInfo;
+            IsDummy = other.IsDummy;
+        }
+
+        public WeakReference ModuleInfo;
+        public bool IsDummy;
+    }
+
     public class ModuleTreeViewItem : TreeViewItem, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -312,6 +366,14 @@ namespace Dependencies
             }
         }
 
+        private class BacklogImport : Tuple<ModuleTreeViewItem, string>
+        {
+            public BacklogImport(ModuleTreeViewItem Node, string Filepath)
+            : base(Node, Filepath)
+            {
+            }
+        }
+
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, string FilePath, int RecursionLevel = 0)
         {
             ConstructDependencyTree(RootNode, new PE(FilePath), RecursionLevel);
@@ -333,8 +395,10 @@ namespace Dependencies
 
 
             bw.RunWorkerCompleted += (sender, e) =>
-            { 
+            {
+                TreeBuildingBehaviour.DependencyTreeBehaviour SettingTreeBehaviour = Dependencies.TreeBuildingBehaviour.GetGlobalBehaviour();
                 List<ModuleTreeViewItem> PeWithDummyEntries = new List<ModuleTreeViewItem>();
+                List<BacklogImport> PEProcessingBacklog = new List<BacklogImport>();
 
                 // Important !
                 // 
@@ -370,11 +434,30 @@ namespace Dependencies
                                 var NewModule = new ApiSetModuleInfo(NewTreeContext.ModuleName, ref ApiSetContractModule);
 
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
+
+                                if (SettingTreeBehaviour == TreeBuildingBehaviour.DependencyTreeBehaviour.Recursive)
+                                {
+                                    PEProcessingBacklog.Add(new BacklogImport(childTreeNode, ApiSetContractModule.ModuleName));
+                                }
                             }
                             else
                             {
                                 var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, NewTreeContext.IsDelayLoadImport);
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
+
+                                switch(SettingTreeBehaviour)
+                                {
+                                    case TreeBuildingBehaviour.DependencyTreeBehaviour.RecursiveOnlyOnDirectImports:
+                                        if (!NewTreeContext.IsDelayLoadImport)
+                                        {
+                                            PEProcessingBacklog.Add(new BacklogImport(childTreeNode, NewModule.ModuleName));
+                                        }
+                                        break;
+
+                                    case TreeBuildingBehaviour.DependencyTreeBehaviour.Recursive:
+                                        PEProcessingBacklog.Add(new BacklogImport(childTreeNode, NewModule.ModuleName));
+                                        break;
+                                }
                             }
                         }
 
@@ -412,6 +495,18 @@ namespace Dependencies
                     childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
                     RootNode.Items.Add(childTreeNode);
                 }
+
+
+                // Process next batch of dll imports
+                if (SettingTreeBehaviour != TreeBuildingBehaviour.DependencyTreeBehaviour.ChildOnly)
+                { 
+                    foreach (var ImportNode in PEProcessingBacklog)
+                    {
+                        ConstructDependencyTree(ImportNode.Item1, ImportNode.Item2, RecursionLevel + 1); // warning : recursive call
+                    }
+                }
+
+
             };
 
             bw.RunWorkerAsync();

@@ -24,8 +24,11 @@
   &lt;string /&gt;
 &lt;/ArrayOfString&gt;</Value>
     </Setting>
-    <Setting Name="PeVewierPath" Type="System.String" Scope="User">
-      <Value Profile="(Default)">"./peviewer.exe"</Value>
+    <Setting Name="PeViewerPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)">peviewer.exe</Value>
+    </Setting>
+    <Setting Name="TreeBuildBehaviour" Type="System.String" Scope="User">
+      <Value Profile="(Default)">ChildOnly</Value>
     </Setting>
   </Settings>
 </SettingsFile>
