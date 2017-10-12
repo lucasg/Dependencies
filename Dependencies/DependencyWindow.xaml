@@ -1,14 +1,15 @@
-﻿<UserControl x:Class="Dependencies.DependencyWindow"
+﻿<TabItem x:Class="Dependencies.DependencyWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
+        xmlns:dragablz="clr-namespace:Dragablz;assembly=Dragablz"
         xmlns:util="clr-namespace:Wpf.Util"
         xmlns:properties="clr-namespace:Dependencies.Properties"
         mc:Ignorable="d" d:DesignHeight="600" d:DesignWidth="600">
 
-    <UserControl.Resources>
+    <TabItem.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
         <local:DelayedImageToHeaderConverter x:Key="imgdelayed"/>
 
@@ -17,7 +18,7 @@
             <Setter Property="Padding" Value="5,0,0,0"></Setter>
         </Style>
 
-    </UserControl.Resources>
+    </TabItem.Resources>
 
 
     <Grid x:Name="ResizeElemGrid" Margin="0,0,0,0">
@@ -164,4 +165,4 @@
 
 
     </Grid>
-</UserControl>
+</TabItem>

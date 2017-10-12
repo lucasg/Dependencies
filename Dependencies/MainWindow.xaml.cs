@@ -1,12 +1,31 @@
 ﻿using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Forms;
 using System.Windows.Data;
+using System.Collections.ObjectModel;
+
 using System.ClrPh;
+using Dragablz;
 
 namespace Dependencies
 {
+    public class DependenciesInterTabClient : DefaultInterTabClient
+    {
+        //public INewTabHost<Window> GetNewHost(IInterTabClient interTabClient, object partition, TabablzControl source)
+        //{
+        //    var view = new DependencyWindow(null);
+        //    //var model = new BoundExampleModel();
+        //    //view.DataContext = model;
+        //    return new NewTabHost<Window>((Window)view, source);
+        //}
+
+        public override TabEmptiedResponse TabEmptiedHandler(TabablzControl tabControl, Window window)
+        {
+            return TabEmptiedResponse.DoNothing;
+        }
+    }
 
     /// <summary>
     /// Logique d'interaction pour MainWindow.xaml
@@ -15,6 +34,7 @@ namespace Dependencies
     {
         public static readonly RoutedUICommand OpenAboutCommand = new RoutedUICommand();
         public static readonly RoutedUICommand OpenUserSettingsCommand = new RoutedUICommand();
+        private readonly IInterTabClient _interTabClient = new DependenciesInterTabClient();
 
         private About AboutPage;
         private UserSettings UserSettings;
@@ -29,7 +49,17 @@ namespace Dependencies
 
             this.AboutPage = new About();
             this.UserSettings = new UserSettings();
+
+            // TODO : understand how to reliably bind in xaml
+            this.TabControl.InterTabController.InterTabClient = DoNothingInterTabClient;
         }
+
+        public IInterTabClient DoNothingInterTabClient
+        {
+            get { return _interTabClient; }
+        }
+
+
 
 
         // Populate "recent entries"
@@ -75,9 +105,11 @@ namespace Dependencies
 
         public void OpenNewDependencyWindow(String Filename)
         {
-
-            this.DependencyRootLayout.FloatingItems.Add(new DependencyWindow(Filename));
-
+            var newDependencyWindow = new DependencyWindow(Filename);
+            newDependencyWindow.Header = Path.GetFileNameWithoutExtension(Filename);
+            
+            this.TabControl.AddToSource(newDependencyWindow);
+            this.TabControl.SelectedItem = newDependencyWindow;
 
             // Update recent files entries
             App.AddToRecentDocuments(Filename);

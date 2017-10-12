@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Data;
+using Dragablz;
 
 /// <summary>
 /// ImportContext : Describe an import module parsed from a PE
@@ -234,7 +235,7 @@ namespace Dependencies
     /// <summary>
     /// Logique d'interaction pour DependencyWindow.xaml
     /// </summary>
-    public partial class DependencyWindow : UserControl
+    public partial class DependencyWindow : TabItem // UserControl
     { 
 
         PE Pe;
@@ -250,10 +251,10 @@ namespace Dependencies
         /// <summary>
         /// Header's name for MDI child window
         /// </summary>
-        public string Header
-        {
-            get { return this.Filename; }
-        }
+        //public override string Header
+        //{
+        //    get { return Path.GetFileNameWithoutExtension(this.Filename); }
+        //}
 
         /// <summary>
         /// Constructor.

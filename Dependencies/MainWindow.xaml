@@ -42,6 +42,18 @@
             <!-- Hide/Show the status bar based on a global switch -->
             <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
 
+            <dragablz:InterTabController  x:Key="DependenciesInterTabController" Partition="2AE89D18-F236-4D20-9605-6C03319038E6"/>
+
+            <Style TargetType="{x:Type dragablz:TabablzControl}" x:Key="DependenciesTabControlStyle">
+                <Setter Property="ShowDefaultCloseButton" Value="True" />
+                <Setter Property="ItemContainerStyle" Value="{StaticResource TrapezoidDragableTabItemStyle}" />
+                <Setter Property="HeaderMemberPath" Value="Header" />
+                <Setter Property="HeaderMemberPath" Value="Header" />
+                <Setter Property="InterTabController" Value="{StaticResource InterTabController}" />
+                <Setter Property="Margin" Value="0 0 0 0" />
+                <Setter Property="AdjacentHeaderItemOffset" Value="-10" />
+                <Setter Property="FixedHeaderCount" Value="0" />
+            </Style>
         </ResourceDictionary>
 
     </Window.Resources>
@@ -84,16 +96,50 @@
         <!-- DependencyWindow does not support being a floating window => IsFloatDropZoneEnabled="False" -->
         <!-- all dragablz controls need to reference  Partition="2AE89D18-F236-4D20-9605-6C03319038E6" in order to dock correctly -->
         <dockablz:Layout Partition="2AE89D18-F236-4D20-9605-6C03319038E6" Name="DependencyRootLayout"
-                    IsFloatDropZoneEnabled="False"
+                    IsFloatDropZoneEnabled="True"
                     FloatingItemHeaderMemberPath="Header"
-                    FloatingItemsContainerMargin="0 0 0 0"
                     Grid.Row="1">
 
-            <dockablz:Layout.FloatingItems>
-            </dockablz:Layout.FloatingItems>
+            <!--<dockablz:Layout.FloatingItems>
+            </dockablz:Layout.FloatingItems>-->
+
+            
+
+            <!-- branch template lets dragablz create a new tab control after a window is split via docking -->
+            <dockablz:Layout.BranchTemplate>
+                <DataTemplate>
+                    <dragablz:TabablzControl Style="{StaticResource DependenciesTabControlStyle}" InterTabController="{StaticResource DependenciesInterTabController}">
+                    </dragablz:TabablzControl>
+                </DataTemplate>
+            </dockablz:Layout.BranchTemplate>
+            
+            <!-- a root, named tab control is needed, so when a tab is torn and a new window is created, the new target tab control can be identified -->
+            <dragablz:TabablzControl x:Name="TabControl"
+                                 Style="{StaticResource DependenciesTabControlStyle}"
+                                 InterTabController="{StaticResource DependenciesInterTabController}">
+                <!--<dragablz:TabablzControl.HeaderSuffixContent>
+                    --><!--<Button Style="{StaticResource AddItemCommandButtonStyle}" 
+                            Command="Open"/>-->
+                            
+                            <!--TODO : implement Visibility button -->
+                            <!--IsHeaderPanelVisible="{Binding Path=ShowAddItemButtom, RelativeSource={RelativeSource AncestorLevel=1,AncestorType={x:Type local:MainWindow},Mode=FindAncestor}}">-->
+                            <!--Visibility="{TemplateBinding ShowDefaultAddButton, Converter={StaticResource BooleanToVisibilityConverter}}"--><!--
+                            
+                </dragablz:TabablzControl.HeaderSuffixContent>-->
+            </dragablz:TabablzControl>
+
 
         </dockablz:Layout>
 
-        <StatusBar x:Name="AppStatusBar" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Bottom" Grid.Row="2" MinHeight="28" Panel.ZIndex="1" Margin="0" VerticalAlignment="Bottom" Visibility="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}"/>
+        <StatusBar x:Name="AppStatusBar" 
+                   HorizontalContentAlignment="Stretch" 
+                   VerticalContentAlignment="Bottom" 
+                   Grid.Row="2" 
+                   MinHeight="28" 
+                   Panel.ZIndex="1" 
+                   Margin="0" 
+                   VerticalAlignment="Bottom" 
+                   Visibility="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}"
+                   />
     </Grid>
 </Window>
