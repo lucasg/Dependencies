@@ -321,18 +321,26 @@ namespace Dependencies
             {
                 bool FoundApiSet = false;
                 string ImportDllName = DllImport.Name;
-                string ImportDllNameWithoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
+
 
                 // Look for api set target 
-                if (this.ApiSetmapCache.ContainsKey(ImportDllNameWithoutExtension))
+                if (ImportDllName.StartsWith("api-") || ImportDllName.StartsWith("ext-"))
                 {
-                    ApiSetTarget Targets = this.ApiSetmapCache[ImportDllNameWithoutExtension];
-                    if (Targets.Count > 0)
+                    // Strip the .dll extension and the last number (which is probably a build counter)
+                    string ImportDllNameWithoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
+                    string ImportDllHashKey = ImportDllNameWithoutExtension.Substring(0, ImportDllNameWithoutExtension.LastIndexOf("-"));
+
+                    if (this.ApiSetmapCache.ContainsKey(ImportDllHashKey))
                     {
-                        FoundApiSet = true;
-                        ImportDllName = Targets[0];
+                        ApiSetTarget Targets = this.ApiSetmapCache[ImportDllHashKey];
+                        if (Targets.Count > 0)
+                        {
+                            FoundApiSet = true;
+                            ImportDllName = Targets[0];
+                        }
                     }
                 }
+               
 
                 // Find Dll in "paths"
                 String PeFilePath = FindPe.FindPeFromDefault(this.Pe, ImportDllName, this.SxsEntriesCache);

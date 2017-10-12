@@ -186,11 +186,15 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
 		
 	auto apiSetMapAsNumber = reinterpret_cast<ULONG_PTR>(apiSetMap);
 	auto ApiSetEntryIterator = reinterpret_cast<PAPI_SET_NAMESPACE_ENTRY>((apiSetMap->EntryOffset + apiSetMapAsNumber));
+
 	for (ULONG i = 0; i < apiSetMap->Count; i++) {
 
 		// Retrieve api min-win contract name
 		PWCHAR ApiSetEntryNameBuffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + ApiSetEntryIterator->NameOffset);
 		String^ ApiSetEntryName = gcnew String(ApiSetEntryNameBuffer, 0, ApiSetEntryIterator->NameLength/sizeof(WCHAR));
+
+		// Strip the .dll extension and the last number (which is probably a build counter)
+		String^ ApiSetEntryHashKey = ApiSetEntryName->Substring(0, ApiSetEntryName->LastIndexOf("-"));
 
 		ApiSetTarget^ ApiSetEntryTargets = gcnew ApiSetTarget();
 
@@ -213,7 +217,7 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
 		}
 
 
-		ApiSets->Add(ApiSetEntryName, ApiSetEntryTargets);
+		ApiSets->Add(ApiSetEntryHashKey, ApiSetEntryTargets);
 		ApiSetEntryIterator++;
 	}
 
