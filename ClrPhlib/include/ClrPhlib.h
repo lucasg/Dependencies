@@ -33,9 +33,13 @@ namespace System {
             static List<String^>^ KnownDll32List;
 
 			
-			// Return the Api Set schema for this application
-			// TODO : check if this is a good approximation for system-wide api set schema.
+			// Return the Api Set schema:
+			// NB: Api set resolution rely on hash buckets who 
+			// can contains more entries than this schema.
 			static ApiSetSchema^ GetApiSetSchema();
+
+			// Resolve an api set dll. Return empty string if there is no host dll.
+			// static String^ ResolveApiSet(_In_ String^ ApiSetLibraryName);
         };
 
 

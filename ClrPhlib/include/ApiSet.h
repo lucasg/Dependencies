@@ -1,6 +1,9 @@
 #pragma once
 #include <ph.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 typedef struct _API_SET_NAMESPACE {
 	ULONG Version;
@@ -33,3 +36,18 @@ typedef struct _API_SET_VALUE_ENTRY {
 	ULONG ValueOffset;
 	ULONG ValueLength;
 } API_SET_VALUE_ENTRY, *PAPI_SET_VALUE_ENTRY;
+
+
+/*NTSTATUS
+NTAPI
+ApiSetResolveToHost(
+	_In_ PAPI_SET_NAMESPACE ApiSetSchema,
+	_In_ PCUNICODE_STRING FileNameIn,
+	_In_opt_ PCUNICODE_STRING ParentName,
+	_Out_ PBOOLEAN Resolved,
+	_Out_ PUNICODE_STRING HostBinary
+);*/
+
+#ifdef __cplusplus
+}
+#endif

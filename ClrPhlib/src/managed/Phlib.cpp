@@ -1,5 +1,6 @@
 #include <ClrPhlib.h>
 #include <UnmanagedPh.h>
+#include <atlstr.h>
 #include <ApiSet.h>
 
 
@@ -101,8 +102,67 @@ List<String^>^ Phlib::GetKnownDlls(_In_ bool Wow64Dlls)
 	return Phlib::KnownDll64List;
 }
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+PAPI_SET_NAMESPACE GetApiSetNamespace()
+{
+	ULONG	ReturnLength;
+	PROCESS_BASIC_INFORMATION ProcessInformation;
+	PAPI_SET_NAMESPACE apiSetMap = NULL;
 
+	//	Retrieve PEB address
+	if (!NT_SUCCESS(NtQueryInformationProcess(
+		GetCurrentProcess(),
+		ProcessBasicInformation,
+		&ProcessInformation,
+		sizeof(PROCESS_BASIC_INFORMATION),
+		&ReturnLength
+	)))
+	{
+		return NULL;
+	}
+
+	//	Parsing PEB structure and locating api set map
+	PPEB peb = static_cast<PPEB>(ProcessInformation.PebBaseAddress);
+	apiSetMap =  static_cast<PAPI_SET_NAMESPACE>(peb->ApiSetMap);
+
+	return apiSetMap;
+}
+
+//bool ResolveApiSetNative(_In_ UNICODE_STRING *ApiSetFileName, UNICODE_STRING *HostLibrary)
+//{
+//	BOOLEAN bResolved = false;
+//	PAPI_SET_NAMESPACE apiSetMap = GetApiSetNamespace();
+//
+//	// Check the returned api namespace is correct
+//	if (!apiSetMap) {
+//		return false;
+//	}
+//	
+//	NTSTATUS Status = STATUS_SUCCESS;
+//	// Resolving using undocumented ntdll API : there is only a public symbol defined for it.
+//	/*NTSTATUS Status = ApiSetResolveToHost(
+//		apiSetMap,
+//		ApiSetFileName,
+//		NULL,
+//		&bResolved,
+//		HostLibrary
+//	);*/
+//
+//	
+//
+//	if ((!NT_SUCCESS(Status)) || !bResolved) {
+//		return false;
+//	}
+//
+//	return true;
+//}
+
+#ifdef __cplusplus
+}
+#endif
 
 ApiSetSchema^ Phlib::GetApiSetSchema()
 {
@@ -114,28 +174,17 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
 	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-i.html
 	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-ii.html
 	
-	ULONG	ReturnLength;
-	PROCESS_BASIC_INFORMATION ProcessInformation;
+	
 	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
+	PAPI_SET_NAMESPACE apiSetMap = GetApiSetNamespace();
 
-	//	Retrieve PEB address
-	if (!NT_SUCCESS(NtQueryInformationProcess(
-		GetCurrentProcess(),
-		ProcessBasicInformation,
-		&ProcessInformation,
-		sizeof(PROCESS_BASIC_INFORMATION),
-		&ReturnLength
-	)))
-	{
+	// Check the returned api namespace is correct
+	if (!apiSetMap) {
 		return ApiSets;
 	}
 
-	//	Parsing PEB structure and locating api set map
-	PPEB peb = static_cast<PPEB>(ProcessInformation.PebBaseAddress);
-	PAPI_SET_NAMESPACE apiSetMap = static_cast<PAPI_SET_NAMESPACE>(peb->ApiSetMap);
+		
 	auto apiSetMapAsNumber = reinterpret_cast<ULONG_PTR>(apiSetMap);
-	
-
 	auto ApiSetEntryIterator = reinterpret_cast<PAPI_SET_NAMESPACE_ENTRY>((apiSetMap->EntryOffset + apiSetMapAsNumber));
 	for (ULONG i = 0; i < apiSetMap->Count; i++) {
 
