@@ -414,7 +414,7 @@ namespace Dependencies
                     if (!this.ProcessedModulesCache.ContainsKey(ModuleKey))
                     {
                         // Missing module "found"
-                        if (NewTreeContext.PeFilePath == null)
+                        if ((NewTreeContext.PeFilePath == null) || !File.Exists(NewTreeContext.PeFilePath)) 
                         {
                             this.ProcessedModulesCache[ModuleKey] = new NotFoundModuleInfo(ModuleName);
                         }

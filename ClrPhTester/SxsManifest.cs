@@ -55,10 +55,10 @@ namespace ClrPhTester
 
 
             // TODO : DLL search order ?
-            if (!File.Exists(Path))
-            {
-                Path = "???";
-            }
+            //if (!File.Exists(Path))
+            //{
+            //    Path = "???";
+            //}
 
         }
 
