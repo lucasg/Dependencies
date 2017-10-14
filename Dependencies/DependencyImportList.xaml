@@ -99,7 +99,8 @@
         <Grid x:Name="ImportSearchBar"
                     VerticalAlignment="Bottom"
                     Visibility="Collapsed"
-                    Grid.Row="1">
+                    Grid.Row="1"
+                    Margin="0 0 3 0">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60"/>
