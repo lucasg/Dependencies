@@ -141,7 +141,7 @@
                    HorizontalContentAlignment="Stretch" 
                    VerticalContentAlignment="Bottom" 
                    Grid.Row="2" 
-                   MinHeight="28" 
+                   MinHeight="20" 
                    Panel.ZIndex="1" 
                    Margin="0" 
                    VerticalAlignment="Bottom" 
