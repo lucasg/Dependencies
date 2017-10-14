@@ -164,9 +164,9 @@ namespace ClrPhTester
 
                 switch (ProcessArch.ToLower())
                 {
+                    case "$(build.arch)":
                     case "*":
                         ProcessArch = (Wow64Pe) ? "x86" : "amd64";
-                        // System.Environment.Is64BitOperatingSystem  to discriminate between wow64 and x86 ??
                         break;
                     case "amd64":
                     case "x86":
@@ -174,13 +174,13 @@ namespace ClrPhTester
                     case "msil":
                         break; // nothing to do
                     default:
-                        ProcessArch = "???";
+                        ProcessArch = ".*";
                         break;
                 }
 
                 Regex MajorVersionRegex = new Regex(@"([0-9]+)\.(.*)", RegexOptions.IgnoreCase);
                 Match MajorVersionMatch = MajorVersionRegex.Match(Version);
-                string MajorVersion = (MajorVersionMatch.Success) ? MajorVersionMatch.Groups[1].Value.ToString() : "???";
+                string MajorVersion = (MajorVersionMatch.Success) ? MajorVersionMatch.Groups[1].Value.ToString() : ".*";
 
                 // Manifest filename : {ProcArch}_{Name}_{PublicKeyToken}_{FuzzyVersion}_{Langage}_{some_hash}.manifest
                 Regex ManifestFileNameRegex = new Regex(

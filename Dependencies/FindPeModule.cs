@@ -160,13 +160,13 @@ namespace Dependencies
                 string ProcessArch = SxsAssembly.Attribute("processorArchitecture") != null ? SxsAssembly.Attribute("processorArchitecture").Value : "*";
                 string Version = SxsAssembly.Attribute("version").Value;
                 string Langage = SxsAssembly.Attribute("langage") != null ? SxsAssembly.Attribute("langage").Value : "none"; // TODO : support localized sxs redirection
-                
+
 
                 switch (ProcessArch.ToLower())
                 {
+                    case "$(build.arch)":
                     case "*":
                         ProcessArch = (Wow64Pe) ? "x86" : "amd64";
-                        // System.Environment.Is64BitOperatingSystem  to discriminate between wow64 and x86 ??
                         break;
                     case "amd64":
                     case "x86":
@@ -174,24 +174,24 @@ namespace Dependencies
                     case "msil":
                         break; // nothing to do
                     default:
-                        ProcessArch = "???";
+                        ProcessArch = ".*";
                         break;
                 }
 
                 Regex MajorVersionRegex = new Regex(@"([0-9]+)\.(.*)", RegexOptions.IgnoreCase);
                 Match MajorVersionMatch = MajorVersionRegex.Match(Version);
-                string MajorVersion = (MajorVersionMatch.Success) ? MajorVersionMatch.Groups[1].Value.ToString() : "???";
+                string MajorVersion = (MajorVersionMatch.Success) ? MajorVersionMatch.Groups[1].Value.ToString() : ".*";
 
                 // Manifest filename : {ProcArch}_{Name}_{PublicKeyToken}_{FuzzyVersion}_{Langage}_{some_hash}.manifest
                 Regex ManifestFileNameRegex = new Regex(
                     String.Format(@"({0:s}_{1:s}_{2:s}_({3:s}\.[\.0-9]*)_none_([a-fA-F0-9]+))\.manifest",
-                        ProcessArch, 
+                        ProcessArch,
                         Name,
                         PublicKeyToken,
                         MajorVersion
-                        //Langage,
-                        // some hash
-                    ), 
+                    //Langage,
+                    // some hash
+                    ),
                     RegexOptions.IgnoreCase
                 );
 
@@ -224,7 +224,7 @@ namespace Dependencies
             // 1. \\<appdir>\<assemblyname>.DLL
             // find dll with same assembly name in same directory
             SxsEntries EntriesFromMatchingDll = SxsFindTargetDll(SxsManifestName, Folder);
-            if (EntriesFromMatchingDll.Count > 0) 
+            if (EntriesFromMatchingDll.Count > 0)
             {
                 return EntriesFromMatchingDll;
             }
@@ -242,7 +242,7 @@ namespace Dependencies
             // 3. \\<appdir>\<assemblyname>\<assemblyname>.DLL
             // find matching dll in sub directory
             SxsEntries EntriesFromMatchingDllSub = SxsFindTargetDll(SxsManifestName, SxsManifestDir);
-            if (EntriesFromMatchingDllSub.Count > 0) 
+            if (EntriesFromMatchingDllSub.Count > 0)
             {
                 return EntriesFromMatchingDllSub;
             }
@@ -288,7 +288,7 @@ namespace Dependencies
         public static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder, string ExecutableName = "", bool Wow64Pe = false)
         {
             SxsEntries AdditionnalDependencies = new SxsEntries();
-            
+
             XDocument XmlManifest = ParseSxsManifest(ManifestStream);
             XNamespace Namespace = XmlManifest.Root.GetDefaultNamespace();
 
@@ -302,7 +302,7 @@ namespace Dependencies
                 AdditionnalDependencies.AddRange(SxsEntries.FromSxsAssembly(SxsAssembly, Namespace, Folder));
             }
 
-           
+
 
             // Find any dependencies :
             // <dependency>
@@ -340,8 +340,8 @@ namespace Dependencies
             XmlParserContext context = new XmlParserContext(null, nsmgr, null, XmlSpace.Preserve);
 
 
-            
-            
+
+
             using (StreamReader xStream = new StreamReader(ManifestStream))
             {
                 // Trim double quotes in manifest attributes
@@ -391,7 +391,7 @@ namespace Dependencies
             System.IO.Stream ManifestStream = new System.IO.MemoryStream(RawManifest);
 
             Entries = ExtractDependenciesFromSxsManifest(
-                ManifestStream, 
+                ManifestStream,
                 RootPeFolder,
                 RootPeFilename,
                 Pe.IsWow64Dll()
