@@ -131,35 +131,6 @@ PAPI_SET_NAMESPACE GetApiSetNamespace()
 	return apiSetMap;
 }
 
-//bool ResolveApiSetNative(_In_ UNICODE_STRING *ApiSetFileName, UNICODE_STRING *HostLibrary)
-//{
-//	BOOLEAN bResolved = false;
-//	PAPI_SET_NAMESPACE apiSetMap = GetApiSetNamespace();
-//
-//	// Check the returned api namespace is correct
-//	if (!apiSetMap) {
-//		return false;
-//	}
-//	
-//	NTSTATUS Status = STATUS_SUCCESS;
-//	// Resolving using undocumented ntdll API : there is only a public symbol defined for it.
-//	/*NTSTATUS Status = ApiSetResolveToHost(
-//		apiSetMap,
-//		ApiSetFileName,
-//		NULL,
-//		&bResolved,
-//		HostLibrary
-//	);*/
-//
-//	
-//
-//	if ((!NT_SUCCESS(Status)) || !bResolved) {
-//		return false;
-//	}
-//
-//	return true;
-//}
-
 #ifdef __cplusplus
 }
 #endif
