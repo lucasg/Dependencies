@@ -1,16 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using System.Reflection;
+
 
 namespace Dependencies
 {
@@ -22,6 +13,8 @@ namespace Dependencies
         public About()
         {
             InitializeComponent();
+
+            this.TextContent.Text = String.Format("Dependencies v{0:s} :\n\nDependency tool made by lucasg@github.com.\nPlease go to \"https://github.com/lucasg/Dependencies/issues\" for filing issues", Assembly.GetEntryAssembly().GetName().Version);
         }
     }
 }

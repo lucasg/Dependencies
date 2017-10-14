@@ -5,15 +5,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
         mc:Ignorable="d"
-        Title="About" Height="300" Width="300">
-    <Grid>
+        Title="About" MinHeight="100" MinWidth="600" SizeToContent="WidthAndHeight" ResizeMode="NoResize" >
+    <Grid Margin="20 20 20 20" MinHeight="100"  MinWidth="600">
         <Grid.RowDefinitions>
-            <RowDefinition Height="33*"/>
-            <RowDefinition Height="33*"/>
             <RowDefinition Height="33*"/>
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="20*"/>
                 <ColumnDefinition Width="80*"/>
@@ -22,8 +20,9 @@
             <Image Source="Images/Dependencies.ico" Height="32" Width="32" Grid.Column="0"/>
             <TextBlock Grid.Column="1" 
                        TextWrapping="Wrap"
-                       VerticalAlignment="Center">
-                Dependency tool made by lucasg@github.com
+                       VerticalAlignment="Center"
+                       Name="TextContent">
+                Dependency tool made by lucasg@github.com.
             </TextBlock>
         </Grid>
     </Grid>
