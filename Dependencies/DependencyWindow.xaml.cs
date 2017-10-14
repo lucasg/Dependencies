@@ -248,13 +248,6 @@ namespace Dependencies
 
         #region PublicAPI
 
-        /// <summary>
-        /// Header's name for MDI child window
-        /// </summary>
-        //public override string Header
-        //{
-        //    get { return Path.GetFileNameWithoutExtension(this.Filename); }
-        //}
 
         /// <summary>
         /// Constructor.
