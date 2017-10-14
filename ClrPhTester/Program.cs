@@ -155,6 +155,27 @@ namespace ClrPhTester
             VerboseWriteLine("[-] Import listing done");
         }
 
+        public static void DumpUsage()
+        {
+            string Usage = String.Join(Environment.NewLine,
+                "ClrPhTester.exe : COFF/PE dumper tool (kinda like dumpbin).",
+                "",
+                "Usage : ClrPhTester.exe [OPTIONS] FILE",
+                "",
+                "Options :",
+                "  -h -help : display this help",
+                "  -verbose : activate human centric output.",
+                "  -apisets : display the ApiSet schema (api set dll -> host dll)",
+                "  -knowndll : display all the known dlls (x86 and x64)",
+                "  -manifest : display the FILE embedded manifest, if it exists.",
+                "  -sxsentries : display all the FILE's sxs dependencies.",
+                "  -imports : display the FILE imports",
+                "  -exports : display the FILE exports"
+            );
+
+            Console.WriteLine(Usage);
+        }
+
 
         static void Main(string[] args)
         { 
@@ -169,7 +190,13 @@ namespace ClrPhTester
             if (ProgramArgs.ContainsKey("-verbose"))
                 VerboseOutput = true;
 
-            // no need to load PE for it
+            // no need to load PE for those commands
+            if ((args.Length == 0) || ProgramArgs.ContainsKey("-h") || ProgramArgs.ContainsKey("-help"))
+            {
+                DumpUsage();
+                return;
+            }
+
             if (ProgramArgs.ContainsKey("-knowndll"))
             {
                 DumpKnownDlls();
