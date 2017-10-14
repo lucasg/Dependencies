@@ -23,7 +23,10 @@ namespace Dependencies
 
         public override TabEmptiedResponse TabEmptiedHandler(TabablzControl tabControl, Window window)
         {
-            return TabEmptiedResponse.DoNothing;
+            if (((MainWindow) window).IsMaster)
+                return TabEmptiedResponse.DoNothing;
+
+            return TabEmptiedResponse.CloseWindowOrLayoutBranch;
         }
     }
 
@@ -38,6 +41,8 @@ namespace Dependencies
 
         private About AboutPage;
         private UserSettings UserSettings;
+        private bool _Master;
+
 
         public MainWindow()
         {
@@ -52,11 +57,19 @@ namespace Dependencies
 
             // TODO : understand how to reliably bind in xaml
             this.TabControl.InterTabController.InterTabClient = DoNothingInterTabClient;
+
+            this._Master = false;
         }
 
         public IInterTabClient DoNothingInterTabClient
         {
             get { return _interTabClient; }
+        }
+
+        public bool IsMaster
+        {
+            get { return _Master; }
+            set { _Master = value; }
         }
 
 

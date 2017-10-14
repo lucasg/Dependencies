@@ -42,7 +42,7 @@
             <!-- Hide/Show the status bar based on a global switch -->
             <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
 
-            <dragablz:InterTabController  x:Key="DependenciesInterTabController" Partition="2AE89D18-F236-4D20-9605-6C03319038E6"/>
+            <dragablz:InterTabController  x:Key="DependenciesInterTabController" x:Shared="False"  Partition="2AE89D18-F236-4D20-9605-6C03319038E6"/>
 
             <Style TargetType="{x:Type dragablz:TabablzControl}" x:Key="DependenciesTabControlStyle">
                 <Setter Property="ShowDefaultCloseButton" Value="True" />
@@ -96,14 +96,10 @@
         <!-- DependencyWindow does not support being a floating window => IsFloatDropZoneEnabled="False" -->
         <!-- all dragablz controls need to reference  Partition="2AE89D18-F236-4D20-9605-6C03319038E6" in order to dock correctly -->
         <dockablz:Layout Partition="2AE89D18-F236-4D20-9605-6C03319038E6" Name="DependencyRootLayout"
-                    IsFloatDropZoneEnabled="True"
+                    IsFloatDropZoneEnabled="False"
                     FloatingItemHeaderMemberPath="Header"
                     Grid.Row="1">
 
-            <!--<dockablz:Layout.FloatingItems>
-            </dockablz:Layout.FloatingItems>-->
-
-            
 
             <!-- branch template lets dragablz create a new tab control after a window is split via docking -->
             <dockablz:Layout.BranchTemplate>
@@ -117,16 +113,26 @@
             <dragablz:TabablzControl x:Name="TabControl"
                                  Style="{StaticResource DependenciesTabControlStyle}"
                                  InterTabController="{StaticResource DependenciesInterTabController}">
-                <!--<dragablz:TabablzControl.HeaderSuffixContent>
-                    --><!--<Button Style="{StaticResource AddItemCommandButtonStyle}" 
-                            Command="Open"/>-->
-                            
-                            <!--TODO : implement Visibility button -->
-                            <!--IsHeaderPanelVisible="{Binding Path=ShowAddItemButtom, RelativeSource={RelativeSource AncestorLevel=1,AncestorType={x:Type local:MainWindow},Mode=FindAncestor}}">-->
-                            <!--Visibility="{TemplateBinding ShowDefaultAddButton, Converter={StaticResource BooleanToVisibilityConverter}}"--><!--
-                            
-                </dragablz:TabablzControl.HeaderSuffixContent>-->
-            </dragablz:TabablzControl>
+                <dragablz:TabablzControl.HeaderSuffixContent>
+                    <Grid x:Name="CustomHeaderContainerGrid" 
+                          Margin="0,2,2,0">
+                        <Grid.Resources>
+                            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource StandardEmbeddedButtonStyle}"></Style>
+                        </Grid.Resources>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- a root, named tab control is needed, so when a tab is torn and a new window is created, the new target tab control can be identified -->
+                        <Button Style="{StaticResource AddItemCommandButtonStyle}"
+                                    x:Name="AddButton"
+                                    Grid.Column="0"
+                                    Command="Open"
+                                    />
+                    </Grid>
+                </dragablz:TabablzControl.HeaderSuffixContent>            
+           </dragablz:TabablzControl>
 
 
         </dockablz:Layout>

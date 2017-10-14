@@ -17,6 +17,7 @@ namespace Dependencies
         void App_Startup(object sender, StartupEventArgs e)
         {
             MainWindow mainWindow = new MainWindow();
+            mainWindow.IsMaster = true;
             mainWindow.Show();
 
             // Process command line args
