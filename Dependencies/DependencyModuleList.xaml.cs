@@ -58,6 +58,9 @@ namespace Dependencies
             NewModule.DoFindModuleInTreeCommand = DoFindModuleInTreeCommand;
 
             this.ModulesList.Items.Add(NewModule);
+
+            // Refresh search view
+            ModuleSearchFilter_OnTextChanged(null, null);
         }
 
 
