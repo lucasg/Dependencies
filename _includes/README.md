@@ -25,7 +25,7 @@ Since the binary is not signed, `SmartScreen` might scream at runtime. `Dependen
 `Dependencies` currently does not recursively resolve child imports when parsing a new PE since it can be really memory-hungry to do so ( it can go over a GB even for "simple" PEs ). This behaviour can be overriden (app-wide) via a property located in "Options->Properties->Tree build behaviour".
 
 <p align="center">
-<img alt="User options" src="https://raw.githubusercontent.com/lucasg/Dependencies/blob/master/screenshots/UserOptions.png"/>
+<img alt="User options" src="https://raw.githubusercontent.com/lucasg/Dependencies/master/screenshots/UserOptions.png"/>
 </p>
 
 Tree build behaviours available :
