@@ -11,19 +11,36 @@
 
 ## Releases
 
-* v1.0 -- Initial release
+* [v1.5](https://github.com/lucasg/Dependencies/releases/download/v1.5/Dependencies.zip) :
+	* Support of Sxs parsing
+	* Support of api set schema parsing
+	* API and Modules list can be filtered
+* [v1.0](https://github.com/lucasg/Dependencies/releases/download/v1.0/Dependencies.zip) -- Initial release
 
 ## Installation and Usage
 
 `Dependencies` is currently shipped as a binary (no installer present). Just uncompress the archive and click on it.
-Since the binary is not signed, `SmartScreen` might scream at runtime.
+Since the binary is not signed, `SmartScreen` might scream at runtime. `Dependencies` also bundle `ClrPhTester.exe`, a dumpbin-like executable used to test for non-regressions.
+
+`Dependencies` currently does not recursively resolve child imports when parsing a new PE since it can be really memory-hungry to do so ( it can over a GB even for "simple" PEs ). This behaviour can be overriden (app-wide) via a property located in "Options->Properties->Tree build behaviour".
+
+<p align="center">
+<img alt="User options" src="screenshots/UserOptions.PNG"/>
+</p>
+
+Tree build behaviours available :
+
+* `ChildOnly` (default) : only process PE child imports and nothing beyond.
+* `RecursiveOnlyOnDirectImports`  : do not process delayload dlls.
+* `Recursive` : Full recursive analysis. You better have time and RAM on your hands if you activate this setting.
+
 
 ## Limitations
 
 At the moment, `Dependencies` recreates features and "features" of `depends.exe`, which means :
 
 * Only direct, forwarded and delay load dependencies are supported. Dynamic loading via `LoadLibrary` are not supported (and probably won't ever be).
-* `Min-win` dlls are not propertly supported. (UPDATED : minimal support of api set schema redirection)
+* `Min-win` dlls are not propertly supported. (UPDATED : support of api set schema redirection in 1.5)
 * There are no checks between Api Imports and Exports for the moment, only dll presence is supported.
 * No support of esoteric dll load paths (via `AppPaths` or `SxS` manifests entries). (UPDATED : minimal support of sxs private manifests search).
 
