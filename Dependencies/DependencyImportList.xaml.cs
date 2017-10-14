@@ -10,7 +10,10 @@ using System.ClrPh;
 
 namespace Dependencies
 {
-    
+    /// <summary>
+    /// DependencyImportList  Filterable ListView for displaying imports.
+    /// @TODO(Make this a template user control in order to share it between Modeules, Imports and Exports)
+    /// </summary>
     public partial class DependencyImportList : UserControl
     {
         public ICollectionView ImportItemsView { get; set; }
@@ -72,7 +75,7 @@ namespace Dependencies
         {
             if (e.Key == System.Windows.Input.Key.Escape)
             {
-                // HACK : Reset filter before closing
+                // @TODO(HACK : Reset filter before closing, otherwise we might block the user out of enabling search bar again)
                 this.ImportSearchFilter.Text = null;
                 this.ImportSearchFilter_OnTextChanged(this.ImportList, null);
 

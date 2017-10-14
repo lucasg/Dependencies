@@ -11,16 +11,18 @@ using Dragablz;
 
 namespace Dependencies
 {
+    /// <summary>
+    /// We override the default Dragablz.IInterTabClient  in order to change
+    /// it's behaviour on closing all tabs.
+    /// </summary>
     public class DependenciesInterTabClient : DefaultInterTabClient
     {
-        //public INewTabHost<Window> GetNewHost(IInterTabClient interTabClient, object partition, TabablzControl source)
-        //{
-        //    var view = new DependencyWindow(null);
-        //    //var model = new BoundExampleModel();
-        //    //view.DataContext = model;
-        //    return new NewTabHost<Window>((Window)view, source);
-        //}
-
+        /// <summary>
+        /// When closing all tabs on a particular MainWindow instances, we want
+        /// to know if it's okay to close the application also. the MainWindow created
+        /// by the "App" entry point is marked as "master" and is not closed,
+        /// whereas all the others are.
+        /// </summary>
         public override TabEmptiedResponse TabEmptiedHandler(TabablzControl tabControl, Window window)
         {
             if (((MainWindow) window).IsMaster)
@@ -31,7 +33,7 @@ namespace Dependencies
     }
 
     /// <summary>
-    /// Logique d'interaction pour MainWindow.xaml
+    /// MainWindow : container for displaying one or sereral DependencyWindow tree elements.
     /// </summary>
     public partial class MainWindow : Window
     {
@@ -43,7 +45,7 @@ namespace Dependencies
         private UserSettings UserSettings;
         private bool _Master;
 
-
+        #region PublicAPI
         public MainWindow()
         {
             Phlib.InitializePhLib();
@@ -61,21 +63,50 @@ namespace Dependencies
             this._Master = false;
         }
 
+        /// <summary>
+        /// Open a new depedency tree window on a given PE.
+        /// </summary>
+        /// <param name="Filename">File path to a PE to process.</param>
+        public void OpenNewDependencyWindow(String Filename)
+        {
+            var newDependencyWindow = new DependencyWindow(Filename);
+            newDependencyWindow.Header = Path.GetFileNameWithoutExtension(Filename);
+
+            this.TabControl.AddToSource(newDependencyWindow);
+            this.TabControl.SelectedItem = newDependencyWindow;
+
+            // Update recent files entries
+            App.AddToRecentDocuments(Filename);
+            PopulateRecentFilesMenuItems();
+        }
+
+        /// <summary>
+        /// We override the default Dragablz.IInterTabClient  in order to change
+        /// it's behaviour on closing all tabs.
+        /// </summary>
         public IInterTabClient DoNothingInterTabClient
         {
             get { return _interTabClient; }
         }
 
+        /// <summary>
+        /// When closing all tabs on a particular MainWindow instances, we want
+        /// to know if it's okay to close the application also. the MainWindow created
+        /// by the "App" entry point is marked as "master" and is not closed,
+        /// whereas all the others are.
+        /// </summary>
         public bool IsMaster
         {
             get { return _Master; }
             set { _Master = value; }
         }
 
+        #endregion PublicAPI
 
-
-
-        // Populate "recent entries"
+        /// <summary>
+        /// Populate "recent entries" mmenu items
+        /// </summary>
+        /// <param name="InializeMenuEntries">Use to tell the app to initialize recent entries even with dummy ones.</param>
         private void PopulateRecentFilesMenuItems(bool InializeMenuEntries = false)
         { 
 
@@ -116,19 +147,7 @@ namespace Dependencies
 
         }
 
-        public void OpenNewDependencyWindow(String Filename)
-        {
-            var newDependencyWindow = new DependencyWindow(Filename);
-            newDependencyWindow.Header = Path.GetFileNameWithoutExtension(Filename);
-            
-            this.TabControl.AddToSource(newDependencyWindow);
-            this.TabControl.SelectedItem = newDependencyWindow;
-
-            // Update recent files entries
-            App.AddToRecentDocuments(Filename);
-            PopulateRecentFilesMenuItems();
-        }
-
+        #region Commands
         private void RecentFileCommandBinding_Clicked(object sender, RoutedEventArgs e)
         {
             System.Windows.Controls.MenuItem RecentFile = sender as System.Windows.Controls.MenuItem;
@@ -177,7 +196,13 @@ namespace Dependencies
             this.UserSettings = new UserSettings();
             this.UserSettings.Show();
         }
+        #endregion Commands
 
+        #region EventsHandler
+
+        /// <summary>
+        /// Application.Close event handler. Save user settings and close every child windows.
+        /// </summary>
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             this.UserSettings.Close();
@@ -187,6 +212,9 @@ namespace Dependencies
             base.OnClosing(e);
         }
 
+        /// <summary>
+        /// file drag-and-drop event handler.
+        /// </summary>
         private void MainWindow_Drop(object sender, System.Windows.DragEventArgs e)
         {
             if (e.Data.GetDataPresent(System.Windows.Forms.DataFormats.FileDrop))
@@ -199,9 +227,13 @@ namespace Dependencies
                 }
             }
         }
+        #endregion EventsHandler
     }
 
-
+    /// <summary>
+    /// Converter to transform a boolean into a Visibility settings. 
+    /// Why is this not part of the WPF standard lib ? Everybody ends up coding one in every project.
+    /// </summary>
     public class BooleanToVisbilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)

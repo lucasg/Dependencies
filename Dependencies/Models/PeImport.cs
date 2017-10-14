@@ -6,11 +6,11 @@ using Dependencies;
 
 public class DisplayPeImport : SettingBindingHandler
 {
-
+    #region Constructors
     public DisplayPeImport(
-        /*_In_*/ PeImport PeImport,
-        /*_In_*/ PhSymbolProvider SymPrv,
-        /*_In_*/ string ModuleFilePath
+        PeImport PeImport,
+        PhSymbolProvider SymPrv,
+        string ModuleFilePath
     )
     {
        Info.ordinal = PeImport.Ordinal;
@@ -29,10 +29,12 @@ public class DisplayPeImport : SettingBindingHandler
         AddNewEventHandler("Undecorate", "Undecorate", "Name", this.GetDisplayName);
         AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
     }
+    #endregion Constructors
 
-
+    #region PublicAPI
     public string IconUri
     {
+        // @TODO(implement API lookup in order to test for API Export presence)
         get
         {
             if (Info.importNotFound)
@@ -94,6 +96,7 @@ public class DisplayPeImport : SettingBindingHandler
 
         return Info.moduleName;
     }
+    #endregion PublicAPI
 
     #region Commands 
     public RelayCommand QueryImportApi

@@ -6,9 +6,10 @@ using Dependencies;
 
 public class DisplayPeExport : SettingBindingHandler
 {
-   public DisplayPeExport(
-        /*_In_*/ PeExport PeExport,
-        /*_In_*/ PhSymbolProvider SymPrv
+    # region Constructors
+    public DisplayPeExport(
+        PeExport PeExport,
+        PhSymbolProvider SymPrv
     )
     {
         PeInfo.ordinal = PeExport.Ordinal;
@@ -23,7 +24,9 @@ public class DisplayPeExport : SettingBindingHandler
 
         AddNewEventHandler("Undecorate", "Undecorate", "Name", this.GetDisplayName);
     }
+    # endregion Constructors
 
+    # region PublicAPI
     public string IconUri
     {
         get
@@ -80,6 +83,7 @@ public class DisplayPeExport : SettingBindingHandler
         return PeInfo.name;
         
     }
+    # endregion PublicAPI
 
     #region Commands 
     public RelayCommand QueryExportApi

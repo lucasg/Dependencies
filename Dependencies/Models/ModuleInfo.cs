@@ -150,8 +150,7 @@ namespace Dependencies
         }
         #endregion // Constructors 
 
-        //public virtual TreeViewItemContext Context { get { return Info.context; } }
-
+        #region PublicAPI
         public virtual string ModuleName
         {
             get { return GetPathDisplayName(Dependencies.Properties.Settings.Default.FullPath); }
@@ -251,6 +250,8 @@ namespace Dependencies
         public virtual string SubsystemVersion { get { return String.Format("{0:d}.{1:d}" , _Info.SubsystemVersion.Item1, _Info.SubsystemVersion.Item2); } }
         public virtual int? Checksum { get { return _Info.Checksum; } }
         public virtual bool? CorrectChecksum { get { return _Info.CorrectChecksum; } }
+
+        #endregion PublicAPI
 
         #region Commands 
         private RelayCommand _DoFindModuleInTreeCommand;

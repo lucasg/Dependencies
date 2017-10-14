@@ -25,7 +25,8 @@ namespace Dependencies
 
 
     /// <summary>
-    /// Logique d'interaction pour DependencyModuleList.xaml
+    /// DependencyImportList  Filterable ListView for displaying modules.
+    /// @TODO(Make this a template user control in order to share it between Modeules, Imports and Exports)
     /// </summary>
     public partial class DependencyModuleList : UserControl
     {
@@ -77,7 +78,7 @@ namespace Dependencies
         }
         #endregion public events
 
-
+        #region events handlers
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
@@ -111,7 +112,7 @@ namespace Dependencies
         {
             if (e.Key == System.Windows.Input.Key.Escape)
             {
-                // HACK : Reset filter before closing
+                // @TODO(HACK : Reset filter before closing, otherwise we might block the user out of enabling search bar again)
                 this.ModuleSearchFilter.Text = null;
                 this.ModuleSearchFilter_OnTextChanged(this.ModulesList, null);
 
@@ -120,17 +121,16 @@ namespace Dependencies
             }
         }
 
-        private void OnModuleSearchClose(object sender, RoutedEventArgs e)
-        {
-            this.ModulesSearchBar.Visibility = System.Windows.Visibility.Collapsed;
-        }
 
+        #endregion events handlers
+        
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             ListView.SelectAll();
         }
 
+        #region search filter
         private bool ModulesListUserFilter(object item)
         {
             if (String.IsNullOrEmpty(ModuleSearchFilter.Text))
@@ -144,5 +144,11 @@ namespace Dependencies
             ModulesItemsView.Filter = ModulesListUserFilter;
             ModulesItemsView.Refresh();
         }
+
+        private void OnModuleSearchClose(object sender, RoutedEventArgs e)
+        {
+            this.ModulesSearchBar.Visibility = System.Windows.Visibility.Collapsed;
+        }
+        #endregion search filter
     }
 }

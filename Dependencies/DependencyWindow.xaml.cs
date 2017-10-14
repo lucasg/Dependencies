@@ -11,7 +11,8 @@ using System.Windows.Data;
 using Dragablz;
 
 /// <summary>
-/// ImportContext : Describe an import module parsed from a PE
+/// ImportContext : Describe an import module parsed from a PE.
+/// Only used during the dependency tree building phase
 /// </summary>
 public struct ImportContext
 {
@@ -23,18 +24,21 @@ public struct ImportContext
     public PE PeProperties; // null if not found
 
     // Some imports are from api sets
-    // ApiSetModuleName is the name of the module
-    // implementing the api set contract
     public bool IsApiSet;
     public string ApiSetModuleName;
 
-    // 
+    // dealy load import
     public bool IsDelayLoadImport;
 }
 
 
 namespace Dependencies
 {
+    /// <summary>
+    /// Dependency tree building behaviour.
+    /// A full recursive dependency tree can be memory intensive, therefore the
+    /// choice is left to the user to override the default behaviour.
+    /// </summary>
     public class TreeBuildingBehaviour : IValueConverter
     { 
         public enum DependencyTreeBehaviour
@@ -55,6 +59,7 @@ namespace Dependencies
             );
         }
 
+        #region TreeBuildingBehaviour.IValueConverter_contract
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             string StrBehaviour = (string)value;
@@ -86,10 +91,11 @@ namespace Dependencies
                     return "Recursive";
             }
         }
+        #endregion TreeBuildingBehaviour.IValueConverter_contract
     }
 
     /// <summary>
-    /// User context of every dependency tree node
+    /// User context of every dependency tree node.
     /// </summary>
     public struct DependencyNodeContext
     {
@@ -99,10 +105,23 @@ namespace Dependencies
             IsDummy = other.IsDummy;
         }
 
+        /// <summary>
+        /// We use a WeakReference to point towars a DisplayInfoModule
+        /// in order to reduce memory allocations.
+        /// </summary>
         public WeakReference ModuleInfo;
+
+        /// <summary>
+        /// Depending on the dependency tree behaviour, we may have to
+        /// set up "dummy" nodes in order for the parent to display the ">" button.
+        /// Those dummy are usually destroyed when their parents is expandend and imports resolved.
+        /// </summary>
         public bool IsDummy;
     }
 
+    /// <summary>
+    /// Deprendency Tree custom node. It's DataContext is a DependencyNodeContext struct
+    /// </summary>
     public class ModuleTreeViewItem : TreeViewItem, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
@@ -233,9 +252,9 @@ namespace Dependencies
 
 
     /// <summary>
-    /// Logique d'interaction pour DependencyWindow.xaml
+    /// Dependemcy tree analysis window for a given PE.
     /// </summary>
-    public partial class DependencyWindow : TabItem // UserControl
+    public partial class DependencyWindow : TabItem 
     { 
 
         PE Pe;
@@ -247,11 +266,6 @@ namespace Dependencies
         ModulesCache ProcessedModulesCache;
 
         #region PublicAPI
-
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
         public DependencyWindow(String FileName)
         {
             InitializeComponent();
@@ -499,7 +513,9 @@ namespace Dependencies
             bw.RunWorkerAsync();
         }
 
-        
+        /// <summary>
+        /// Resolve imports when the user expand the node.
+        /// </summary>
         private void ResolveDummyEntries(object sender, RoutedEventArgs e)
         {
             ModuleTreeViewItem NeedDummyPeNode = e.OriginalSource as ModuleTreeViewItem;
@@ -524,8 +540,6 @@ namespace Dependencies
         }
 
         #endregion TreeConstruction
-
-        
 
         #region Commands
      

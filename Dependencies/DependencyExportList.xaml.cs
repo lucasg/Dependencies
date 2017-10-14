@@ -10,7 +10,10 @@ using System.ClrPh;
 
 namespace Dependencies
 {
-
+    /// <summary>
+    /// DependencyImportList  Filterable ListView for displaying exports.
+    /// @TODO(Make this a template user control in order to share it between Modeules, Imports and Exports)
+    /// </summary>
     public partial class DependencyExportList : UserControl
     {
         public ICollectionView ExportItemsView { get; set; }
@@ -35,6 +38,7 @@ namespace Dependencies
             ExportSearchFilter_OnTextChanged(null, null);
         }
 
+        #region events handlers
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
@@ -67,7 +71,7 @@ namespace Dependencies
         {
             if (e.Key == System.Windows.Input.Key.Escape)
             {
-                // HACK : Reset filter before closing
+                // @TODO(HACK : Reset filter before closing, otherwise we might block the user out of enabling search bar again)
                 this.ExportSearchFilter.Text = null;
                 this.ExportSearchFilter_OnTextChanged(this.ExportList, null);
 
@@ -75,7 +79,9 @@ namespace Dependencies
                 return;
             }
         }
+        #endregion events handlers
 
+        #region search filter        
         private void OnExportSearchClose(object sender, RoutedEventArgs e)
         {
             this.ExportSearchBar.Visibility = System.Windows.Visibility.Collapsed;
@@ -94,12 +100,13 @@ namespace Dependencies
             ExportItemsView.Filter = ExportListUserFilter;
             ExportItemsView.Refresh();
         }
-
+        #endregion search filter
 
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             ListView.SelectAll();
         }
+        
     }
 }
