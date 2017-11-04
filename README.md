@@ -17,6 +17,8 @@
 	* API and Modules list can be filtered
 * [v1.0](https://github.com/lucasg/Dependencies/releases/download/v1.0/Dependencies.zip) -- Initial release
 
+NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/library/ffkc918h.aspx), `Dependencies` needs [Visual C++ 2015 Redistributable](https://www.microsoft.com/en-us/download/details.aspx?id=53840) installed to run properly.
+
 ## Installation and Usage
 
 `Dependencies` is currently shipped as a binary (no installer present). Just uncompress the archive and click on it.
