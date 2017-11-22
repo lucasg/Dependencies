@@ -154,6 +154,10 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
 		return ApiSets;
 	}
 
+	// TODO: Support ApiSet v2 (Win7) and V4 (Win8.1)
+	if (apiSetMap->Version != 6) {
+		return ApiSets;
+	}
 		
 	auto apiSetMapAsNumber = reinterpret_cast<ULONG_PTR>(apiSetMap);
 	auto ApiSetEntryIterator = reinterpret_cast<PAPI_SET_NAMESPACE_ENTRY>((apiSetMap->EntryOffset + apiSetMapAsNumber));
