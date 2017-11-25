@@ -1,24 +1,26 @@
 #include <ClrPhlib.h>
 #include <UnmanagedPh.h>
-#include <atlstr.h>
 
 using namespace System;
 using namespace System::Text;
 using namespace ClrPh;
+using namespace Runtime::InteropServices;
 
 PE::PE(
     _In_ String ^ Filepath
 )
 {
-    CString PvFilePath(Filepath);
     m_Impl = new UnmanagedPE();
+    wchar_t* PvFilepath = (wchar_t*)(Marshal::StringToHGlobalUni(Filepath)).ToPointer();
 
-	this->LoadSuccessful = m_Impl->LoadPE(PvFilePath.GetBuffer());
+	this->LoadSuccessful = m_Impl->LoadPE(PvFilepath);
 	this->Filepath = gcnew String(Filepath);
+
 
 	if (LoadSuccessful)
 		InitProperties();
-	 
+	
+	Marshal::FreeHGlobal(IntPtr((void*)PvFilepath));
 }
 
 void PE::InitProperties()
@@ -135,7 +137,7 @@ String^ PE::GetManifest()
 	// Converting to wchar* and passing it to a C#-recognized String object
 	UTF8Encoding Utf8Decoder;
 
-	array<byte> ^buffer = gcnew array<byte>(rawManifestLen + 1);
+	array<unsigned char> ^buffer = gcnew array<unsigned char>(rawManifestLen + 1);
 	for (int i = 0; i < rawManifestLen; i++)
 	{
 		buffer[i] = rawManifest[i];

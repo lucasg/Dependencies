@@ -1,9 +1,9 @@
 #include <ClrPhlib.h>
 #include <UnmanagedPh.h>
-#include <atlstr.h>
 
 using namespace System;
 using namespace ClrPh;
+using namespace Runtime::InteropServices;
 
 PhSymbolProvider::PhSymbolProvider()
 :m_Impl(UnmanagedSymPrv::Create())
@@ -32,7 +32,7 @@ String^ PhSymbolProvider::UndecorateName(
 {
 	String ^ManagedUndName;
 	PPH_STRING UndecoratedName = NULL;
-	CString PvDecoratedName(DecoratedName);
+	wchar_t* PvDecoratedName = (wchar_t*)(Marshal::StringToHGlobalUni(DecoratedName)).ToPointer();
 
 	if (!m_Impl) {
 		return gcnew String("");
@@ -42,7 +42,7 @@ String^ PhSymbolProvider::UndecorateName(
 	
 	UndecoratedName = PhUndecorateNameW(
 		m_Impl->m_SymbolProvider->ProcessHandle,
-		PvDecoratedName.GetBuffer()
+		PvDecoratedName
 	);
 
 	if (!UndecoratedName) {
@@ -51,6 +51,7 @@ String^ PhSymbolProvider::UndecorateName(
 
 	ManagedUndName = gcnew String(UndecoratedName->Buffer);
 	PhDereferenceObject(UndecoratedName);
+	Marshal::FreeHGlobal(IntPtr((void*)PvDecoratedName));
 
 	return ManagedUndName;
 }
