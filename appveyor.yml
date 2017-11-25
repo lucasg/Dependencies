@@ -43,15 +43,33 @@ build:
 test_script: # should be on_finish, but it need to be executed before artifacts is
   - ps: |
       if ( $($env:platform) -eq "Any CPU") {
+        # Download external dependencies like peview
+        Push-Location;
+        $PEVIEW_BIN="";
+        New-Item -ItemType Directory -Force -Path "tmp";
+        cd tmp;
+        wget https://github.com/processhacker2/processhacker2/releases/download/v2.39/processhacker-2.39-bin.zip -OutFile processhacker-2.39-bin.zip;
+        $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path .\processhacker-2.39-bin.zip).Hash;
+        if ($PhArchiveHash -eq "2afb5303e191dde688c5626c3ee545e32e52f09da3b35b20f5e0d29a418432f5") {
+          &7z.exe x .\processhacker-2.39-bin.zip x64\peview.exe
+          $PEVIEW_BIN = (Resolve-Path .\x64\peview.exe).Path;
+        }
+        Pop-Location;
+
+        # Creating output directory
         New-Item -ItemType Directory -Force -Path "output";
         cd output;
 
         $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)AnyCPU";
-        $PEVIEW_BIN="C:/projects/dependencies/bin/$($env:CONFIGURATION)64";
+        # $PEVIEW_BIN="C:/projects/dependencies/bin/$($env:CONFIGURATION)64";
 
-        # Test the binary actually works
-        &"$BINPATH/ClrPhTester.exe"
+        # Test if the binary (and the underlying lib) actually works
+        &"$BINPATH/ClrPhTester.exe" -knowndll
+        &"$BINPATH/ClrPhTester.exe" -apisets
+        &"$BINPATH/ClrPhTester.exe" -manifest "$($env:windir)\System32\shell32.dll" 
+        &"$BINPATH/ClrPhTester.exe" -sxsentries "$($env:windir)\System32\ctfmon.exe" 
 
-        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $PEVIEW_BIN/*.exe
+        # Zipping everything
+        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN
       }
   - ps: Write-Host "Building artifact done"
