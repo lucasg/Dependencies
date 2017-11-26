@@ -1,6 +1,5 @@
 #include <ClrPhlib.h>
 #include <UnmanagedPh.h>
-#include <atlstr.h>
 #include <ApiSet.h>
 
 
