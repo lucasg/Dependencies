@@ -135,37 +135,57 @@ PAPI_SET_NAMESPACE GetApiSetNamespace()
 }
 #endif
 
-ApiSetSchema^ Phlib::GetApiSetSchema()
+ApiSetSchema^ Phlib::GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap)
 {
-	// Api set schema resolution adapted from https://github.com/zodiacon/WindowsInternals/blob/master/APISetMap/APISetMap.cpp
-	// References :
-	// 		* Windows Internals v7
-	// 		* @aionescu's slides on "Hooking Nirvana" (RECON 2015)
-	//		* Quarkslab blog posts : 
-	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-i.html
-	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-ii.html
-	
-	
 	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
-	PAPI_SET_NAMESPACE apiSetMap = GetApiSetNamespace();
-
-	// Check the returned api namespace is correct
-	if (!apiSetMap) {
-		return ApiSets;
-	}
-
-	// TODO: Support ApiSet v2 (Win7) and V4 (Win8.1)
-	if (apiSetMap->Version != 6) {
-		return ApiSets;
-	}
-		
-	auto apiSetMapAsNumber = reinterpret_cast<ULONG_PTR>(apiSetMap);
-	auto ApiSetEntryIterator = reinterpret_cast<PAPI_SET_NAMESPACE_ENTRY>((apiSetMap->EntryOffset + apiSetMapAsNumber));
-
-	for (ULONG i = 0; i < apiSetMap->Count; i++) {
+	for (ULONG i=0; i < ApiSetMap->Count; i++)
+	{
+		auto ApiSetEntry = ApiSetMap->Array[i];
 
 		// Retrieve api min-win contract name
-		PWCHAR ApiSetEntryNameBuffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + ApiSetEntryIterator->NameOffset);
+		PWCHAR ApiSetEntryNameBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + ApiSetEntry.NameOffset);
+		String^ ApiSetEntryName = gcnew String(ApiSetEntryNameBuffer, 0, ApiSetEntry.NameLength/sizeof(WCHAR));
+
+		// Strip the .dll extension and the last number (which is probably a build counter)
+		String^ ApiSetEntryHashKey = ApiSetEntryName->Substring(0, ApiSetEntryName->LastIndexOf("-"));
+
+		// Retrieve dlls names implementing the contract
+		ApiSetTarget^ ApiSetEntryTargets = gcnew ApiSetTarget();
+		PAPI_SET_VALUE_ENTRY_V2 ApiSetValueEntry = reinterpret_cast<PAPI_SET_VALUE_ENTRY_V2>(ApiSetMapBaseAddress + ApiSetEntry.DataOffset);
+		for (ULONG j = 0; j < 2*(ApiSetValueEntry->NumberOfRedirections); j++) {
+			auto Redirection = ApiSetValueEntry->Redirections[j];
+
+			if (Redirection.NameLength) {
+				PWCHAR ApiSetEntryTargetBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + Redirection.NameOffset);
+				String ^HostDllName = gcnew String(ApiSetEntryTargetBuffer, 0, Redirection.NameLength / sizeof(WCHAR));
+
+				if (!ApiSetEntryTargets->Contains(HostDllName)) {
+					ApiSetEntryTargets->Add(HostDllName);
+				}
+			}
+		}
+
+		ApiSets->Add(ApiSetEntryHashKey, ApiSetEntryTargets);
+	}
+
+	return ApiSets;
+}
+
+// TODO: Support ApiSet V4 (Win8.1)
+ApiSetSchema^ Phlib::GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap)
+{
+	return gcnew ApiSetSchema();
+}
+
+ApiSetSchema^ Phlib::GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap)
+{
+	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
+
+	auto ApiSetEntryIterator = reinterpret_cast<PAPI_SET_NAMESPACE_ENTRY_V6>((ApiSetMap->EntryOffset + ApiSetMapBaseAddress));
+	for (ULONG i = 0; i < ApiSetMap->Count; i++) {
+
+		// Retrieve api min-win contract name
+		PWCHAR ApiSetEntryNameBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + ApiSetEntryIterator->NameOffset);
 		String^ ApiSetEntryName = gcnew String(ApiSetEntryNameBuffer, 0, ApiSetEntryIterator->NameLength/sizeof(WCHAR));
 
 		// Strip the .dll extension and the last number (which is probably a build counter)
@@ -173,18 +193,18 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
 
 		ApiSetTarget^ ApiSetEntryTargets = gcnew ApiSetTarget();
 
-		// Iterqte over all the host dll for this contract
-		auto valueEntry = reinterpret_cast<PAPI_SET_VALUE_ENTRY>(apiSetMapAsNumber + ApiSetEntryIterator->ValueOffset);
+		// Iterate over all the host dll for this contract
+		auto valueEntry = reinterpret_cast<PAPI_SET_VALUE_ENTRY_V6>(ApiSetMapBaseAddress + ApiSetEntryIterator->ValueOffset);
 		for (ULONG j = 0; j < ApiSetEntryIterator->ValueCount; j++) {
 			
 			// Retrieve dll name implementing the contract
-			PWCHAR ApiSetEntryTargetBuffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + valueEntry->ValueOffset);
+			PWCHAR ApiSetEntryTargetBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + valueEntry->ValueOffset);
 			ApiSetEntryTargets->Add(gcnew String(ApiSetEntryTargetBuffer, 0, valueEntry->ValueLength / sizeof(WCHAR)));
 
 
 			// If there's an alias...
 			if (valueEntry->NameLength != 0) {
-				PWCHAR ApiSetEntryAliasBuffer = reinterpret_cast<PWCHAR>(apiSetMapAsNumber + valueEntry->NameOffset);
+				PWCHAR ApiSetEntryAliasBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + valueEntry->NameOffset);
 				ApiSetEntryTargets->Add(gcnew String(ApiSetEntryAliasBuffer, 0, valueEntry->NameLength / sizeof(WCHAR)));
 			}
 
@@ -197,4 +217,38 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
 	}
 
 	return ApiSets;
+}
+
+ApiSetSchema^ Phlib::GetApiSetSchema()
+{
+	// Api set schema resolution adapted from https://github.com/zodiacon/WindowsInternals/blob/master/APISetMap/APISetMap.cpp
+	// References :
+	// 		* Windows Internals v7
+	// 		* @aionescu's slides on "Hooking Nirvana" (RECON 2015)
+	//		* Quarkslab blog posts : 
+	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-i.html
+	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-ii.html
+	PAPI_SET_NAMESPACE apiSetMap = GetApiSetNamespace();
+	auto apiSetMapAsNumber = reinterpret_cast<ULONG_PTR>(apiSetMap);
+
+	// Check the returned api namespace is correct
+	if (!apiSetMap) {
+		return gcnew ApiSetSchema();
+	}
+
+
+	switch (apiSetMap->Version) 
+	{
+		case 2: // Win7
+			return GetApiSetSchemaV2(apiSetMapAsNumber, &apiSetMap->ApiSetNameSpaceV2);
+
+		case 4: // Win8.1
+			return GetApiSetSchemaV4(apiSetMapAsNumber, &apiSetMap->ApiSetNameSpaceV4);
+
+		case 6: // Win10
+			return GetApiSetSchemaV6(apiSetMapAsNumber, &apiSetMap->ApiSetNameSpaceV6);
+
+		default: // unsupported
+			return gcnew ApiSetSchema();
+	}
 }

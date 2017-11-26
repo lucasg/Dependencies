@@ -38,8 +38,13 @@ namespace System {
 			// can contains more entries than this schema.
 			static ApiSetSchema^ GetApiSetSchema();
 
-			// Resolve an api set dll. Return empty string if there is no host dll.
-			// static String^ ResolveApiSet(_In_ String^ ApiSetLibraryName);
+			
+		private:
+			// private implementation of ApiSet schema parsing
+			static ApiSetSchema^ GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap);
+			static ApiSetSchema^ GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap);
+			static ApiSetSchema^ GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap);
+
         };
 
 
