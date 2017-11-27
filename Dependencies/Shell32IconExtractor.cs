@@ -59,7 +59,11 @@ namespace Dependencies
         {
             SHFILEINFO shinfo = new SHFILEINFO();
             IntPtr hImgSmall = Win32.SHGetFileInfo(fileName, 0, ref shinfo, (uint)Marshal.SizeOf(shinfo), Win32.SHGFI_ICON | flags);
-
+            if (hImgSmall == (IntPtr) 0x00)
+            {
+                return null;
+            }
+                   
             Icon icon = (Icon)System.Drawing.Icon.FromHandle(shinfo.hIcon).Clone();
             Win32.DestroyIcon(shinfo.hIcon);
             return icon;
