@@ -53,6 +53,7 @@
                 <Setter Property="Margin" Value="0 0 0 0" />
                 <Setter Property="AdjacentHeaderItemOffset" Value="-10" />
                 <Setter Property="FixedHeaderCount" Value="0" />
+                <Setter Property="Background" Value="#FF5C8F88"/>
             </Style>
         </ResourceDictionary>
 
@@ -92,6 +93,36 @@
             </MenuItem>
         </Menu>
 
+        <Grid   Name="DefaultMessage"
+                Grid.Row="1" 
+                Panel.ZIndex="1"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+              >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20*"/>
+                <ColumnDefinition Width="80*"/>
+            </Grid.ColumnDefinitions>
+
+            <Image Source="Images/Dependencies_48px.ico" 
+                   Grid.Column="0"
+                   Height="48" 
+                   Width="48"
+                   Margin="10"/>
+            
+            <TextBlock Grid.Column="1" 
+                       TextWrapping="Wrap"
+                       VerticalAlignment="Center"
+                       Name="TextContent"
+                       FontFamily="Courrier New"
+                       FontSize="18"
+                       >
+                Analyze a new binary via File-> Open (Ctrl+O) <LineBreak/>
+                or simply by dragging it into the application.
+            </TextBlock>
+        </Grid>
+               
+        
         <!-- dockablz:Layout is part of the main grid =>  Grid.Row="1" -->
         <!-- DependencyWindow does not support being a floating window => IsFloatDropZoneEnabled="False" -->
         <!-- all dragablz controls need to reference  Partition="2AE89D18-F236-4D20-9605-6C03319038E6" in order to dock correctly -->
@@ -99,7 +130,6 @@
                     IsFloatDropZoneEnabled="False"
                     FloatingItemHeaderMemberPath="Header"
                     Grid.Row="1">
-
 
             <!-- branch template lets dragablz create a new tab control after a window is split via docking -->
             <dockablz:Layout.BranchTemplate>
@@ -113,7 +143,7 @@
             <dragablz:TabablzControl x:Name="TabControl"
                                  Style="{StaticResource DependenciesTabControlStyle}"
                                  InterTabController="{StaticResource DependenciesInterTabController}">
-                <dragablz:TabablzControl.HeaderSuffixContent>
+                <!--<dragablz:TabablzControl.HeaderSuffixContent>
                     <Grid x:Name="CustomHeaderContainerGrid" 
                           Margin="0,2,2,0">
                         <Grid.Resources>
@@ -124,14 +154,14 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
 
-                        <!-- a root, named tab control is needed, so when a tab is torn and a new window is created, the new target tab control can be identified -->
+                        --><!-- a root, named tab control is needed, so when a tab is torn and a new window is created, the new target tab control can be identified --><!--
                         <Button Style="{StaticResource AddItemCommandButtonStyle}"
                                     x:Name="AddButton"
                                     Grid.Column="0"
                                     Command="Open"
                                     />
                     </Grid>
-                </dragablz:TabablzControl.HeaderSuffixContent>            
+                </dragablz:TabablzControl.HeaderSuffixContent>-->            
            </dragablz:TabablzControl>
 
 
@@ -147,5 +177,7 @@
                    VerticalAlignment="Bottom" 
                    Visibility="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}"
                    />
+                   
+                  
     </Grid>
 </Window>

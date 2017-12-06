@@ -25,8 +25,13 @@ namespace Dependencies
         /// </summary>
         public override TabEmptiedResponse TabEmptiedHandler(TabablzControl tabControl, Window window)
         {
-            if (((MainWindow) window).IsMaster)
+            MainWindow main = window as MainWindow;
+            if (main.IsMaster)
+            {
+                //main.DefaultMessage.Visibility = Visibility.Visible;
                 return TabEmptiedResponse.DoNothing;
+            }
+                
 
             return TabEmptiedResponse.CloseWindowOrLayoutBranch;
         }
@@ -59,6 +64,7 @@ namespace Dependencies
 
             // TODO : understand how to reliably bind in xaml
             this.TabControl.InterTabController.InterTabClient = DoNothingInterTabClient;
+            this.TabControl.IsEmptyChanged += MainWindow_TabControlIsEmptyHandler;
 
             this._Master = false;
         }
@@ -226,6 +232,11 @@ namespace Dependencies
                     OpenNewDependencyWindow(file);
                 }
             }
+        }
+
+        private void MainWindow_TabControlIsEmptyHandler(object sender, RoutedPropertyChangedEventArgs<bool> e)
+        {
+            this.DefaultMessage.Visibility = (e.NewValue) ? Visibility.Visible : Visibility.Hidden;
         }
         #endregion EventsHandler
     }
