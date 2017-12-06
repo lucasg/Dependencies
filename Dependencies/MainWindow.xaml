@@ -117,7 +117,7 @@
                        FontFamily="Courrier New"
                        FontSize="18"
                        >
-                Analyze a new binary via File-> Open (Ctrl+O) <LineBreak/>
+                Analyze a new binary via "File -> Open" (Ctrl+O) <LineBreak/>
                 or simply by dragging it into the application.
             </TextBlock>
         </Grid>
