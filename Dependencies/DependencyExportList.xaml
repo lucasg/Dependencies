@@ -30,7 +30,8 @@
                   VerticalContentAlignment="Stretch"
                   util:GridViewSort.AutoSort="True"
                   KeyDown ="OnListViewKeyDown" 
-                  Grid.Row="0">
+                  Grid.Row="0"
+                  >
 
             <ListView.CommandBindings>
                 <CommandBinding Command="ApplicationCommands.SelectAll" Executed="ListViewSelectAll_Executed"/>
@@ -101,7 +102,8 @@
                     VerticalAlignment="Bottom"
                     Visibility="Collapsed"
                     Grid.Row="1"
-                    Margin="0 0 3 0">
+                    Margin="0 0 0 0"
+                    Background="White">
 
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="60"/>
@@ -127,7 +129,7 @@
 
             <Button Height="20" 
                             Grid.Column="2"
-                            Margin="2 0 0 0"
+                            Margin="2 0 3 0"
                             Click="OnExportSearchClose">
                 X
             </Button>
