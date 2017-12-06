@@ -13,7 +13,7 @@
         HorizontalContentAlignment="Stretch" 
         VerticalContentAlignment="Bottom"
         VerticalAlignment="Bottom"
-        Height="950" Width="1600" 
+        Height="700" Width="1200" 
         AllowDrop="True"
         Drop="MainWindow_Drop"
         >
