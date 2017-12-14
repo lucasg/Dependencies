@@ -45,7 +45,7 @@ build:
   project: C:/projects/dependencies/Dependencies.sln
 
 environment:
-  cert-secret:
+  certsecret:
     secure: 1id6kDyNieDfYWTAnoJ/hA==
 
 before_build:
@@ -53,7 +53,7 @@ before_build:
       if ( $($env:platform) -eq "Any CPU") {
         # extracting signing cert
         &nuget install secure-file -ExcludeVersion;
-        &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret $env:cert-secret;
+        &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret "$($env:certsecret)" -out "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx";
       }
 
 after_test:
