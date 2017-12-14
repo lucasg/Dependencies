@@ -21,8 +21,13 @@ platform:
   - Any CPU
 
 artifacts:
+
+  # old style packaging
   - path: output/Dependencies.zip
     name: Dependencies
+
+  # "centennial" style packaging
+  - path: "bin\**\*.appx"
 
 deploy:
   # Deploy to GitHub Releases
@@ -39,10 +44,14 @@ deploy:
 build:
   project: C:/projects/dependencies/Dependencies.sln
 
+environment:
+  cert-secret:
+    secure: 1id6kDyNieDfYWTAnoJ/hA==
 
 test_script: # should be on_finish, but it need to be executed before artifacts is
   - ps: |
       if ( $($env:platform) -eq "Any CPU") {
+
         # Download external dependencies like peview
         Push-Location;
         $PEVIEW_BIN="";
@@ -61,7 +70,6 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         cd output;
 
         $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)AnyCPU";
-        # $PEVIEW_BIN="C:/projects/dependencies/bin/$($env:CONFIGURATION)64";
 
         # Test if the binary (and the underlying lib) actually works
         &"$BINPATH/ClrPhTester.exe" -knowndll
@@ -70,6 +78,23 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         &"$BINPATH/ClrPhTester.exe" -sxsentries "$($env:windir)\System32\ctfmon.exe" 
 
         # Zipping everything
-        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN
+        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN;
+
+
+        # extracting signing cert
+        &nuget install secure-file -ExcludeVersion;
+        &secure-file\tools\secure-file -decrypt "C:/projects/dependencies\DependenciesAppx\DependenciesAppx_TemporaryKey.pfx.enc" -secret $env:cert-secret;
+
+        # Create appx package
+        &MakeAppx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x86" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x86.appx"
+        &MakeAppx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x64" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
+
+        # Sign appx package
+        &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies\DependenciesAppx\DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x86.appx"
+        &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies\DependenciesAppx\DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
+
+        # remove decoded cert as soon as it is not useful anymore
+        Remove-Item -Force "C:/projects/dependencies\DependenciesAppx\DependenciesAppx_TemporaryKey.pfx"
+
       }
   - ps: Write-Host "Building artifact done"
