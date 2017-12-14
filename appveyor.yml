@@ -86,11 +86,9 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret $env:cert-secret;
 
         # Create appx package
-        &MakeAppx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x86" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x86.appx"
         &MakeAppx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x64" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
 
         # Sign appx package
-        &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x86.appx"
         &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
 
         # remove decoded cert as soon as it is not useful anymore
