@@ -27,7 +27,7 @@ artifacts:
     name: Dependencies
 
   # "centennial" style packaging
-  - path: "bin\**\*.appx"
+  - path: "bin/**/*.appx"
 
 deploy:
   # Deploy to GitHub Releases
@@ -58,10 +58,10 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         New-Item -ItemType Directory -Force -Path "tmp";
         cd tmp;
         wget https://github.com/processhacker2/processhacker2/releases/download/v2.39/processhacker-2.39-bin.zip -OutFile processhacker-2.39-bin.zip;
-        $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path .\processhacker-2.39-bin.zip).Hash;
+        $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path ./processhacker-2.39-bin.zip).Hash;
         if ($PhArchiveHash -eq "2afb5303e191dde688c5626c3ee545e32e52f09da3b35b20f5e0d29a418432f5") {
-          &7z.exe x .\processhacker-2.39-bin.zip x64\peview.exe
-          $PEVIEW_BIN = (Resolve-Path .\x64\peview.exe).Path;
+          &7z.exe x ./processhacker-2.39-bin.zip x64/peview.exe
+          $PEVIEW_BIN = (Resolve-Path ./x64/peview.exe).Path;
         }
         Pop-Location;
 
@@ -74,8 +74,8 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         # Test if the binary (and the underlying lib) actually works
         &"$BINPATH/ClrPhTester.exe" -knowndll
         &"$BINPATH/ClrPhTester.exe" -apisets
-        &"$BINPATH/ClrPhTester.exe" -manifest "$($env:windir)\System32\shell32.dll" 
-        &"$BINPATH/ClrPhTester.exe" -sxsentries "$($env:windir)\System32\ctfmon.exe" 
+        &"$BINPATH/ClrPhTester.exe" -manifest "$($env:windir)/System32/shell32.dll" 
+        &"$BINPATH/ClrPhTester.exe" -sxsentries "$($env:windir)/System32/ctfmon.exe" 
 
         # Zipping everything
         &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN;
@@ -83,18 +83,18 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
 
         # extracting signing cert
         &nuget install secure-file -ExcludeVersion;
-        &secure-file\tools\secure-file -decrypt "C:/projects/dependencies\DependenciesAppx\DependenciesAppx_TemporaryKey.pfx.enc" -secret $env:cert-secret;
+        &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret $env:cert-secret;
 
         # Create appx package
         &MakeAppx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x86" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x86.appx"
         &MakeAppx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x64" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
 
         # Sign appx package
-        &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies\DependenciesAppx\DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x86.appx"
-        &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies\DependenciesAppx\DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
+        &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x86.appx"
+        &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
 
         # remove decoded cert as soon as it is not useful anymore
-        Remove-Item -Force "C:/projects/dependencies\DependenciesAppx\DependenciesAppx_TemporaryKey.pfx"
+        Remove-Item -Force "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx"
 
       }
   - ps: Write-Host "Building artifact done"
