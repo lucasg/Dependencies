@@ -48,6 +48,21 @@ environment:
   cert-secret:
     secure: 1id6kDyNieDfYWTAnoJ/hA==
 
+before_build:
+  - ps: |
+      if ( $($env:platform) -eq "Any CPU") {
+        # extracting signing cert
+        &nuget install secure-file -ExcludeVersion;
+        &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret $env:cert-secret;
+      }
+
+after_test:
+ - ps: |
+      if ( $($env:platform) -eq "Any CPU") {
+        # remove decoded cert as soon as it is not useful anymore
+        Remove-Item -Force "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx"
+      }
+
 test_script: # should be on_finish, but it need to be executed before artifacts is
   - ps: |
       if ( $($env:platform) -eq "Any CPU") {
@@ -80,19 +95,11 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         # Zipping everything
         &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN;
 
-
-        # extracting signing cert
-        &nuget install secure-file -ExcludeVersion;
-        &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret $env:cert-secret;
-
         # Create appx package
         &MakeAppx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x64" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
 
         # Sign appx package
         &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
-
-        # remove decoded cert as soon as it is not useful anymore
-        Remove-Item -Force "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx"
 
       }
   - ps: Write-Host "Building artifact done"
