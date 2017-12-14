@@ -95,11 +95,14 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         # Zipping everything
         &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN;
 
+        $makeappx = "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\makeappx.exe";
+        $signtool = "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe";
+
         # Create appx package
-        &MakeAppx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x64" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
+        & $makeappx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x64" /l /p "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
 
         # Sign appx package
-        &SignTool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
+        & $signtool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/DependenciesAppx_$($env:CONFIGURATION)x64.appx"
 
       }
   - ps: Write-Host "Building artifact done"
