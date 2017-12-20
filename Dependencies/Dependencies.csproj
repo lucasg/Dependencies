@@ -42,6 +42,7 @@
   <PropertyGroup>
     <ApplicationIcon>Dependencies.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -169,11 +170,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Images\Dependencies_48px.png" />
     <Resource Include="Images\GlyphSortAscending.png" />
     <Resource Include="Images\GlyphSortDescending.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Dependencies.ico" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Hourglass.png" />
@@ -182,23 +181,32 @@
     <Resource Include="Images\Question.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Dependencies_48px.ico" />
+    <Resource Include="Images\Dependencies_32px.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\dependencies_16x.png" />
+    <Resource Include="Images\Dependencies_32px-no-blur.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\export_c.gif" />
-    <Resource Include="Images\export_cpp.gif" />
-    <Resource Include="Images\export_forward.gif" />
-    <Resource Include="Images\export_ord.gif" />
-    <Resource Include="Images\import_c.gif" />
-    <Resource Include="Images\import_cpp.gif" />
-    <Resource Include="Images\import_err.gif" />
-    <Resource Include="Images\import_ord.gif" />
+    <Resource Include="Images\Dependencies_48px-no-blur.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Dependencies.ico" />
+    <Resource Include="Images\export_c.png" />
+    <Resource Include="Images\export_cpp.png" />
+    <Resource Include="Images\export_forward.png" />
+    <Resource Include="Images\export_ord.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\import_cpp_found.png" />
+    <Resource Include="Images\import_cpp_not_found.png" />
+    <Resource Include="Images\import_c_found.png" />
+    <Resource Include="Images\import_c_not_found.png" />
+    <Resource Include="Images\import_ord_not_found.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\import_ord_found.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Dependencies.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

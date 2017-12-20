@@ -32,13 +32,13 @@ public class DisplayPeExport : SettingBindingHandler
         get
         {
             if (PeInfo.forwardedExport)
-                return "Images/export_forward.gif";
+                return "Images/export_forward.png";
             if (PeInfo.exportByOrdinal)
-                return "Images/export_ord.gif";
+                return "Images/export_ord.png";
             if (PeInfo.exportAsCppName)
-                return "Images/export_cpp.gif";
+                return "Images/export_cpp.png";
             
-            return "Images/export_C.gif";
+            return "Images/export_C.png";
         }
     }
 

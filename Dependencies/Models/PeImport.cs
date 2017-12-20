@@ -37,14 +37,18 @@ public class DisplayPeImport : SettingBindingHandler
         // @TODO(implement API lookup in order to test for API Export presence)
         get
         {
+            string PathStrFormat = "Images/import_{0:s}_found.png";
             if (Info.importNotFound)
-                 return "Images/import_err.gif";
-            if (Info.importByOrdinal)
-                return "Images/import_ord.gif";
-            if (Info.importAsCppName)
-                return "Images/import_cpp.gif";
+                PathStrFormat = "Images/import_{0:s}_not_found.png";
 
-            return "Images/import_c.gif";
+
+            if (Info.importByOrdinal)
+                return String.Format(PathStrFormat, "ord");
+
+            if (Info.importAsCppName)
+                return String.Format(PathStrFormat, "cpp");
+
+            return String.Format(PathStrFormat, "c");
         }
     }
     public int Type

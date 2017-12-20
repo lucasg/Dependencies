@@ -17,7 +17,7 @@
                 <ColumnDefinition Width="80*"/>
             </Grid.ColumnDefinitions>
 
-            <Image Source="Images/Dependencies.ico" Height="32" Width="32" Grid.Column="0"/>
+            <Image Source="Images/Dependencies_48px.png" Height="48" Width="48" Grid.Column="0"/>
             <TextBlock Grid.Column="1" 
                        TextWrapping="Wrap"
                        VerticalAlignment="Center"

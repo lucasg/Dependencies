@@ -10,10 +10,11 @@
         mc:Ignorable="d"
         
         Title="Dependencies" 
+        Icon="Images/Dependencies_32px-no-blur.png"
         HorizontalContentAlignment="Stretch" 
         VerticalContentAlignment="Bottom"
         VerticalAlignment="Bottom"
-        Height="700" Width="1200" 
+        Height="521" Width="791" 
         AllowDrop="True"
         Drop="MainWindow_Drop"
         >
@@ -100,22 +101,21 @@
                 VerticalAlignment="Center"
               >
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="20*"/>
-                <ColumnDefinition Width="80*"/>
+                <ColumnDefinition Width="48"/>
+                <ColumnDefinition Width="auto"/>
             </Grid.ColumnDefinitions>
 
-            <Image Source="Images/Dependencies_48px.ico" 
-                   Grid.Column="0"
-                   Height="48" 
-                   Width="48"
-                   Margin="10"/>
+            <Image Source="Images/Dependencies_48px-no-blur.png" Height="48" Width="48" Grid.Column="0"/>
             
-            <TextBlock Grid.Column="1" 
+            
+            
+            <TextBlock Grid.Column="2" 
                        TextWrapping="Wrap"
                        VerticalAlignment="Center"
                        Name="TextContent"
                        FontFamily="Courrier New"
                        FontSize="18"
+                       Margin="20 0 0 00"
                        >
                 Analyze a new binary via "File -> Open" (Ctrl+O) <LineBreak/>
                 or simply by dragging it into the application.
