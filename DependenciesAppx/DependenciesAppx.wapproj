@@ -119,6 +119,8 @@
     <Content Include="Assets\Wide310x150Logo.scale-150.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
+    <Content Include="Assets\Dependencies_150px_background.png" />
+    <Content Include="Assets\Dependencies_44px_background.png" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClrPhTester\ClrPhTester.csproj" />
