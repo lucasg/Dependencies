@@ -28,6 +28,7 @@ artifacts:
 
   # "centennial" style packaging
   - path: "bin/**/*.appx"
+  - path: "DependenciesAppx/DependenciesAppx_TemporaryKey.cer"
 
 deploy:
   # Deploy to GitHub Releases
