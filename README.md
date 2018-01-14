@@ -10,7 +10,8 @@
 `Dependencies` can help Windows developers troubleshooting their dll load dependencies issues.
 
 ## Releases
-
+* [v1.6](https://github.com/lucasg/Dependencies/releases/download/v1.6/Dependencies.zip) :
+	* Add appx packaging
 * [v1.5](https://github.com/lucasg/Dependencies/releases/download/v1.5/Dependencies.zip) :
 	* Support of Sxs parsing
 	* Support of api set schema parsing
@@ -23,6 +24,8 @@ NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/l
 
 `Dependencies` is currently shipped as a binary (no installer present). Just uncompress the archive and click on it.
 Since the binary is not signed, `SmartScreen` might scream at runtime. `Dependencies` also bundle `ClrPhTester.exe`, a dumpbin-like executable used to test for non-regressions.
+
+Since `v1.6`, Dependencies is also packaged as an appx package (the Windows equivalent of a `.deb` file) which can be installed locally. However, you also need to add the test certificate `DependenciesAppx_TemporaryKey.cer` to your cert hive.
 
 `Dependencies` currently does not recursively resolve child imports when parsing a new PE since it can be really memory-hungry to do so ( it can over a GB even for "simple" PEs ). This behaviour can be overriden (app-wide) via a property located in "Options->Properties->Tree build behaviour".
 
