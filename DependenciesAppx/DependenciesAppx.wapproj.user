@@ -10,4 +10,15 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DebuggerFlavor>AppHostLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup>
+    <SmallTileSource>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</SmallTileSource>
+    <MediumTileSource>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</MediumTileSource>
+    <AppIconSource>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</AppIconSource>
+    <PackageLogoSource>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</PackageLogoSource>
+    <Source>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</Source>
+    <WideTileSource>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</WideTileSource>
+    <LargeTileSource>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</LargeTileSource>
+    <SplashScreenSource>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</SplashScreenSource>
+    <BadgeLogoSource>F:\Dev\Dependencies\Assets\Dependencies_88px_StoreLogo-01.png</BadgeLogoSource>
+  </PropertyGroup>
 </Project>
