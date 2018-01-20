@@ -38,9 +38,18 @@ namespace Dependencies
             set { SetValue(DoFindModuleInTreeCommandProperty, value);}
         }
 
+        public RelayCommand ConfigureSearchOrderCommand
+        {
+            get { return (RelayCommand)GetValue(ConfigureSearchOrderCommandProperty); }
+            set { SetValue(ConfigureSearchOrderCommandProperty, value); }
+        }
+
         // Using a DependencyProperty as the backing store for DoFindModuleInTreeCommand.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty DoFindModuleInTreeCommandProperty =
             DependencyProperty.Register("DoFindModuleInTreeCommand", typeof(RelayCommand), typeof(DependencyModuleList), new UIPropertyMetadata(null));
+
+        public static readonly DependencyProperty ConfigureSearchOrderCommandProperty =
+            DependencyProperty.Register("ConfigureSearchOrderCommand", typeof(RelayCommand), typeof(DependencyModuleList), new UIPropertyMetadata(null));
 
         public static readonly RoutedEvent SelectedModuleChangedEvent
             = EventManager.RegisterRoutedEvent("SelectedModuleChanged", RoutingStrategy.Direct, typeof(RoutedEventHandler), typeof(DependencyModuleList));
@@ -57,6 +66,7 @@ namespace Dependencies
         {
             // TODO : Find a way to properly bind commands instead of using this hack
             NewModule.DoFindModuleInTreeCommand = DoFindModuleInTreeCommand;
+            NewModule.ConfigureSearchOrderCommand = ConfigureSearchOrderCommand;
 
             this.ModulesList.Items.Add(NewModule);
 

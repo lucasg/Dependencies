@@ -1,0 +1,53 @@
+﻿<Window x:Class="Dependencies.ModuleSearchOrder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dependencies"
+        mc:Ignorable="d"
+        Title="Configure module search order" 
+        MinHeight="200" 
+        MinWidth="600" 
+        SizeToContent="Width" 
+        Width="500" Height="400" >
+        <!--ResizeMode="NoResize"-->
+    <Grid Margin="20 20 20 20"  MinWidth="600">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="33*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="80*"/>
+            </Grid.ColumnDefinitions>
+
+            <ListView Name="OrderedModules"
+                      Grid.Column="0">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Module" Width="600" DisplayMemberBinding="{Binding ModuleFilePath}" />
+                    </GridView>
+                </ListView.View>
+
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                        <Setter Property="FontFamily" Value="Courier New" />
+                        <Setter Property="FontSize" Value="12" />
+                    </Style>
+                </ListView.ItemContainerStyle>
+
+                <ListView.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ListView.GroupStyle>
+            </ListView>
+        </Grid>
+    </Grid>
+</Window>

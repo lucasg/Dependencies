@@ -63,6 +63,7 @@ namespace Dependencies
         public override string SubsystemVersion { get { return null; } }
         public override int? Checksum { get { return null; } }
         public override bool? CorrectChecksum { get { return null; } }
+        public override ModuleSearchStrategy Location { get { return ModuleSearchStrategy.NOT_FOUND; } }
 
     }
 
@@ -92,6 +93,7 @@ namespace Dependencies
         public override string SubsystemVersion { get { return UnderlyingModule.SubsystemVersion; } }
         public override int? Checksum { get { return UnderlyingModule.Checksum; } }
         public override bool? CorrectChecksum { get { return UnderlyingModule.CorrectChecksum; } }
+        public override ModuleSearchStrategy Location { get { return ModuleSearchStrategy.ApiSetSchema; } }
 
         /// <summary>
         /// The pointed module which actually does implement the api set contract
@@ -113,7 +115,7 @@ namespace Dependencies
             AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
         }
 
-        public DisplayModuleInfo(string ModuleName, PE Pe, bool DelayLoad = false)
+        public DisplayModuleInfo(string ModuleName, PE Pe, ModuleSearchStrategy Location, bool DelayLoad = false)
         {
 
             _Name = ModuleName;
@@ -124,6 +126,7 @@ namespace Dependencies
             // lessen memory allocations
             _Imports = null;
             _Exports = null;
+            _Location = Location;
 
             _Info = new ModuleInfo()
             {
@@ -223,6 +226,7 @@ namespace Dependencies
                 }
             }
         }
+
         public virtual string Type
         {
             get
@@ -250,17 +254,27 @@ namespace Dependencies
         public virtual string SubsystemVersion { get { return String.Format("{0:d}.{1:d}" , _Info.SubsystemVersion.Item1, _Info.SubsystemVersion.Item2); } }
         public virtual int? Checksum { get { return _Info.Checksum; } }
         public virtual bool? CorrectChecksum { get { return _Info.CorrectChecksum; } }
+        public virtual ModuleSearchStrategy Location { get { return _Location; } }
+
 
         #endregion PublicAPI
 
-        #region Commands 
+            #region Commands 
         private RelayCommand _DoFindModuleInTreeCommand;
+        private RelayCommand _ConfigureSearchOrderCommand;
 
         public RelayCommand DoFindModuleInTreeCommand
         {
             get { return _DoFindModuleInTreeCommand; }
             set { _DoFindModuleInTreeCommand = value; }
         }
+
+        public RelayCommand ConfigureSearchOrderCommand
+        {
+            get { return _ConfigureSearchOrderCommand; }
+            set { _ConfigureSearchOrderCommand = value; }
+        }
+
 
         public RelayCommand OpenPeviewerCommand
         {
@@ -361,6 +375,7 @@ namespace Dependencies
         protected bool _DelayLoad;
 
         private ModuleInfo _Info;
+        private ModuleSearchStrategy _Location;
         private List<PeImportDll> _Imports;
         private List<PeExport> _Exports;
 

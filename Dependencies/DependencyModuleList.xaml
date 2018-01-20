@@ -66,13 +66,21 @@
                     <MenuItem Header="View Module in separate application" 
                                         Command="{Binding Path=PlacementTarget.DataContext.OpenNewAppCommand, RelativeSource={RelativeSource AncestorType=ContextMenu} }"
                                         CommandParameter ="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu} }"
-                                        InputGestureText="Alt+Enter"  
+                                        InputGestureText="Maj+Enter"  
                                         IsEnabled="True" />
                     <MenuItem Header="View Module in Peviewer" 
                                         Command="{Binding Path=PlacementTarget.DataContext.OpenPeviewerCommand, RelativeSource={RelativeSource AncestorType=ContextMenu} }"
                                         CommandParameter ="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu} }"
                                         InputGestureText="Alt+Enter"  
                                         IsEnabled="True" />
+                    <Separator Height="3" Margin="-1,0,0,0"/>
+                    <MenuItem x:Name="ModuleSearchOrderItem" 
+                              Header="Configure _Module search order" 
+                              Command="{Binding DataContext.ConfigureSearchOrderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                              CommandParameter ="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu} }"
+                              InputGestureText="Maj+M" 
+                              IsEnabled="True"/>
+
                 </ContextMenu>
             </ListView.Resources>
 

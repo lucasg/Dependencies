@@ -9,31 +9,33 @@ using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Data;
 
-
-/// <summary>
-/// ImportContext : Describe an import module parsed from a PE.
-/// Only used during the dependency tree building phase
-/// </summary>
-public struct ImportContext
-{
-    // Import "identifier" 
-    public string ModuleName;
-
-    // If found, set the filepath and parsed PE, otherwise it's null
-    public string PeFilePath; // null if not found
-    public PE PeProperties; // null if not found
-
-    // Some imports are from api sets
-    public bool IsApiSet;
-    public string ApiSetModuleName;
-
-    // dealy load import
-    public bool IsDelayLoadImport;
-}
-
-
 namespace Dependencies
 {
+    /// <summary>
+    /// ImportContext : Describe an import module parsed from a PE.
+    /// Only used during the dependency tree building phase
+    /// </summary>
+    public struct ImportContext
+{
+        // Import "identifier" 
+        public string ModuleName;
+
+        // Return how the module was found (NOT_FOUND otherwise)
+        public ModuleSearchStrategy ModuleLocation;
+
+        // If found, set the filepath and parsed PE, otherwise it's null
+        public string PeFilePath;
+        public PE PeProperties;
+
+        // Some imports are from api sets
+        public bool IsApiSet;
+        public string ApiSetModuleName;
+
+        // dealy load import
+        public bool IsDelayLoadImport;
+    }
+
+
     /// <summary>
     /// Dependency tree building behaviour.
     /// A full recursive dependency tree can be memory intensive, therefore the
@@ -224,7 +226,7 @@ namespace Dependencies
         {
             get
             {
-                if (_OpenPeviewerCommand == null)
+                if (_OpenNewAppCommand == null)
                 {
                     _OpenNewAppCommand = new RelayCommand((param) =>
                     {
@@ -244,10 +246,12 @@ namespace Dependencies
                 return _OpenNewAppCommand;
             }
         }
+
         #endregion // Commands 
 
         private RelayCommand _OpenPeviewerCommand;
         private RelayCommand _OpenNewAppCommand;
+        
     }
 
 
@@ -291,9 +295,10 @@ namespace Dependencies
 
             // TODO : Find a way to properly bind commands instead of using this hack
             this.ModulesList.DoFindModuleInTreeCommand = DoFindModuleInTree;
+            this.ModulesList.ConfigureSearchOrderCommand = ConfigureSearchOrderCommand;
 
             var RootFilename = Path.GetFileName(FileName);
-            var RootModule = new DisplayModuleInfo(RootFilename, this.Pe);
+            var RootModule = new DisplayModuleInfo(RootFilename, this.Pe, ModuleSearchStrategy.ROOT);
             this.ProcessedModulesCache.Add(new ModuleCacheKey(RootFilename, FileName), RootModule);
 
             ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
@@ -350,18 +355,25 @@ namespace Dependencies
                 }
                
 
-                // Find Dll in "paths"
-                String PeFilePath = FindPe.FindPeFromDefault(this.Pe, ImportDllName, this.SxsEntriesCache);
-                PE ImportPe = (PeFilePath != null) ? BinaryCache.LoadPe(PeFilePath) : null;
 
 
                 ImportContext ImportModule = new ImportContext();
-                ImportModule.PeProperties = ImportPe;
-                ImportModule.PeFilePath = PeFilePath;
+                ImportModule.PeFilePath = null;
+                ImportModule.PeProperties = null;
                 ImportModule.ModuleName = DllImport.Name;
                 ImportModule.IsApiSet = FoundApiSet;
                 ImportModule.ApiSetModuleName = ImportDllName;
                 ImportModule.IsDelayLoadImport = (DllImport.Flags & 0x01) == 0x01; // TODO : Use proper macros
+
+
+                // Find Dll in "paths"
+                Tuple<ModuleSearchStrategy, String> FoundPe = FindPe.FindPeFromDefault(this.Pe, ImportDllName, this.SxsEntriesCache);
+                ImportModule.ModuleLocation = FoundPe.Item1;
+                if (ImportModule.ModuleLocation != ModuleSearchStrategy.NOT_FOUND)
+                {
+                    ImportModule.PeFilePath = FoundPe.Item2;
+                    ImportModule.PeProperties = BinaryCache.LoadPe(ImportModule.PeFilePath);
+                }
 
                 NewTreeContexts.Add(ImportModule);
             }
@@ -431,7 +443,7 @@ namespace Dependencies
 
                             if (NewTreeContext.IsApiSet)
                             {
-                                var ApiSetContractModule = new DisplayModuleInfo(NewTreeContext.ApiSetModuleName, NewTreeContext.PeProperties, NewTreeContext.IsDelayLoadImport);
+                                var ApiSetContractModule = new DisplayModuleInfo(NewTreeContext.ApiSetModuleName, NewTreeContext.PeProperties, NewTreeContext.ModuleLocation, NewTreeContext.IsDelayLoadImport);
                                 var NewModule = new ApiSetModuleInfo(NewTreeContext.ModuleName, ref ApiSetContractModule);
 
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
@@ -443,7 +455,7 @@ namespace Dependencies
                             }
                             else
                             {
-                                var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, NewTreeContext.IsDelayLoadImport);
+                                var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, NewTreeContext.ModuleLocation, NewTreeContext.IsDelayLoadImport);
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
 
                                 switch(SettingTreeBehaviour)
@@ -684,7 +696,17 @@ namespace Dependencies
             }
         }
 
-
+        public RelayCommand ConfigureSearchOrderCommand
+        {
+            get
+            {
+                return new RelayCommand((param) =>
+                {
+                    ModuleSearchOrder modalWindow = new ModuleSearchOrder(ProcessedModulesCache);
+                    modalWindow.ShowDialog();
+                });
+            }
+        }
         #endregion // Commands 
 
     }

@@ -31,11 +31,11 @@ namespace Dependencies
 
             foreach (PeImportDll DllImport in Imports)
             {
-                String PeFilePath = FindPe.FindPeFromDefault(rootPe, DllImport.Name, SxsCache);
+                Tuple<ModuleSearchStrategy, String> PeFilePath = FindPe.FindPeFromDefault(rootPe, DllImport.Name, SxsCache);
 
                 foreach (PeImport Import in DllImport.ImportList)
                 {
-                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath));
+                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath.Item2));
                 }
             }
 

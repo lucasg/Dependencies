@@ -8,6 +8,23 @@ using System.Text.RegularExpressions;
 
 namespace Dependencies
 {
+    public enum ModuleSearchStrategy
+    {
+        ROOT,
+
+        SxS,
+        WellKnownDlls,
+        ApplicationDirectory,
+        WorkingDirectory,
+        System32Folder,
+        WindowsFolder,
+        AppInit,
+        Environment,
+        ApiSetSchema,
+
+        NOT_FOUND
+    };
+
     // C# typedefs
     #region Sxs Classes
     public class SxsEntry 
@@ -433,7 +450,7 @@ namespace Dependencies
         //      5. %pwd%
         //      6. AppDatas
         //      }
-        public static string FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache)
+        public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache)
         {
             bool Wow64Dll = RootPe.IsWow64Dll();
             string RootPeFolder = Path.GetDirectoryName(RootPe.Filepath);
@@ -455,7 +472,7 @@ namespace Dependencies
 
                 if (Entry != null)
                 {
-                    return Entry.Path;
+                    return new Tuple<ModuleSearchStrategy, string>(ModuleSearchStrategy.SxS, Entry.Path);
                 }
             }
 
@@ -466,7 +483,10 @@ namespace Dependencies
             String KnownDll = Phlib.GetKnownDlls(Wow64Dll).Find(x => string.Equals(x, ModuleName, StringComparison.OrdinalIgnoreCase));
             if (KnownDll != null)
             {
-                return Path.Combine(WindowsSystemFolderPath, KnownDll);
+                return new Tuple<ModuleSearchStrategy, string>(
+                    ModuleSearchStrategy.WellKnownDlls, 
+                    Path.Combine(WindowsSystemFolderPath, KnownDll)
+                );
             }
 
 
@@ -474,7 +494,10 @@ namespace Dependencies
             FoundPePath = FindPeFromPath(ModuleName, new List<string>(new string[] { RootPeFolder }), Wow64Dll);
             if (FoundPePath != null)
             {
-                return FoundPePath;
+                return new Tuple<ModuleSearchStrategy, string>(
+                    ModuleSearchStrategy.ApplicationDirectory,
+                   FoundPePath
+                );
             }
 
             // {2-3-4}. Look in system folders
@@ -487,7 +510,10 @@ namespace Dependencies
             FoundPePath = FindPeFromPath(ModuleName, SystemFolders, Wow64Dll);
             if (FoundPePath != null)
             {
-                return FoundPePath;
+                return new Tuple<ModuleSearchStrategy, string>(
+                    ModuleSearchStrategy.WindowsFolder,
+                   FoundPePath
+                );
             }
 
             // 5. Look in current directory
@@ -506,10 +532,17 @@ namespace Dependencies
             FoundPePath = FindPeFromPath(ModuleName, PATHFolders, Wow64Dll);
             if (FoundPePath != null)
             {
-                return FoundPePath;
+                return new Tuple<ModuleSearchStrategy, string>(
+                    ModuleSearchStrategy.Environment,
+                   FoundPePath
+                );
             }
 
-            return null;
+
+            return new Tuple<ModuleSearchStrategy, string>(
+                ModuleSearchStrategy.NOT_FOUND,
+                null
+            );
         }
     }
     #endregion FindPe
