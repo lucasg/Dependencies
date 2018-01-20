@@ -41,7 +41,7 @@ String^ PhSymbolProvider::UndecorateName(
 
 	
 	UndecoratedName = PhUndecorateNameW(
-		m_Impl->m_SymbolProvider->ProcessHandle,
+		m_Impl->m_SymbolProvider,
 		PvDecoratedName
 	);
 
