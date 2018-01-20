@@ -579,6 +579,13 @@ PhGetBaseName(
 PHLIBAPI
 PPH_STRING
 NTAPI
+PhGetBaseDirectory(
+    _In_ PPH_STRING FileName
+    );
+
+PHLIBAPI
+PPH_STRING
+NTAPI
 PhGetSystemDirectory(
     VOID
     );
@@ -812,6 +819,22 @@ PhQueryRegistryString(
     _In_opt_ PWSTR ValueName
     );
 
+PHLIBAPI
+ULONG
+NTAPI
+PhQueryRegistryUlong(
+    _In_ HANDLE KeyHandle,
+    _In_opt_ PWSTR ValueName
+    );
+
+PHLIBAPI
+ULONG64
+NTAPI
+PhQueryRegistryUlong64(
+    _In_ HANDLE KeyHandle,
+    _In_opt_ PWSTR ValueName
+    );
+
 typedef struct _PH_FLAG_MAPPING
 {
     ULONG Flag1;
@@ -876,6 +899,7 @@ PhShowFileDialog(
 #define PH_FILEDIALOG_DEFAULTEXPANDED 0x40
 #define PH_FILEDIALOG_STRICTFILETYPES 0x80
 #define PH_FILEDIALOG_PICKFOLDERS 0x100
+#define PH_FILEDIALOG_NOPATHVALIDATE 0x200
 
 PHLIBAPI
 ULONG
@@ -1049,40 +1073,76 @@ PhParseCommandLineFuzzy(
     _Out_opt_ PPH_STRING *FullFileName
     );
 
-FORCEINLINE
-HANDLE 
+PHLIBAPI
+BOOLEAN
+NTAPI
+PhSearchFilePath(
+    _In_ PWSTR FileName,
+    _In_opt_ PWSTR Extension,
+    _Out_writes_(MAX_PATH) PWSTR Buffer
+    );
+
+PHLIBAPI
+PPH_STRING
+NTAPI
+PhGetCacheDirectory(
+    VOID
+    );
+
+PHLIBAPI
+VOID
+NTAPI
+PhClearCacheDirectory(
+    VOID
+    );
+
+PHLIBAPI
+PPH_STRING
+NTAPI
+PhCreateCacheFile(
+    _In_ PPH_STRING FileName
+    );
+
+PHLIBAPI
+VOID
+NTAPI
+PhDeleteCacheFile(
+    _In_ PPH_STRING FileName
+    );
+
+PHLIBAPI
+HANDLE
 NTAPI
 PhGetNamespaceHandle(
     VOID
-    )
-{
-    static PH_INITONCE initOnce = PH_INITONCE_INIT;
-    static UNICODE_STRING namespacePathUs = RTL_CONSTANT_STRING(L"\\BaseNamedObjects\\ProcessHacker");
-    static HANDLE directory = NULL;
+    );
 
-    if (PhBeginInitOnce(&initOnce))
-    {
-        OBJECT_ATTRIBUTES objectAttributes;
+PHLIBAPI
+BOOLEAN
+NTAPI
+PhLoadResource(
+    _In_ PVOID DllBase,
+    _In_ PCWSTR Name,
+    _In_ PCWSTR Type,
+    _Out_opt_ ULONG *ResourceLength,
+    _Out_ PVOID *ResourceBuffer
+    );
 
-        InitializeObjectAttributes(
-            &objectAttributes,
-            &namespacePathUs,
-            OBJ_OPENIF,
-            NULL,
-            NULL
-            );
+PHLIBAPI
+PPH_STRING
+NTAPI
+PhLoadIndirectString(
+    _In_ PWSTR SourceString
+    );
 
-        NtCreateDirectoryObject(
-            &directory,
-            MAXIMUM_ALLOWED,
-            &objectAttributes
-            );
-
-        PhEndInitOnce(&initOnce);
-    }
-
-    return directory;
-}
+PHLIBAPI
+BOOLEAN
+NTAPI
+PhExtractIcon(
+    _In_ PWSTR FileName,
+    _In_ HICON *IconLarge,
+    _In_ HICON *IconSmall
+    );
 
 #ifdef __cplusplus
 }

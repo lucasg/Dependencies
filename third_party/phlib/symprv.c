@@ -156,7 +156,14 @@ VOID PhSymbolProviderCompleteInitialization(
     UnDecorateSymbolNameW_I = PhGetProcedureAddress(dbghelpHandle, "UnDecorateSymbolNameW", 0);
 
     if (SymGetOptions_I && SymSetOptions_I)
-        SymSetOptions_I(SymGetOptions_I() | SYMOPT_DEFERRED_LOADS | SYMOPT_FAVOR_COMPRESSED | SYMOPT_UNDNAME);
+    {
+        SymSetOptions_I(
+            SymGetOptions_I() |
+            SYMOPT_AUTO_PUBLICS | SYMOPT_CASE_INSENSITIVE | SYMOPT_DEFERRED_LOADS |
+            SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_INCLUDE_32BIT_MODULES |
+            SYMOPT_LOAD_LINES | SYMOPT_OMAP_FIND_NEAREST | SYMOPT_UNDNAME
+            );
+    }
 }
 
 PPH_SYMBOL_PROVIDER PhCreateSymbolProvider(
@@ -1310,7 +1317,7 @@ NTSTATUS PhAccessOutOfProcessFunctionEntry(
 
 ULONG64 __stdcall PhGetModuleBase64(
     _In_ HANDLE hProcess,
-    _In_ DWORD64 dwAddr
+    _In_ ULONG64 dwAddr
     )
 {
     ULONG64 base;
@@ -1347,7 +1354,7 @@ ULONG64 __stdcall PhGetModuleBase64(
 
 PVOID __stdcall PhFunctionTableAccess64(
     _In_ HANDLE hProcess,
-    _In_ DWORD64 AddrBase
+    _In_ ULONG64 AddrBase
     )
 {
 #ifdef _WIN64
@@ -1763,62 +1770,64 @@ ResumeExit:
     return status;
 }
 
-
 PPH_STRING PhUndecorateName(
-    _In_ HANDLE ProcessHandle,
-    _In_ PCSTR DecoratedName
-)
+    _In_ PPH_SYMBOL_PROVIDER SymbolProvider,
+    _In_ PSTR DecoratedName
+    )
 {
-    PPH_STRING UndecoratedStr = NULL;
-    PSTR UndecoratedName = NULL;
-    DWORD CandidateSize = 512; // there is no way to know the resulting length of an undecorated name
-                               // if there is not enough place, the function does not fail. Instead it
-                               // return a truncated name.
+    PPH_STRING undecoratedStr = NULL;
+    PSTR undecoratedName = NULL;
 
-    if ((!SymInitialize_I) || (!UnDecorateSymbolName_I))
+    PhpRegisterSymbolProvider(SymbolProvider);
+
+    if (!UnDecorateSymbolName_I)
         return NULL;
-    
-    
-    SymInitialize_I(ProcessHandle, NULL, TRUE);
-    
-    UndecoratedName = PhAllocate(CandidateSize*sizeof(CHAR));
 
-    DWORD Length = UnDecorateSymbolName_I(DecoratedName, UndecoratedName, CandidateSize, UNDNAME_COMPLETE);
-    if (Length > 0)
+    // lucasg: there is no way to know the resulting length of an undecorated name
+    // if there is not enough place, the function does not fail. Instead it
+    // return a truncated name.
+
+    undecoratedName = PhAllocate(PAGE_SIZE * sizeof(CHAR));
+
+    PH_LOCK_SYMBOLS();
+    if (UnDecorateSymbolName_I(DecoratedName, undecoratedName, PAGE_SIZE, UNDNAME_COMPLETE) != 0)
     {
-        UndecoratedStr = PhZeroExtendToUtf16(UndecoratedName);
+        undecoratedStr = PhZeroExtendToUtf16(undecoratedName);
     }
-        
-    PhFree(UndecoratedName);
-    return UndecoratedStr;
+    PH_UNLOCK_SYMBOLS();
+
+    PhFree(undecoratedName);
+
+    return undecoratedStr;
 }
 
 PPH_STRING PhUndecorateNameW(
-    _In_ HANDLE ProcessHandle,
+    _In_ PPH_SYMBOL_PROVIDER SymbolProvider,
     _In_ PWSTR DecoratedName
-)
+    )
 {
+    PPH_STRING undecoratedStr = NULL;
+    PWSTR undecoratedName = NULL;
 
-    PPH_STRING UndecoratedStr = NULL;
-    PWSTR  UndecoratedName = NULL;
-    DWORD CandidateSize = 512; // there is no way to know the resulting length of an undecorated name
-                               // if there is not enough place, the function does not fail. Instead it
-                               // return a truncated name.
+    PhpRegisterSymbolProvider(SymbolProvider);
 
-    if ((!SymInitialize_I) || (!UnDecorateSymbolNameW_I))
+    if (!UnDecorateSymbolNameW_I)
         return NULL;
 
+    // lucasg: there is no way to know the resulting length of an undecorated name
+    // if there is not enough place, the function does not fail. Instead it
+    // return a truncated name.
 
-    SymInitialize_I(ProcessHandle, NULL, TRUE);
+    undecoratedName = PhAllocate(PAGE_SIZE * sizeof(WCHAR));
 
-    UndecoratedName = PhAllocate(CandidateSize *sizeof(WCHAR));
-
-    if (UnDecorateSymbolNameW_I(DecoratedName, UndecoratedName, CandidateSize, UNDNAME_COMPLETE))
+    PH_LOCK_SYMBOLS();
+    if (UnDecorateSymbolNameW_I(DecoratedName, undecoratedName, PAGE_SIZE, UNDNAME_COMPLETE) != 0)
     {
-        UndecoratedStr = PhCreateString(UndecoratedName);
+        undecoratedStr = PhCreateString(undecoratedName);
     }
+    PH_UNLOCK_SYMBOLS();
 
-    PhFree(UndecoratedName);
-    return UndecoratedStr;
+    PhFree(undecoratedName);
 
+    return undecoratedStr;
 }

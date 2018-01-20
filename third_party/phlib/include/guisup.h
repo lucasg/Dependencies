@@ -20,8 +20,10 @@ typedef BOOL (WINAPI *_IsImmersiveProcess)(
 #define RFF_CALCDIRECTORY 0x0004
 #define RFF_NOLABEL 0x0008
 #define RFF_NOSEPARATEMEM 0x0020
+#define RFF_OPTRUNAS 0x0040
 
 #define RFN_VALIDATE (-510)
+#define RFN_LIMITEDRUNAS (-511)
 
 typedef struct _NMRUNFILEDLGW
 {
@@ -52,7 +54,7 @@ typedef BOOL (WINAPI *_RunFileDlg)(
 
 typedef HRESULT (WINAPI *_SHAutoComplete)(
     _In_ HWND hwndEdit,
-    _In_ DWORD dwFlags
+    _In_ ULONG dwFlags
     );
 
 extern _IsImmersiveProcess IsImmersiveProcess_I;

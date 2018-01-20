@@ -1,15 +1,6 @@
 #ifndef _PH_APIIMPORT_H
 #define _PH_APIIMPORT_H
 
-// comctl32
-
-typedef HRESULT (WINAPI *_TaskDialogIndirect)(
-    _In_ const struct _TASKDIALOGCONFIG *pTaskConfig,
-    _In_ int *pnButton,
-    _In_ int *pnRadioButton,
-    _In_ BOOL *pfVerificationFlagChecked
-    );
-
 // ntdll
 
 typedef NTSTATUS (NTAPI *_NtQueryInformationEnlistment)(
@@ -61,7 +52,7 @@ typedef HRESULT (WINAPI *_SHOpenFolderAndSelectItems)(
     _In_ const struct _ITEMIDLIST __unaligned *pidlFolder,
     _In_ UINT cidl,
     _In_reads_opt_(cidl) const struct _ITEMIDLIST __unaligned **apidl,
-    _In_ DWORD dwFlags
+    _In_ ULONG dwFlags
     );
 
 typedef HRESULT (WINAPI *_SHParseDisplayName)(
@@ -74,7 +65,6 @@ typedef HRESULT (WINAPI *_SHParseDisplayName)(
 
 #define PH_DECLARE_IMPORT(Name) _##Name Name##_Import(VOID)
 
-PH_DECLARE_IMPORT(TaskDialogIndirect);
 PH_DECLARE_IMPORT(NtQueryInformationEnlistment);
 PH_DECLARE_IMPORT(NtQueryInformationResourceManager);
 PH_DECLARE_IMPORT(NtQueryInformationTransaction);

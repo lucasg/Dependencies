@@ -273,15 +273,6 @@ PhGetProcessWsCounters(
 PHLIBAPI
 NTSTATUS
 NTAPI
-PhInjectDllProcess(
-    _In_ HANDLE ProcessHandle,
-    _In_ PWSTR FileName,
-    _In_opt_ PLARGE_INTEGER Timeout
-    );
-
-PHLIBAPI
-NTSTATUS
-NTAPI
 PhUnloadDllProcess(
     _In_ HANDLE ProcessHandle,
     _In_ PVOID BaseAddress,
@@ -345,6 +336,14 @@ NTAPI
 PhGetTokenGroups(
     _In_ HANDLE TokenHandle,
     _Out_ PTOKEN_GROUPS *Groups
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhGetTokenRestrictedSids(
+    _In_ HANDLE TokenHandle,
+    _Out_ PTOKEN_GROUPS* RestrictedSids
     );
 
 PHLIBAPI
@@ -625,10 +624,16 @@ PhGetKernelFileName(
  */
 #define PH_NEXT_PROCESS(Process) ( \
     ((PSYSTEM_PROCESS_INFORMATION)(Process))->NextEntryOffset ? \
-    (PSYSTEM_PROCESS_INFORMATION)((PCHAR)(Process) + \
+    (PSYSTEM_PROCESS_INFORMATION)PTR_ADD_OFFSET((Process), \
     ((PSYSTEM_PROCESS_INFORMATION)(Process))->NextEntryOffset) : \
     NULL \
     )
+
+#define PH_PROCESS_EXTENSION(Process) \
+    ((PSYSTEM_PROCESS_INFORMATION_EXTENSION)PTR_ADD_OFFSET((Process), \
+    FIELD_OFFSET(SYSTEM_PROCESS_INFORMATION, Threads) + \
+    sizeof(SYSTEM_THREAD_INFORMATION) * \
+    ((PSYSTEM_PROCESS_INFORMATION)(Process))->NumberOfThreads))
 
 PHLIBAPI
 NTSTATUS
@@ -683,6 +688,14 @@ PhEnumHandlesEx(
     _Out_ PSYSTEM_HANDLE_INFORMATION_EX *Handles
     );
 
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhEnumHandlesEx2(
+    _In_ HANDLE ProcessHandle,
+    _Out_ PPROCESS_HANDLE_SNAPSHOT_INFORMATION *Handles
+    );
+
 #define PH_FIRST_PAGEFILE(Pagefiles) ( \
     /* The size of a pagefile can never be 0. A TotalSize of 0
      * is used to indicate that there are no pagefiles.
@@ -692,7 +705,7 @@ PhEnumHandlesEx(
     )
 #define PH_NEXT_PAGEFILE(Pagefile) ( \
     ((PSYSTEM_PAGEFILE_INFORMATION)(Pagefile))->NextEntryOffset ? \
-    (PSYSTEM_PAGEFILE_INFORMATION)((PCHAR)(Pagefile) + \
+    (PSYSTEM_PAGEFILE_INFORMATION)PTR_ADD_OFFSET((Pagefile), \
     ((PSYSTEM_PAGEFILE_INFORMATION)(Pagefile))->NextEntryOffset) : \
     NULL \
     )
@@ -842,6 +855,7 @@ typedef struct _PH_MODULE_INFO
     ULONG Flags;
     PPH_STRING Name;
     PPH_STRING FileName;
+    PPH_STRING OriginalFileName;
 
     USHORT LoadOrderIndex; // -1 if N/A
     USHORT LoadCount; // -1 if N/A
@@ -915,6 +929,16 @@ PhOpenKey(
 PHLIBAPI
 NTSTATUS
 NTAPI
+PhLoadAppKey(
+    _Out_ PHANDLE KeyHandle,
+    _In_ PWSTR FileName,
+    _In_ ACCESS_MASK DesiredAccess,
+    _In_opt_ ULONG Flags
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
 PhQueryKey(
     _In_ HANDLE KeyHandle,
     _In_ KEY_INFORMATION_CLASS KeyInformationClass,
@@ -971,6 +995,20 @@ NTSTATUS
 NTAPI
 PhDeleteFileWin32(
     _In_ PWSTR FileName
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhCreateDirectory(
+    _In_ PPH_STRING DirectoryPath
+    );
+
+PHLIBAPI
+NTSTATUS
+NTAPI
+PhDeleteDirectory(
+    _In_ PPH_STRING DirectoryPath
     );
 
 PHLIBAPI
