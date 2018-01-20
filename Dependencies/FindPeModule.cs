@@ -411,9 +411,9 @@ namespace Dependencies
             foreach (String CandidatePath in CandidateFolders)
             {
                 PeFilePath = Path.Combine(CandidatePath, ModuleName);
-                PE TestPe = new PE(PeFilePath);
+                PE TestPe = BinaryCache.LoadPe(PeFilePath);
 
-                if ((TestPe.LoadSuccessful) && (TestPe.IsWow64Dll() == Wow64Dll))
+                if ((TestPe != null) && (TestPe.LoadSuccessful) && (TestPe.IsWow64Dll() == Wow64Dll))
                     return PeFilePath;
             }
 

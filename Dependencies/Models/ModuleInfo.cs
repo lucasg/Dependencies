@@ -170,7 +170,7 @@ namespace Dependencies
             get { 
             
                 if (_Imports == null) {
-                    _Imports = new PE(Filepath).GetImports();
+                    _Imports = BinaryCache.LoadPe(Filepath).GetImports();
                 }
             
                 return _Imports;  
@@ -182,7 +182,7 @@ namespace Dependencies
             get { 
             
                 if (_Exports == null) {
-                    _Exports = new PE(Filepath).GetExports();
+                    _Exports = BinaryCache.LoadPe(Filepath).GetExports();
                 }
 
                 return _Exports;

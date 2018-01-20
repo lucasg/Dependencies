@@ -214,7 +214,6 @@ namespace Dependencies
             this.UserSettings.Close();
             this.AboutPage.Close();
 
-            Properties.Settings.Default.Save();
             base.OnClosing(e);
         }
 

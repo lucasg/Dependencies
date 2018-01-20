@@ -71,6 +71,7 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
+    <Compile Include="BinaryCache.cs" />
     <Compile Include="DependencyExportList.xaml.cs">
       <DependentUpon>DependencyExportList.xaml</DependentUpon>
     </Compile>

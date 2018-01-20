@@ -8,7 +8,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Data;
-using Dragablz;
+
 
 /// <summary>
 /// ImportContext : Describe an import module parsed from a PE.
@@ -271,7 +271,7 @@ namespace Dependencies
             InitializeComponent();
 
             this.Filename = FileName;
-            this.Pe = new PE(FileName);
+            this.Pe = BinaryCache.LoadPe(FileName);
             
             if (!this.Pe.LoadSuccessful)
             {
@@ -352,7 +352,7 @@ namespace Dependencies
 
                 // Find Dll in "paths"
                 String PeFilePath = FindPe.FindPeFromDefault(this.Pe, ImportDllName, this.SxsEntriesCache);
-                PE ImportPe = (PeFilePath != null) ? new PE(PeFilePath) : null;
+                PE ImportPe = (PeFilePath != null) ? BinaryCache.LoadPe(PeFilePath) : null;
 
 
                 ImportContext ImportModule = new ImportContext();
@@ -377,7 +377,7 @@ namespace Dependencies
 
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, string FilePath, int RecursionLevel = 0)
         {
-            ConstructDependencyTree(RootNode, new PE(FilePath), RecursionLevel);
+            ConstructDependencyTree(RootNode, BinaryCache.LoadPe(FilePath), RecursionLevel);
         }
 
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, PE CurrentPE, int RecursionLevel = 0)
