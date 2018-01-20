@@ -211,7 +211,7 @@ namespace ClrPhTester
 
             VerboseWriteLine("[-] Loading file {0:s} ", FileName);
             PE Pe = new PE(FileName);
-            if (!Pe.LoadSuccessful)
+            if (!Pe.Load())
             {
                 Console.Error.WriteLine("[x] Could not load file {0:s} as a PE", FileName);
                 return;
