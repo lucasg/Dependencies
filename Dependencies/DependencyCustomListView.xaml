@@ -1,0 +1,76 @@
+<ResourceDictionary 
+                    
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+    xmlns:local="clr-namespace:Dependencies"
+    xmlns:util="clr-namespace:Wpf.Util"
+    xmlns:properties="clr-namespace:Dependencies.Properties"
+    mc:Ignorable="d" 
+>
+
+    <Style x:Key="DependencyCustomListView"  TargetType="UserControl">
+        <!--<Setter Property="d:DesignWidth" Value="300"/>
+        <Setter Property="d:DesignHeight" Value="300"/>-->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="UserControl">
+
+                    <Grid x:Name="SearchBarGrid" Margin="0,0,0,0">
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="46*"/>
+                            <RowDefinition  Height="auto" MaxHeight="25"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Where the list goes -->
+                        <ContentPresenter   Grid.Row="0"
+                                            Content="{TemplateBinding ContentControl.Content}" 
+                                            ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"/>
+
+                        <Grid   x:Name="SearchBar"
+                                VerticalAlignment="Bottom"
+                                Visibility="Collapsed"
+                                Grid.Row="1"
+                                Margin="0 0 0 0"
+                                Background="White">
+
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="60*"/>
+                                <ColumnDefinition Width="20"/>
+                            </Grid.ColumnDefinitions>
+
+                            <Label  Height="25" 
+                                    VerticalAlignment="Center"
+                                    Grid.Column="0">
+                                Search :
+                            </Label>
+
+                            <!-- TextChanged="SearchFilter_OnTextChanged"
+                            KeyDown ="{x:Static local:DependencyCustomListView.OnTextBoxKeyDown}" -->
+                            <TextBox Name = "SearchFilter"
+                                    
+
+                                    Width="auto" 
+                                    Height="20" 
+                                    HorizontalContentAlignment="Stretch"
+                                    HorizontalAlignment="Stretch"
+                                    Grid.Column="1">
+                            </TextBox>
+
+                            <Button Height="20" 
+                                    Grid.Column="2"
+                                    Margin="2 0 3 0"
+                                    Click="{Binding OnSearchClose}">
+                                X
+                            </Button>
+
+                        </Grid>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary> 
