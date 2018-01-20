@@ -148,7 +148,7 @@ String^ PE::GetManifest()
 
     // Extract embedded manifest
     INT  rawManifestLen;
-    PSTR rawManifest;
+    BYTE* rawManifest;
     if (!m_Impl->GetPeManifest(&rawManifest, &rawManifestLen))
         return gcnew String("");
 

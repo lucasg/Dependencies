@@ -26,8 +26,8 @@ public:
     // /param  manifestLen variable returning the length of the embedded binary manifest
     // /return false if there is none
     bool GetPeManifest(
-            _Out_ PSTR *manifest,
-            _Out_ INT  *manfestLen
+		_Out_ BYTE* *manifest,
+        _Out_ INT  *manifestLen
     );
     
 
