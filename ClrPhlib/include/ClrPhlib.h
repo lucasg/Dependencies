@@ -13,11 +13,11 @@ namespace System {
 
     namespace ClrPh {
 
-		public ref class ApiSetTarget : List<String^>
-		{};
+        public ref class ApiSetTarget : List<String^>
+        {};
 
-		public ref class ApiSetSchema : Dictionary<String^, ApiSetTarget^>
-		{};
+        public ref class ApiSetSchema : Dictionary<String^, ApiSetTarget^>
+        {};
 
         public ref class Phlib {
         public:
@@ -32,18 +32,18 @@ namespace System {
             static List<String^>^ KnownDll64List;
             static List<String^>^ KnownDll32List;
 
-			
-			// Return the Api Set schema:
-			// NB: Api set resolution rely on hash buckets who 
-			// can contains more entries than this schema.
-			static ApiSetSchema^ GetApiSetSchema();
+            
+            // Return the Api Set schema:
+            // NB: Api set resolution rely on hash buckets who 
+            // can contains more entries than this schema.
+            static ApiSetSchema^ GetApiSetSchema();
 
-			
-		private:
-			// private implementation of ApiSet schema parsing
-			static ApiSetSchema^ GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap);
-			static ApiSetSchema^ GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap);
-			static ApiSetSchema^ GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap);
+            
+        private:
+            // private implementation of ApiSet schema parsing
+            static ApiSetSchema^ GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap);
+            static ApiSetSchema^ GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap);
+            static ApiSetSchema^ GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap);
 
         };
 
@@ -113,17 +113,22 @@ namespace System {
             Int16 Characteristics;
             Int16 DllCharacteristics;
 
-			UInt64 FileSize;
+            UInt64 FileSize;
         };
 
 
-
+        // C# visible class representing a parsed PE file
         public ref class PE
         {
         public:
             PE(_In_ String^ Filepath);
-
             ~PE();
+
+            // Mapped the PE in memory and init infos
+            bool Load();
+
+            // Unmapped the PE from memory
+            void Unload();
 
             // Check if the PE is 32-bit
             bool IsWow64Dll();
@@ -138,22 +143,29 @@ namespace System {
             // Return an empty string if there is none.
             String^ GetManifest();
 
+            // PE properties parsed from the NT header
             PeProperties ^Properties;
+
+            // Check if the specified file has been successfully parsed as a PE file.
             Boolean LoadSuccessful;
+
+            // Path to PE file.
             String^ Filepath;
 
         protected:
             // Deallocate the native object on the finalizer just in case no destructor is called  
-            !PE() {
-                delete m_Impl;
-            }
+            !PE();
 
+            // Initalize PeProperties struct once the PE has been loaded into memory
             void InitProperties();
 
         private:
+            
+            // C++ part interfacing with phlib
             UnmanagedPE * m_Impl;
         };
 
+        // Symbol resolution and undecoration utility class
         public ref class PhSymbolProvider
         {
         public:
