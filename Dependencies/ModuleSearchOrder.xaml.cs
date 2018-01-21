@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
+using System.ComponentModel;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 
 namespace Dependencies
 {
@@ -41,8 +35,12 @@ namespace Dependencies
             OrderedModules.ItemsSource = items;
 
             CollectionView view = (CollectionView)CollectionViewSource.GetDefaultView(OrderedModules.ItemsSource);
+
             PropertyGroupDescription groupDescription = new PropertyGroupDescription("SearchStrategy");
             view.GroupDescriptions.Add(groupDescription);
+
+            SortDescription sortDescription = new SortDescription("SearchStrategy", ListSortDirection.Ascending);
+            view.SortDescriptions.Add(sortDescription);
         }
     }
 }

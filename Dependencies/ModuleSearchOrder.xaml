@@ -11,7 +11,7 @@
         SizeToContent="Width" 
         Width="500" Height="400" >
         <!--ResizeMode="NoResize"-->
-    <Grid Margin="20 20 20 20"  MinWidth="600">
+    <Grid Margin="20 20 20 20"  MinWidth="500">
         <Grid.RowDefinitions>
             <RowDefinition Height="33*"/>
         </Grid.RowDefinitions>
@@ -22,15 +22,18 @@
             </Grid.ColumnDefinitions>
 
             <ListView Name="OrderedModules"
+                      HorizontalAlignment="Stretch"
+                      HorizontalContentAlignment="Stretch"
                       Grid.Column="0">
                 <ListView.View>
                     <GridView>
-                        <GridViewColumn Header="Module" Width="600" DisplayMemberBinding="{Binding ModuleFilePath}" />
+                        <GridViewColumn Header="Module" DisplayMemberBinding="{Binding ModuleFilePath}" />
                     </GridView>
                 </ListView.View>
 
                 <ListView.ItemContainerStyle>
                     <Style TargetType="ListViewItem">
+                        <Setter Property="HorizontalAlignment" Value="Stretch" />
                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                         <Setter Property="VerticalContentAlignment" Value="Stretch" />
                         <Setter Property="FontFamily" Value="Courier New" />
@@ -42,7 +45,9 @@
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
-                                <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                                <Border BorderThickness="1" Padding="0" BorderBrush="lightgray" Background="gainsboro" SnapsToDevicePixels="True">
+                                    <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                                </Border>
                             </DataTemplate>
                         </GroupStyle.HeaderTemplate>
                     </GroupStyle>

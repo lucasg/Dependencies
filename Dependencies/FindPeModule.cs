@@ -10,19 +10,19 @@ namespace Dependencies
 {
     public enum ModuleSearchStrategy
     {
-        ROOT,
+        ROOT = -1,
 
-        SxS,
-        WellKnownDlls,
-        ApplicationDirectory,
-        WorkingDirectory,
-        System32Folder,
-        WindowsFolder,
-        AppInit,
-        Environment,
-        ApiSetSchema,
+        SxS = 0,
+        ApiSetSchema = 1,
+        WellKnownDlls = 2,
+        ApplicationDirectory = 3,
+        System32Folder = 4,
+        WindowsFolder = 5,
+        WorkingDirectory = 6,
+        Environment = 7,
+        AppInit = 8,
 
-        NOT_FOUND
+        NOT_FOUND = 9
     };
 
     // C# typedefs
