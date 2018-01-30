@@ -54,6 +54,69 @@ namespace Dependencies
             return Instance.GetBinary(PePath);
         }
 
+        //public static ApiSetSchema ApiSetmapCache = Phlib.GetApiSetSchema();
+
+        public static string LookupApiSetLibrary(string ImportDllName)
+        {
+            ApiSetSchema ApiSetmapCache = Phlib.GetApiSetSchema();
+
+            // Look for api set target 
+            if (!ImportDllName.StartsWith("api-") && !ImportDllName.StartsWith("ext-"))
+                return null;
+           
+            // Strip the .dll extension and the last number (which is probably a build counter)
+            string ImportDllNameWithoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
+            string ImportDllHashKey = ImportDllNameWithoutExtension.Substring(0, ImportDllNameWithoutExtension.LastIndexOf("-"));
+
+            if (ApiSetmapCache.ContainsKey(ImportDllHashKey))
+            {
+                ApiSetTarget Targets = ApiSetmapCache[ImportDllHashKey];
+                if (Targets.Count > 0)
+                {
+                    return Targets[0];
+                }
+            }
+            
+            return null;
+        }
+
+        public static bool LookupImport(string ModuleFilePath, string ImportName, int ImportOrdinal, bool ImportByOrdinal)
+        {
+            if (ModuleFilePath == null)
+                return false;
+
+            string ApiSetName = LookupApiSetLibrary(ModuleFilePath);
+            if (ApiSetName != null)
+            {
+                ModuleFilePath = ApiSetName;
+            }
+
+            PE Module = LoadPe(ModuleFilePath);
+            if (Module == null)
+                return false;
+
+            foreach (var export in Module.GetExports())
+            {
+                if (ImportByOrdinal)
+                {
+                    if ((export.Ordinal == ImportOrdinal) && export.ExportByOrdinal)
+                        return true;
+                }
+                else
+                {
+                    if (export.ForwardedName == ImportName)
+                        return true;
+
+                    if (export.Name == ImportName)
+                        return true;
+
+                }
+                
+            }
+
+            return false;
+        }
+
         #endregion Singleton implementation
 
 

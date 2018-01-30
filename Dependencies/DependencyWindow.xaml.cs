@@ -336,25 +336,12 @@ namespace Dependencies
                 string ImportDllName = DllImport.Name;
 
 
-                // Look for api set target 
-                if (ImportDllName.StartsWith("api-") || ImportDllName.StartsWith("ext-"))
+                string ApiSetName = BinaryCache.LookupApiSetLibrary(ImportDllName);
+                if (ApiSetName != null)
                 {
-                    // Strip the .dll extension and the last number (which is probably a build counter)
-                    string ImportDllNameWithoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
-                    string ImportDllHashKey = ImportDllNameWithoutExtension.Substring(0, ImportDllNameWithoutExtension.LastIndexOf("-"));
-
-                    if (this.ApiSetmapCache.ContainsKey(ImportDllHashKey))
-                    {
-                        ApiSetTarget Targets = this.ApiSetmapCache[ImportDllHashKey];
-                        if (Targets.Count > 0)
-                        {
-                            FoundApiSet = true;
-                            ImportDllName = Targets[0];
-                        }
-                    }
+                    FoundApiSet = true;
+                    ImportDllName = ApiSetName;
                 }
-               
-
 
 
                 ImportContext ImportModule = new ImportContext();

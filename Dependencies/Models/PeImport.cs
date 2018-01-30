@@ -23,7 +23,7 @@ public class DisplayPeImport : SettingBindingHandler
        Info.delayedImport = PeImport.DelayImport;
        Info.importAsCppName = (PeImport.Name.Length > 0 && PeImport.Name[0] == '?');
        Info.importByOrdinal = PeImport.ImportByOrdinal;
-       Info.importNotFound = ModuleFilePath == null;
+       Info.importNotFound = !BinaryCache.LookupImport(ModuleFilePath, PeImport.Name, PeImport.Ordinal, PeImport.ImportByOrdinal);
 
 
         AddNewEventHandler("Undecorate", "Undecorate", "Name", this.GetDisplayName);
