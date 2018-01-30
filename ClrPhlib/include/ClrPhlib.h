@@ -163,6 +163,12 @@ namespace System {
             
             // C++ part interfacing with phlib
             UnmanagedPE * m_Impl;
+
+            // local cache for imports and exports list
+            List<PeImportDll ^>^ m_Imports;
+            List<PeExport ^>^  m_Exports;
+            bool m_ExportsInit;
+            bool m_ImportsInit;
         };
 
         // Symbol resolution and undecoration utility class

@@ -13,6 +13,9 @@ PE::PE(
     this->m_Impl = new UnmanagedPE();
     this->Filepath = gcnew String(Filepath);
     this->LoadSuccessful = false;
+
+    this->m_ExportsInit = false;
+    this->m_ImportsInit = false;
 }
 
 PE::~PE()
@@ -94,36 +97,44 @@ void PE::InitProperties()
 
 Collections::Generic::List<PeExport^> ^ PE::GetExports()
 {
-    Collections::Generic::List<PeExport^> ^Exports = gcnew Collections::Generic::List<PeExport^>();
+    if (m_ExportsInit)
+        return m_Exports;
+
+    m_ExportsInit = true;
+    m_Exports = gcnew Collections::Generic::List<PeExport^>();
 
     if (!LoadSuccessful)
-        return Exports;
+        return m_Exports;
 
     if (NT_SUCCESS(PhGetMappedImageExports(&m_Impl->m_PvExports, &m_Impl->m_PvMappedImage)))
     {
         for (size_t Index = 0; Index < m_Impl->m_PvExports.NumberOfEntries; Index++)
         {
-            Exports->Add(gcnew PeExport(*m_Impl, Index));
+            m_Exports->Add(gcnew PeExport(*m_Impl, Index));
         }
     }
 
-    return Exports;
+    return m_Exports;
 }
 
 
 Collections::Generic::List<PeImportDll^> ^ PE::GetImports()
 {
-    Collections::Generic::List<PeImportDll^> ^Imports = gcnew Collections::Generic::List<PeImportDll^>();
+    if (m_ImportsInit)
+        return m_Imports;
+
+    m_ImportsInit = true;
+    m_Imports = gcnew Collections::Generic::List<PeImportDll^>();
 
     if (!LoadSuccessful)
-        return Imports;
+        return m_Imports;
 
     // Standard Imports
     if (NT_SUCCESS(PhGetMappedImageImports(&m_Impl->m_PvImports, &m_Impl->m_PvMappedImage)))
     {
         for (size_t IndexDll = 0; IndexDll< m_Impl->m_PvImports.NumberOfDlls; IndexDll++)
         {
-            Imports->Add(gcnew PeImportDll(&m_Impl->m_PvImports, IndexDll));
+            m_Imports->Add(gcnew PeImportDll(&m_Impl->m_PvImports, IndexDll));
         }
     }
 
@@ -132,11 +143,11 @@ Collections::Generic::List<PeImportDll^> ^ PE::GetImports()
     {
         for (size_t IndexDll = 0; IndexDll< m_Impl->m_PvDelayImports.NumberOfDlls; IndexDll++)
         {
-            Imports->Add(gcnew PeImportDll(&m_Impl->m_PvDelayImports, IndexDll));
+            m_Imports->Add(gcnew PeImportDll(&m_Impl->m_PvDelayImports, IndexDll));
         }
     }
 
-    return Imports;
+    return m_Imports;
 }
 
 
