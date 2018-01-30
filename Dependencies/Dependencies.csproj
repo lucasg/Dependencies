@@ -216,5 +216,8 @@
   <ItemGroup>
     <Resource Include="Dependencies.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Dependencies.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
