@@ -156,10 +156,12 @@ namespace Dependencies
 
         public BinaryCache(string ApplicationAppDataPath, int _MaxBinaryCount)
         {
-            MaxBinaryCount = _MaxBinaryCount;
+            
             BinaryDatabase = new Dictionary<string, PE>();
+            BinaryDatabaseLock = new Object();
             LruCache = new List<string>();
 
+            MaxBinaryCount = _MaxBinaryCount;
             BinaryCacheFolderPath = Path.Combine(ApplicationAppDataPath, "BinaryCache");
             Directory.CreateDirectory(BinaryCacheFolderPath);
         }
@@ -212,21 +214,29 @@ namespace Dependencies
 
             string PeHash = GetBinaryHash(PePath);
 
-            // Cache "miss"
-            bool hit = BinaryDatabase.ContainsKey(PeHash);
-            if (!hit)
+            
+            // A sync lock is mandatory here in order not to load twice the
+            // same binary from two differents workers
+            lock (BinaryDatabaseLock)
             {
-                string DestFilePath = Path.Combine(BinaryCacheFolderPath, PeHash);
-                if (DestFilePath != PePath)
-                {
-                    File.Copy(PePath, DestFilePath, true);
-                }
+                bool hit = BinaryDatabase.ContainsKey(PeHash);
                 
-                PE NewShadowBinary = new PE(DestFilePath);
-                NewShadowBinary.Load();
+                // Cache "miss"
+                if (!hit)
+                {
+                
+                    string DestFilePath = Path.Combine(BinaryCacheFolderPath, PeHash);
+                    if (DestFilePath != PePath)
+                    {
+                        File.Copy(PePath, DestFilePath, true);
+                    }
+                
+                    PE NewShadowBinary = new PE(DestFilePath);
+                    NewShadowBinary.Load();
 
-                LruCache.Add(PeHash);
-                BinaryDatabase.Add(PeHash, NewShadowBinary);
+                    LruCache.Add(PeHash);
+                    BinaryDatabase.Add(PeHash, NewShadowBinary);
+                }
             }
 
             // Cache "Hit"
@@ -256,8 +266,11 @@ namespace Dependencies
         protected void UpdateLru(string PeHash)
         {
             string MatchingHash = LruCache.Find(Hash => (Hash == PeHash));
-            if (null != MatchingHash)
-            { 
+            if (null == MatchingHash)
+                return;
+
+            lock (BinaryDatabaseLock)
+            {
                 // prepend the matching item at the beginning of the list
                 LruCache.Remove(MatchingHash);
                 LruCache.Insert(0, MatchingHash);
@@ -268,6 +281,8 @@ namespace Dependencies
 
         private List<string> LruCache;
         private Dictionary<string, PE> BinaryDatabase;
+        private Object BinaryDatabaseLock; 
+
         private string BinaryCacheFolderPath;
         private int MaxBinaryCount;
 
