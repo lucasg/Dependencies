@@ -38,7 +38,10 @@ namespace Dependencies
                 return SingletonInstance;
             }
         }
+        #endregion Singleton implementation
 
+        #region PublicAPI
+        
         /// <summary>
         /// Ask the BinaryCache to load a PE from the filesystem. The
         /// whole cache magic is hidden underneath
@@ -54,11 +57,38 @@ namespace Dependencies
             return Instance.GetBinary(PePath);
         }
 
-        //public static ApiSetSchema ApiSetmapCache = Phlib.GetApiSetSchema();
+        public static Tuple<ModuleSearchStrategy, PE> ResolveModule(PE RootPe, string ModuleName, SxsEntries SxsCache)
+        {
+            Tuple<ModuleSearchStrategy, string> ResolvedFilepath;
+
+            string ApiSetName = LookupApiSetLibrary(ModuleName);
+            if (ApiSetName != null)
+            {
+                ModuleName = ApiSetName;
+            }
+
+            ResolvedFilepath = FindPe.FindPeFromDefault(RootPe, ModuleName, SxsCache);
+
+            // ApiSet override the underneath search location if found
+            ModuleSearchStrategy ModuleLocation = ResolvedFilepath.Item1;
+            if ((ApiSetName != null) && (ResolvedFilepath.Item2 != null))
+                ModuleLocation = ModuleSearchStrategy.ApiSetSchema;
+
+            // 
+            PE ResolvedModule = null;
+            if (ResolvedFilepath.Item2 != null)
+                ResolvedModule = LoadPe(ResolvedFilepath.Item2);
+
+
+            return new Tuple<ModuleSearchStrategy, PE>(ModuleLocation, ResolvedModule);
+        }
+
+
+        private static ApiSetSchema ApiSetmapCache = Phlib.GetApiSetSchema();
 
         public static string LookupApiSetLibrary(string ImportDllName)
         {
-            ApiSetSchema ApiSetmapCache = Phlib.GetApiSetSchema();
+            //ApiSetSchema ApiSetmapCache = Phlib.GetApiSetSchema();
 
             // Look for api set target 
             if (!ImportDllName.StartsWith("api-") && !ImportDllName.StartsWith("ext-"))
@@ -117,7 +147,7 @@ namespace Dependencies
             return false;
         }
 
-        #endregion Singleton implementation
+        #endregion PublicAPI
 
 
 
@@ -136,7 +166,7 @@ namespace Dependencies
 
         #endregion constructors
 
-        #region PublicAPI
+        
         public void Load()
         {
             // "warm up" the cache
@@ -205,8 +235,6 @@ namespace Dependencies
             ShadowBinary.Filepath = PePath;
             return ShadowBinary;
         }
-
-        #endregion PublicAPI
 
         protected string GetBinaryHash(string PePath)
         {

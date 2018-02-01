@@ -332,35 +332,29 @@ namespace Dependencies
             List<PeImportDll> PeImports = newPe.GetImports();
             foreach (PeImportDll DllImport in PeImports)
             {
-                bool FoundApiSet = false;
-                string ImportDllName = DllImport.Name;
-
-
-                string ApiSetName = BinaryCache.LookupApiSetLibrary(ImportDllName);
-                if (ApiSetName != null)
-                {
-                    FoundApiSet = true;
-                    ImportDllName = ApiSetName;
-                }
-
 
                 ImportContext ImportModule = new ImportContext();
                 ImportModule.PeFilePath = null;
                 ImportModule.PeProperties = null;
                 ImportModule.ModuleName = DllImport.Name;
-                ImportModule.IsApiSet = FoundApiSet;
-                ImportModule.ApiSetModuleName = ImportDllName;
+                ImportModule.ApiSetModuleName = null;
                 ImportModule.IsDelayLoadImport = (DllImport.Flags & 0x01) == 0x01; // TODO : Use proper macros
 
 
                 // Find Dll in "paths"
-                Tuple<ModuleSearchStrategy, String> FoundPe = FindPe.FindPeFromDefault(this.Pe, ImportDllName, this.SxsEntriesCache);
-                ImportModule.ModuleLocation = FoundPe.Item1;
+                Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(this.Pe, DllImport.Name, this.SxsEntriesCache);
+                ImportModule.ModuleLocation = ResolvedModule.Item1;
                 if (ImportModule.ModuleLocation != ModuleSearchStrategy.NOT_FOUND)
                 {
-                    ImportModule.PeFilePath = FoundPe.Item2;
-                    ImportModule.PeProperties = BinaryCache.LoadPe(ImportModule.PeFilePath);
+                    ImportModule.PeProperties = ResolvedModule.Item2;
+                    ImportModule.PeFilePath = ResolvedModule.Item2.Filepath;
                 }
+
+                
+                // special case for apiset schema
+                ImportModule.IsApiSet = (ImportModule.ModuleLocation == ModuleSearchStrategy.ApiSetSchema);
+                if (ImportModule.IsApiSet)
+                    ImportModule.ApiSetModuleName = BinaryCache.LookupApiSetLibrary(DllImport.Name);
 
                 NewTreeContexts.Add(ImportModule);
             }

@@ -31,20 +31,12 @@ namespace Dependencies
 
             foreach (PeImportDll DllImport in Imports)
             {
-                Tuple<ModuleSearchStrategy, String> PeFilePath;
+                Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(rootPe, DllImport.Name, SxsCache);
+                string ModuleFilepath = (ResolvedModule.Item2 != null) ? ResolvedModule.Item2.Filepath : null;
                 
-                string ImportDllName = DllImport.Name;
-                string ApiSetName = BinaryCache.LookupApiSetLibrary(ImportDllName);
-                if (ApiSetName != null)
-                {
-                    ImportDllName = ApiSetName;
-                }
-
-
-                PeFilePath = FindPe.FindPeFromDefault(rootPe, ImportDllName, SxsCache);
                 foreach (PeImport Import in DllImport.ImportList)
                 {
-                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, PeFilePath.Item2));
+                    this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, ModuleFilepath));
                 }
             }
 
