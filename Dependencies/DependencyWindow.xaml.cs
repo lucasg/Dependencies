@@ -268,6 +268,7 @@ namespace Dependencies
         SxsEntries SxsEntriesCache;
         ApiSetSchema ApiSetmapCache;
         ModulesCache ProcessedModulesCache;
+        DisplayModuleInfo _SelectedModule;
 
         #region PublicAPI
         public DependencyWindow(String FileName)
@@ -292,6 +293,7 @@ namespace Dependencies
             this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
             this.ProcessedModulesCache = new ModulesCache();
             this.ApiSetmapCache = Phlib.GetApiSetSchema();
+            this._SelectedModule = null;
 
             // TODO : Find a way to properly bind commands instead of using this hack
             this.ModulesList.DoFindModuleInTreeCommand = DoFindModuleInTree;
@@ -561,10 +563,52 @@ namespace Dependencies
 
         private void UpdateImportExportLists(DisplayModuleInfo SelectedModule)
         {
-
-            this.ImportList.SetImports(SelectedModule.Imports, this.Pe, this.SxsEntriesCache, SymPrv);
+            this.ImportList.SetImports(SelectedModule.Imports, SymPrv, this);
             this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
         }
+
+        public PE LoadImport(string ModuleName, DisplayModuleInfo CurrentModule = null, bool DelayLoad = false)
+        {
+            if (CurrentModule == null)
+            {
+                CurrentModule = this._SelectedModule;
+            }
+
+            Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(this.Pe, ModuleName, this.SxsEntriesCache);
+            string ModuleFilepath = (ResolvedModule.Item2 != null) ? ResolvedModule.Item2.Filepath : null;
+
+            ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
+            if ( (ModuleFilepath != null) && !this.ProcessedModulesCache.ContainsKey(ModuleKey))
+            {
+                if (ResolvedModule.Item1 == ModuleSearchStrategy.ApiSetSchema)
+                {
+                    var ApiSetContractModule = new DisplayModuleInfo(
+                        BinaryCache.LookupApiSetLibrary(ModuleName),
+                        ResolvedModule.Item2,
+                        ResolvedModule.Item1,
+                        DelayLoad
+                    );
+                    var NewModule = new ApiSetModuleInfo(ModuleName, ref ApiSetContractModule);
+                    this.ProcessedModulesCache[ModuleKey] = NewModule;
+                }
+                else
+                {
+                    var NewModule = new DisplayModuleInfo(
+                        ModuleName,
+                        ResolvedModule.Item2,
+                        ResolvedModule.Item1,
+                        DelayLoad
+                    );
+                    this.ProcessedModulesCache[ModuleKey] = NewModule;
+                }
+
+                // add it to the module list
+                this.ModulesList.AddModule(this.ProcessedModulesCache[ModuleKey]);
+            }
+
+            return ResolvedModule.Item2;
+        }
+
 
         /// <summary>
         /// Reentrant version of Collapse/Expand Node

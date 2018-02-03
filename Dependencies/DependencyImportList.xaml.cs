@@ -25,15 +25,16 @@ namespace Dependencies
             ImportItemsView = CollectionViewSource.GetDefaultView(this.ImportList.Items.SourceCollection);
         }
 
-        public void SetImports(List<PeImportDll> Imports, PE rootPe, SxsEntries SxsCache, PhSymbolProvider SymPrv)
+        public void SetImports(List<PeImportDll> Imports, PhSymbolProvider SymPrv, DependencyWindow Dependencies)
         {
             this.ImportList.Items.Clear();
 
             foreach (PeImportDll DllImport in Imports)
             {
-                Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(rootPe, DllImport.Name, SxsCache);
-                string ModuleFilepath = (ResolvedModule.Item2 != null) ? ResolvedModule.Item2.Filepath : null;
-                
+
+                PE ModuleImport = Dependencies.LoadImport(DllImport.Name, null, (DllImport.Flags & 0x01) == 0x01 /* TODO : Use proper macros */ );
+                string ModuleFilepath = (ModuleImport != null) ? ModuleImport.Filepath : null;
+
                 foreach (PeImport Import in DllImport.ImportList)
                 {
                     this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, ModuleFilepath));
