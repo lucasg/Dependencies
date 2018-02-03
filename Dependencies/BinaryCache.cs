@@ -177,6 +177,20 @@ namespace Dependencies
                 GetBinary(CachedBinary);
             }
 
+            string System32Folder = Environment.GetFolderPath(Environment.SpecialFolder.System);
+            string SysWow64Folder = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+
+            // preload all well konwn dlls
+            foreach (String KnownDll in Phlib.GetKnownDlls(false))
+            {
+                GetBinary(Path.Combine(System32Folder, KnownDll));
+            }
+
+            foreach (String KnownDll in Phlib.GetKnownDlls(true))
+            {
+                GetBinary(Path.Combine(SysWow64Folder, KnownDll));
+            }
+
         }
 
         public void Unload()

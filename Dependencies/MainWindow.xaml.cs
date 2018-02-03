@@ -53,7 +53,6 @@ namespace Dependencies
         #region PublicAPI
         public MainWindow()
         {
-            Phlib.InitializePhLib();
 
             InitializeComponent();
 

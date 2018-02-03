@@ -16,6 +16,8 @@ namespace Dependencies
     {
         void App_Startup(object sender, StartupEventArgs e)
         {
+            Phlib.InitializePhLib();
+            
             BinaryCache.Instance.Load();
 
             MainWindow mainWindow = new MainWindow();
