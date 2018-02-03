@@ -37,7 +37,11 @@ Tree build behaviours available :
 
 * `ChildOnly` (default) : only process PE child imports and nothing beyond.
 * `RecursiveOnlyOnDirectImports`  : do not process delayload dlls.
-* `Recursive` : Full recursive analysis. You better have time and RAM on your hands if you activate this setting.
+* `Recursive` : Full recursive analysis. You better have time and RAM on your hands if you activate this setting :
+
+<p align="center">
+<img alt="Yes that's 7 GB of RAM being consumed. I'm impressed the application didn't even crash" src="screenshots/RamEater.png"/>
+</p>
 
 
 ## Limitations
@@ -46,7 +50,7 @@ At the moment, `Dependencies` recreates features and "features" of `depends.exe`
 
 * Only direct, forwarded and delay load dependencies are supported. Dynamic loading via `LoadLibrary` are not supported (and probably won't ever be).
 * `Min-win` dlls are not propertly supported. (UPDATED : support of api set schema redirection in 1.5)
-* There are no checks between Api Imports and Exports for the moment, only dll presence is supported.
+* There are no checks between Api Imports and Exports for the moment, only dll presence is supported. 
 * No support of esoteric dll load paths (via `AppPaths` or `SxS` manifests entries). (UPDATED : minimal support of sxs private manifests search).
 
 
