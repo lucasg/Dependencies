@@ -40,7 +40,7 @@ Tree build behaviours available :
 * `Recursive` : Full recursive analysis. You better have time and RAM on your hands if you activate this setting :
 
 <p align="center">
-<img alt="Yes that's 7 GB of RAM being consumed. I'm impressed the application didn't even crash" src="screenshots/RamEater.png"/>
+<img alt="Yes that's 7 GB of RAM being consumed. I'm impressed the application didn't even crash" src="screenshots/RamEater.PNG"/>
 </p>
 
 
