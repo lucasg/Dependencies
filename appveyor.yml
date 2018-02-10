@@ -81,6 +81,12 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         }
         Pop-Location;
 
+        # Bundling dbghelp.dll along for undecorating names
+        $DbgHelpDll="";
+        if (Test-Path "$env:SystemRoot\System32\dbghelp.dll") {
+          $DbgHelpDll=(Resolve-Path $env:SystemRoot\System32\dbghelp.dll).Path;
+        }
+
         # Creating output directory
         New-Item -ItemType Directory -Force -Path "output";
         cd output;
@@ -94,7 +100,7 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         &"$BINPATH/ClrPhTester.exe" -sxsentries "$($env:windir)/System32/ctfmon.exe" 
 
         # Zipping everything
-        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN;
+        &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DbgHelpDll;
 
         $makeappx = "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\makeappx.exe";
         $signtool = "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe";
