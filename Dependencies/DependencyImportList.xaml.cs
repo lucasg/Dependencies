@@ -32,7 +32,7 @@ namespace Dependencies
             foreach (PeImportDll DllImport in Imports)
             {
 
-                PE ModuleImport = Dependencies.LoadImport(DllImport.Name, null, (DllImport.Flags & 0x01) == 0x01 /* TODO : Use proper macros */ );
+                PE ModuleImport = Dependencies.LoadImport(DllImport.Name, null, DllImport.IsDelayLoad() );
                 string ModuleFilepath = (ModuleImport != null) ? ModuleImport.Filepath : null;
 
                 foreach (PeImport Import in DllImport.ImportList)

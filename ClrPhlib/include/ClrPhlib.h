@@ -68,12 +68,18 @@ namespace System {
             Int64 Flags;
             String ^Name;
             Int64 NumberOfEntries;
-
             List<PeImport^>^ ImportList;
 
+            // constructors
             PeImportDll(const PPH_MAPPED_IMAGE_IMPORTS &PvMappedImports, size_t ImportDllIndex);
             PeImportDll(const PeImportDll ^ other);
+
+            // destructors
             ~PeImportDll();
+
+            // getters
+            bool IsDelayLoad();
+
         protected:
             !PeImportDll();
 

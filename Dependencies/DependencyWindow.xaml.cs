@@ -340,7 +340,7 @@ namespace Dependencies
                 ImportModule.PeProperties = null;
                 ImportModule.ModuleName = DllImport.Name;
                 ImportModule.ApiSetModuleName = null;
-                ImportModule.IsDelayLoadImport = (DllImport.Flags & 0x01) == 0x01; // TODO : Use proper macros
+                ImportModule.IsDelayLoadImport = DllImport.IsDelayLoad(); // TODO : Use proper macros
 
 
                 // Find Dll in "paths"

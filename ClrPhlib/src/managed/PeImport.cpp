@@ -95,3 +95,9 @@ PeImportDll::PeImportDll(
 	}
 
 }
+
+
+bool PeImportDll::IsDelayLoad()
+{
+	return this->Flags & PH_MAPPED_IMAGE_DELAY_IMPORTS;
+}
