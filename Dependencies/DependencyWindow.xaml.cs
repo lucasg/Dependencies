@@ -269,6 +269,7 @@ namespace Dependencies
         ApiSetSchema ApiSetmapCache;
         ModulesCache ProcessedModulesCache;
         DisplayModuleInfo _SelectedModule;
+        bool _DisplayWarning;
 
         #region PublicAPI
         public DependencyWindow(String FileName)
@@ -294,6 +295,7 @@ namespace Dependencies
             this.ProcessedModulesCache = new ModulesCache();
             this.ApiSetmapCache = Phlib.GetApiSetSchema();
             this._SelectedModule = null;
+            this._DisplayWarning = false;
 
             // TODO : Find a way to properly bind commands instead of using this hack
             this.ModulesList.DoFindModuleInTreeCommand = DoFindModuleInTree;
@@ -351,12 +353,27 @@ namespace Dependencies
                     ImportModule.PeProperties = ResolvedModule.Item2;
                     ImportModule.PeFilePath = ResolvedModule.Item2.Filepath;
                 }
-
                 
                 // special case for apiset schema
                 ImportModule.IsApiSet = (ImportModule.ModuleLocation == ModuleSearchStrategy.ApiSetSchema);
                 if (ImportModule.IsApiSet)
                     ImportModule.ApiSetModuleName = BinaryCache.LookupApiSetLibrary(DllImport.Name);
+
+                // add warning for appv isv applications 
+                if (String.Compare(DllImport.Name, "AppvIsvSubsystems32.dll", StringComparison.OrdinalIgnoreCase) == 0 ||
+                    String.Compare(DllImport.Name, "AppvIsvSubsystems64.dll", StringComparison.OrdinalIgnoreCase) == 0 )
+                {
+                    if (!this._DisplayWarning)
+                    {
+                        MessageBoxResult result = MessageBox.Show(
+                        "This binary use the App-V containerization technology which fiddle with search directories and PATH env in ways Dependencies can't handle.\n\nFollowing results are probably not quite exact.",
+                        "App-V ISV disclaimer"
+                        );
+
+                        this._DisplayWarning = true; // prevent the same warning window to popup several times
+                    }
+                    
+                }
 
                 NewTreeContexts.Add(ImportModule);
             }
