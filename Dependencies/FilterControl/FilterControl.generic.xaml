@@ -110,7 +110,7 @@
                                        Grid.Column="1"
                                        IsHitTestVisible="False" Foreground="#ADADAD"/>
                 			<Button x:Name="PART_ClearButton" Grid.Column="2" Margin="0,0,4,0" Style="{StaticResource ClearButtonStyle}" 
-                                    Visibility="Collapsed"/>
+                                    Visibility="Visible"/>
                 		</Grid>
                 	</Border>
                     <ControlTemplate.Triggers>

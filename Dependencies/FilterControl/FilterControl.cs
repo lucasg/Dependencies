@@ -269,11 +269,11 @@ namespace Dependencies
 
             if (collectionView == null)
             {
-                throw new InvalidOperationException("The TargetConrol should use ICollectionView as ItemSource.");
+                throw new InvalidOperationException("The TargetControl should use ICollectionView as ItemSource.");
             }            
 
             collectionView.Filter = null;
-
+            this.Visibility = System.Windows.Visibility.Collapsed;
         }
 
         private void RaiseFilterEvent()
@@ -335,7 +335,7 @@ namespace Dependencies
 
         private void OnControlKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Escape && !string.IsNullOrEmpty(FilterText))
+            if (e.Key == Key.Escape) /* && !string.IsNullOrEmpty(FilterText)) */
             {
                 Clear();
             }
@@ -396,7 +396,7 @@ namespace Dependencies
             }
             if (string.IsNullOrEmpty(filterBox.Text))
             {
-                clearButton.Visibility = Visibility.Collapsed;
+                //clearButton.Visibility = Visibility.Collapsed;
 
                 if (!filterBox.IsFocused)
                     textBlock.Visibility = Visibility.Visible;
@@ -405,7 +405,7 @@ namespace Dependencies
             }
             else
             {
-                clearButton.Visibility = Visibility.Visible;
+                //clearButton.Visibility = Visibility.Visible;
                 textBlock.Visibility = Visibility.Collapsed;
             }
         }
