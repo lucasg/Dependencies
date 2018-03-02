@@ -84,6 +84,7 @@
     <Compile Include="DependencyModuleList.xaml.cs">
       <DependentUpon>DependencyModuleList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FilterControl\FilterControl.cs" />
     <Compile Include="FindPeModule.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Helpers\SettingBindingHandler.cs" />
@@ -121,6 +122,10 @@
     <Page Include="DependencyWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FilterControl\FilterControl.generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

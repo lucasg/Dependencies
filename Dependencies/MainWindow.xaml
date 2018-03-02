@@ -38,6 +38,7 @@
             <!-- Import themes for Dragablz forms -->
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Dependencies;component/FilterControl/FilterControl.generic.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Hide/Show the status bar based on a global switch -->
@@ -127,7 +128,7 @@
         <dockablz:Layout Partition="2AE89D18-F236-4D20-9605-6C03319038E6" Name="DependencyRootLayout"
                     IsFloatDropZoneEnabled="False"
                     FloatingItemHeaderMemberPath="Header"
-                    Grid.Row="1">
+                    Grid.Row="1" d:IsHidden="True">
 
             <!-- branch template lets dragablz create a new tab control after a window is split via docking -->
             <dockablz:Layout.BranchTemplate>

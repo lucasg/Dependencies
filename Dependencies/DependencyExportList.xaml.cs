@@ -14,31 +14,31 @@ namespace Dependencies
     /// DependencyImportList  Filterable ListView for displaying exports.
     /// @TODO(Make this a template user control in order to share it between Modeules, Imports and Exports)
     /// </summary>
-    public partial class DependencyExportList : DependencyCustomListView
+    public partial class DependencyExportList : UserControl
     {
         // public ICollectionView ExportItemsView { get; set; }
 
         public DependencyExportList()
         {
-            InitializeComponent();
+           InitializeComponent();
 
-            ItemsView = CollectionViewSource.GetDefaultView(ElementsList.Items.SourceCollection);
-            _ListUserFilter = ExportListUserFilter;
+           // ItemsView = CollectionViewSource.GetDefaultView(ElementsList.Items.SourceCollection);
+            //_ListUserFilter = ExportListUserFilter;
 
             // ExportItemsView = CollectionViewSource.GetDefaultView(this.ExportList.Items.SourceCollection);
         }
 
         public void SetExports(List<PeExport> Exports, PhSymbolProvider SymPrv)
         {
-            this.ElementsList.Items.Clear();
+            this.ExportList.Items.Clear();
 
             foreach (PeExport Export in Exports)
             {
-                this.ElementsList.Items.Add(new DisplayPeExport(Export, SymPrv));
+                this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
             }
 
             // Refresh search view
-            SearchFilter_OnTextChanged(null, null);
+            //SearchFilter_OnTextChanged(null, null);
         }
 
         #region events handlers
@@ -92,10 +92,12 @@ namespace Dependencies
 
         private bool ExportListUserFilter(object item)
         {
-            if (String.IsNullOrEmpty(SearchText))
-                return true;
-            else
-                return ((item as DisplayPeExport).Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
+            //if (String.IsNullOrEmpty(SearchText))
+            //    return true;
+            //else
+            //    return ((item as DisplayPeExport).Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
+
+            return true;
         }
 
         // private void ExportSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
@@ -105,11 +107,11 @@ namespace Dependencies
         // }
         #endregion search filter
 
-        // private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
-        // {
-        //     System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
-        //     ListView.SelectAll();
-        // }
-        
+        private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
+            ListView.SelectAll();
+        }
+
     }
 }
