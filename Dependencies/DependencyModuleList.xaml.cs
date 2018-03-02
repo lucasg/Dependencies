@@ -69,9 +69,6 @@ namespace Dependencies
             NewModule.ConfigureSearchOrderCommand = ConfigureSearchOrderCommand;
 
             this.ModulesList.Items.Add(NewModule);
-
-            // Refresh search view
-            ModuleSearchFilter_OnTextChanged(null, null);
         }
 
 
@@ -91,14 +88,13 @@ namespace Dependencies
         #region events handlers
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
 
             Debug.WriteLine("[DependencyModuleList] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
             if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
             {
                 List<string> StrToCopy = new List<string>();
-                foreach (object SelectItem in ListView.SelectedItems)
+                foreach (object SelectItem in this.ModulesList.SelectedItems)
                 {
                     DisplayModuleInfo ModuleInfo = SelectItem as DisplayModuleInfo;
                     StrToCopy.Add(ModuleInfo.ModuleName);
@@ -109,56 +105,27 @@ namespace Dependencies
                 return;
             }
 
-            if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
+            else if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
             {
-                this.ModulesSearchBar.Visibility = System.Windows.Visibility.Visible;
-                this.ModuleSearchFilter.Focus();
+                this.SearchBar.Visibility = System.Windows.Visibility.Visible;
+                this.SearchBar.Focus();
                 return;
+            }
+
+            else if (e.Key == Key.Escape)
+            {
+                this.SearchBar.Clear();
             }
 
         }
 
-        private void OnTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == System.Windows.Input.Key.Escape)
-            {
-                // @TODO(HACK : Reset filter before closing, otherwise we might block the user out of enabling search bar again)
-                this.ModuleSearchFilter.Text = null;
-                this.ModuleSearchFilter_OnTextChanged(this.ModulesList, null);
-
-                this.OnModuleSearchClose(null, null);
-                return;
-            }
-        }
-
-
-        #endregion events handlers
-        
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             ListView.SelectAll();
         }
 
-        #region search filter
-        private bool ModulesListUserFilter(object item)
-        {
-            if (String.IsNullOrEmpty(ModuleSearchFilter.Text))
-                return true;
-            else
-                return ((item as DisplayModuleInfo).ModuleName.IndexOf(ModuleSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
-        }
 
-        private void ModuleSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            ModulesItemsView.Filter = ModulesListUserFilter;
-            ModulesItemsView.Refresh();
-        }
-
-        private void OnModuleSearchClose(object sender, RoutedEventArgs e)
-        {
-            this.ModulesSearchBar.Visibility = System.Windows.Visibility.Collapsed;
-        }
-        #endregion search filter
+        #endregion events handlers
     }
 }

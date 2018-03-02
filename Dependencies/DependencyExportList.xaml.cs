@@ -29,6 +29,8 @@ namespace Dependencies
             {
                 this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
             }
+
+            this.SearchBar.RaiseFilterEvent();
         }
 
         #region events handlers

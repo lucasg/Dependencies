@@ -278,7 +278,7 @@ namespace Dependencies
             this.Visibility = System.Windows.Visibility.Collapsed;
         }
 
-        private void RaiseFilterEvent()
+        public void RaiseFilterEvent()
         {
             FilterEventArgs args = new FilterEventArgs(FilterEvent, this, this.FilterText);
             RaiseEvent(args);

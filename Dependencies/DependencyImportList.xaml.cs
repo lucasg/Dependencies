@@ -37,6 +37,8 @@ namespace Dependencies
                     this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, ModuleFilepath));
                 }
             }
+
+            this.SearchBar.RaiseFilterEvent();
         }
 
         #region events handlers
