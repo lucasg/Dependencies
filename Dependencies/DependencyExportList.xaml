@@ -7,7 +7,9 @@
              xmlns:local="clr-namespace:Dependencies"
              xmlns:util="clr-namespace:Wpf.Util"
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="300" d:DesignWidth="300"
+             KeyDown ="OnListViewKeyDown"
+    >
 
     <UserControl.Resources>
 
@@ -25,9 +27,12 @@
             <RowDefinition  Height="auto" MaxHeight="25"/>
         </Grid.RowDefinitions>
 
-        <local:FilterControl Height="25" Header="Type here to filter" Grid.Row="1"
+        <local:FilterControl x:Name="SearchBar"
+            Height="25" Grid.Row="1"
             TargetControl="{Binding ElementName=ExportList}"
             FilterTextBindingPath="Name"
+            FilterFiringInterval="20"
+            Visibility="Collapsed"
         />
 
         <ListView x:Name="ExportList"
@@ -42,7 +47,6 @@
             </ListView.CommandBindings>
 
             <ListView.Resources>
-
                 <ContextMenu x:Key="ItemContextMenu">
                     <MenuItem HeaderStringFormat= "Copy {0:s}"
                                         Header = "{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"

@@ -16,16 +16,9 @@ namespace Dependencies
     /// </summary>
     public partial class DependencyExportList : UserControl
     {
-        // public ICollectionView ExportItemsView { get; set; }
-
         public DependencyExportList()
         {
            InitializeComponent();
-
-           // ItemsView = CollectionViewSource.GetDefaultView(ElementsList.Items.SourceCollection);
-            //_ListUserFilter = ExportListUserFilter;
-
-            // ExportItemsView = CollectionViewSource.GetDefaultView(this.ExportList.Items.SourceCollection);
         }
 
         public void SetExports(List<PeExport> Exports, PhSymbolProvider SymPrv)
@@ -36,82 +29,44 @@ namespace Dependencies
             {
                 this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
             }
-
-            // Refresh search view
-            //SearchFilter_OnTextChanged(null, null);
         }
 
         #region events handlers
-        // private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        // {
-        //     System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
-        //     bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
-
-        //     Debug.WriteLine("[DependencyImportList] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
-        //     if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
-        //     {
-        //         List<string> StrToCopy = new List<string>();
-        //         foreach (object SelectItem in ListView.SelectedItems)
-        //         {
-        //             DisplayPeExport PeInfo = SelectItem as DisplayPeExport;
-        //             StrToCopy.Add(PeInfo.Name);
-        //         }
-
-        //         System.Windows.Clipboard.Clear();
-        //         System.Windows.Clipboard.SetText(String.Join("\n", StrToCopy.ToArray()), System.Windows.TextDataFormat.Text);
-        //         return;
-        //     }
-
-        //     if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
-        //     {
-        //         this.ExportSearchBar.Visibility = System.Windows.Visibility.Visible;
-        //         this.ExportSearchFilter.Focus();
-        //         return;
-        //     }
-        // }
-
-        // private void OnTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        // {
-        //     if (e.Key == System.Windows.Input.Key.Escape)
-        //     {
-        //         // @TODO(HACK : Reset filter before closing, otherwise we might block the user out of enabling search bar again)
-        //         this.ExportSearchFilter.Text = null;
-        //         this.ExportSearchFilter_OnTextChanged(this.ElementsList, null);
-
-        //         this.OnExportSearchClose(null, null);
-        //         return;
-        //     }
-        // }
-        #endregion events handlers
-
-        #region search filter        
-        // private void OnExportSearchClose(object sender, RoutedEventArgs e)
-        // {
-        //     this.ExportSearchBar.Visibility = System.Windows.Visibility.Collapsed;
-        // }
-
-        private bool ExportListUserFilter(object item)
+        private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            //if (String.IsNullOrEmpty(SearchText))
-            //    return true;
-            //else
-            //    return ((item as DisplayPeExport).Name.IndexOf(SearchText, StringComparison.OrdinalIgnoreCase) >= 0);
+            bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
 
-            return true;
+            Debug.WriteLine("[DependencyExportList] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
+            if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
+            {
+                List<string> StrToCopy = new List<string>();
+                foreach (object SelectItem in this.ExportList.SelectedItems)
+                {
+                    DisplayPeExport PeInfo = SelectItem as DisplayPeExport;
+                    StrToCopy.Add(PeInfo.Name);
+                }
+
+                System.Windows.Clipboard.Clear();
+                System.Windows.Clipboard.SetText(String.Join("\n", StrToCopy.ToArray()), System.Windows.TextDataFormat.Text);
+                return;
+            }
+
+            if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
+            {
+                this.SearchBar.Visibility = System.Windows.Visibility.Visible;
+                this.SearchBar.Focus();
+                return;
+            }
         }
 
-        // private void ExportSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        // {
-        //     ExportItemsView.Filter = ExportListUserFilter;
-        //     ExportItemsView.Refresh();
-        // }
-        #endregion search filter
+        
 
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             ListView.SelectAll();
         }
+        #endregion events handlers
 
     }
 }
