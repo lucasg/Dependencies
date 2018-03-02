@@ -16,13 +16,10 @@ namespace Dependencies
     /// </summary>
     public partial class DependencyImportList : UserControl
     {
-        public ICollectionView ImportItemsView { get; set; }
 
         public DependencyImportList()
         {
             InitializeComponent();
-
-            ImportItemsView = CollectionViewSource.GetDefaultView(this.ImportList.Items.SourceCollection);
         }
 
         public void SetImports(List<PeImportDll> Imports, PhSymbolProvider SymPrv, DependencyWindow Dependencies)
@@ -40,21 +37,18 @@ namespace Dependencies
                     this.ImportList.Items.Add(new DisplayPeImport(Import, SymPrv, ModuleFilepath));
                 }
             }
-
-            // Refresh search view
-            ImportSearchFilter_OnTextChanged(null, null);
         }
 
+        #region events handlers
         private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
 
             Debug.WriteLine("[DependencyImportList] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
             if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
             {
                 List<string> StrToCopy = new List<string>();
-                foreach (object SelectItem in ListView.SelectedItems)
+                foreach (object SelectItem in this.ImportList.SelectedItems)
                 {
                     DisplayPeImport PeInfo = SelectItem as DisplayPeImport;
                     StrToCopy.Add(PeInfo.Name);
@@ -67,51 +61,23 @@ namespace Dependencies
 
             if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
             {
-                this.ImportSearchBar.Visibility = System.Windows.Visibility.Visible;
-                this.ImportSearchFilter.Focus();
+                this.SearchBar.Visibility = System.Windows.Visibility.Visible;
+                this.SearchBar.Focus();
                 return;
             }
-        }
 
-        private void OnTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == System.Windows.Input.Key.Escape)
+            else if (e.Key == Key.Escape)
             {
-                // @TODO(HACK : Reset filter before closing, otherwise we might block the user out of enabling search bar again)
-                this.ImportSearchFilter.Text = null;
-                this.ImportSearchFilter_OnTextChanged(this.ImportList, null);
-
-                this.OnImportSearchClose(null, null);
-                return;
+                this.SearchBar.Clear();
             }
         }
-
-        private void OnImportSearchClose(object sender, RoutedEventArgs e)
-        {
-            this.ImportSearchBar.Visibility = System.Windows.Visibility.Collapsed;
-        }
-
-        private bool ImportListUserFilter(object item)
-        {
-            if (String.IsNullOrEmpty(ImportSearchFilter.Text))
-                return true;
-            else
-                return ((item as DisplayPeImport).Name.IndexOf(ImportSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                       ((item as DisplayPeImport).ModuleName.IndexOf(ImportSearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
-
-        }
-
-        private void ImportSearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            ImportItemsView.Filter = ImportListUserFilter;
-            ImportItemsView.Refresh();
-        }
-
 
         private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             ListView.SelectAll();
         }
+        #endregion events handlers
+
     }
 }

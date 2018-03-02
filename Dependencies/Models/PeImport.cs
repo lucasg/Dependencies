@@ -51,6 +51,7 @@ public class DisplayPeImport : SettingBindingHandler
             return String.Format(PathStrFormat, "c");
         }
     }
+
     public int Type
     {
         get
@@ -65,6 +66,7 @@ public class DisplayPeImport : SettingBindingHandler
             return 0;
         }
     }
+
     public int Hint { get { return Info.hint; } }
     public int? Ordinal { get { if (Info.importByOrdinal) { return Info.ordinal; } return null; } }
 
@@ -76,6 +78,11 @@ public class DisplayPeImport : SettingBindingHandler
     public string ModuleName
     {
         get { return GetPathDisplayName(Dependencies.Properties.Settings.Default.FullPath); }
+    }
+
+    public string FilterName
+    {
+        get { return  String.Format("{0:s}:{1:s}", this.ModuleName, this.Name); }
     }
 
     public Boolean DelayImport { get { return Info.delayedImport; } }
