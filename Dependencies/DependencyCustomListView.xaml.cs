@@ -15,56 +15,50 @@ namespace Dependencies
     /// DependencyImportList  Filterable ListView for displaying exports.
     /// @TODO(Make this a template user control in order to share it between Modeules, Imports and Exports)
     /// </summary>
-    public partial class DependencyCustomListView : UserControl
+    [TemplatePart(Name = PART_SearchBar, Type = typeof(FilterControl))]
+    public partial class DependencyCustomListView : ListView
     {
-        /// <summary>
-        /// Routed command which can be used to close a tab.
-        /// </summary>
-        public static RoutedCommand CloseSearchCommand = new RoutedUICommand("Close", "Close", typeof(DependencyCustomListView));
 
-        protected ICollectionView ItemsView { get; set; }
-        protected Predicate<object> _ListUserFilter;
+        private const string PART_SearchBar = "PART_SearchBar";
+        public FilterControl SearchBar = null;
+
+        public static readonly DependencyProperty SearchListFilterProperty = DependencyProperty.Register(
+            "SearchListFilter", typeof(string), typeof(DependencyCustomListView), new PropertyMetadata(null));
+
+        public string SearchListFilter
+        {
+            get { return (string)GetValue(SearchListFilterProperty); }
+            set { SetValue(SearchListFilterProperty, value); }
+        }
 
         public DependencyCustomListView()
+        { 
+            this.KeyDown += new KeyEventHandler(OnListViewKeyDown);
+        }
+
+        public override void OnApplyTemplate()
         {
-            CommandManager.RegisterClassCommandBinding(typeof(Button), new CommandBinding(CloseSearchCommand, CloseSearchClassHandler, CloseSearchCanExecuteClassHandler));
+            base.OnApplyTemplate();
+
+            AttachToVisualTree();
         }
 
-        private static void CloseSearchCanExecuteClassHandler(object sender, CanExecuteRoutedEventArgs e)
+        
+        private void AttachToVisualTree()
         {
-            e.CanExecute = true;
-        }
-        private static void CloseSearchClassHandler(object sender, ExecutedRoutedEventArgs e)
-        {
-            //(sender as DependencyCustomListView).SearchBar.Visibility = System.Windows.Visibility.Collapsed;
+            SearchBar = GetTemplateChild(PART_SearchBar) as FilterControl;
+            SearchBar.TargetControl = this;
         }
 
-        public string SearchText {
-            // get {return this.SearchFilter.Text;}
-            get { return ""; }
-        }
-
-        // public void SetExports(List<PeExport> Exports, PhSymbolProvider SymPrv)
-        // {
-        //     this.ExportList.Items.Clear();
-
-        //     foreach (PeExport Export in Exports)
-        //     {
-        //         this.ExportList.Items.Add(new DisplayPeExport(Export, SymPrv));
-        //     }
-
-        //     // Refresh search view
-        //     ExportSearchFilter_OnTextChanged(null, null);
-        // }
 
         #region events handlers
-        protected void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        protected virtual void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
 
             bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
 
-            Debug.WriteLine("[DependencyImportList] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
+            Debug.WriteLine("[DependencyCustomListView] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
             if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
             {
                 List<string> StrToCopy = new List<string>();
@@ -79,75 +73,33 @@ namespace Dependencies
                 return;
             }
 
-            if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
+            else if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
             {
-                // this.SearchBar.Visibility = System.Windows.Visibility.Visible;
-                // this.SearchFilter.Focus();
+                if (this.SearchBar != null)
+                {
+                    this.SearchBar.Visibility = System.Windows.Visibility.Visible;
+                    this.SearchBar.Focus();
+                }
+
                 return;
             }
-        }
 
-        private void OnTextBoxKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            if (e.Key == System.Windows.Input.Key.Escape)
+            else if (e.Key == Key.Escape)
             {
-                // @TODO(HACK : Reset filter before closing, otherwise we might block the user out of enabling search bar again)
-                //this.SearchFilter.Text = null;
-                // this.SearchFilter_OnTextChanged(this.ExportList, null);
-
-                //this.OnSearchClose(null, null);
-                return;
+                if (this.SearchBar != null)
+                {
+                    this.SearchBar.Clear();
+                }
             }
         }
         #endregion events handlers
 
-        #region search filter       
-        
-        //public ICommand OnSearchClose
-        //{
-        //    get { return }
-        //}
 
-        //public class CloseCommand : ICommand
-        //{
-        //    public bool CanExecute(object parameter)
-        //    {
-        //        return true;
-        //    }
-        //    public event EventHandler CanExecuteChanged;
-
-        //    public void Execute(object parameter)
-        //    {
-        //        this.SearchBar.Visibility = System.Windows.Visibility.Collapsed;
-        //    }
-        //}
-
-        //public void OnSearchClose(object sender, RoutedEventArgs e)
-        //{
-        //    DependencyCustomListView List = (sender as DependencyCustomListView);
-        //    //this.SearchBar.Visibility = System.Windows.Visibility.Collapsed;
-        //}
-
-        // private bool ExportListUserFilter(object item)
+        // protected void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
         // {
-        //     if (String.IsNullOrEmpty(ExportSearchFilter.Text))
-        //         return true;
-        //     else
-        //         return ((item as DisplayPeExport).Name.IndexOf(SearchFilter.Text, StringComparison.OrdinalIgnoreCase) >= 0);
+        //     System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
+        //     ListView.SelectAll();
         // }
-
-        public void SearchFilter_OnTextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
-        {
-            this.ItemsView.Filter = this._ListUserFilter;
-            this.ItemsView.Refresh();
-        }
-        #endregion search filter
-
-        protected void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
-            ListView.SelectAll();
-        }
         
     }
 }

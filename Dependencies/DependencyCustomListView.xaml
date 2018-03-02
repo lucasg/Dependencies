@@ -6,71 +6,127 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:Dependencies"
     xmlns:util="clr-namespace:Wpf.Util"
-    xmlns:properties="clr-namespace:Dependencies.Properties"
     mc:Ignorable="d" 
+    x:Class="DependencyCustomListView"
 >
+    <Style x:Key="LeftAlignHeader" TargetType="{x:Type GridViewColumnHeader}">
+        <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
+        <Setter Property="Padding" Value="5,0,0,0"></Setter>
+    </Style>
 
-    <Style x:Key="DependencyCustomListView"  TargetType="UserControl">
-        <!--<Setter Property="d:DesignWidth" Value="300"/>
-        <Setter Property="d:DesignHeight" Value="300"/>-->
+    <Style  x:Key="DependencyCustomListViewItem" TargetType="ListViewItem">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FontFamily" Value="Courier New" />
+        <!--<Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />-->
+    </Style>
+
+    <Style x:Key="GridViewScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
+        <Setter Property="Focusable" Value="false"/>
         <Setter Property="Template">
             <Setter.Value>
-                <ControlTemplate TargetType="UserControl">
+                <ControlTemplate TargetType="{x:Type ScrollViewer}">
 
-                    <Grid x:Name="SearchBarGrid" Margin="0,0,0,0">
+                    <Grid  x:Name="_grid"   SnapsToDevicePixels="true">
+                        
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <DockPanel x:Name="dp" Background="{Binding TemplatedParent.Background, RelativeSource={RelativeSource TemplatedParent}}"
+                                Margin="0">
+
+
+                            <ScrollViewer x:Name ="sv" Margin="0,-1,0,-1" Padding="0" DockPanel.Dock="Bottom" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                                  ContentTemplate="{TemplateBinding ContentTemplate}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                  HorizontalContentAlignment="Stretch"
+                                  >
+                                <!--Style="{Binding TemplatedParent.FooterStyle, RelativeSource={RelativeSource TemplatedParent}}"-->
+
+                                <!--<GridViewRowPresenter x:Name="FooterRow"
+                                        Columns="{Binding TemplatedParent.View.Columns, RelativeSource={RelativeSource TemplatedParent}}" 
+                                        Content="{Binding TemplatedParent.FooterObj, RelativeSource={RelativeSource TemplatedParent}}" >
+                                </GridViewRowPresenter>-->
+
+                            </ScrollViewer>
+
+                            <ScrollViewer DockPanel.Dock="Top" Focusable="false" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden">
+                                <GridViewHeaderRowPresenter AllowsColumnReorder="{Binding TemplatedParent.View.AllowsColumnReorder, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                    ColumnHeaderContainerStyle="{Binding TemplatedParent.View.ColumnHeaderContainerStyle, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    ColumnHeaderToolTip="{Binding TemplatedParent.View.ColumnHeaderToolTip, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                    ColumnHeaderStringFormat="{Binding TemplatedParent.View.ColumnHeaderStringFormat, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                    ColumnHeaderContextMenu="{Binding TemplatedParent.View.ColumnHeaderContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    ColumnHeaderTemplate="{Binding TemplatedParent.View.ColumnHeaderTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    Columns="{Binding TemplatedParent.View.Columns, RelativeSource={RelativeSource TemplatedParent}}"
+                                                    ColumnHeaderTemplateSelector="{Binding TemplatedParent.View.ColumnHeaderTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}" 
+                                                    Margin="0,0,0,0" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                                    HorizontalAlignment="Stretch"/>
+                            </ScrollViewer>
+
+
+                            <ScrollContentPresenter x:Name="PART_ScrollContentPresenter" CanContentScroll="{TemplateBinding CanContentScroll}"
+                                                ContentTemplate="{TemplateBinding ContentTemplate}" 
+                                                Content="{TemplateBinding Content}" 
+                                                KeyboardNavigation.DirectionalNavigation="Local" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"/>
+                        </DockPanel>
+                        <ScrollBar x:Name="PART_HorizontalScrollBar" Cursor="Arrow" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0.0" Orientation="Horizontal" Grid.Row="1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportWidth}"/>
+                        <ScrollBar x:Name="PART_VerticalScrollBar" Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0.0" Orientation="Vertical" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" ViewportSize="{TemplateBinding ViewportHeight}"/>
+
+                        <DockPanel Background="{Binding Background, ElementName=PART_VerticalScrollBar}" Grid.Column="1" LastChildFill="false" Grid.Row="1">
+                            <Rectangle DockPanel.Dock="Left" Fill="White" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" Width="1"/>
+                            <Rectangle DockPanel.Dock="Top" Fill="White" Height="1" Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"/>
+                        </DockPanel>
+                    </Grid>
+
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="DependencyCustomListViewStyle" TargetType="{x:Type local:DependencyCustomListView}">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FontFamily" Value="Courier New" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="util:GridViewSort.AutoSort" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type local:DependencyCustomListView}">
+
+                    <Grid  x:Name="_Grid"   SnapsToDevicePixels="true">
 
                         <Grid.RowDefinitions>
                             <RowDefinition Height="46*"/>
                             <RowDefinition  Height="auto" MaxHeight="25"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Where the list goes -->
-                        <ContentPresenter   Grid.Row="0"
-                                            Content="{TemplateBinding ContentControl.Content}" 
-                                            ContentTemplate="{TemplateBinding ContentControl.ContentTemplate}"/>
+                        <ScrollViewer Style="{StaticResource ResourceKey=GridViewScrollViewerStyle}" >
+                            <ItemsPresenter x:Name="ContentsItems" Grid.Row="0"></ItemsPresenter>
+                        </ScrollViewer>
 
-                        <Grid   x:Name="SearchBar"
-                                VerticalAlignment="Bottom"
-                                Visibility="Collapsed"
-                                Grid.Row="1"
-                                Margin="0 0 0 0"
-                                Background="White">
 
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="60"/>
-                                <ColumnDefinition Width="60*"/>
-                                <ColumnDefinition Width="20"/>
-                            </Grid.ColumnDefinitions>
-
-                            <Label  Height="25" 
-                                    VerticalAlignment="Center"
-                                    Grid.Column="0">
-                                Search :
-                            </Label>
-
-                            <!-- TextChanged="SearchFilter_OnTextChanged"
-                            KeyDown ="{x:Static local:DependencyCustomListView.OnTextBoxKeyDown}" -->
-                            <TextBox Name = "SearchFilter"
-                                    
-
-                                    Width="auto" 
-                                    Height="20" 
-                                    HorizontalContentAlignment="Stretch"
-                                    HorizontalAlignment="Stretch"
-                                    Grid.Column="1">
-                            </TextBox>
-
-                            <Button Height="20" 
-                                    Grid.Column="2"
-                                    Margin="2 0 3 0"
-                                    Click="{Binding OnSearchClose}">
-                                X
-                            </Button>
-
-                        </Grid>
+                        <!-- TargetControl is patched at runtime -->
+                        <local:FilterControl x:Name="PART_SearchBar"
+                            Height="25" Grid.Row="1"
+                            FilterTextBindingPath="{TemplateBinding SearchListFilter}"
+                            FilterFiringInterval="20"
+                        />
+                            
                     </Grid>
+
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+
+    <!--<Style x:Key="DependencyCustomListView" TargetType="{x:Type local:DependencyCustomListView}">
+        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="util:GridViewSort.AutoSort" Value="True"/>
+        
+    </Style>-->
 </ResourceDictionary> 
