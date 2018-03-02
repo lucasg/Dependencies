@@ -557,7 +557,7 @@ namespace Dependencies
      
         private void OnModuleViewSelectedItemChanged(object sender, RoutedEventArgs e)
         {
-            DisplayModuleInfo SelectedModule = (sender as DependencyModuleList).ModulesList.SelectedItem as DisplayModuleInfo;
+            DisplayModuleInfo SelectedModule = (sender as DependencyModuleList).SelectedItem as DisplayModuleInfo;
 
             // Selected Pe has not been found on disk
             if (SelectedModule == null)
@@ -661,13 +661,13 @@ namespace Dependencies
             ModuleTreeViewItem Source = e.Source as ModuleTreeViewItem;
             String SelectedModuleName = Source.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
 
-            foreach (DisplayModuleInfo item in this.ModulesList.ModulesList.Items)
+            foreach (DisplayModuleInfo item in this.ModulesList.Items)
             {
                 if (item.ModuleName == SelectedModuleName)
                 {
 
-                    this.ModulesList.ModulesList.SelectedItem = item;
-                    this.ModulesList.ModulesList.ScrollIntoView(item);
+                    this.ModulesList.SelectedItem = item;
+                    this.ModulesList.ScrollIntoView(item);
                     return;
                 }
             }

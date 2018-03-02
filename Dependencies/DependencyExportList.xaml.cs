@@ -12,7 +12,6 @@ namespace Dependencies
 {
     /// <summary>
     /// DependencyImportList  Filterable ListView for displaying exports.
-    /// @TODO(Make this a template user control in order to share it between Modeules, Imports and Exports)
     /// </summary>
     public partial class DependencyExportList : DependencyCustomListView
     {
@@ -30,8 +29,5 @@ namespace Dependencies
                 this.Items.Add(new DisplayPeExport(Export, SymPrv));
             }
         }
-
-        #region events handlers
-        #endregion events handlers
     }
 }

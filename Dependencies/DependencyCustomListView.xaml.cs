@@ -31,6 +31,8 @@ namespace Dependencies
             set { SetValue(SearchListFilterProperty, value); }
         }
 
+
+
         public DependencyCustomListView()
         { 
             this.KeyDown += new KeyEventHandler(OnListViewKeyDown);
@@ -93,13 +95,6 @@ namespace Dependencies
             }
         }
         #endregion events handlers
-
-
-        // protected void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
-        // {
-        //     System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
-        //     ListView.SelectAll();
-        // }
         
     }
 }

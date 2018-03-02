@@ -15,32 +15,26 @@
 
     <local:DependencyCustomListView.Resources>
         <ContextMenu x:Key="ItemContextMenu">
-                        <MenuItem HeaderStringFormat= "Copy {0:s}"
-                                            Header = "{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                            Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                            CommandParameter ="{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
-                                            InputGestureText="Ctrl+C"  
-                                            IsEnabled="True"/>
-                        <MenuItem Header="Select All" 
-                                            Command="ApplicationCommands.SelectAll" 
-                                            IsEnabled="True"/>
-                        <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
-                        <Separator Height="3" Margin="-1,0,0,0"/>
-                        <MenuItem Header="Lookup Export function on MSDN"  
-                                        Command="{Binding Path=DataContext.QueryExportApi, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
-                                        CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
-                                        InputGestureText="Alt+Enter"  
-                                        IsEnabled="True" />
-             </ContextMenu>
+            <MenuItem HeaderStringFormat= "Copy {0:s}"
+                                Header = "{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                                Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                                CommandParameter ="{Binding DataContext.Name, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
+                                InputGestureText="Ctrl+C"  
+                                IsEnabled="True"/>
+            <MenuItem Header="Select All" 
+                                Command="ApplicationCommands.SelectAll" 
+                                IsEnabled="True"/>
+            <Separator Height="3" Margin="-1,0,0,0"/>
+            <MenuItem Header="_Undecorate C++ Functions" Height="26" InputGestureText="F10" IsCheckable="True" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=Undecorate, Mode=TwoWay }"/>
+            <Separator Height="3" Margin="-1,0,0,0"/>
+            <MenuItem Header="Lookup Export function on MSDN"  
+                            Command="{Binding Path=DataContext.QueryExportApi, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
+                            CommandParameter ="{Binding DataContext , RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
+                            InputGestureText="Alt+Enter"  
+                            IsEnabled="True" />
+        </ContextMenu>
     </local:DependencyCustomListView.Resources>
-    
-
-    <local:DependencyCustomListView.ItemContainerStyle>
-        <Style TargetType="ListViewItem">
-            <Setter Property="ContextMenu" Value="{StaticResource ItemContextMenu}" />
-        </Style>
-    </local:DependencyCustomListView.ItemContainerStyle>
+   
 
     <local:DependencyCustomListView.View>
         <GridView AllowsColumnReorder="true">
@@ -54,7 +48,7 @@
             <GridViewColumn Header="Ordinal" Width="140" util:GridViewSort.PropertyName="Ordinal" HeaderContainerStyle="{StaticResource LeftAlignHeader}">
                 <GridViewColumn.CellTemplate>
                     <DataTemplate>
-                        <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding Ordinal, StringFormat={}{0} (0x{0:x08}), TargetNullValue='N/A' }" TextAlignment="Right" HorizontalAlignment="Right"/>
                     </DataTemplate>
                 </GridViewColumn.CellTemplate>
             </GridViewColumn>

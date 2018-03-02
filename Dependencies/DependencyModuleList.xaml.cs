@@ -28,9 +28,9 @@ namespace Dependencies
     /// DependencyImportList  Filterable ListView for displaying modules.
     /// @TODO(Make this a template user control in order to share it between Modeules, Imports and Exports)
     /// </summary>
-    public partial class DependencyModuleList : UserControl
+    public partial class DependencyModuleList : DependencyCustomListView
     {
-        public ICollectionView ModulesItemsView { get; set; }
+        //public ICollectionView ModulesItemsView { get; set; }
 
         public RelayCommand DoFindModuleInTreeCommand
         {
@@ -59,7 +59,7 @@ namespace Dependencies
         {
             InitializeComponent();
 
-            ModulesItemsView = CollectionViewSource.GetDefaultView(this.ModulesList.Items.SourceCollection);
+            //ModulesItemsView = CollectionViewSource.GetDefaultView(this.ModulesList.Items.SourceCollection);
         }
 
         public void AddModule(DisplayModuleInfo NewModule)
@@ -68,64 +68,18 @@ namespace Dependencies
             NewModule.DoFindModuleInTreeCommand = DoFindModuleInTreeCommand;
             NewModule.ConfigureSearchOrderCommand = ConfigureSearchOrderCommand;
 
-            this.ModulesList.Items.Add(NewModule);
+            this.Items.Add(NewModule);
         }
 
-
-        #region public events
         public event RoutedEventHandler SelectedModuleChanged
         {
             add { AddHandler(SelectedModuleChangedEvent, value); }
             remove { RemoveHandler(SelectedModuleChangedEvent, value); }
         }
 
-        private void OnSelectedModuleChanged(object sender, RoutedEventArgs e)
+        private void OnSelectedModuleChanged(object sender, MouseButtonEventArgs e)
         {
             RaiseEvent(new RoutedEventArgs(SelectedModuleChangedEvent));
         }
-        #endregion public events
-
-        #region events handlers
-        private void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        {
-            bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
-
-            Debug.WriteLine("[DependencyModuleList] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
-            if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
-            {
-                List<string> StrToCopy = new List<string>();
-                foreach (object SelectItem in this.ModulesList.SelectedItems)
-                {
-                    DisplayModuleInfo ModuleInfo = SelectItem as DisplayModuleInfo;
-                    StrToCopy.Add(ModuleInfo.ModuleName);
-                }
-
-                System.Windows.Clipboard.Clear();
-                System.Windows.Clipboard.SetText(String.Join("\n", StrToCopy.ToArray()), System.Windows.TextDataFormat.Text);
-                return;
-            }
-
-            else if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
-            {
-                this.SearchBar.Visibility = System.Windows.Visibility.Visible;
-                this.SearchBar.Focus();
-                return;
-            }
-
-            else if (e.Key == Key.Escape)
-            {
-                this.SearchBar.Clear();
-            }
-
-        }
-
-        private void ListViewSelectAll_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
-            ListView.SelectAll();
-        }
-
-
-        #endregion events handlers
     }
 }
