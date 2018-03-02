@@ -35,11 +35,7 @@
 
     <Window.Resources>
         <ResourceDictionary>
-            <!-- Import themes for Dragablz forms -->
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/Dependencies;component/FilterControl/FilterControl.generic.xaml" />
-            </ResourceDictionary.MergedDictionaries>
+
 
             <!-- Hide/Show the status bar based on a global switch -->
             <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>

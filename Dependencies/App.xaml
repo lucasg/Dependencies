@@ -4,7 +4,18 @@
              Startup="App_Startup"
              Exit="App_Exit">
     <Application.Resources>
-         
+        <ResourceDictionary >
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Import themes for Dragablz forms -->
+                <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
+                
+                <!-- Import themes for FilterControl forms -->
+                <ResourceDictionary Source="pack://application:,,,/Dependencies;component/FilterControl/FilterControl.generic.xaml" />
+
+                <!-- Import themes for DependencyCustomListView forms -->
+                <ResourceDictionary Source="pack://application:,,,/Dependencies;component/DependencyCustomListView.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
     <JumpList.JumpList>
         <JumpList ShowRecentCategory="True">
