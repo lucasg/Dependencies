@@ -32,7 +32,6 @@
             TargetControl="{Binding ElementName=ExportList}"
             FilterTextBindingPath="Name"
             FilterFiringInterval="20"
-            Visibility="Collapsed"
         />
 
         <ListView x:Name="ExportList"

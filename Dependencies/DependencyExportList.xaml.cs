@@ -51,11 +51,16 @@ namespace Dependencies
                 return;
             }
 
-            if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
+            else if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)
             {
                 this.SearchBar.Visibility = System.Windows.Visibility.Visible;
                 this.SearchBar.Focus();
                 return;
+            }
+
+            else if (e.Key == Key.Escape)
+            {
+                this.SearchBar.Clear();
             }
         }
 

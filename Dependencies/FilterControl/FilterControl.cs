@@ -75,6 +75,8 @@ namespace Dependencies
             timer = new DispatcherTimer(DispatcherPriority.Normal);
             timer.Interval = new TimeSpan(0, 0, 0, 0, FilterFiringInterval);
             timer.Tick += new EventHandler(OnDispatcherTimerTick);
+
+            Visibility = System.Windows.Visibility.Collapsed;
         }
 
         #endregion
@@ -312,6 +314,7 @@ namespace Dependencies
 
             if (filterBox != null)
             {
+                filterBox.Focus();
                 filterBox.LostKeyboardFocus += new System.Windows.Input.KeyboardFocusChangedEventHandler(OnLostKeyboardFocus);
                 filterBox.GotKeyboardFocus += new System.Windows.Input.KeyboardFocusChangedEventHandler(OnGotKeyboardFocus);
                 filterBox.TextChanged += new TextChangedEventHandler(OnFilterBoxTextChanged);
@@ -396,7 +399,7 @@ namespace Dependencies
             }
             if (string.IsNullOrEmpty(filterBox.Text))
             {
-                //clearButton.Visibility = Visibility.Collapsed;
+                // clearButton.Visibility = Visibility.Collapsed;
 
                 if (!filterBox.IsFocused)
                     textBlock.Visibility = Visibility.Visible;
@@ -413,6 +416,7 @@ namespace Dependencies
         private void OnGotKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
         {
             textBlock.Visibility = Visibility.Collapsed;
+            
         }
 
         private void OnLostKeyboardFocus(object sender, System.Windows.Input.KeyboardFocusChangedEventArgs e)
