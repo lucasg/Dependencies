@@ -37,5 +37,15 @@ namespace Dependencies
                 }
             }
         }
+
+        private string ImportCopyHandler(object SelectedItem)
+        {
+            if (SelectedItem == null)
+            {
+                return "";
+            }
+
+            return (SelectedItem as DisplayPeImport).Name;
+        }
     }
 }

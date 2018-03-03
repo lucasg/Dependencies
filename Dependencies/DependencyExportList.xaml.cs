@@ -29,5 +29,15 @@ namespace Dependencies
                 this.Items.Add(new DisplayPeExport(Export, SymPrv));
             }
         }
+
+        private string ExportCopyHandler(object SelectedItem)
+        {
+            if (SelectedItem == null)
+            {
+                return "";
+            }
+
+            return (SelectedItem as DisplayPeExport).Name;
+        }
     }
 }

@@ -26,7 +26,6 @@ namespace Dependencies
 
     /// <summary>
     /// DependencyImportList  Filterable ListView for displaying modules.
-    /// @TODO(Make this a template user control in order to share it between Modeules, Imports and Exports)
     /// </summary>
     public partial class DependencyModuleList : DependencyCustomListView
     {
@@ -59,7 +58,6 @@ namespace Dependencies
         {
             InitializeComponent();
 
-            //ModulesItemsView = CollectionViewSource.GetDefaultView(this.ModulesList.Items.SourceCollection);
         }
 
         public void AddModule(DisplayModuleInfo NewModule)
@@ -80,6 +78,16 @@ namespace Dependencies
         private void OnSelectedModuleChanged(object sender, MouseButtonEventArgs e)
         {
             RaiseEvent(new RoutedEventArgs(SelectedModuleChangedEvent));
+        }
+
+        private string ModuleCopyHandler(object SelectedItem)
+        {
+            if (SelectedItem == null)
+            {
+                return "";
+            }
+
+            return (SelectedItem as DisplayModuleInfo).ModuleName;
         }
     }
 }

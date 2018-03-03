@@ -22,6 +22,12 @@ namespace Dependencies
         private const string PART_SearchBar = "PART_SearchBar";
         public FilterControl SearchBar = null;
 
+        public DependencyCustomListView()
+        {
+            this.KeyDown += new KeyEventHandler(OnListViewKeyDown);
+        }
+
+
         public static readonly DependencyProperty SearchListFilterProperty = DependencyProperty.Register(
             "SearchListFilter", typeof(string), typeof(DependencyCustomListView), new PropertyMetadata(null));
 
@@ -32,12 +38,16 @@ namespace Dependencies
         }
 
 
+        public static readonly DependencyProperty CopyHandlerProperty = DependencyProperty.Register(
+            "CopyHandler", typeof(Func<object, string>), typeof(DependencyCustomListView), new PropertyMetadata(null));
 
-        public DependencyCustomListView()
-        { 
-            this.KeyDown += new KeyEventHandler(OnListViewKeyDown);
+        public Func<object, string> CopyHandler
+        {
+            get { return (Func<object, string>)GetValue(CopyHandlerProperty); }
+            set { SetValue(CopyHandlerProperty, value); }
         }
 
+        
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -53,11 +63,11 @@ namespace Dependencies
         }
 
 
+
         #region events handlers
         protected virtual void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
-
             bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
 
             Debug.WriteLine("[DependencyCustomListView] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
@@ -66,8 +76,7 @@ namespace Dependencies
                 List<string> StrToCopy = new List<string>();
                 foreach (object SelectItem in ListView.SelectedItems)
                 {
-                    // DisplayPeExport PeInfo = SelectItem as DisplayPeExport;
-                    // StrToCopy.Add(PeInfo.Name);
+                    StrToCopy.Add(CopyHandler(SelectItem));
                 }
 
                 System.Windows.Clipboard.Clear();
