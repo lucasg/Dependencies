@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Diagnostics;
-using System.ComponentModel;
 using System.Windows;
-using System.Windows.Data;
-using System.ClrPh;
 
 namespace Dependencies
 {

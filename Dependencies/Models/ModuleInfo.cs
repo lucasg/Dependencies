@@ -330,10 +330,10 @@ namespace Dependencies
                             return;
                         }
 
-                        Process PeviewerProcess = new Process();
-                        PeviewerProcess.StartInfo.FileName = Application.ExecutablePath;
-                        PeviewerProcess.StartInfo.Arguments = Filepath;
-                        PeviewerProcess.Start();
+                        Process OtherDependenciesProcess = new Process();
+                        OtherDependenciesProcess.StartInfo.FileName = Application.ExecutablePath;
+                        OtherDependenciesProcess.StartInfo.Arguments = Filepath;
+                        OtherDependenciesProcess.Start();
                     });
                 }
 

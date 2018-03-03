@@ -197,7 +197,7 @@ namespace Dependencies
 
         public bool OpenPeviewer(object Context)
         {
-            string programPath = @".\peview.exe";
+            string programPath = Dependencies.Properties.Settings.Default.PeViewerPath;
             Process PeviewerProcess = new Process();
 
             if (Context == null)
@@ -236,10 +236,10 @@ namespace Dependencies
                             return;
                         }
 
-                        Process PeviewerProcess = new Process();
-                        PeviewerProcess.StartInfo.FileName = System.Windows.Forms.Application.ExecutablePath;
-                        PeviewerProcess.StartInfo.Arguments = Filepath;
-                        PeviewerProcess.Start();
+                        Process OtherDependenciesProcess = new Process();
+                        OtherDependenciesProcess.StartInfo.FileName = System.Windows.Forms.Application.ExecutablePath;
+                        OtherDependenciesProcess.StartInfo.Arguments = Filepath;
+                        OtherDependenciesProcess.Start();
                     });
                 }
 
