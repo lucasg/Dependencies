@@ -17,6 +17,7 @@
     <Style x:Key="DependencyCustomListViewItem" TargetType="{x:Type ListViewItem}">
          <Setter Property="HorizontalContentAlignment" Value="Stretch" /> 
          <Setter Property="FontFamily" Value="Courier New" />
+        <Setter Property="ContextMenu" Value="{DynamicResource ResourceKey=ItemContextMenu}" />
     </Style>
     
     <Style x:Key="GridViewScrollViewerStyle" TargetType="{x:Type ScrollViewer}">
