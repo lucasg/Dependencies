@@ -10,7 +10,7 @@
         d:DesignHeight="300" d:DesignWidth="300"
                                 
         Style="{StaticResource DependencyCustomListViewStyle}"
-        SearchListFilter="Module"
+        SearchListFilter="ModuleName"
         CopyHandler="ModuleCopyHandler"
                                 
         PreviewMouseLeftButtonUp="OnSelectedModuleChanged"
