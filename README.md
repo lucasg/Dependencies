@@ -49,9 +49,9 @@ Tree build behaviours available :
 At the moment, `Dependencies` recreates features and "features" of `depends.exe`, which means :
 
 * Only direct, forwarded and delay load dependencies are supported. Dynamic loading via `LoadLibrary` are not supported (and probably won't ever be).
-* `Min-win` dlls are not propertly supported. (UPDATED : support of api set schema redirection in 1.5)
-* There are no checks between Api Imports and Exports for the moment, only dll presence is supported. 
-* No support of esoteric dll load paths (via `AppPaths` or `SxS` manifests entries). (UPDATED : minimal support of sxs private manifests search).
+* Support of api set schema redirection since 1.5
+* Checks between Api Imports and Exports. 
+* Minimal support of sxs private manifests search only.
 
 
 ## Credits and licensing
@@ -64,3 +64,4 @@ Special thanks to :
 * [Dragablz](https://github.com/ButchersBoy/Dragablz) a C#/XAML library which implement dockable and dragable UI elements, and can recreate the [MDI programming model](https://en.wikipedia.org/wiki/Multiple_document_interface) in `WPF`.
 * @aionescu, @zodiacon and Quarkslab for their public infos on ApiSets schema.
 * [Thomas levesque's blog](https://www.thomaslevesque.com) which pretty much solved all my `WPF` programming issues. His [`AutoGridSort`](http://www.thomaslevesque.com/2009/08/04/wpf-automatically-sort-a-gridview-continued/) is used in this project 
+* Venkatesh Mookkan [for it's `FilterControl` for ListView used in this project](https://www.codeproject.com/Articles/170095/WPF-Custom-Control-FilterControl-for-ListBox-ListV)
