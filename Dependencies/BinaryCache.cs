@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.ClrPh;
 using System.Security.Cryptography;
+using System.Diagnostics;
 
 namespace Dependencies
 {
@@ -210,7 +211,17 @@ namespace Dependencies
                         BinaryDatabase[PeHash].Unload();
                     }
 
-                    File.Delete(CachedBinary);
+                    try
+                    {
+                        File.Delete(CachedBinary);
+                    }
+                    catch (System.UnauthorizedAccessException uae)
+                    {
+                        // The BinaryCache is shared among serveral Dependencies.exe instance
+                        // so only the last one alive can clear the cache.
+                        Debug.WriteLine("[BinaryCache] Could not unload file {0:s} : {1:s} ", CachedBinary, uae);
+                    }
+                    
                 }
             }
 
@@ -240,7 +251,7 @@ namespace Dependencies
                 {
                 
                     string DestFilePath = Path.Combine(BinaryCacheFolderPath, PeHash);
-                    if (DestFilePath != PePath)
+                    if (!File.Exists(DestFilePath) && (DestFilePath != PePath))
                     {
                         File.Copy(PePath, DestFilePath, true);
                     }
