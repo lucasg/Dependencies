@@ -62,6 +62,12 @@ namespace Dependencies
         {
             Tuple<ModuleSearchStrategy, string> ResolvedFilepath;
 
+            // if no extension is used, assume a .dll
+            if (Path.GetExtension(ModuleName) == String.Empty)
+            {
+                ModuleName = String.Format("{0:s}.dll", ModuleName);
+            }
+
             string ApiSetName = LookupApiSetLibrary(ModuleName);
             if (ApiSetName != null)
             {
