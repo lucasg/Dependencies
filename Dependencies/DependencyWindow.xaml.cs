@@ -8,6 +8,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Data;
+using Microsoft.Win32;
 
 namespace Dependencies
 {
@@ -334,6 +335,12 @@ namespace Dependencies
         private void ProcessPe(List<ImportContext> NewTreeContexts, PE newPe)
         {
             List<PeImportDll> PeImports = newPe.GetImports();
+
+            Environment.SpecialFolder WindowsSystemFolder = (this.Pe.IsWow64Dll()) ?
+                Environment.SpecialFolder.SystemX86 :
+                Environment.SpecialFolder.System;
+            string User32Filepath = Path.Combine(Environment.GetFolderPath(WindowsSystemFolder), "user32.dll");
+
             foreach (PeImportDll DllImport in PeImports)
             {
 
@@ -342,7 +349,7 @@ namespace Dependencies
                 ImportModule.PeProperties = null;
                 ImportModule.ModuleName = DllImport.Name;
                 ImportModule.ApiSetModuleName = null;
-                ImportModule.IsDelayLoadImport = DllImport.IsDelayLoad(); // TODO : Use proper macros
+                ImportModule.IsDelayLoadImport = DllImport.IsDelayLoad(); 
 
 
                 // Find Dll in "paths"
@@ -376,6 +383,45 @@ namespace Dependencies
                 }
 
                 NewTreeContexts.Add(ImportModule);
+
+
+                // AppInitDlls are triggered by user32.dll, so if the binary does not import user32.dll they are not loaded.
+                if (ImportModule.PeFilePath == User32Filepath)
+                {
+                    string AppInitRegistryKey = (this.Pe.IsWow64Dll()) ?
+                        "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" :
+                        "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows";
+
+                    int LoadAppInitDlls = (int) Registry.GetValue(AppInitRegistryKey, "LoadAppInit_DLLs", 0);
+                    string AppInitDlls = (string)Registry.GetValue(AppInitRegistryKey, "AppInit_DLLs", "");
+
+                    if ((LoadAppInitDlls!=0) && (AppInitDlls != ""))
+                    {
+                        // Extremely crude parser. TODO : Add support for quotes wrapped paths with spaces
+                        foreach (var AppInitDll in AppInitDlls.Split(' '))
+                        {
+                            Debug.WriteLine("AppInit loading " + AppInitDll);
+
+                            ImportContext AppInitImportModule = new ImportContext();
+                            AppInitImportModule.PeFilePath = null;
+                            AppInitImportModule.PeProperties = null;
+                            AppInitImportModule.ModuleName = AppInitDll;
+                            AppInitImportModule.ApiSetModuleName = null;
+                            AppInitImportModule.IsDelayLoadImport = false;
+                            AppInitImportModule.ModuleLocation = ModuleSearchStrategy.AppInitDLL;
+
+                            Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, AppInitDll, this.SxsEntriesCache);
+                            if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
+                            {
+                                AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
+                                AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
+                            }
+
+                            NewTreeContexts.Add(AppInitImportModule);
+                        }
+                    }
+                }
+
             }
         }
 

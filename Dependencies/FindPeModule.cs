@@ -20,9 +20,10 @@ namespace Dependencies
         WindowsFolder = 5,
         WorkingDirectory = 6,
         Environment = 7,
-        AppInit = 8,
+        AppInitDLL = 8,
+        Fullpath = 9,
 
-        NOT_FOUND = 9
+        NOT_FOUND = 0xff
     };
 
     // C# typedefs
@@ -536,6 +537,16 @@ namespace Dependencies
                     ModuleSearchStrategy.Environment,
                    FoundPePath
                 );
+            }
+
+
+            // 8. Check if it's an absolute import
+            if (File.Exists(ModuleName))
+            {
+                return new Tuple<ModuleSearchStrategy, string>(
+                   ModuleSearchStrategy.Fullpath,
+                   ModuleName
+               );
             }
 
 
