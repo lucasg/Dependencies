@@ -8,6 +8,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ClrPhlib", "ClrPhlib\ClrPhlib.vcxproj", "{FC5FFCAF-982F-4A95-8FA6-2A95B1F7CDC8}"
 	ProjectSection(ProjectDependencies) = postProject
 		{477D0215-F252-41A1-874B-F27E3EA1ED17} = {477D0215-F252-41A1-874B-F27E3EA1ED17}
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1} = {BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClrPhTester", "ClrPhTester\ClrPhTester.csproj", "{5565A612-B250-4FE0-98DD-07C56916C194}"
@@ -19,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dragablz.net45", "third_party\Dragablz\Dragablz\Dragablz.net45.csproj", "{7B11011C-7FD7-4AB0-A1AD-04E940B026DE}"
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "DependenciesAppx", "DependenciesAppx\DependenciesAppx.wapproj", "{9901060D-98A3-44D8-A389-D4285C4C3020}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demumble", "demumble\demumble.vcxproj", "{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -100,6 +103,18 @@ Global
 		{9901060D-98A3-44D8-A389-D4285C4C3020}.Release|Any CPU.Deploy.0 = Release|x64
 		{9901060D-98A3-44D8-A389-D4285C4C3020}.Release|x64.ActiveCfg = Release|x64
 		{9901060D-98A3-44D8-A389-D4285C4C3020}.Release|x86.ActiveCfg = Release|x86
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Debug|Any CPU.Build.0 = Debug|x64
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Debug|x64.ActiveCfg = Debug|x64
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Debug|x64.Build.0 = Debug|x64
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Debug|x86.ActiveCfg = Debug|Win32
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Debug|x86.Build.0 = Debug|Win32
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Release|Any CPU.ActiveCfg = Release|x64
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Release|Any CPU.Build.0 = Release|x64
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Release|x64.ActiveCfg = Release|x64
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Release|x64.Build.0 = Release|x64
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Release|x86.ActiveCfg = Release|Win32
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -107,6 +122,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{477D0215-F252-41A1-874B-F27E3EA1ED17} = {A2A2925A-0582-4436-9A12-8567E979A621}
 		{7B11011C-7FD7-4AB0-A1AD-04E940B026DE} = {A2A2925A-0582-4436-9A12-8567E979A621}
+		{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1} = {A2A2925A-0582-4436-9A12-8567E979A621}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {054EFA82-95F8-4719-9F9A-546E7BEC56BF}

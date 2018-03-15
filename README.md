@@ -65,3 +65,4 @@ Special thanks to :
 * @aionescu, @zodiacon and Quarkslab for their public infos on ApiSets schema.
 * [Thomas levesque's blog](https://www.thomaslevesque.com) which pretty much solved all my `WPF` programming issues. His [`AutoGridSort`](http://www.thomaslevesque.com/2009/08/04/wpf-automatically-sort-a-gridview-continued/) is used in this project 
 * Venkatesh Mookkan [for it's `FilterControl` for ListView used in this project](https://www.codeproject.com/Articles/170095/WPF-Custom-Control-FilterControl-for-ListBox-ListV)
+* [demumble](https://github.com/nico/demumble) for demangling GCC symbols on Windows

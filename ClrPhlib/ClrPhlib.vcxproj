@@ -104,7 +104,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <CLRImageType>Default</CLRImageType>
     </Link>
@@ -122,7 +122,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <CLRImageType>Default</CLRImageType>
     </Link>
@@ -138,7 +138,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -153,7 +153,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>

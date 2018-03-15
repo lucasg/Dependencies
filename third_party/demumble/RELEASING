@@ -1,0 +1,13 @@
+Push new release branch:
+1. Make sure branches 'master' and 'release' are synced up locally
+2. update src/demumble.cc with new version (with ".git"), then
+       git commit -am 'mark this 1.0.0.git'
+3. git checkout release; git merge master
+4. fix version number in src/version.cc (it will likely conflict in the above)
+5. commit, tag, push (don't forget to push --tags)
+       git commit -am v1.0.0; git push origin release
+       git tag v1.0.0; git push --tags
+       # Push the 1.0.0.git change on master too:
+       git checkout master; git push origin master
+6. Add binaries to https://github.com/nico/demumble/releases
+   Build them with `-DCMAKE_BUILD_TYPE=Release`, strip after building.
