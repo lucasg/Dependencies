@@ -42,7 +42,7 @@ String^ PhSymbolProvider::UndecorateName(
 	String ^ManagedUndName;
 	PPH_STRING UndecoratedName = NULL;
 	
-	if (!m_Impl) {
+	if (!m_Impl || DecoratedName->Length == 0) {
 		return gcnew String("");
 	}
 	
