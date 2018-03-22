@@ -28,7 +28,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DependencyCustomListView}">
-                    <Border x:Name="_Border" Background="GhostWhite" BorderBrush="#FF828790" BorderThickness="1,1,1,1">
+                    <Border x:Name="_Border" Background="White" BorderBrush="#FF828790" BorderThickness="1,1,1,1">
                         <Grid  x:Name="_Grid"   SnapsToDevicePixels="true">
 
                             <Grid.RowDefinitions>
