@@ -134,8 +134,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\third_party\demumble\third_party\libcxxabi\cxa_demangle.cpp" />
-    <ClCompile Include="..\third_party\demumble\third_party\wine\undname.c" />
+    <ClCompile Include="third_party\libcxxabi\cxa_demangle.cpp" />
+    <ClCompile Include="third_party\wine\undname.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

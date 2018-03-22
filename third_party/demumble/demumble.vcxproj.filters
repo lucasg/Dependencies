@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\third_party\demumble\third_party\libcxxabi\cxa_demangle.cpp">
+    <ClCompile Include="third_party\libcxxabi\cxa_demangle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\third_party\demumble\third_party\wine\undname.c">
+    <ClCompile Include="third_party\wine\undname.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
