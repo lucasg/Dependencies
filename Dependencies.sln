@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dragablz.net45", "third_par
 EndProject
 Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "DependenciesAppx", "DependenciesAppx\DependenciesAppx.wapproj", "{9901060D-98A3-44D8-A389-D4285C4C3020}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demumble", "demumble\demumble.vcxproj", "{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "demumble", "third_party\demumble\demumble.vcxproj", "{BE4A9759-A412-44CB-887D-FEFBEF1ABBF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
