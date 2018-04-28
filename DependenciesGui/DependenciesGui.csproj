@@ -74,7 +74,6 @@
     <Compile Include="About.xaml.cs">
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
-    <Compile Include="BinaryCache.cs" />
     <Compile Include="DependencyCustomListView.xaml.cs">
       <DependentUpon>DependencyCustomListView.xaml</DependentUpon>
     </Compile>
@@ -88,7 +87,6 @@
       <DependentUpon>DependencyModuleList.xaml</DependentUpon>
     </Compile>
     <Compile Include="FilterControl\FilterControl.cs" />
-    <Compile Include="FindPeModule.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Helpers\SettingBindingHandler.cs" />
     <Compile Include="Models\ModuleInfo.cs" />

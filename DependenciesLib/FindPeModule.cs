@@ -27,6 +27,10 @@ namespace Dependencies
     };
 
     #region FindPe
+
+    /// <summary>
+    /// Dll path resolver emulator for the NT Loader.
+    /// </summary>
     public class FindPe
     {
         static string FindPeFromPath(string ModuleName, List<string> CandidateFolders, bool Wow64Dll = false)

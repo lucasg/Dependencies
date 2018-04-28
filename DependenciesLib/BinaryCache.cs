@@ -13,7 +13,7 @@ namespace Dependencies
     /// The BinaryCache copy every PE the application wants to open in a special folder in LocalAppData
     /// and open this one instead, prevent the original file from being locked.
     /// </summary>
-    class BinaryCache
+    public class BinaryCache
     {
         #region Singleton implementation
         private static BinaryCache SingletonInstance;
