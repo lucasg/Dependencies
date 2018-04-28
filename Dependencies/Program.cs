@@ -12,7 +12,9 @@ namespace Dependencies
         void PrettyPrint();
     }
 
-
+    /// <summary>
+    /// Printable KnownDlls object
+    /// </summary>
     class NtKnownDlls : IPrettyPrintable
     {
         public NtKnownDlls()
@@ -49,26 +51,17 @@ namespace Dependencies
         public List<String> x86;
     }
 
-    class Program
+    /// <summary>
+    /// Printable ApiSet schema object
+    /// </summary>
+    class NtApiSet : ApiSetSchema, IPrettyPrintable
     {
-        public static void PrettyPrinter(IPrettyPrintable obj)
+        public NtApiSet()
         {
-            obj.PrettyPrint();
+            Schema = Phlib.GetApiSetSchema();
         }
 
-        public static void JsonPrinter(IPrettyPrintable obj)
-        {
-            Console.WriteLine(JsonConvert.SerializeObject(obj));
-        }
-
-        public static void DumpKnownDlls(Action<IPrettyPrintable> Printer)
-        {
-
-            NtKnownDlls KnownDlls = new NtKnownDlls();
-            Printer(KnownDlls);
-        }
-
-        public static void DumpApiSets(Action<IPrettyPrintable> Printer)
+        public void PrettyPrint()
         {
             Console.WriteLine("[-] Api Sets Map : ");
 
@@ -82,7 +75,34 @@ namespace Dependencies
             }
 
             Console.WriteLine("");
+        }
 
+        public ApiSetSchema Schema;
+    }
+
+
+    class Program
+    {
+        public static void PrettyPrinter(IPrettyPrintable obj)
+        {
+            obj.PrettyPrint();
+        }
+
+        public static void JsonPrinter(IPrettyPrintable obj)
+        {
+            Console.WriteLine(JsonConvert.SerializeObject(obj));
+        }
+
+        public static void DumpKnownDlls(Action<IPrettyPrintable> Printer)
+        { 
+            NtKnownDlls KnownDlls = new NtKnownDlls();
+            Printer(KnownDlls);
+        }
+
+        public static void DumpApiSets(Action<IPrettyPrintable> Printer)
+        {
+            NtApiSet ApiSet = new NtApiSet();
+            Printer(ApiSet);
         }
 
         
