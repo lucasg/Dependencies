@@ -3,16 +3,53 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using System.ClrPh;
 using System.IO;
+using Newtonsoft.Json;
 
 namespace Dependencies
 {
+    class NtKnownDlls
+    {
+        public NtKnownDlls()
+        {
+            x64 = Phlib.GetKnownDlls(false);
+            x86 = Phlib.GetKnownDlls(true);
+        }
+
+        public void PrettyPrint()
+        {
+            Console.WriteLine("[-] 64-bit KnownDlls : ");
+
+            foreach (String KnownDll in this.x64)
+            {
+                string System32Folder = Environment.GetFolderPath(Environment.SpecialFolder.System);
+                Console.WriteLine("  {0:s}\\{1:s}", System32Folder, KnownDll);
+            }
+
+            Console.WriteLine("");
+
+            Console.WriteLine("[-] 32-bit KnownDlls : ");
+
+            foreach (String KnownDll in this.x86)
+            {
+                string SysWow64Folder = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+                Console.WriteLine("  {0:s}\\{1:s}", SysWow64Folder, KnownDll);
+            }
+
+
+            Console.WriteLine("");
+        }
+
+        public List<String> x64;
+        public List<String> x86;
+    }
+
     class Program
     {
-        static bool VerboseOutput = false;
+        static bool PrettyOutput= false;
 
         public static void VerboseWriteLine(string format, params object[] args)
         {
-            if (VerboseOutput)
+            if (PrettyOutput)
             {
                 Console.WriteLine(format, args);
             }
@@ -20,26 +57,19 @@ namespace Dependencies
 
         public static void DumpKnownDlls()
         {
-            VerboseWriteLine("[-] 64-bit KnownDlls : ");
-            
-            foreach (String KnownDll in Phlib.GetKnownDlls(false))
+
+            NtKnownDlls KnownDlls = new NtKnownDlls();
+
+            if (PrettyOutput)
             {
-                string System32Folder = Environment.GetFolderPath(Environment.SpecialFolder.System);
-                Console.WriteLine("  {0:s}\\{1:s}", System32Folder, KnownDll);
+                KnownDlls.PrettyPrint();
+            }
+            else
+            {
+                Console.WriteLine(JsonConvert.SerializeObject(KnownDlls));
             }
 
-            VerboseWriteLine("");
-
-            VerboseWriteLine("[-] 32-bit KnownDlls : ");
             
-            foreach (String KnownDll in Phlib.GetKnownDlls(true))
-            {
-                string SysWow64Folder = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
-                Console.WriteLine("  {0:s}\\{1:s}", SysWow64Folder, KnownDll);
-            }
-
-
-            VerboseWriteLine("");
         }
 
         public static void DumpApiSets()
@@ -158,19 +188,21 @@ namespace Dependencies
         public static void DumpUsage()
         {
             string Usage = String.Join(Environment.NewLine,
-                "Dependencies.exe : COFF/PE dumper tool (kinda like dumpbin).",
+                "Dependencies.exe : command line tool for dumping dependencies and various utilities.",
                 "",
                 "Usage : Dependencies.exe [OPTIONS] FILE",
+                "        Every command returns a json formatted output, unless -pretty is set.",  
                 "",
                 "Options :",
                 "  -h -help : display this help",
-                "  -verbose : activate human centric output.",
-                "  -apisets : display the ApiSet schema (api set dll -> host dll)",
-                "  -knowndll : display all the known dlls (x86 and x64)",
-                "  -manifest : display the FILE embedded manifest, if it exists.",
-                "  -sxsentries : display all the FILE's sxs dependencies.",
-                "  -imports : display the FILE imports",
-                "  -exports : display the FILE exports"
+                "  -pretty : activate human centric output.",
+                "  -apisets : dump the system's ApiSet schema (api set dll -> host dll)",
+                "  -knowndll : dump all the system's known dlls (x86 and x64)",
+                "  -manifest : dump FILE embedded manifest, if it exists.",
+                "  -sxsentries : dump all of FILE's sxs dependencies.",
+                "  -imports : dump FILE imports",
+                "  -exports : dump  FILE exports",
+                "  -dependencies : dump FILE whole dependency chain"
             );
 
             Console.WriteLine(Usage);
@@ -187,8 +219,8 @@ namespace Dependencies
             if (ProgramArgs.ContainsKey("file"))
                 FileName = ProgramArgs["file"];
 
-            if (ProgramArgs.ContainsKey("-verbose"))
-                VerboseOutput = true;
+            if (ProgramArgs.ContainsKey("-pretty"))
+                PrettyOutput = true;
 
             // no need to load PE for those commands
             if ((args.Length == 0) || ProgramArgs.ContainsKey("-h") || ProgramArgs.ContainsKey("-help"))
