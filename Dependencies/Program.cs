@@ -137,8 +137,77 @@ namespace Dependencies
         public string Manifest;
         public XDocument XmlManifest;
 
+        // stays private in order not end up in the json output
         private PE Application;
         private string Exception;
+    }
+
+    class PEImports : IPrettyPrintable
+    {
+        public PEImports(PE _Application)
+        {
+            Application = _Application;
+            Imports = Application.GetImports();
+        } 
+
+        public void PrettyPrint()
+        {
+            Console.WriteLine("[-] Import listing for file : {0}", Application.Filepath);
+
+            foreach (PeImportDll DllImport in Imports)
+            {
+                Console.WriteLine("Import from module {0:s} :", DllImport.Name);
+
+                foreach (PeImport Import in DllImport.ImportList)
+                {
+                    if (Import.ImportByOrdinal)
+                    {
+                        Console.Write("\t Ordinal_{0:d} ", Import.Ordinal);
+                    }
+                    else
+                    {
+                        Console.Write("\t Function {0:s}", Import.Name);
+                    }
+                    if (Import.DelayImport)
+                        Console.WriteLine(" (Delay Import)");
+                    else
+                        Console.WriteLine("");
+                }
+            }
+
+            Console.WriteLine("[-] Import listing done");
+        }
+
+        public List<PeImportDll> Imports;
+        private PE Application;
+    }
+
+    class PEExports : IPrettyPrintable
+    {
+        public PEExports(PE _Application)
+        {
+            Application = _Application;
+            Exports =  Application.GetExports();
+        } 
+
+        public void PrettyPrint()
+        {
+            Console.WriteLine("[-] Export listing for file : {0}", Application.Filepath);
+
+            foreach (PeExport Export in Exports)
+            {
+                Console.WriteLine("Export {0:d} :", Export.Ordinal);
+                Console.WriteLine("\t Name : {0:s}", Export.Name);
+                Console.WriteLine("\t VA : 0x{0:X}", (int)Export.VirtualAddress);
+                if (Export.ForwardedName.Length > 0)
+                    Console.WriteLine("\t ForwardedName : {0:s}", Export.ForwardedName);
+            }
+
+            Console.WriteLine("[-] Export listing done");
+        }
+
+        public List<PeExport> Exports;
+        private PE Application;
     }
 
 
@@ -166,38 +235,10 @@ namespace Dependencies
             Printer(ApiSet);
         }
 
-        
-
         public static void DumpManifest(PE Application, Action<IPrettyPrintable> Printer)
         {
             PEManifest Manifest = new PEManifest(Application);
             Printer(Manifest);
-
-            // String PeManifest = Application.GetManifest();
-            // Console.WriteLine("[-] Manifest for file : {0}", Application.Filepath);
-
-            // if (PeManifest.Length == 0)
-            // {
-            //     Console.WriteLine("[x] No embedded pe manifest for file {0:s}", Application.Filepath);
-            //     return;
-            // }
-
-            // try
-            // {
-            //     // Use a memory stream to correctly handle BOM encoding for manifest resource
-            //     using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
-            //     {
-            //         XDocument XmlManifest = SxsManifest.ParseSxsManifest(stream);
-            //         Console.WriteLine(XmlManifest);
-            //     }
-                
-
-            // }
-            // catch (System.Xml.XmlException e)
-            // {
-            //     Console.Error.WriteLine("[x] \"Malformed\" pe manifest for file {0:s} : {1:s}", Application.Filepath, PeManifest);
-            //     Console.Error.WriteLine("[x] Exception : {0:s}", e.ToString());
-            // }
         }
 
         public static void DumpSxsEntries(PE Application, Action<IPrettyPrintable> Printer)
@@ -221,48 +262,14 @@ namespace Dependencies
 
         public static void DumpExports(PE Pe, Action<IPrettyPrintable> Printer)
         {
-            List<PeExport> Exports = Pe.GetExports();
-            Console.WriteLine("[-] Export listing for file : {0}", Pe.Filepath);
-
-            foreach (PeExport Export in Exports)
-            {
-                Console.WriteLine("Export {0:d} :", Export.Ordinal);
-                Console.WriteLine("\t Name : {0:s}", Export.Name);
-                Console.WriteLine("\t VA : 0x{0:X}", (int)Export.VirtualAddress);
-                if (Export.ForwardedName.Length > 0)
-                    Console.WriteLine("\t ForwardedName : {0:s}", Export.ForwardedName);
-            }
-
-            Console.WriteLine("[-] Export listing done");
+            PEExports Exports = new PEExports(Pe);
+            Printer(Exports);
         }
 
         public static void DumpImports(PE Pe, Action<IPrettyPrintable> Printer)
         {
-            List<PeImportDll> Imports = Pe.GetImports();
-            Console.WriteLine("[-] Import listing for file : {0}", Pe.Filepath);
-
-            foreach (PeImportDll DllImport in Imports)
-            {
-                Console.WriteLine("Import from module {0:s} :", DllImport.Name);
-
-                foreach (PeImport Import in DllImport.ImportList)
-                {
-                    if (Import.ImportByOrdinal)
-                    {
-                        Console.Write("\t Ordinal_{0:d} ", Import.Ordinal);
-                    }
-                    else
-                    {
-                        Console.Write("\t Function {0:s}", Import.Name);
-                    }
-                    if (Import.DelayImport)
-                        Console.WriteLine(" (Delay Import)");
-                    else
-                        Console.WriteLine("");
-                }
-            }
-
-            Console.WriteLine("[-] Import listing done");
+            PEImports Imports = new PEImports(Pe);
+            Printer(Imports);
         }
 
         public static void DumpUsage()
