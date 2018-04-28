@@ -7,7 +7,13 @@ using Newtonsoft.Json;
 
 namespace Dependencies
 {
-    class NtKnownDlls
+    interface IPrettyPrintable
+    {
+        void PrettyPrint();
+    }
+
+
+    class NtKnownDlls : IPrettyPrintable
     {
         public NtKnownDlls()
         {
@@ -45,36 +51,26 @@ namespace Dependencies
 
     class Program
     {
-        static bool PrettyOutput= false;
-
-        public static void VerboseWriteLine(string format, params object[] args)
+        public static void PrettyPrinter(IPrettyPrintable obj)
         {
-            if (PrettyOutput)
-            {
-                Console.WriteLine(format, args);
-            }
+            obj.PrettyPrint();
         }
 
-        public static void DumpKnownDlls()
+        public static void JsonPrinter(IPrettyPrintable obj)
+        {
+            Console.WriteLine(JsonConvert.SerializeObject(obj));
+        }
+
+        public static void DumpKnownDlls(Action<IPrettyPrintable> Printer)
         {
 
             NtKnownDlls KnownDlls = new NtKnownDlls();
-
-            if (PrettyOutput)
-            {
-                KnownDlls.PrettyPrint();
-            }
-            else
-            {
-                Console.WriteLine(JsonConvert.SerializeObject(KnownDlls));
-            }
-
-            
+            Printer(KnownDlls);
         }
 
-        public static void DumpApiSets()
+        public static void DumpApiSets(Action<IPrettyPrintable> Printer)
         {
-            VerboseWriteLine("[-] Api Sets Map : ");
+            Console.WriteLine("[-] Api Sets Map : ");
 
             foreach (var ApiSetEntry in Phlib.GetApiSetSchema())
             {
@@ -85,20 +81,20 @@ namespace Dependencies
                 Console.WriteLine("{0:s} -> [ {1:s} ]", ApiSetName, ApiSetImplStr);
             }
 
-            VerboseWriteLine("");
+            Console.WriteLine("");
 
         }
 
         
 
-        public static void DumpManifest(PE Application)
+        public static void DumpManifest(PE Application, Action<IPrettyPrintable> Printer)
         {
             String PeManifest = Application.GetManifest();
-            VerboseWriteLine("[-] Manifest for file : {0}", Application.Filepath);
+            Console.WriteLine("[-] Manifest for file : {0}", Application.Filepath);
 
             if (PeManifest.Length == 0)
             {
-                VerboseWriteLine("[x] No embedded pe manifest for file {0:s}", Application.Filepath);
+                Console.WriteLine("[x] No embedded pe manifest for file {0:s}", Application.Filepath);
                 return;
             }
 
@@ -120,11 +116,11 @@ namespace Dependencies
             }
         }
 
-        public static void DumpSxsEntries(PE Application)
+        public static void DumpSxsEntries(PE Application, Action<IPrettyPrintable> Printer)
         {
             SxsEntries SxsDependencies = SxsManifest.GetSxsEntries(Application);
 
-            VerboseWriteLine("[-] sxs dependencies for executable : {0}", Application.Filepath);
+            Console.WriteLine("[-] sxs dependencies for executable : {0}", Application.Filepath);
             foreach (var entry in SxsDependencies)
             {
                 if (entry.Path.Contains("???"))
@@ -139,10 +135,10 @@ namespace Dependencies
         }
 
 
-        public static void DumpExports(PE Pe)
+        public static void DumpExports(PE Pe, Action<IPrettyPrintable> Printer)
         {
             List<PeExport> Exports = Pe.GetExports();
-            VerboseWriteLine("[-] Export listing for file : {0}", Pe.Filepath);
+            Console.WriteLine("[-] Export listing for file : {0}", Pe.Filepath);
 
             foreach (PeExport Export in Exports)
             {
@@ -153,13 +149,13 @@ namespace Dependencies
                     Console.WriteLine("\t ForwardedName : {0:s}", Export.ForwardedName);
             }
 
-            VerboseWriteLine("[-] Export listing done");
+            Console.WriteLine("[-] Export listing done");
         }
 
-        public static void DumpImports(PE Pe)
+        public static void DumpImports(PE Pe, Action<IPrettyPrintable> Printer)
         {
             List<PeImportDll> Imports = Pe.GetImports();
-            VerboseWriteLine("[-] Import listing for file : {0}", Pe.Filepath);
+            Console.WriteLine("[-] Import listing for file : {0}", Pe.Filepath);
 
             foreach (PeImportDll DllImport in Imports)
             {
@@ -182,7 +178,7 @@ namespace Dependencies
                 }
             }
 
-            VerboseWriteLine("[-] Import listing done");
+            Console.WriteLine("[-] Import listing done");
         }
 
         public static void DumpUsage()
@@ -210,17 +206,24 @@ namespace Dependencies
 
 
         static void Main(string[] args)
-        { 
-
-            Phlib.InitializePhLib();
-            var ProgramArgs = ParseArgs(args);
-
+        {
             String FileName = null;
+            var ProgramArgs = ParseArgs(args);
+            Action<IPrettyPrintable> ObjectPrinter = JsonPrinter;
+
+            // always the first call to make
+            Phlib.InitializePhLib();
+            
             if (ProgramArgs.ContainsKey("file"))
+            { 
                 FileName = ProgramArgs["file"];
+            }
 
             if (ProgramArgs.ContainsKey("-pretty"))
-                PrettyOutput = true;
+            {
+                ObjectPrinter = PrettyPrinter;
+            }
+                
 
             // no need to load PE for those commands
             if ((args.Length == 0) || ProgramArgs.ContainsKey("-h") || ProgramArgs.ContainsKey("-help"))
@@ -231,17 +234,17 @@ namespace Dependencies
 
             if (ProgramArgs.ContainsKey("-knowndll"))
             {
-                DumpKnownDlls();
+                DumpKnownDlls(ObjectPrinter);
                 return;
             }
 
             if (ProgramArgs.ContainsKey("-apisets"))
             {
-                DumpApiSets();
+                DumpApiSets(ObjectPrinter);
                 return;
             }
 
-            VerboseWriteLine("[-] Loading file {0:s} ", FileName);
+            Console.WriteLine("[-] Loading file {0:s} ", FileName);
             PE Pe = new PE(FileName);
             if (!Pe.Load())
             {
@@ -251,13 +254,13 @@ namespace Dependencies
 
             
             if (ProgramArgs.ContainsKey("-manifest"))
-                DumpManifest(Pe);
+                DumpManifest(Pe, ObjectPrinter);
             if (ProgramArgs.ContainsKey("-sxsentries"))
-                DumpSxsEntries(Pe);
+                DumpSxsEntries(Pe, ObjectPrinter);
             if (ProgramArgs.ContainsKey("-imports"))
-                DumpImports(Pe);
+                DumpImports(Pe, ObjectPrinter);
             if (ProgramArgs.ContainsKey("-exports"))
-                DumpExports(Pe);
+                DumpExports(Pe, ObjectPrinter);
 
 
         }
