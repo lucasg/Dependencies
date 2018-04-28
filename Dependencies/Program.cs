@@ -54,7 +54,7 @@ namespace Dependencies
     /// <summary>
     /// Printable ApiSet schema object
     /// </summary>
-    class NtApiSet : ApiSetSchema, IPrettyPrintable
+    class NtApiSet : IPrettyPrintable
     {
         public NtApiSet()
         {
@@ -65,7 +65,7 @@ namespace Dependencies
         {
             Console.WriteLine("[-] Api Sets Map : ");
 
-            foreach (var ApiSetEntry in Phlib.GetApiSetSchema())
+            foreach (var ApiSetEntry in this.Schema)
             {
                 ApiSetTarget ApiSetImpl = ApiSetEntry.Value;
                 string ApiSetName = ApiSetEntry.Key;
@@ -78,6 +78,67 @@ namespace Dependencies
         }
 
         public ApiSetSchema Schema;
+    }
+
+
+    class PEManifest : IPrettyPrintable
+    {
+
+        public PEManifest(PE _Application)
+        {
+            Application = _Application;
+            Manifest = Application.GetManifest();
+            XmlManifest = null;
+            Exception = "";
+
+            if (Manifest.Length != 0)
+            {
+                try
+                {
+                    // Use a memory stream to correctly handle BOM encoding for manifest resource
+                    using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(Manifest)))
+                    {
+                        XmlManifest = SxsManifest.ParseSxsManifest(stream);
+                    }
+                    
+
+                }
+                catch (System.Xml.XmlException e)
+                {
+                    //Console.Error.WriteLine("[x] \"Malformed\" pe manifest for file {0:s} : {1:s}", Application.Filepath, PeManifest);
+                    //Console.Error.WriteLine("[x] Exception : {0:s}", e.ToString());
+                    XmlManifest = null;
+                    Exception = e.ToString();
+                }
+            }
+        }
+
+
+        public void PrettyPrint()
+        {
+            Console.WriteLine("[-] Manifest for file : {0}", Application.Filepath);
+
+            if (Manifest.Length == 0)
+            {
+                Console.WriteLine("[x] No embedded pe manifest for file {0:s}", Application.Filepath);
+                return;
+            }
+
+            if (Exception.Length != 0)
+            {
+                Console.Error.WriteLine("[x] \"Malformed\" pe manifest for file {0:s} : {1:s}", Application.Filepath, Manifest);
+                Console.Error.WriteLine("[x] Exception : {0:s}", Exception);
+                return;
+            }
+
+            Console.WriteLine(XmlManifest);
+        }
+
+        public string Manifest;
+        public XDocument XmlManifest;
+
+        private PE Application;
+        private string Exception;
     }
 
 
@@ -109,31 +170,34 @@ namespace Dependencies
 
         public static void DumpManifest(PE Application, Action<IPrettyPrintable> Printer)
         {
-            String PeManifest = Application.GetManifest();
-            Console.WriteLine("[-] Manifest for file : {0}", Application.Filepath);
+            PEManifest Manifest = new PEManifest(Application);
+            Printer(Manifest);
 
-            if (PeManifest.Length == 0)
-            {
-                Console.WriteLine("[x] No embedded pe manifest for file {0:s}", Application.Filepath);
-                return;
-            }
+            // String PeManifest = Application.GetManifest();
+            // Console.WriteLine("[-] Manifest for file : {0}", Application.Filepath);
 
-            try
-            {
-                // Use a memory stream to correctly handle BOM encoding for manifest resource
-                using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
-                {
-                    XDocument XmlManifest = SxsManifest.ParseSxsManifest(stream);
-                    Console.WriteLine(XmlManifest);
-                }
+            // if (PeManifest.Length == 0)
+            // {
+            //     Console.WriteLine("[x] No embedded pe manifest for file {0:s}", Application.Filepath);
+            //     return;
+            // }
+
+            // try
+            // {
+            //     // Use a memory stream to correctly handle BOM encoding for manifest resource
+            //     using (var stream = new System.IO.MemoryStream(System.Text.Encoding.UTF8.GetBytes(PeManifest)))
+            //     {
+            //         XDocument XmlManifest = SxsManifest.ParseSxsManifest(stream);
+            //         Console.WriteLine(XmlManifest);
+            //     }
                 
 
-            }
-            catch (System.Xml.XmlException e)
-            {
-                Console.Error.WriteLine("[x] \"Malformed\" pe manifest for file {0:s} : {1:s}", Application.Filepath, PeManifest);
-                Console.Error.WriteLine("[x] Exception : {0:s}", e.ToString());
-            }
+            // }
+            // catch (System.Xml.XmlException e)
+            // {
+            //     Console.Error.WriteLine("[x] \"Malformed\" pe manifest for file {0:s} : {1:s}", Application.Filepath, PeManifest);
+            //     Console.Error.WriteLine("[x] Exception : {0:s}", e.ToString());
+            // }
         }
 
         public static void DumpSxsEntries(PE Application, Action<IPrettyPrintable> Printer)
@@ -264,7 +328,7 @@ namespace Dependencies
                 return;
             }
 
-            Console.WriteLine("[-] Loading file {0:s} ", FileName);
+            //Console.WriteLine("[-] Loading file {0:s} ", FileName);
             PE Pe = new PE(FileName);
             if (!Pe.Load())
             {
@@ -275,11 +339,11 @@ namespace Dependencies
             
             if (ProgramArgs.ContainsKey("-manifest"))
                 DumpManifest(Pe, ObjectPrinter);
-            if (ProgramArgs.ContainsKey("-sxsentries"))
+            else if (ProgramArgs.ContainsKey("-sxsentries"))
                 DumpSxsEntries(Pe, ObjectPrinter);
-            if (ProgramArgs.ContainsKey("-imports"))
+            else if (ProgramArgs.ContainsKey("-imports"))
                 DumpImports(Pe, ObjectPrinter);
-            if (ProgramArgs.ContainsKey("-exports"))
+            else if (ProgramArgs.ContainsKey("-exports"))
                 DumpExports(Pe, ObjectPrinter);
 
 
