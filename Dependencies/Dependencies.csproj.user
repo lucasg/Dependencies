@@ -2,5 +2,6 @@
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
+    <StartArguments>-sxsentries F:\Dev\Dependencies\Dependencies\tests\sxs-regress\chrome.exe</StartArguments>
   </PropertyGroup>
 </Project>

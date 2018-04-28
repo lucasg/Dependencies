@@ -41,8 +41,8 @@
     <TargetPlatformMinVersion>10.0.14393.0</TargetPlatformMinVersion>
     <DefaultLanguage>fr-FR</DefaultLanguage>
     <PackageCertificateKeyFile>DependenciesAppx_TemporaryKey.pfx</PackageCertificateKeyFile>
-    <EntryPointProjectUniqueName>..\Dependencies\Dependencies.csproj</EntryPointProjectUniqueName>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <EntryPointProjectUniqueName>..\Dependencies\Dependencies.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefaultLanguage>en-us</DefaultLanguage>
@@ -123,8 +123,8 @@
     <Content Include="Assets\Dependencies_44px_background.png" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClrPhTester\ClrPhTester.csproj" />
     <ProjectReference Include="..\Dependencies\Dependencies.csproj" />
+    <ProjectReference Include="..\DependenciesGui\DependenciesGui.csproj" />
   </ItemGroup>
   <Import Project="$(WapProjPath)\Microsoft.DesktopBridge.targets" />
 </Project>

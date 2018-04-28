@@ -1,0 +1,79 @@
+﻿<Window x:Class="Dependencies.UserSettings"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Dependencies"
+        xmlns:properties="clr-namespace:Dependencies.Properties"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="UserSettings"  d:DesignHeight="300" d:DesignWidth="600"
+        SizeToContent="WidthAndHeight">
+    <Window.Resources>
+        <local:TreeBuildingBehaviour x:Key="TreeBuildingBehaviourConverter"/>
+    </Window.Resources>
+    <Grid Margin="10 20 20 20" MinHeight="100"  MinWidth="600">
+        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="33*"/>
+            <RowDefinition Height="33*"/>
+            <RowDefinition Height="33*"/>
+            <RowDefinition Height="33*"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="80*"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Peviewer path:" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Center"
+                   Grid.Column="0"
+                   Height="25"
+                   />
+
+            <TextBox Text="{Binding Source={x:Static properties:Settings.Default}, Path=PeViewerPath, Mode=TwoWay}"
+                    TextWrapping="Wrap" 
+                    HorizontalContentAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    Height="20"
+                    Width="auto" 
+                    Grid.Column="1"
+                    />
+            
+            <Button Content="..." 
+                    Height="20"
+                    Margin="2 0 0 0"
+                    Click="OnPeviewerPathSettingChange"
+                    Grid.Column="2"/>
+        </Grid>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="80*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Tree build behaviour:" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Center"
+                   Grid.Column="0"
+                   Height="25"
+                   />
+
+            <ComboBox x:Name="TreeBuildCombo"
+                      SelectedItem="{Binding Source={x:Static properties:Settings.Default}, Path=TreeBuildBehaviour, Mode=TwoWay, Converter={StaticResource TreeBuildingBehaviourConverter}}"
+                      HorizontalContentAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                      Height="20"
+                      Width="auto" 
+                      Grid.Column="1"
+                    >
+
+            </ComboBox>
+        </Grid>
+    </Grid>
+</Window>
