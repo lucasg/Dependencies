@@ -211,6 +211,36 @@ namespace Dependencies
     }
 
 
+    class SxsDependencies : IPrettyPrintable
+    {
+        public SxsDependencies(PE _Application)
+        {
+            Application = _Application;
+            SxS = SxsManifest.GetSxsEntries(Application);
+        } 
+
+        public void PrettyPrint()
+        {
+            Console.WriteLine("[-] sxs dependencies for executable : {0}", Application.Filepath);
+            foreach (var entry in SxS)
+            {
+                if (entry.Path.Contains("???"))
+                {
+                    Console.WriteLine("  [x] {0:s} : {1:s}", entry.Name, entry.Path);
+                }
+                else
+                {
+                    Console.WriteLine("  [+] {0:s} : {1:s}", entry.Name, Path.GetFullPath(entry.Path));
+                }
+            }
+        }
+
+        public SxsEntries SxS;
+        private PE Application;
+
+    }
+
+
     class Program
     {
         public static void PrettyPrinter(IPrettyPrintable obj)
@@ -243,20 +273,8 @@ namespace Dependencies
 
         public static void DumpSxsEntries(PE Application, Action<IPrettyPrintable> Printer)
         {
-            SxsEntries SxsDependencies = SxsManifest.GetSxsEntries(Application);
-
-            Console.WriteLine("[-] sxs dependencies for executable : {0}", Application.Filepath);
-            foreach (var entry in SxsDependencies)
-            {
-                if (entry.Path.Contains("???"))
-                {
-                    Console.WriteLine("  [x] {0:s} : {1:s}", entry.Name, entry.Path);
-                }
-                else
-                {
-                    Console.WriteLine("  [+] {0:s} : {1:s}", entry.Name, Path.GetFullPath(entry.Path));
-                }
-            }
+            SxsDependencies SxsDeps = new SxsDependencies(Application);
+            Printer(SxsDeps);
         }
 
 
