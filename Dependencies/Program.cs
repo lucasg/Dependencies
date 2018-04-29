@@ -509,7 +509,7 @@ namespace Dependencies
                 "",
                 "Options :",
                 "  -h -help : display this help",
-                "  -pretty : activate human centric output.",
+                "  -json : activate json output.",
                 "  -apisets : dump the system's ApiSet schema (api set dll -> host dll)",
                 "  -knowndll : dump all the system's known dlls (x86 and x64)",
                 "  -manifest : dump FILE embedded manifest, if it exists.",
@@ -528,7 +528,7 @@ namespace Dependencies
         {
             String FileName = null;
             var ProgramArgs = ParseArgs(args);
-            Action<IPrettyPrintable> ObjectPrinter = JsonPrinter;
+            Action<IPrettyPrintable> ObjectPrinter = PrettyPrinter;
 
             // always the first call to make
             Phlib.InitializePhLib();
@@ -538,9 +538,9 @@ namespace Dependencies
                 FileName = ProgramArgs["file"];
             }
 
-            if (ProgramArgs.ContainsKey("-pretty"))
+            if (ProgramArgs.ContainsKey("-json"))
             {
-                ObjectPrinter = PrettyPrinter;
+                ObjectPrinter = JsonPrinter;
             }
                 
 
