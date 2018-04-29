@@ -475,7 +475,7 @@ namespace Dependencies
             Printer(Imports);
         }
 
-        public static void DumpDependencies(PE Pe, Action<IPrettyPrintable> Printer)
+        public static void DumpDependencyChain(PE Pe, Action<IPrettyPrintable> Printer)
         {
             if (Printer == JsonPrinter)
             {
@@ -515,8 +515,9 @@ namespace Dependencies
                 "  -sxsentries : dump all of FILE's sxs dependencies.",
                 "  -imports : dump FILE imports",
                 "  -exports : dump  FILE exports",
-                "  -dependencies : dump FILE whole dependency chain",
-                "  -modules : dump FILE resolved modules"
+                "  -modules : dump FILE resolved modules",
+                "  -chain : dump FILE whole dependency chain"
+                
             );
 
             Console.WriteLine(Usage);
@@ -579,8 +580,8 @@ namespace Dependencies
                 DumpImports(Pe, ObjectPrinter);
             else if (ProgramArgs.ContainsKey("-exports"))
                 DumpExports(Pe, ObjectPrinter);
-            else if (ProgramArgs.ContainsKey("-dependencies"))
-                DumpDependencies(Pe, ObjectPrinter);
+            else if (ProgramArgs.ContainsKey("-chain"))
+                DumpDependencyChain(Pe, ObjectPrinter);
             else if (ProgramArgs.ContainsKey("-modules"))
                 DumpModules(Pe, ObjectPrinter);
 
