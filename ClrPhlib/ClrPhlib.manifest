@@ -3,7 +3,7 @@
   <assemblyIdentity
     name="ClrPhLib"
     processorArchitecture="*"
-    version="1.6.0.0"
+    version="1.7.0.0"
     type="win32"
   />
   <description>CLR Process Hacker library</description>

@@ -10,6 +10,8 @@
 `Dependencies` can help Windows developers troubleshooting their dll load dependencies issues.
 
 ## Releases
+* [v1.7](https://github.com/lucasg/Dependencies/releases/download/v1.7/Dependencies.zip) :
+	* Add CLI tool "dependencies.exe"
 * [v1.6](https://github.com/lucasg/Dependencies/releases/download/v1.6/Dependencies.zip) :
 	* Add appx packaging
 * [v1.5](https://github.com/lucasg/Dependencies/releases/download/v1.5/Dependencies.zip) :
