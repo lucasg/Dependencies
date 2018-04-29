@@ -327,14 +327,34 @@ namespace Dependencies
         public string ModuleName;
         public string Filepath;
         public ModuleSearchStrategy SearchStrategy;
-        public List<PeImportDll> Imports;
         public List<PeDependencyItem> Dependencies;
 
-
+        protected List<PeImportDll> Imports;
         protected PeDependencies Root;
         protected int RecursionLevel;
 
         private bool DependenciesResolved;
+    }
+
+
+    class ModuleCacheKey : Tuple<string, string>
+    {
+        public ModuleCacheKey(string Name, string Filepath)
+        : base(Name, Filepath)
+        {
+        }
+    }
+
+    class ModuleEntries : Dictionary<ModuleCacheKey, PeDependencyItem>, IPrettyPrintable
+    {
+        public void PrettyPrint()
+        {
+            foreach (var item in this.Values.OrderBy(module => module.SearchStrategy))
+            {
+                Console.WriteLine("[{0:s}] {1:s} : {2:s} ", item.SearchStrategy.ToString(), item.ModuleName, item.Filepath);
+            }
+            
+        }
     }
 
     class PeDependencies : IPrettyPrintable
@@ -345,7 +365,7 @@ namespace Dependencies
 
             RootPe = Application;
             SxsEntriesCache = SxsManifest.GetSxsEntries(RootPe);
-            ModulesCache = new Dictionary<ModuleCacheKey, PeDependencyItem> ();
+            ModulesCache = new ModuleEntries();
 
             Root = new PeDependencyItem(this, RootFilename, Application.Filepath, ModuleSearchStrategy.ROOT, 0);
             Root.ResolveDependencies();
@@ -388,20 +408,16 @@ namespace Dependencies
             return true;
         }
 
-        public class ModuleCacheKey : Tuple<string, string>
+        public ModuleEntries GetModules 
         {
-            public ModuleCacheKey(string Name, string Filepath)
-            : base(Name, Filepath)
-            {
-            }
+            get {return ModulesCache;}
         }
-
 
         public PeDependencyItem Root;
 
         private PE RootPe;
         private SxsEntries SxsEntriesCache;
-        private Dictionary<ModuleCacheKey, PeDependencyItem> ModulesCache;
+        private ModuleEntries ModulesCache;
         private Dictionary<ModuleCacheKey, bool> ModulesVisited;
     }
 
@@ -414,7 +430,12 @@ namespace Dependencies
 
         public static void JsonPrinter(IPrettyPrintable obj)
         {
-            Console.WriteLine(JsonConvert.SerializeObject(obj));
+            JsonSerializerSettings Settings = new JsonSerializerSettings
+            {
+                // ReferenceLoopHandling = ReferenceLoopHandling.Serialize
+            };
+
+            Console.WriteLine(JsonConvert.SerializeObject(obj, Formatting.Indented, Settings));
         }
 
         public static void DumpKnownDlls(Action<IPrettyPrintable> Printer)
@@ -466,6 +487,18 @@ namespace Dependencies
             Printer(Deps);
         }
 
+        public static void DumpModules(PE Pe, Action<IPrettyPrintable> Printer)
+        {
+            if (Printer == JsonPrinter)
+            {
+                Console.Error.WriteLine("Json output is not currently supported when dumping the dependency chain.");
+                return;
+            }
+
+            PeDependencies Deps = new PeDependencies(Pe);
+            Printer(Deps.GetModules);
+        }
+
         public static void DumpUsage()
         {
             string Usage = String.Join(Environment.NewLine,
@@ -483,7 +516,8 @@ namespace Dependencies
                 "  -sxsentries : dump all of FILE's sxs dependencies.",
                 "  -imports : dump FILE imports",
                 "  -exports : dump  FILE exports",
-                "  -dependencies : dump FILE whole dependency chain"
+                "  -dependencies : dump FILE whole dependency chain",
+                "  -modules : dump FILE resolved modules"
             );
 
             Console.WriteLine(Usage);
@@ -548,6 +582,8 @@ namespace Dependencies
                 DumpExports(Pe, ObjectPrinter);
             else if (ProgramArgs.ContainsKey("-dependencies"))
                 DumpDependencies(Pe, ObjectPrinter);
+            else if (ProgramArgs.ContainsKey("-modules"))
+                DumpModules(Pe, ObjectPrinter);
 
 
         }
