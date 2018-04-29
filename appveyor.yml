@@ -41,6 +41,8 @@ deploy:
       platform: Any CPU
       appveyor_repo_tag: true       # deploy on tag push only
 
+cache:
+  - packages -> **\packages.config
 
 build:
   project: C:/projects/dependencies/Dependencies.sln
@@ -56,6 +58,9 @@ before_build:
         &nuget install secure-file -ExcludeVersion;
         &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret "$($env:certsecret)" -out "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx";
       }
+
+      # download all the necessary packages
+      nuget restore 
 
 after_test:
  - ps: |
