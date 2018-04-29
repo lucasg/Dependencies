@@ -505,7 +505,6 @@ namespace Dependencies
                 "Dependencies.exe : command line tool for dumping dependencies and various utilities.",
                 "",
                 "Usage : Dependencies.exe [OPTIONS] FILE",
-                "        Every command returns a json formatted output, unless -pretty is set.",  
                 "",
                 "Options :",
                 "  -h -help : display this help",
