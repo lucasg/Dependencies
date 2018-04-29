@@ -313,7 +313,6 @@ namespace Dependencies
         public void PrettyPrint()
         {
             string Tabs = string.Concat(Enumerable.Repeat("|  ", RecursionLevel));
-
             Console.WriteLine("{0:s}├ {1:s} ({2:s}) : {3:s} ", Tabs, ModuleName, SearchStrategy.ToString(), Filepath);
 
             foreach (var Dep in Dependencies)
@@ -457,6 +456,12 @@ namespace Dependencies
 
         public static void DumpDependencies(PE Pe, Action<IPrettyPrintable> Printer)
         {
+            if (Printer == JsonPrinter)
+            {
+                Console.Error.WriteLine("Json output is not currently supported when dumping the dependency chain.");
+                return;
+            }
+
             PeDependencies Deps = new PeDependencies(Pe);
             Printer(Deps);
         }
