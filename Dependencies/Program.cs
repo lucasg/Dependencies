@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Xml.Linq;
 using System.ClrPh;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace Dependencies
 {
@@ -241,6 +243,169 @@ namespace Dependencies
     }
 
 
+
+    class PeDependencyItem : IPrettyPrintable
+    {
+
+        public PeDependencyItem(PeDependencies _Root, string _ModuleName,  string ModuleFilepath, ModuleSearchStrategy Strategy, int Level)
+        {
+            Root = _Root;
+            ModuleName = _ModuleName;
+
+            if (ModuleFilepath != null)
+            {
+                PE Module = BinaryCache.LoadPe(ModuleFilepath);
+                Imports = Module.GetImports();
+            }
+            else
+            {
+                //Module = null;
+                Imports = new List<PeImportDll>();
+            }
+            
+            Filepath = ModuleFilepath;
+            SearchStrategy = Strategy;
+            RecursionLevel = Level;
+
+            DependenciesResolved = false;
+        }
+
+        public void ResolveDependencies()
+        {
+            if (DependenciesResolved)
+            {
+                return;
+            }
+
+            Dependencies = new List<PeDependencyItem>();
+
+            foreach (PeImportDll DllImport in Imports)
+            {
+                string ModuleFilepath = null;
+                ModuleSearchStrategy Strategy;
+                
+
+                // Find Dll in "paths"
+                Tuple<ModuleSearchStrategy, PE> ResolvedModule =  Root.ResolveModule(DllImport.Name);
+                Strategy = ResolvedModule.Item1;
+
+                if (Strategy != ModuleSearchStrategy.NOT_FOUND)
+                {
+                    ModuleFilepath = ResolvedModule.Item2.Filepath;
+                }
+
+
+                Debug.WriteLine("[{0:d}] [{1:s}] Adding dep {2:s}", RecursionLevel,  ModuleName, ModuleFilepath);
+                PeDependencyItem DependencyItem = Root.GetModuleItem(DllImport.Name, ModuleFilepath, Strategy, RecursionLevel + 1);
+                Dependencies.Add(DependencyItem);
+            }
+
+            DependenciesResolved = true;
+
+
+            // Recursively resolve dependencies
+            foreach (var Dep in Dependencies)
+            {
+                Dep.ResolveDependencies();
+            }
+        }
+
+        public void PrettyPrint()
+        {
+            string Tabs = string.Concat(Enumerable.Repeat("|  ", RecursionLevel));
+
+            Console.WriteLine("{0:s}├ {1:s} ({2:s}) : {3:s} ", Tabs, ModuleName, SearchStrategy.ToString(), Filepath);
+
+            foreach (var Dep in Dependencies)
+            {
+                if (Root.VisitModule(Dep.ModuleName, Dep.Filepath))
+                {
+                    Dep.PrettyPrint();
+                }
+            }
+        }
+
+        public string ModuleName;
+        public string Filepath;
+        public ModuleSearchStrategy SearchStrategy;
+        public List<PeImportDll> Imports;
+        public List<PeDependencyItem> Dependencies;
+
+
+        protected PeDependencies Root;
+        protected int RecursionLevel;
+
+        private bool DependenciesResolved;
+    }
+
+    class PeDependencies : IPrettyPrintable
+    {
+        public PeDependencies(PE Application)
+        {
+            string RootFilename = Path.GetFileName(Application.Filepath);
+
+            RootPe = Application;
+            SxsEntriesCache = SxsManifest.GetSxsEntries(RootPe);
+            ModulesCache = new Dictionary<ModuleCacheKey, PeDependencyItem> ();
+
+            Root = new PeDependencyItem(this, RootFilename, Application.Filepath, ModuleSearchStrategy.ROOT, 0);
+            Root.ResolveDependencies();
+        }
+
+        public Tuple<ModuleSearchStrategy, PE> ResolveModule(string ModuleName)
+        {
+            return BinaryCache.ResolveModule(RootPe, ModuleName /*DllImport.Name*/, SxsEntriesCache);
+        }
+
+        public PeDependencyItem GetModuleItem(string ModuleName, string ModuleFilepath, ModuleSearchStrategy SearchStrategy, int RecursionLevel)
+        {
+            // Do not process twice the same item
+            ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
+            if (!ModulesCache.ContainsKey(ModuleKey))
+            {
+                ModulesCache[ModuleKey] = new PeDependencyItem(this, ModuleName, ModuleFilepath, SearchStrategy, RecursionLevel);
+            }
+
+            return ModulesCache[ModuleKey];
+        }
+
+        public void PrettyPrint()
+        {
+            ModulesVisited = new Dictionary<ModuleCacheKey, bool>();
+            Root.PrettyPrint();
+        }
+
+        public bool VisitModule(string ModuleName, string ModuleFilepath)
+        {
+            ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
+
+            // do not visit recursively the same node (in order to prevent stack overflow)
+            if (ModulesVisited.ContainsKey(ModuleKey))
+            {
+                return false;
+            }
+
+            ModulesVisited[ModuleKey] = true;
+            return true;
+        }
+
+        public class ModuleCacheKey : Tuple<string, string>
+        {
+            public ModuleCacheKey(string Name, string Filepath)
+            : base(Name, Filepath)
+            {
+            }
+        }
+
+
+        public PeDependencyItem Root;
+
+        private PE RootPe;
+        private SxsEntries SxsEntriesCache;
+        private Dictionary<ModuleCacheKey, PeDependencyItem> ModulesCache;
+        private Dictionary<ModuleCacheKey, bool> ModulesVisited;
+    }
+
     class Program
     {
         public static void PrettyPrinter(IPrettyPrintable obj)
@@ -288,6 +453,12 @@ namespace Dependencies
         {
             PEImports Imports = new PEImports(Pe);
             Printer(Imports);
+        }
+
+        public static void DumpDependencies(PE Pe, Action<IPrettyPrintable> Printer)
+        {
+            PeDependencies Deps = new PeDependencies(Pe);
+            Printer(Deps);
         }
 
         public static void DumpUsage()
@@ -370,6 +541,8 @@ namespace Dependencies
                 DumpImports(Pe, ObjectPrinter);
             else if (ProgramArgs.ContainsKey("-exports"))
                 DumpExports(Pe, ObjectPrinter);
+            else if (ProgramArgs.ContainsKey("-dependencies"))
+                DumpDependencies(Pe, ObjectPrinter);
 
 
         }
