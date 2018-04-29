@@ -367,7 +367,7 @@ namespace Dependencies
             SxsEntriesCache = SxsManifest.GetSxsEntries(RootPe);
             ModulesCache = new ModuleEntries();
 
-            Root = new PeDependencyItem(this, RootFilename, Application.Filepath, ModuleSearchStrategy.ROOT, 0);
+            Root = GetModuleItem(RootFilename, Application.Filepath, ModuleSearchStrategy.ROOT, 0);
             Root.ResolveDependencies();
         }
 
