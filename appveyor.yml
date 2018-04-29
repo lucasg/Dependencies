@@ -94,10 +94,10 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
         $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)AnyCPU";
 
         # Test if the binary (and the underlying lib) actually works
-        &"$BINPATH/ClrPhTester.exe" -knowndll
-        &"$BINPATH/ClrPhTester.exe" -apisets
-        &"$BINPATH/ClrPhTester.exe" -manifest "$($env:windir)/System32/shell32.dll" 
-        &"$BINPATH/ClrPhTester.exe" -sxsentries "$($env:windir)/System32/ctfmon.exe" 
+        &"$BINPATH/Dependencies.exe" -knowndll
+        &"$BINPATH/Dependencies.exe" -apisets
+        &"$BINPATH/Dependencies.exe" -manifest "$($env:windir)/System32/shell32.dll" 
+        &"$BINPATH/Dependencies.exe" -sxsentries "$($env:windir)/System32/ctfmon.exe" 
 
         # Zipping everything
         &7z.exe a Dependencies.zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DbgHelpDll;
