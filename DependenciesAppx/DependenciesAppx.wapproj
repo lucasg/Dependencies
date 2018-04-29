@@ -42,7 +42,7 @@
     <DefaultLanguage>fr-FR</DefaultLanguage>
     <PackageCertificateKeyFile>DependenciesAppx_TemporaryKey.pfx</PackageCertificateKeyFile>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
-    <EntryPointProjectUniqueName>..\Dependencies\Dependencies.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\DependenciesGui\DependenciesGui.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefaultLanguage>en-us</DefaultLanguage>
