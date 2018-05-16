@@ -1,6 +1,7 @@
 .vs/
 obj/
 bin/
+packages/
 
 
 *.obj
@@ -10,3 +11,4 @@ bin/
 *.cache
 *.pdb
 *.pch
+*.user
