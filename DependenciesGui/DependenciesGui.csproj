@@ -24,7 +24,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
+    <OutputPath>$(SolutionDir)bin\$(Configuration)$(Platform)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(Platform)</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
@@ -33,7 +34,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
+    <OutputPath>$(SolutionDir)bin\$(Configuration)$(Platform)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(Platform)</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
@@ -43,7 +45,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
+    <OutputPath>$(SolutionDir)bin\$(Configuration)$(Platform)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(Platform)</IntermediateOutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DebugType>full</DebugType>
@@ -52,7 +55,8 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
+    <OutputPath>$(SolutionDir)bin\$(Configuration)$(Platform)</OutputPath>
+    <IntermediateOutputPath>$(SolutionDir)obj\$(ProjectName)\$(Configuration)$(Platform)</IntermediateOutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
