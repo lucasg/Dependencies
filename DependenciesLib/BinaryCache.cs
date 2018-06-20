@@ -169,7 +169,9 @@ namespace Dependencies
             LruCache = new List<string>();
 
             MaxBinaryCount = _MaxBinaryCount;
-            BinaryCacheFolderPath = Path.Combine(ApplicationAppDataPath, "BinaryCache");
+	        string platform = (IntPtr.Size == 8) ? "x64" : "x86";
+
+            BinaryCacheFolderPath = Path.Combine(ApplicationAppDataPath, "BinaryCache", platform);
             Directory.CreateDirectory(BinaryCacheFolderPath);
         }
 

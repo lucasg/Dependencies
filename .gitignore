@@ -1,7 +1,7 @@
 .vs/
 obj/
 bin/
-
+packages/
 
 *.obj
 *.log
@@ -10,3 +10,4 @@ bin/
 *.cache
 *.pdb
 *.pch
+*.user
