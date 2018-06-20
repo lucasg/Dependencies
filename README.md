@@ -10,6 +10,8 @@
 `Dependencies` can help Windows developers troubleshooting their dll load dependencies issues.
 
 ## Releases
+* [v1.8](https://github.com/lucasg/Dependencies/releases/download/v1.8/Dependencies_x64_Release.zip) :
+	* Add x86/x64 variants for Dependencies
 * [v1.7](https://github.com/lucasg/Dependencies/releases/download/v1.7/Dependencies.zip) :
 	* Add CLI tool "dependencies.exe"
 * [v1.6](https://github.com/lucasg/Dependencies/releases/download/v1.6/Dependencies.zip) :
