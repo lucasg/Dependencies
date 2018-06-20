@@ -105,18 +105,18 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
       &7z.exe a Dependencies_$($env:platform)_$($env:CONFIGURATION).zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DbgHelpDll;
 
       # APPX packaging
-      if ( $($env:platform) -eq "x64") {
+      if ( $($env:CONFIGURATION) -eq "Release") {
         $makeappx = "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\makeappx.exe";
         $signtool = "${env:ProgramFiles(x86)}\Windows Kits\10\App Certification Kit\signtool.exe";
 
         # Copy assets to build folder
-        Copy-Item "C:/projects/dependencies/DependenciesAppx/Assets" -Destination "C:/projects/dependencies/bin/Appx_$($env:CONFIGURATION)x64" -Force -Recurse
+        Copy-Item "C:/projects/dependencies/DependenciesAppx/Assets" -Destination "C:/projects/dependencies/bin/Appx_$($env:CONFIGURATION)$($env:platform)" -Force -Recurse
 
         # Create appx package
-        & $makeappx pack /d "C:/projects/dependencies/bin/$($env:CONFIGURATION)x64" /l /p "C:/projects/dependencies/bin/Appx_$($env:CONFIGURATION)x64.appx"
+        & $makeappx pack /d "C:/projects/dependencies/bin/Appx_$($env:CONFIGURATION)$($env:platform)" /l /p "C:/projects/dependencies/bin/Appx_$($env:CONFIGURATION)$($env:platform).appx"
 
         # Sign appx package
-        & $signtool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/Appx_$($env:CONFIGURATION)x64.appx"
+        & $signtool sign /fd SHA256 /a /f "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx" "C:/projects/dependencies/bin/Appx_$($env:CONFIGURATION)$($env:platform).appx"
       }
     
   - ps: Write-Host "Building artifact done"
