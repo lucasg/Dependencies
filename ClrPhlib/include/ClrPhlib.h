@@ -105,9 +105,9 @@ namespace System {
             DateTime ^ Time;
             Int16 Magic;
 
-            IntPtr ImageBase;
+			Int64 ImageBase;
             Int32  SizeOfImage;
-            IntPtr EntryPoint;
+			Int64 EntryPoint;
 
 
             Int32 Checksum;
@@ -163,7 +163,7 @@ namespace System {
             !PE();
 
             // Initalize PeProperties struct once the PE has been loaded into memory
-            void InitProperties();
+            bool InitProperties();
 
         private:
             

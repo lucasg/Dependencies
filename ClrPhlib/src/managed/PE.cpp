@@ -31,13 +31,22 @@ PE::!PE() {
 
 bool PE::Load()
 {
+    // Load PE as mapped section
     wchar_t* PvFilepath = (wchar_t*)(Marshal::StringToHGlobalUni(Filepath)).ToPointer();
     this->LoadSuccessful = m_Impl->LoadPE(PvFilepath);
+	Marshal::FreeHGlobal(IntPtr((void*)PvFilepath));
 
-    if (LoadSuccessful)
-        InitProperties();
+	if (!LoadSuccessful) {
+		return false;
+	}
+        
+	// Parse PE
+	LoadSuccessful &= InitProperties();
+	if (!LoadSuccessful) {
+		m_Impl->UnloadPE();
+		return false;
+	}
 
-    Marshal::FreeHGlobal(IntPtr((void*)PvFilepath));
 
     return LoadSuccessful;
 }
@@ -48,7 +57,7 @@ void PE::Unload()
         m_Impl->UnloadPE();
 }
 
-void PE::InitProperties()
+bool PE::InitProperties()
 {
     LARGE_INTEGER time;
     SYSTEMTIME systemTime;
@@ -69,17 +78,17 @@ void PE::InitProperties()
     {
         PIMAGE_OPTIONAL_HEADER32 OptionalHeader = (PIMAGE_OPTIONAL_HEADER32) &PvMappedImage.NtHeaders->OptionalHeader;
         
-        Properties->ImageBase = (IntPtr) (Int32) OptionalHeader->ImageBase;
+        Properties->ImageBase = (Int64) OptionalHeader->ImageBase;
         Properties->SizeOfImage = OptionalHeader->SizeOfImage;
-        Properties->EntryPoint = (IntPtr) (Int32) OptionalHeader->AddressOfEntryPoint;
+        Properties->EntryPoint = (Int64) OptionalHeader->AddressOfEntryPoint;
     }
     else
     {
         PIMAGE_OPTIONAL_HEADER64 OptionalHeader = (PIMAGE_OPTIONAL_HEADER64)&PvMappedImage.NtHeaders->OptionalHeader;
 
-        Properties->ImageBase = (IntPtr)(Int64)OptionalHeader->ImageBase;
+        Properties->ImageBase = (Int64)OptionalHeader->ImageBase;
         Properties->SizeOfImage = OptionalHeader->SizeOfImage;
-        Properties->EntryPoint = (IntPtr)(Int64)OptionalHeader->AddressOfEntryPoint;
+        Properties->EntryPoint = (Int64)OptionalHeader->AddressOfEntryPoint;
 
     }
 
@@ -91,6 +100,7 @@ void PE::InitProperties()
     Properties->DllCharacteristics = PvMappedImage.NtHeaders->OptionalHeader.DllCharacteristics;
 
     Properties->FileSize = PvMappedImage.Size;
+	return true;
 }
 
 
