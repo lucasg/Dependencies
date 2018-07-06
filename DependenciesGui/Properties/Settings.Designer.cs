@@ -88,7 +88,7 @@ namespace Dependencies.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("peviewer.exe")]
+        [global::System.Configuration.DefaultSettingValueAttribute("peview.exe")]
         public string PeViewerPath {
             get {
                 return ((string)(this["PeViewerPath"]));

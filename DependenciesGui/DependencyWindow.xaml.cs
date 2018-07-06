@@ -208,7 +208,7 @@ namespace Dependencies
 
             if (!File.Exists(programPath))
             {
-                System.Windows.MessageBox.Show("peview.exe file could not be found !");
+                System.Windows.MessageBox.Show(String.Format("{0:s} file could not be found !", programPath));
                 return false;
             }
 
