@@ -14,7 +14,7 @@ exclude: [docs/, lib/, scripts/]
 project:
   name: Dependencies
   description: a modern Dependency Walker
-  download: https://github.com/lucasg/Dependencies/releases/download/v1.0/Dependencies.zip
+  download: https://github.com/lucasg/Dependencies/releases/download/v1.8/Dependencies_x64_Release.zip
   fork: https://github.com/lucasg/Dependencies
 
 author:
