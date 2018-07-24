@@ -1,5 +1,9 @@
 # Dependencies - An open-source modern Dependency Walker
 
+### [Download here](https://github.com/lucasg/Dependencies/releases/download/v1.8/Dependencies_x64_Release.zip)
+
+NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/library/ffkc918h.aspx), `Dependencies` needs [Visual C++  Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) installed to run properly.
+
 <p align="center">
 <img alt="Usage Exemple" src="screenshots/UsageExemple.gif"/>
 </p>
@@ -22,7 +26,6 @@
 	* API and Modules list can be filtered
 * [v1.0](https://github.com/lucasg/Dependencies/releases/download/v1.0/Dependencies.zip) -- Initial release
 
-NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/library/ffkc918h.aspx), `Dependencies` needs [Visual C++  Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) installed to run properly.
 
 ## Installation and Usage
 
