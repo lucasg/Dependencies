@@ -11,6 +11,12 @@
 
 ## Releases
 
+* [v1.8](https://github.com/lucasg/Dependencies/releases/download/v1.8/Dependencies_x64_Release.zip) :
+	* Add x86/x64 variants for Dependencies
+* [v1.7](https://github.com/lucasg/Dependencies/releases/download/v1.7/Dependencies.zip) :
+	* Add CLI tool "dependencies.exe"
+* [v1.6](https://github.com/lucasg/Dependencies/releases/download/v1.6/Dependencies.zip) :
+	* Add appx packaging
 * [v1.5](https://github.com/lucasg/Dependencies/releases/download/v1.5/Dependencies.zip) :
 	* Support of Sxs parsing
 	* Support of api set schema parsing
