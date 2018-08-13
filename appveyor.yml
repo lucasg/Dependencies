@@ -102,6 +102,7 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
 
       Write-Host "Zipping everything"
       &7z.exe a Dependencies_$($env:platform)_$($env:CONFIGURATION).zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DbgHelpDll;
+      &7z.exe a "Dependencies_$($env:platform)_$($env:CONFIGURATION)_(without peview.exe).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $DbgHelpDll;
 
       # APPX packaging
       if ( $($env:CONFIGURATION) -eq "Release") {
