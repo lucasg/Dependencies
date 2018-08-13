@@ -98,7 +98,8 @@
                                 </DataTemplate>
                             </Setter.Value>
                         </Setter>
-
+                        
+                        <Setter Property="FontFamily" Value="{Binding Source={x:Static properties:Settings.Default}, Path=Font, Mode=OneWay}" />
                         <Setter Property="ContextMenu" Value="{StaticResource TreeItemContextMenu}" />
                     </Style>
 
@@ -155,11 +156,6 @@
                                     Grid.Row="2" 
                                     SelectedModuleChanged="OnModuleViewSelectedItemChanged"
                                     />
-        <!--DoFindModuleInTreeCommand="{Binding Path=DoFindModuleInTree}"-->
-        <!--DoFindModuleInTreeCommand="{Binding DoFindModuleInTree}"-->
-        <!--FindModuleInTree = "DoFindModuleInTree_Executed"-->
-
-
 
 
     </Grid>

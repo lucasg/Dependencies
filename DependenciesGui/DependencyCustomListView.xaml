@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
     xmlns:local="clr-namespace:Dependencies"
     xmlns:util="clr-namespace:Wpf.Util"
+    xmlns:properties="clr-namespace:Dependencies.Properties"
     mc:Ignorable="d" 
     x:Class="DependencyCustomListView"
 >
@@ -15,11 +16,11 @@
     </Style>
 
     <Style x:Key="DependencyCustomListViewItem" TargetType="{x:Type ListViewItem}">
-         <Setter Property="HorizontalContentAlignment" Value="Stretch" /> 
-         <Setter Property="FontFamily" Value="Courier New" />
+         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="FontFamily" Value="{Binding Source={x:Static properties:Settings.Default}, Path=Font, Mode=OneWay}" />
         <Setter Property="ContextMenu" Value="{DynamicResource ResourceKey=ItemContextMenu}" />
     </Style>
-    
+
     <Style x:Key="DependencyCustomListViewStyle" TargetType="{x:Type local:DependencyCustomListView}">
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
@@ -54,11 +55,4 @@
             </Setter.Value>
         </Setter>
     </Style>
-
-    <!--<Style x:Key="DependencyCustomListView" TargetType="{x:Type local:DependencyCustomListView}">
-        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-        <Setter Property="VerticalContentAlignment" Value="Stretch"/>
-        <Setter Property="util:GridViewSort.AutoSort" Value="True"/>
-        
-    </Style>-->
 </ResourceDictionary> 

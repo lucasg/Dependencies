@@ -30,5 +30,8 @@
     <Setting Name="TreeBuildBehaviour" Type="System.String" Scope="User">
       <Value Profile="(Default)">ChildOnly</Value>
     </Setting>
+    <Setting Name="Font" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Courier New</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -15,6 +15,7 @@
     <Grid Margin="10 20 20 20" MinHeight="100"  MinWidth="600">
 
         <Grid.RowDefinitions>
+            <RowDefinition Height="5*"/>
             <RowDefinition Height="33*"/>
             <RowDefinition Height="33*"/>
             <RowDefinition Height="33*"/>
@@ -77,6 +78,28 @@
         </Grid>
 
         <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150"/>
+                <ColumnDefinition Width="60*"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Font family:" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Top"
+                   Grid.Column="0"
+                   Height="25"
+                   />
+
+            <ListBox Name="FontFamilyList"
+                     Grid.Column="1"
+                     VerticalAlignment="Stretch"
+                     VerticalContentAlignment="Stretch"
+                     HorizontalContentAlignment="Stretch"
+                     HorizontalAlignment="Stretch"
+                     />
+        </Grid>
+
+        <Grid Grid.Row="4">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150*"/>
                 <ColumnDefinition Width="60"/>

@@ -435,7 +435,14 @@ namespace Dependencies
 
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, string FilePath, int RecursionLevel = 0)
         {
-            ConstructDependencyTree(RootNode, BinaryCache.LoadPe(FilePath), RecursionLevel);
+            PE CurrentPE = BinaryCache.LoadPe(FilePath);
+
+            if (null == CurrentPE)
+            {
+                return;
+            }
+
+            ConstructDependencyTree(RootNode, CurrentPE, RecursionLevel);
         }
 
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, PE CurrentPE, int RecursionLevel = 0)
