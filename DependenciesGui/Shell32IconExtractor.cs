@@ -94,14 +94,22 @@ namespace Dependencies
         }
     }
 
-    public class DelayedImageToHeaderConverter : IValueConverter
+    public class AlternateImageToHeaderConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            bool DelayLoadModule = (bool) value;
+            ModuleFlag Flags = (ModuleFlag)value;
+
+            bool DelayLoadModule = (Flags & ModuleFlag.DelayLoad) != 0;
             if (DelayLoadModule)
             {
                 return "Images/Hourglass.png";
+            }
+
+            bool ClrAssembly = (Flags & ModuleFlag.ClrReference) != 0;
+            if (ClrAssembly)
+            {
+                return "Images/Reference.png";
             }
 
             return null;

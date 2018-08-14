@@ -13,6 +13,14 @@ public enum PeTypes
     IMAGE_FILE_DLL = 0x2000,
 }
 
+[Flags]
+public enum ModuleFlag
+{
+    DelayLoad = 0x01,
+    ClrReference = 0x02,
+    ApiSet = 0x04,
+}
+
 namespace Dependencies
 {
     public struct ModuleInfo
@@ -110,18 +118,19 @@ namespace Dependencies
 
             _Name = ModuleName;
             _Filepath = null;
-            _DelayLoad = false;
+            _Flags = 0;
 
             AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
         }
 
-        public DisplayModuleInfo(string ModuleName, PE Pe, ModuleSearchStrategy Location, bool DelayLoad = false)
+        public DisplayModuleInfo(string ModuleName, PE Pe, ModuleSearchStrategy Location, ModuleFlag Flags = 0)
         {
 
             _Name = ModuleName;
             _Filepath = Pe.Filepath;
-            _DelayLoad = DelayLoad;
-
+            _Flags = Flags;
+            
+            
             // Do not set this variables in order to 
             // lessen memory allocations
             _Imports = null;
@@ -165,7 +174,12 @@ namespace Dependencies
 
         public virtual bool DelayLoad
         {
-            get { return _DelayLoad; }
+            get { return (_Flags & ModuleFlag.DelayLoad) != 0;  }
+        }
+
+        public virtual ModuleFlag Flags
+        {
+            get { return _Flags; }
         }
 
         public virtual List<PeImportDll> Imports
@@ -372,7 +386,7 @@ namespace Dependencies
         /// </summary>
         protected string _Name;
         protected string _Filepath;
-        protected bool _DelayLoad;
+        protected ModuleFlag _Flags;
 
         private ModuleInfo _Info;
         private ModuleSearchStrategy _Location;

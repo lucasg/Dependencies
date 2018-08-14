@@ -9,7 +9,7 @@
 
     <TabItem.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
-        <local:DelayedImageToHeaderConverter x:Key="imgdelayed"/>
+        <local:AlternateImageToHeaderConverter x:Key="img_alternate"/>
 
         <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
@@ -91,7 +91,7 @@
                             <Setter.Value>
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal">
-                                        <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding Path=(local:ModuleTreeViewItem.IsModuleDelayLoad), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource imgdelayed} }"></Image>
+                                        <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding Path=(local:ModuleTreeViewItem.Flags), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img_alternate} }"></Image>
                                         <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
                                         <TextBlock Text="{Binding}"></TextBlock>
                                     </StackPanel>

@@ -13,6 +13,7 @@ using Mono.Cecil;
 
 namespace Dependencies
 {
+
     /// <summary>
     /// ImportContext : Describe an import module parsed from a PE.
     /// Only used during the dependency tree building phase
@@ -33,8 +34,8 @@ namespace Dependencies
         public bool IsApiSet;
         public string ApiSetModuleName;
 
-        // dealy load import
-        public bool IsDelayLoadImport;
+        // module flag attributes
+        public ModuleFlag Flags;
     }
 
 
@@ -172,11 +173,11 @@ namespace Dependencies
             }
         }
 
-        public bool IsModuleDelayLoad
+        public ModuleFlag Flags
         {
             get
             {
-                return (((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo).DelayLoad;
+                return (((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo).Flags;
             }
         }
 
@@ -351,7 +352,12 @@ namespace Dependencies
                 ImportModule.PeProperties = null;
                 ImportModule.ModuleName = DllImport.Name;
                 ImportModule.ApiSetModuleName = null;
-                ImportModule.IsDelayLoadImport = DllImport.IsDelayLoad();
+                ImportModule.Flags = 0;
+                if (DllImport.IsDelayLoad())
+                {
+                    ImportModule.Flags |= ModuleFlag.DelayLoad;
+                }
+                
 
 
                 // Find Dll in "paths"
@@ -415,8 +421,10 @@ namespace Dependencies
                             AppInitImportModule.PeProperties = null;
                             AppInitImportModule.ModuleName = AppInitDll;
                             AppInitImportModule.ApiSetModuleName = null;
-                            AppInitImportModule.IsDelayLoadImport = false;
+                            AppInitImportModule.Flags = 0;
                             AppInitImportModule.ModuleLocation = ModuleSearchStrategy.AppInitDLL;
+
+                            
 
                             Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, AppInitDll, this.SxsEntriesCache);
                             if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
@@ -461,7 +469,7 @@ namespace Dependencies
                                 AppInitImportModule.PeProperties = null;
                                 AppInitImportModule.ModuleName = Path.GetFileName(AssemblyModule.FileName);
                                 AppInitImportModule.ApiSetModuleName = null;
-                                AppInitImportModule.IsDelayLoadImport = false;
+                                AppInitImportModule.Flags = ModuleFlag.ClrReference;
                                 AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
 
                                 Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, AssemblyModule.FileName, this.SxsEntriesCache);
@@ -500,7 +508,7 @@ namespace Dependencies
                             AppInitImportModule.PeProperties = null;
                             AppInitImportModule.ModuleName = UnmanagedModule.Name;
                             AppInitImportModule.ApiSetModuleName = null;
-                            AppInitImportModule.IsDelayLoadImport = false;
+                            AppInitImportModule.Flags = ModuleFlag.ClrReference;
                             AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
 
                             Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, UnmanagedModule.Name, this.SxsEntriesCache);
@@ -588,7 +596,7 @@ namespace Dependencies
 
                             if (NewTreeContext.IsApiSet)
                             {
-                                var ApiSetContractModule = new DisplayModuleInfo(NewTreeContext.ApiSetModuleName, NewTreeContext.PeProperties, NewTreeContext.ModuleLocation, NewTreeContext.IsDelayLoadImport);
+                                var ApiSetContractModule = new DisplayModuleInfo(NewTreeContext.ApiSetModuleName, NewTreeContext.PeProperties, NewTreeContext.ModuleLocation, NewTreeContext.Flags);
                                 var NewModule = new ApiSetModuleInfo(NewTreeContext.ModuleName, ref ApiSetContractModule);
 
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
@@ -600,13 +608,13 @@ namespace Dependencies
                             }
                             else
                             {
-                                var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, NewTreeContext.ModuleLocation, NewTreeContext.IsDelayLoadImport);
+                                var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, NewTreeContext.ModuleLocation, NewTreeContext.Flags);
                                 this.ProcessedModulesCache[ModuleKey] = NewModule;
 
                                 switch(SettingTreeBehaviour)
                                 {
                                     case TreeBuildingBehaviour.DependencyTreeBehaviour.RecursiveOnlyOnDirectImports:
-                                        if (!NewTreeContext.IsDelayLoadImport)
+                                        if ((NewTreeContext.Flags & ModuleFlag.DelayLoad) == 0)
                                         {
                                             PEProcessingBacklog.Add(new BacklogImport(childTreeNode, NewModule.ModuleName));
                                         }
@@ -742,13 +750,15 @@ namespace Dependencies
             ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
             if ( (ModuleFilepath != null) && !this.ProcessedModulesCache.ContainsKey(ModuleKey))
             {
+                ModuleFlag DelayLoadFlag = (DelayLoad) ? ModuleFlag.DelayLoad : 0;
+
                 if (ResolvedModule.Item1 == ModuleSearchStrategy.ApiSetSchema)
                 {
                     var ApiSetContractModule = new DisplayModuleInfo(
                         BinaryCache.LookupApiSetLibrary(ModuleName),
                         ResolvedModule.Item2,
                         ResolvedModule.Item1,
-                        DelayLoad
+                        DelayLoadFlag & ModuleFlag.ApiSet
                     );
                     var NewModule = new ApiSetModuleInfo(ModuleName, ref ApiSetContractModule);
                     this.ProcessedModulesCache[ModuleKey] = NewModule;
@@ -759,7 +769,7 @@ namespace Dependencies
                         ModuleName,
                         ResolvedModule.Item2,
                         ResolvedModule.Item1,
-                        DelayLoad
+                        DelayLoadFlag
                     );
                     this.ProcessedModulesCache[ModuleKey] = NewModule;
                 }

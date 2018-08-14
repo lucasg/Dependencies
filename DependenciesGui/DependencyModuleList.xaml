@@ -18,7 +18,7 @@
 
     <local:DependencyCustomListView.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
-        <local:DelayedImageToHeaderConverter x:Key="imgdelayed"/>
+        <local:AlternateImageToHeaderConverter x:Key="img_alternate"/>
 
         <ContextMenu x:Key="ItemContextMenu">
 
@@ -70,7 +70,7 @@
                 <GridViewColumn.CellTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding  DelayLoad, Converter={StaticResource imgdelayed} }"></Image>
+                            <Image Width="16" Height="16" Margin="0,0,1,0" Source="{Binding  Flags, Converter={StaticResource img_alternate} }"></Image>
                             <Image Width="16" Height="16" Margin="0,0,5,0" Source="{Binding  Filepath, Converter={StaticResource img} }"></Image>
                         </StackPanel>
                         <!--<Image Width="30" Height="14" Source="{Binding IconUri}"/>-->

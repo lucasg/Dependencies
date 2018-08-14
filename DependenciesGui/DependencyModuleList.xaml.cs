@@ -10,6 +10,7 @@ using System.Windows.Data;
 
 namespace Dependencies
 {
+
     public class ModuleCacheKey : Tuple<string, string>
     {
         public ModuleCacheKey(string Name, string Filepath)
