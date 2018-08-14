@@ -22,6 +22,7 @@ namespace Dependencies
         Environment = 7,
         AppInitDLL = 8,
         Fullpath = 9,
+        ClrAssembly = 10,
 
         NOT_FOUND = 0xff
     };

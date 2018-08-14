@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Data;
 using Microsoft.Win32;
+using Mono.Cecil;
 
 namespace Dependencies
 {
@@ -340,6 +341,7 @@ namespace Dependencies
                 Environment.SpecialFolder.SystemX86 :
                 Environment.SpecialFolder.System;
             string User32Filepath = Path.Combine(Environment.GetFolderPath(WindowsSystemFolder), "user32.dll");
+            string MsCoreeFilepath = Path.Combine(Environment.GetFolderPath(WindowsSystemFolder), "mscoree.dll");
 
             foreach (PeImportDll DllImport in PeImports)
             {
@@ -349,7 +351,7 @@ namespace Dependencies
                 ImportModule.PeProperties = null;
                 ImportModule.ModuleName = DllImport.Name;
                 ImportModule.ApiSetModuleName = null;
-                ImportModule.IsDelayLoadImport = DllImport.IsDelayLoad(); 
+                ImportModule.IsDelayLoadImport = DllImport.IsDelayLoad();
 
 
                 // Find Dll in "paths"
@@ -360,7 +362,7 @@ namespace Dependencies
                     ImportModule.PeProperties = ResolvedModule.Item2;
                     ImportModule.PeFilePath = ResolvedModule.Item2.Filepath;
                 }
-                
+
                 // special case for apiset schema
                 ImportModule.IsApiSet = (ImportModule.ModuleLocation == ModuleSearchStrategy.ApiSetSchema);
                 if (ImportModule.IsApiSet)
@@ -368,7 +370,7 @@ namespace Dependencies
 
                 // add warning for appv isv applications 
                 if (String.Compare(DllImport.Name, "AppvIsvSubsystems32.dll", StringComparison.OrdinalIgnoreCase) == 0 ||
-                    String.Compare(DllImport.Name, "AppvIsvSubsystems64.dll", StringComparison.OrdinalIgnoreCase) == 0 )
+                    String.Compare(DllImport.Name, "AppvIsvSubsystems64.dll", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     if (!this._DisplayWarning)
                     {
@@ -379,7 +381,7 @@ namespace Dependencies
 
                         this._DisplayWarning = true; // prevent the same warning window to popup several times
                     }
-                    
+
                 }
 
                 NewTreeContexts.Add(ImportModule);
@@ -392,15 +394,21 @@ namespace Dependencies
                         "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" :
                         "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows";
 
-                    int LoadAppInitDlls = (int) Registry.GetValue(AppInitRegistryKey, "LoadAppInit_DLLs", 0);
+                    int LoadAppInitDlls = (int)Registry.GetValue(AppInitRegistryKey, "LoadAppInit_DLLs", 0);
                     string AppInitDlls = (string)Registry.GetValue(AppInitRegistryKey, "AppInit_DLLs", "");
 
-                    if ((LoadAppInitDlls!=0) && (AppInitDlls != ""))
+                    if ((LoadAppInitDlls != 0) && (AppInitDlls != ""))
                     {
                         // Extremely crude parser. TODO : Add support for quotes wrapped paths with spaces
                         foreach (var AppInitDll in AppInitDlls.Split(' '))
                         {
                             Debug.WriteLine("AppInit loading " + AppInitDll);
+
+                            // Do not process twice the same imported module
+                            if (null != PeImports.Find(module => module.Name == AppInitDll))
+                            {
+                                continue;
+                            }
 
                             ImportContext AppInitImportModule = new ImportContext();
                             AppInitImportModule.PeFilePath = null;
@@ -422,6 +430,90 @@ namespace Dependencies
                     }
                 }
 
+
+                // if mscoree.dll is imported, it means the module is a C# assembly, and we can use Mono.Cecil to enumerate its references
+                if (ImportModule.PeFilePath == MsCoreeFilepath)
+                {
+                    var resolver = new DefaultAssemblyResolver();
+                    resolver.AddSearchDirectory(RootFolder);
+
+                    AssemblyDefinition PeAssembly = AssemblyDefinition.ReadAssembly(newPe.Filepath);
+
+                    foreach (var module in PeAssembly.Modules)
+                    {
+                        // Process CLR referenced assemblies
+                        foreach (var assembly in module.AssemblyReferences)
+                        {
+                            AssemblyDefinition definition = resolver.Resolve(assembly);
+
+                            foreach (var AssemblyModule in definition.Modules)
+                            { 
+                                Debug.WriteLine("Referenced Assembling loading " + AssemblyModule.Name + " : "+ AssemblyModule.FileName );
+
+                                // Do not process twice the same imported module
+                                if (null != PeImports.Find(mod => mod.Name == Path.GetFileName(AssemblyModule.FileName)))
+                                {
+                                    continue;
+                                }
+
+                                ImportContext AppInitImportModule = new ImportContext();
+                                AppInitImportModule.PeFilePath = null;
+                                AppInitImportModule.PeProperties = null;
+                                AppInitImportModule.ModuleName = Path.GetFileName(AssemblyModule.FileName);
+                                AppInitImportModule.ApiSetModuleName = null;
+                                AppInitImportModule.IsDelayLoadImport = false;
+                                AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
+
+                                Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, AssemblyModule.FileName, this.SxsEntriesCache);
+                                if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
+                                {
+                                    AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
+                                    AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
+                                }
+
+                                NewTreeContexts.Add(AppInitImportModule);
+                            }
+
+                        }
+
+                        // Process unmanaged dlls for native calls
+                        foreach (var UnmanagedModule in module.ModuleReferences)
+                        {
+                            // some clr dll have a reference to an "empty" dll
+                            if (UnmanagedModule.Name.Length == 0)
+                            {
+                                continue;
+                            }
+
+                            Debug.WriteLine("Referenced module loading " + UnmanagedModule.Name);
+
+                            // Do not process twice the same imported module
+                            if (null != PeImports.Find(m => m.Name == UnmanagedModule.Name))
+                            {
+                                continue;
+                            }
+
+                                
+
+                            ImportContext AppInitImportModule = new ImportContext();
+                            AppInitImportModule.PeFilePath = null;
+                            AppInitImportModule.PeProperties = null;
+                            AppInitImportModule.ModuleName = UnmanagedModule.Name;
+                            AppInitImportModule.ApiSetModuleName = null;
+                            AppInitImportModule.IsDelayLoadImport = false;
+                            AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
+
+                            Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, UnmanagedModule.Name, this.SxsEntriesCache);
+                            if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
+                            {
+                                AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
+                                AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
+                            }
+
+                            NewTreeContexts.Add(AppInitImportModule);
+                        }
+                    }
+                }
             }
         }
 

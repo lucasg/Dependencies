@@ -275,7 +275,7 @@ namespace Dependencies
             // Cache "Hit"
             UpdateLru(PeHash);
             PE ShadowBinary = BinaryDatabase[PeHash];
-            ShadowBinary.Filepath = PePath;
+            ShadowBinary.Filepath = Path.GetFullPath(PePath); // convert any paths to an absolute one.
             return ShadowBinary;
         }
 
