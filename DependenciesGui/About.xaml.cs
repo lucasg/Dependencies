@@ -1,7 +1,7 @@
-﻿using System;
-using System.Windows;
+﻿using System.Diagnostics;
 using System.Reflection;
-
+using System.Windows;
+using System.Windows.Navigation;
 
 namespace Dependencies
 {
@@ -13,8 +13,20 @@ namespace Dependencies
         public About()
         {
             InitializeComponent();
+            DataContext = this;
+        }
 
-            this.TextContent.Text = String.Format("Dependencies v{0:s} :\n\nDependency tool made by lucasg@github.com.\nPlease go to \"https://github.com/lucasg/Dependencies/issues\" for filing issues", Assembly.GetEntryAssembly().GetName().Version);
+        private void Uri_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(e.Uri.ToString());
+        }
+
+        public string VersionStr
+        {
+            get
+            {
+                return Assembly.GetEntryAssembly().GetName().Version.ToString();
+            }
         }
     }
 }
