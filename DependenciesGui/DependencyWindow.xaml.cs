@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows;
@@ -275,25 +275,29 @@ namespace Dependencies
         bool _DisplayWarning;
 
         #region PublicAPI
-        public DependencyWindow(String FileName)
+        public DependencyWindow(String Filename)
         {
             InitializeComponent();
 
-            this.Filename = FileName;
-            this.Pe = BinaryCache.LoadPe(FileName);
-            
+            this.Filename = Filename;
+            InitializeView();
+        }
+
+        public void InitializeView()
+        {
+            this.Pe = BinaryCache.LoadPe(this.Filename);
+
             if (!this.Pe.LoadSuccessful)
             {
                 MessageBox.Show(
-                    String.Format("{0:s} is not a valid PE-COFF file", this.Filename), 
-                    "Invalid PE", 
+                    String.Format("{0:s} is not a valid PE-COFF file", this.Filename),
+                    "Invalid PE",
                     MessageBoxButton.OK
                 );
-                return;
             }
 
             this.SymPrv = new PhSymbolProvider();
-            this.RootFolder = Path.GetDirectoryName(FileName);
+            this.RootFolder = Path.GetDirectoryName(this.Filename);
             this.SxsEntriesCache = SxsManifest.GetSxsEntries(this.Pe);
             this.ProcessedModulesCache = new ModulesCache();
             this.ApiSetmapCache = Phlib.GetApiSetSchema();
@@ -301,12 +305,13 @@ namespace Dependencies
             this._DisplayWarning = false;
 
             // TODO : Find a way to properly bind commands instead of using this hack
+            this.ModulesList.Items.Clear();
             this.ModulesList.DoFindModuleInTreeCommand = DoFindModuleInTree;
             this.ModulesList.ConfigureSearchOrderCommand = ConfigureSearchOrderCommand;
 
-            var RootFilename = Path.GetFileName(FileName);
+            var RootFilename = Path.GetFileName(this.Filename);
             var RootModule = new DisplayModuleInfo(RootFilename, this.Pe, ModuleSearchStrategy.ROOT);
-            this.ProcessedModulesCache.Add(new ModuleCacheKey(RootFilename, FileName), RootModule);
+            this.ProcessedModulesCache.Add(new ModuleCacheKey(RootFilename, this.Filename), RootModule);
 
             ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
             DependencyNodeContext childTreeInfoContext = new DependencyNodeContext()
@@ -319,12 +324,12 @@ namespace Dependencies
             treeNode.Header = treeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
             treeNode.IsExpanded = true;
 
+            this.DllTreeView.Items.Clear();
             this.DllTreeView.Items.Add(treeNode);
 
             // Recursively construct tree of dll imports
             ConstructDependencyTree(treeNode, this.Pe);
         }
-
         #endregion PublicAPI
 
         #region TreeConstruction
@@ -721,6 +726,12 @@ namespace Dependencies
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            if (this.DllTreeView.SelectedItem == null)
+            {
+                UpdateImportExportLists(null);
+                return;
+            }
+
             DependencyNodeContext childTreeContext = ((DependencyNodeContext)(this.DllTreeView.SelectedItem as ModuleTreeViewItem).DataContext);
             DisplayModuleInfo SelectedModule = childTreeContext.ModuleInfo.Target as DisplayModuleInfo;
 
@@ -733,8 +744,16 @@ namespace Dependencies
 
         private void UpdateImportExportLists(DisplayModuleInfo SelectedModule)
         {
-            this.ImportList.SetImports(SelectedModule.Imports, SymPrv, this);
-            this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
+            if (SelectedModule == null)
+            {
+                this.ImportList.Items.Clear();
+                this.ExportList.Items.Clear();
+            }
+            else
+            {
+                this.ImportList.SetImports(SelectedModule.Imports, SymPrv, this);
+                this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
+            }
         }
 
         public PE LoadImport(string ModuleName, DisplayModuleInfo CurrentModule = null, bool DelayLoad = false)

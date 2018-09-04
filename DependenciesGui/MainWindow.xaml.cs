@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
@@ -201,6 +201,11 @@ namespace Dependencies
             this.UserSettings = new UserSettings();
             this.UserSettings.Show();
         }
+
+        private void RefreshCommandBinding_Executed(object sender, RoutedEventArgs e)
+        {
+            (this.TabControl.SelectedItem as DependencyWindow).InitializeView();
+        }
         #endregion Commands
 
         #region EventsHandler
@@ -235,6 +240,7 @@ namespace Dependencies
         private void MainWindow_TabControlIsEmptyHandler(object sender, RoutedPropertyChangedEventArgs<bool> e)
         {
             this.DefaultMessage.Visibility = (e.NewValue) ? Visibility.Visible : Visibility.Hidden;
+            this._RefreshItem.IsEnabled = !e.NewValue;
         }
         #endregion EventsHandler
     }
