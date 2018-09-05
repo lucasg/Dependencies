@@ -1,8 +1,33 @@
-# branches to build
-branches:
-  # whitelist
-  only:
-    - master
+
+configuration:
+    - Release
+    - Debug
+
+# common configuration
+for:
+
+# override for tag push
+-
+  branches:
+    only:
+      - master
+  
+  configuration:
+    - Release
+    - Debug
+    - Appx
+
+# Do not package appx on pull requests
+- 
+  branches:
+    only:
+      - /pr*/
+
+  configuration:
+    - Release
+    - Debug
+
+
 
 # Operating system (build VM template)
 os:
@@ -10,10 +35,6 @@ os:
   #- Visual Studio 2015
   #- Visual Studio 2013
 
-
-configuration:
-  - Release
-  - Debug
 
 platform:
   - x86
@@ -36,7 +57,6 @@ deploy:
     draft: false
     prerelease: false
     on:
-      branch: master                # release from master branch only
       appveyor_repo_tag: true       # deploy on tag push only
 
 cache:
