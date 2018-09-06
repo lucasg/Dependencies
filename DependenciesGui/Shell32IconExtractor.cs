@@ -4,6 +4,8 @@ using System.Windows.Data;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
+using System.ClrPh;
+using Microsoft.Win32.SafeHandles;
 
 namespace Dependencies
 {
@@ -38,6 +40,18 @@ namespace Dependencies
             [DllImport("User32.dll")]
             public static extern int DestroyIcon(IntPtr hIcon);
 
+            [DllImport("kernel32.dll", SetLastError = true)]
+            public static extern bool Wow64DisableWow64FsRedirection(ref IntPtr ptr);
+
+            [DllImport("kernel32.dll", SetLastError = true)]
+            public static extern bool Wow64RevertWow64FsRedirection(IntPtr ptr);
+
+            [DllImport("kernel32.dll", SetLastError = true, CallingConvention = CallingConvention.Winapi)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            public static extern bool IsWow64Process(
+                [In] IntPtr processHandle,
+                [Out, MarshalAs(UnmanagedType.Bool)] out bool wow64Process
+            );
         }
 
         static ShellIcon()
@@ -57,8 +71,30 @@ namespace Dependencies
 
         private static Icon GetIcon(string fileName, uint flags)
         {
+            bool bIsWow64;
             SHFILEINFO shinfo = new SHFILEINFO();
+
+            // Check if calling process is 32-bit
+            SafeProcessHandle processHandle = System.Diagnostics.Process.GetCurrentProcess().SafeHandle;
+            if (!Win32.IsWow64Process(processHandle.DangerousGetHandle(), out bIsWow64))
+            {
+                return null;
+            }
+            
+            // Force ignoring folder redirection
+            IntPtr OldRedirectionValue = new IntPtr();
+            if (bIsWow64)
+            {
+                Win32.Wow64DisableWow64FsRedirection(ref OldRedirectionValue);
+            }
+        
             IntPtr hImgSmall = Win32.SHGetFileInfo(fileName, 0, ref shinfo, (uint)Marshal.SizeOf(shinfo), Win32.SHGFI_ICON | flags);
+
+            if (bIsWow64)
+            {
+                Win32.Wow64RevertWow64FsRedirection(OldRedirectionValue);
+            }
+
             if (hImgSmall == (IntPtr) 0x00)
             {
                 return null;
@@ -77,7 +113,7 @@ namespace Dependencies
             string Filepath = (string) value;
             Icon icon = ShellIcon.GetSmallIcon(Filepath);
 
-            if (System.IO.File.Exists(Filepath) && (icon != null))
+            if (NativeFile.Exists(Filepath) && (icon != null))
             {
                 return System.Windows.Interop.Imaging.CreateBitmapSourceFromHIcon(
                             icon.Handle,
