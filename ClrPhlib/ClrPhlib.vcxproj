@@ -142,7 +142,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <CLRImageType>Default</CLRImageType>
     </Link>
@@ -160,7 +160,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <CLRImageType>Default</CLRImageType>
     </Link>
@@ -176,7 +176,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -192,7 +192,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -207,7 +207,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -223,7 +223,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -235,12 +235,14 @@
   <ItemGroup>
     <ClInclude Include="include\ApiSet.h" />
     <ClInclude Include="include\ClrPhlib.h" />
+    <ClInclude Include="include\NativeFile.h" />
     <ClInclude Include="include\UnmanagedPh.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssemblyInfo.cpp" />
     <ClCompile Include="ClrPhlib.cpp" />
+    <ClCompile Include="src\managed\NativeFile.cpp" />
     <ClCompile Include="src\managed\PE.cpp" />
     <ClCompile Include="src\managed\PeExport.cpp" />
     <ClCompile Include="src\managed\PeImport.cpp" />

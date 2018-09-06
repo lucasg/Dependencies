@@ -33,6 +33,9 @@
     <ClInclude Include="include\ApiSet.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="include\NativeFile.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClrPhlib.cpp">
@@ -60,6 +63,9 @@
       <Filter>Fichiers sources\Managed</Filter>
     </ClCompile>
     <ClCompile Include="src\managed\PhSymbolProvider.cpp">
+      <Filter>Fichiers sources\Managed</Filter>
+    </ClCompile>
+    <ClCompile Include="src\managed\NativeFile.cpp">
       <Filter>Fichiers sources\Managed</Filter>
     </ClCompile>
   </ItemGroup>

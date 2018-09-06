@@ -17,6 +17,8 @@ static bool bInitializedPhLib = false;
 
 bool Phlib::InitializePhLib()
 {
+	
+
 	if (!bInitializedPhLib)
 	{
 		bInitializedPhLib = NT_SUCCESS(PhInitializePhLib());
