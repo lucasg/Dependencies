@@ -95,7 +95,6 @@ namespace Dependencies
 
         public static string LookupApiSetLibrary(string ImportDllName)
         {
-            //ApiSetSchema ApiSetmapCache = Phlib.GetApiSetSchema();
 
             // Look for api set target 
             if (!ImportDllName.StartsWith("api-") && !ImportDllName.StartsWith("ext-"))
@@ -240,7 +239,8 @@ namespace Dependencies
 
         public PE GetBinary(string PePath)
         {
-            if (!File.Exists(PePath))
+            
+            if (!NativeFile.Exists(PePath))
             {
                 return null;
             }
@@ -261,7 +261,7 @@ namespace Dependencies
                     string DestFilePath = Path.Combine(BinaryCacheFolderPath, PeHash);
                     if (!File.Exists(DestFilePath) && (DestFilePath != PePath))
                     {
-                        File.Copy(PePath, DestFilePath, true);
+                        NativeFile.Copy(PePath, DestFilePath);
                     }
                 
                     PE NewShadowBinary = new PE(DestFilePath);
@@ -285,15 +285,16 @@ namespace Dependencies
             // in order not to spend too much CPU cycles here.
             // Hopefully there is enough entropy in PE headers 
             // not to trigger too many collisions.
-            using (FileStream stream = File.OpenRead(PePath))
-            {
-                var sha = new SHA256Managed();
-                byte[] buffer = new byte[1024];
+            //using (FileStream stream = File.OpenRead(PePath))
+            //{
+            //    var sha = new SHA256Managed();
+            //    byte[] buffer = new byte[1024];
 
-                stream.Read(buffer, 0, buffer.Length);
-                byte[] checksum = sha.ComputeHash(buffer, 0, buffer.Length);
-                return BitConverter.ToString(checksum).Replace("-", String.Empty);
-            }
+            //    stream.Read(buffer, 0, buffer.Length);
+            //    byte[] checksum = sha.ComputeHash(buffer, 0, buffer.Length);
+            //    return BitConverter.ToString(checksum).Replace("-", String.Empty);
+            //}
+            return NativeFile.GetPartialHashFile(PePath, 1024);
         }
 
         protected void UpdateLru(string PeHash)
