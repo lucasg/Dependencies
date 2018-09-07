@@ -144,7 +144,7 @@ String^ NativeFile::GetPartialHashFile(_In_ String^ Path, _In_ size_t FileSize)
     if (!ReadFile(
       fileHandle,
       fileBuffer,
-      FileSize,
+      (DWORD) FileSize,
       &FileSizeRead,
       NULL
     ))
