@@ -281,19 +281,6 @@ namespace Dependencies
 
         protected string GetBinaryHash(string PePath)
         {
-            // Compute checksum only on first 1 KB of file data
-            // in order not to spend too much CPU cycles here.
-            // Hopefully there is enough entropy in PE headers 
-            // not to trigger too many collisions.
-            //using (FileStream stream = File.OpenRead(PePath))
-            //{
-            //    var sha = new SHA256Managed();
-            //    byte[] buffer = new byte[1024];
-
-            //    stream.Read(buffer, 0, buffer.Length);
-            //    byte[] checksum = sha.ComputeHash(buffer, 0, buffer.Length);
-            //    return BitConverter.ToString(checksum).Replace("-", String.Empty);
-            //}
             return NativeFile.GetPartialHashFile(PePath, 1024);
         }
 
