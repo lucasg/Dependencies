@@ -11,6 +11,14 @@ namespace System {
 
     namespace ClrPh {
 
+		public enum class CLRPH_ARCH
+		{
+			x86,
+			x64,
+			WOW64
+		};
+
+
         public ref class ApiSetTarget : List<String^>
         {};
 
@@ -19,6 +27,9 @@ namespace System {
 
         public ref class Phlib {
         public:
+
+			// Return the arch is which ClrPhLib runs.
+			static CLRPH_ARCH GetClrPhArch();
 
             // Imitialize Process Hacker's phlib internal data
             // Must be called before any other API (kinda like OleInitialize).

@@ -1,4 +1,5 @@
 #include <NativeFile.h>
+#include <ClrPhLib.h>
 #include <phconfig.h>
 #include <vcclr.h> 
 #include <bcrypt.h>
@@ -7,7 +8,7 @@ using namespace System;
 using namespace ClrPh;
 using namespace System::Text;
 
-static bool isCurrentProcessWow64 = (TRUE == PhIsExecutingInWow64());
+static bool isCurrentProcessWow64 = CLRPH_ARCH::WOW64 == Phlib::GetClrPhArch();
 static PVOID FsRedirectionValue = NULL;
 #define WITH_WOW64_FS_REDIRECTION_DISABLED(action) do { \
     DisableWow64FsRedirection(); \

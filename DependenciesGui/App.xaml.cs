@@ -7,6 +7,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Shell;
 
+
 namespace Dependencies
 {
     /// <summary>
@@ -22,7 +23,22 @@ namespace Dependencies
 
             MainWindow mainWindow = new MainWindow();
             mainWindow.IsMaster = true;
+
+            switch(Phlib.GetClrPhArch())
+            {
+                case CLRPH_ARCH.x86:
+                    mainWindow.Title = "Dependencies (x86)";
+                    break;
+                case CLRPH_ARCH.x64:
+                    mainWindow.Title = "Dependencies (x64)";
+                    break;
+                case CLRPH_ARCH.WOW64:
+                    mainWindow.Title = "Dependencies (WoW64)";
+                    break;
+            }
+            
             mainWindow.Show();
+            
 
             // Process command line args
             if (e.Args.Length > 0)
