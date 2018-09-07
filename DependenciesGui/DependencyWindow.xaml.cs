@@ -294,6 +294,8 @@ namespace Dependencies
                     "Invalid PE",
                     MessageBoxButton.OK
                 );
+
+                return;
             }
 
             this.SymPrv = new PhSymbolProvider();
