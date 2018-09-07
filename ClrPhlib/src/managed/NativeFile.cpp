@@ -193,7 +193,7 @@ bool NativeFile::HashBuffer(_In_ uint8_t *Buffer, _In_ size_t BufferSize, _In_ w
 	)))
 		goto CleanupExit;
 
-	if (!NT_SUCCESS(status = BCryptHashData(hashHandle, (PUCHAR)Buffer, BufferSize, 0)))
+	if (!NT_SUCCESS(status = BCryptHashData(hashHandle, (PUCHAR)Buffer, (ULONG)BufferSize, 0)))
 		goto CleanupExit;
 
 	if (!NT_SUCCESS(status = BCryptFinishHash(hashHandle, (PUCHAR)hash, hashSize, 0)))
@@ -226,7 +226,7 @@ CleanupExit:
 String^ NativeFile::GetHexString(_In_ uint8_t *Buffer, _In_ size_t BufferSize)
 {
     ASCIIEncoding AsciiDecoder;
-    array<unsigned char> ^hexBuffer = gcnew array<unsigned char>(2*BufferSize);
+    array<unsigned char> ^hexBuffer = gcnew array<unsigned char>(2 * (int)BufferSize);
 
     for (ULONG i = 0; i < BufferSize; i++)
     {
@@ -237,5 +237,5 @@ String^ NativeFile::GetHexString(_In_ uint8_t *Buffer, _In_ size_t BufferSize)
         hexBuffer[2*i + 1] = hexNumber[1];
     }
 
-   return AsciiDecoder.GetString(hexBuffer, 0, 2 * BufferSize);
+   return AsciiDecoder.GetString(hexBuffer, 0, 2 * (int)BufferSize);
 }
