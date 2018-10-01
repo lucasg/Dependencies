@@ -3,6 +3,7 @@
 #pragma once
 
 #include <UnmanagedPh.h>
+#include <UnmanagedSymPrv.h>
 #using <System.dll>
 
 namespace System {

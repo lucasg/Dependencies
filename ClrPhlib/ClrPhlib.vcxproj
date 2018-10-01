@@ -136,13 +136,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;$(SolutionDir)third_party\llvm-demangle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <PrecompiledHeaderFile />
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;$(OutputPath)\llvm-demangle.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <CLRImageType>Default</CLRImageType>
     </Link>
@@ -153,14 +153,14 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;$(SolutionDir)third_party\llvm-demangle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <PrecompiledHeaderFile />
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;$(OutputPath)\llvm-demangle.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
       <CLRImageType>Default</CLRImageType>
     </Link>
@@ -170,13 +170,13 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;$(SolutionDir)third_party\llvm-demangle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeaderFile />
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;$(OutputPath)\llvm-demangle.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -185,14 +185,14 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;$(SolutionDir)third_party\llvm-demangle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;$(OutputPath)\llvm-demangle.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -201,13 +201,13 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;$(SolutionDir)third_party\llvm-demangle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeaderFile />
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;$(OutputPath)\llvm-demangle.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -216,14 +216,14 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)third_party\phnt\include;$(SolutionDir)third_party\phlib\include;$(ProjectDir)include;$(SolutionDir)third_party\llvm-demangle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OutputPath)\phlib.lib;$(OutputPath)\demumble.lib;$(OutputPath)\llvm-demangle.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <CLRImageType>Default</CLRImageType>
     </Link>
   </ItemDefinitionGroup>
@@ -237,6 +237,7 @@
     <ClInclude Include="include\ClrPhlib.h" />
     <ClInclude Include="include\NativeFile.h" />
     <ClInclude Include="include\UnmanagedPh.h" />
+    <ClInclude Include="include\UnmanagedSymPrv.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -248,6 +249,7 @@
     <ClCompile Include="src\managed\PeImport.cpp" />
     <ClCompile Include="src\managed\Phlib.cpp" />
     <ClCompile Include="src\managed\PhSymbolProvider.cpp" />
+    <ClCompile Include="src\unmanaged\demangle.cpp" />
     <ClCompile Include="src\unmanaged\UnmanagedPE.cpp" />
     <ClCompile Include="src\unmanaged\UnmanagedSymPrv.cpp" />
   </ItemGroup>

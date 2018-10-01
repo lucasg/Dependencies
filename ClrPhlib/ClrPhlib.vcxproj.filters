@@ -36,6 +36,9 @@
     <ClInclude Include="include\NativeFile.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="include\UnmanagedSymPrv.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClrPhlib.cpp">
@@ -67,6 +70,9 @@
     </ClCompile>
     <ClCompile Include="src\managed\NativeFile.cpp">
       <Filter>Fichiers sources\Managed</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unmanaged\demangle.cpp">
+      <Filter>Fichiers sources\Unmanaged</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

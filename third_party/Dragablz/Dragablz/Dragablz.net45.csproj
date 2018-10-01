@@ -21,7 +21,7 @@
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x86\Debug\</OutputPath>
     <DefineConstants>TRACE;DEBUG;NET45</DefineConstants>
-    <DocumentationFile>..\bin\Debug_net45\Dragablz.XML</DocumentationFile>
+    <DocumentationFile>bin\x86\Debug\Dragablz.xml</DocumentationFile>
     <NoWarn>CS1591, CS0169, CS1574, CS1587</NoWarn>
     <DebugType>full</DebugType>
     <PlatformTarget>x86</PlatformTarget>

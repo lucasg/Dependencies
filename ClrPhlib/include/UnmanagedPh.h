@@ -2,7 +2,7 @@
 
 #include <ph.h>
 #include <mapimg.h>
-#include <symprv.h>
+
 
 // C++ part of the PE class interfacing with phlib.
 // Responsible for mapping/unmapping the PE file in memory and
@@ -43,13 +43,4 @@ public:
 
 private:
     bool            m_bImageLoaded;
-};
-
-
-class UnmanagedSymPrv {
-public :
-
-    static UnmanagedSymPrv* Create();
-
-    PPH_SYMBOL_PROVIDER m_SymbolProvider;
 };

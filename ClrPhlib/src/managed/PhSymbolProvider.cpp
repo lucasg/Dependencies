@@ -6,12 +6,7 @@ using namespace ClrPh;
 using namespace Runtime::InteropServices;
 
 
-extern "C" {
-char* __cxa_demangle(const char* mangled_name,
-	char* buf,
-	size_t* n,
-	int* status);
-}
+
 
 PhSymbolProvider::PhSymbolProvider()
 :m_Impl(UnmanagedSymPrv::Create())
@@ -38,53 +33,42 @@ String^ PhSymbolProvider::UndecorateName(
 	_In_ String ^DecoratedName
 )
 {
-	int status;
 	String ^ManagedUndName;
-	PPH_STRING UndecoratedName = NULL;
+	wchar_t* UndecoratedName = NULL;
+	size_t UndecoratedNameLen = 0;
 	
 	if (!m_Impl || DecoratedName->Length == 0) {
 		return gcnew String("");
 	}
 	
-	// try to undecorate GCC/LLVM symbols
 	wchar_t* PvDecoratedName = (wchar_t*)(Marshal::StringToHGlobalUni(DecoratedName)).ToPointer();
-	size_t len = wcslen(PvDecoratedName);
-	char *PvDecoratedNameAscii = (char*)malloc(len * 2);
-	sprintf_s(PvDecoratedNameAscii, len * 2, "%ws", PvDecoratedName);
+	size_t PvDecoratedNameLen = wcslen(PvDecoratedName);
+	
 
-	char *UndecoratedNameAscii = __cxa_demangle(
-		PvDecoratedNameAscii,
-		NULL,
-		NULL,
-		&status
-	);
-
-	if (!status)
+	if (m_Impl->DemangleName(
+		PvDecoratedName,
+		PvDecoratedNameLen,
+		&UndecoratedName,
+		&UndecoratedNameLen
+	))
 	{
-		ManagedUndName = gcnew String(UndecoratedNameAscii);
-		
-		free(PvDecoratedNameAscii);
-		Marshal::FreeHGlobal(IntPtr((void*)PvDecoratedName));
-		return ManagedUndName;
+		ManagedUndName = gcnew String(UndecoratedName);
+	}
+	else
+	{
+		ManagedUndName = gcnew String("");
 	}
 
-	// try to undecorate MSVC symbols
-	UndecoratedName = PhUndecorateNameW(
-		m_Impl->m_SymbolProvider,
-		PvDecoratedName
-	);
+	if (UndecoratedName) 
+	{	
+		free(UndecoratedName);
+	}
 
-	if (UndecoratedName) {
-
-		ManagedUndName = gcnew String(UndecoratedName->Buffer);
-		PhDereferenceObject(UndecoratedName);
+	if (PvDecoratedName)
+	{
 		Marshal::FreeHGlobal(IntPtr((void*)PvDecoratedName));
-
-		return ManagedUndName;
 	}
 
 
-
-	Marshal::FreeHGlobal(IntPtr((void*)PvDecoratedName));
-	return gcnew String("");
+	return ManagedUndName;
 }
