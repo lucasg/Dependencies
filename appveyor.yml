@@ -125,7 +125,7 @@ test_script: # should be on_finish, but it need to be executed before artifacts 
       &"$BINPATH/Dependencies.exe" -manifest "$($env:windir)/System32/shell32.dll" 
       &"$BINPATH/Dependencies.exe" -sxsentries "$($env:windir)/System32/ctfmon.exe" 
 
-      &"$BINPATH/demangler-test.exe"
+      # &"$BINPATH/demangler-test.exe"
 
       Write-Host "Zipping everything"
       &7z.exe a Dependencies_$($env:platform)_$($env:CONFIGURATION).zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DbgHelpDll;
