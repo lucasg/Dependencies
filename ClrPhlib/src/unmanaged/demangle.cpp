@@ -40,49 +40,56 @@ bool UnmanagedSymPrv::DemangleName(
 		return true;	
 	}
 
-	// try llvm-demangler 
-	int LLVMDemanglerStatus = 0;
-	char *LLVMItaniumDemangled = llvm::itaniumDemangle(DecoratedNameAscii, nullptr, nullptr, &LLVMDemanglerStatus);
-	if (!LLVMDemanglerStatus)
-	{
-		size_t MbstowcsStatus = 0;
+	// try llvm-demangler. the heuristic is copied from .\llvm-7.0.0.src\lib\DebugInfo\Symbolize\Symbolize.cpp: LLVMSymbolizer::DemangleName
+	if (!strncmp(DecoratedNameAscii, "_Z", 2))
+	{ 
+		int LLVMDemanglerStatus = 0;
+		char *LLVMItaniumDemangled = llvm::itaniumDemangle(DecoratedNameAscii, nullptr, nullptr, &LLVMDemanglerStatus);
+		if (!LLVMDemanglerStatus)
+		{
+			size_t MbstowcsStatus = 0;
 
-		*UndecoratedNameLen = strlen(LLVMItaniumDemangled) * sizeof(wchar_t);
-		*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen + sizeof(wchar_t));
+			*UndecoratedNameLen = strlen(LLVMItaniumDemangled) * sizeof(wchar_t);
+			*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen + sizeof(wchar_t));
 
-		mbstowcs_s(
-			&MbstowcsStatus,
-			*UndecoratedName, 
-			*UndecoratedNameLen, 
-			LLVMItaniumDemangled,
-			*UndecoratedNameLen * sizeof(wchar_t)
-		);
+			mbstowcs_s(
+				&MbstowcsStatus,
+				*UndecoratedName, 
+				*UndecoratedNameLen, 
+				LLVMItaniumDemangled,
+				*UndecoratedNameLen * sizeof(wchar_t)
+			);
 
-		free(DecoratedNameAscii);
-		return true;
+			free(DecoratedNameAscii);
+			return true;
+		}
 	}
 
-	//LLVMDemanglerStatus = 0;
-	//char *LLVMMicrosoftDemangled = llvm::microsoftDemangle(DecoratedNameAscii, nullptr, nullptr, &LLVMDemanglerStatus);
-	//if (!LLVMDemanglerStatus)
-	//{
-	//	size_t MbstowcsStatus = 0;
+	// TODO : use llvm::microsoftDemangle if necessary
+	/*if (!strncmp(DecoratedNameAscii, "?", 1))
+	{
+		int LLVMDemanglerStatus = 0;
+		char *LLVMMicrosoftDemangled = llvm::microsoftDemangle(DecoratedNameAscii, nullptr, nullptr, &LLVMDemanglerStatus);
+		if (!LLVMDemanglerStatus)
+		{
+			size_t MbstowcsStatus = 0;
 
-	//	*UndecoratedNameLen = strlen(LLVMMicrosoftDemangled) + 1;
-	//	*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen * sizeof(wchar_t));
+			*UndecoratedNameLen = strlen(LLVMMicrosoftDemangled) + 1;
+			*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen * sizeof(wchar_t));
 
-	//	//swprintf_s(*UndecoratedName, *UndecoratedNameLen * sizeof(wchar_t), L"%hs", LLVMMicrosoftDemangled);
-	//	mbstowcs_s(
-	//		&MbstowcsStatus,
-	//		*UndecoratedName,
-	//		*UndecoratedNameLen,
-	//		LLVMMicrosoftDemangled,
-	//		*UndecoratedNameLen * sizeof(wchar_t)
-	//	);
+			mbstowcs_s(
+				&MbstowcsStatus,
+				*UndecoratedName,
+				*UndecoratedNameLen,
+				LLVMMicrosoftDemangled,
+				*UndecoratedNameLen * sizeof(wchar_t)
+			);
 
-	//	free(DecoratedNameAscii);
-	//	return true;
-	//}
+			free(DecoratedNameAscii);
+			return true;
+		}
+	}*/
+
 
 	free(DecoratedNameAscii);
 
