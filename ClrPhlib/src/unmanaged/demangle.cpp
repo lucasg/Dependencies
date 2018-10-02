@@ -32,8 +32,8 @@ bool UnmanagedSymPrv::DemangleName(
 
 	if (!status)
 	{
-		*UndecoratedNameLen = strlen(UndecoratedNameAscii) + 1;
-		*UndecoratedName = (wchar_t*) malloc(*UndecoratedNameLen*sizeof(wchar_t));
+		*UndecoratedNameLen = strlen(UndecoratedNameAscii) * sizeof(wchar_t);
+		*UndecoratedName = (wchar_t*) malloc(*UndecoratedNameLen + sizeof(wchar_t));
 
 		swprintf_s(*UndecoratedName, *UndecoratedNameLen, L"%hs", UndecoratedNameAscii);
 		free(DecoratedNameAscii);
@@ -47,8 +47,8 @@ bool UnmanagedSymPrv::DemangleName(
 	{
 		size_t MbstowcsStatus = 0;
 
-		*UndecoratedNameLen = strlen(LLVMItaniumDemangled) + 1;
-		*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen * sizeof(wchar_t));
+		*UndecoratedNameLen = strlen(LLVMItaniumDemangled) * sizeof(wchar_t);
+		*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen + sizeof(wchar_t));
 
 		mbstowcs_s(
 			&MbstowcsStatus,
@@ -92,11 +92,13 @@ bool UnmanagedSymPrv::DemangleName(
 		DecoratedName
 	);
 
-	if (UndecoratedName) {
+	if (PhUndecoratedName) {
 		*UndecoratedNameLen = PhUndecoratedName->Length;
-		*UndecoratedName = (wchar_t*) malloc(*UndecoratedNameLen*sizeof(wchar_t));
+		*UndecoratedName = (wchar_t*) malloc(PhUndecoratedName->Length + sizeof(wchar_t));
 
-		memcpy(*UndecoratedName, PhUndecoratedName->Buffer, *UndecoratedNameLen*sizeof(wchar_t));
+		memset(*UndecoratedName, 0, PhUndecoratedName->Length + sizeof(wchar_t));
+		memcpy(*UndecoratedName, PhUndecoratedName->Buffer, PhUndecoratedName->Length);
+		
 		PhDereferenceObject(UndecoratedName);
 		return true;
 	}
