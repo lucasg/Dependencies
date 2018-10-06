@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using System.ClrPh;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
 using System.Diagnostics;
+
+using Newtonsoft.Json;
+using Dependencies.ClrPh;
 
 namespace Dependencies
 {
+    
     interface IPrettyPrintable
     {
         void PrettyPrint();

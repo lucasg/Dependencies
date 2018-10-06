@@ -4,7 +4,7 @@
 #include <vcclr.h> 
 #include <bcrypt.h>
 
-using namespace System;
+using namespace Dependencies;
 using namespace ClrPh;
 using namespace System::Text;
 

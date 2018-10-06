@@ -3,7 +3,7 @@
 #include <phnt_ntdef.h>
 
 using namespace System;
-using namespace ClrPh;
+using namespace Dependencies::ClrPh;
 
 
 UnmanagedPE::UnmanagedPE()

@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.ClrPh;
-using System.IO;
 using System.Windows;
 using System.Windows.Shell;
 
+using Dependencies.ClrPh;
 
 namespace Dependencies
 {

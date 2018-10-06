@@ -3,13 +3,14 @@ using System.IO;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.ClrPh;
 using System.ComponentModel;
 using System.Windows.Input;
 using System.Diagnostics;
 using System.Windows.Data;
 using Microsoft.Win32;
+
 using Mono.Cecil;
+using Dependencies.ClrPh;
 
 namespace Dependencies
 {

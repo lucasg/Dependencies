@@ -4,8 +4,9 @@ using System.Windows.Data;
 using System.Drawing;
 using System.Windows.Media.Imaging;
 using System.Runtime.InteropServices;
-using System.ClrPh;
 using Microsoft.Win32.SafeHandles;
+
+using Dependencies.ClrPh;
 
 namespace Dependencies
 {

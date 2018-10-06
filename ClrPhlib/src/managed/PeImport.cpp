@@ -2,7 +2,7 @@
 #include <UnmanagedPh.h>
 
 
-using namespace System;
+using namespace Dependencies;
 using namespace ClrPh;
 
 

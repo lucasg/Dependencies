@@ -1,7 +1,7 @@
 #include <ClrPhlib.h>
 #include <UnmanagedPh.h>
 
-using namespace System;
+using namespace Dependencies;
 using namespace ClrPh;
 using namespace Runtime::InteropServices;
 

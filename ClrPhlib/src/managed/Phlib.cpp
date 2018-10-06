@@ -7,7 +7,7 @@
 #include <ntpsapi.h>
 
 
-using namespace System;
+using namespace Dependencies;
 using namespace ClrPh;
 
 // Private : build the known dlls list

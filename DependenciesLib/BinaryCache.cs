@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.ClrPh;
-using System.Security.Cryptography;
 using System.Diagnostics;
+using Dependencies.ClrPh;
 
 namespace Dependencies
 {

@@ -1,6 +1,6 @@
 #include <ClrPhlib.h>
 
-using namespace System;
+using namespace Dependencies;
 
 ClrPh::CLRPH_ARCH ClrPh::Phlib::GetClrPhArch()
 {

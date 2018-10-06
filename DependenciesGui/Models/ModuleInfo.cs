@@ -1,9 +1,10 @@
 using System;
-using System.ClrPh;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+
+using Dependencies.ClrPh;
 
 [Flags]
 public enum PeTypes

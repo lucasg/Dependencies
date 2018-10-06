@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Linq;
 using System.IO;
-using System.ClrPh;
 using System.Text.RegularExpressions;
+
+using Dependencies.ClrPh;
 
 namespace Dependencies
 {

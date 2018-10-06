@@ -6,9 +6,11 @@
 #include <UnmanagedSymPrv.h>
 #using <System.dll>
 
-namespace System {
+using namespace System;
 
-    using namespace Collections::Generic;
+namespace Dependencies {
+
+	using namespace Collections::Generic;
 
     namespace ClrPh {
 

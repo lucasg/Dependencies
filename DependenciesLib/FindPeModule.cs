@@ -1,10 +1,8 @@
 using System;
-using System.ClrPh;
 using System.IO;
 using System.Collections.Generic;
-using System.Xml;
-using System.Xml.Linq;
-using System.Text.RegularExpressions;
+
+using Dependencies.ClrPh;
 
 namespace Dependencies
 {

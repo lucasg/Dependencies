@@ -5,7 +5,9 @@
 #include <stdint.h>
 #using <System.dll>
 
-namespace System {
+using namespace System;
+
+namespace Dependencies {
 namespace ClrPh {
 
 	// Partial rewrite of System.IO.File in order to circumvent the wow64 system folder redirection

@@ -4,9 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Forms;
 using System.Windows.Data;
-using System.Collections.ObjectModel;
 
-using System.ClrPh;
 using Dragablz;
 
 namespace Dependencies

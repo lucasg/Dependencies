@@ -1,8 +1,9 @@
 using System;
-using System.ClrPh;
 using System.Diagnostics;
 using System.Windows;
+
 using Dependencies;
+using Dependencies.ClrPh;
 
 public class DisplayPeImport : SettingBindingHandler
 {
