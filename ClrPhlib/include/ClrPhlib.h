@@ -197,9 +197,19 @@ namespace Dependencies {
             ~PhSymbolProvider();
             !PhSymbolProvider();
 
-            String^ UndecorateName(_In_ String ^DecoratedName);
+            virtual String^ UndecorateName(_In_ String ^DecoratedName);
+
+		protected:
+
+			String^ UndecorateNameDemumble(_In_ String ^DecoratedName);
+			String^ UndecorateNameLLVMItanium(_In_ String ^DecoratedName);
+			String^ UndecorateNameLLVMMicrosoft(_In_ String ^DecoratedName);
+			String^ UndecorateNamePh(_In_ String ^DecoratedName);
+
 
         private:
+			String ^ UndecorateNamePrv(_In_ String ^DecoratedName, _In_ DemangleNameFn Demangler);
+
             UnmanagedSymPrv *m_Impl;
 
         };

@@ -29,8 +29,74 @@ PhSymbolProvider::!PhSymbolProvider()
 
 }
 
-String^ PhSymbolProvider::UndecorateName(
+String^ PhSymbolProvider::UndecorateNameDemumble(
 	_In_ String ^DecoratedName
+)
+{
+	return UndecorateNamePrv(DecoratedName, DemumbleDemangleName);
+}
+
+String^ PhSymbolProvider::UndecorateNameLLVMItanium(_In_ String ^DecoratedName)
+{
+	return UndecorateNamePrv(DecoratedName, LLVMItaniumDemangleName);
+}
+
+String^ PhSymbolProvider::UndecorateNameLLVMMicrosoft(_In_ String ^DecoratedName)
+{
+	return UndecorateNamePrv(DecoratedName, LLVMMicrosoftDemangleName);
+}
+
+String^ PhSymbolProvider::UndecorateNamePh(_In_ String ^DecoratedName)
+{
+	return UndecorateNamePrv(DecoratedName, UndecorateSymbolDemangleName);
+}
+
+String^ PhSymbolProvider::UndecorateName(_In_ String ^DecoratedName)
+{
+	String ^ManagedUndName;
+	wchar_t* UndecoratedName = NULL;
+	size_t UndecoratedNameLen = 0;
+
+	if (!m_Impl || DecoratedName->Length == 0) {
+		return gcnew String("");
+	}
+
+	wchar_t* PvDecoratedName = (wchar_t*)(Marshal::StringToHGlobalUni(DecoratedName)).ToPointer();
+	size_t PvDecoratedNameLen = wcslen(PvDecoratedName);
+
+
+	if (m_Impl->DemangleName(
+		PvDecoratedName,
+		PvDecoratedNameLen,
+		&UndecoratedName,
+		&UndecoratedNameLen
+	))
+	{
+		ManagedUndName = gcnew String(UndecoratedName);
+	}
+	else
+	{
+		ManagedUndName = gcnew String("");
+	}
+
+	if (UndecoratedName)
+	{
+		free(UndecoratedName);
+	}
+
+	if (PvDecoratedName)
+	{
+		Marshal::FreeHGlobal(IntPtr((void*)PvDecoratedName));
+	}
+
+
+	return ManagedUndName;
+}
+
+String^ PhSymbolProvider::UndecorateNamePrv(
+	_In_ String ^DecoratedName,
+	_In_ DemangleNameFn Demangler
+
 )
 {
 	String ^ManagedUndName;
@@ -45,7 +111,9 @@ String^ PhSymbolProvider::UndecorateName(
 	size_t PvDecoratedNameLen = wcslen(PvDecoratedName);
 	
 
-	if (m_Impl->DemangleName(
+	//if (m_Impl->DemangleName(
+	if (Demangler(
+		this->m_Impl,
 		PvDecoratedName,
 		PvDecoratedNameLen,
 		&UndecoratedName,

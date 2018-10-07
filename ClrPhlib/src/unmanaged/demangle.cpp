@@ -9,58 +9,208 @@ extern "C" {
 		int* status);
 }
 
-bool UnmanagedSymPrv::DemangleName(
-	wchar_t* DecoratedName,
-	size_t DecoratedNameLen,
-	wchar_t** UndecoratedName,
-	size_t* UndecoratedNameLen
+bool DemumbleDemangleName(
+	_In_ UnmanagedSymPrv* obj,
+	_In_ wchar_t* DecoratedName,
+	_In_ size_t DecoratedNameLen,
+	_Out_ wchar_t** UndecoratedName,
+	_Out_ size_t* UndecoratedNameLen
 )
 {
+	size_t NameLen;
 	int status;
-	PPH_STRING PhUndecoratedName = NULL;
+	size_t MbstowcsStatus = 0;
+	char *AsciiUndecoratedName = NULL;
 
-	// try to undecorate GCC/LLVM symbols using demumble
+
 	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen * sizeof(wchar_t));
 	sprintf_s(DecoratedNameAscii, DecoratedNameLen * sizeof(wchar_t), "%ws", DecoratedName);
 
-	char *UndecoratedNameAscii = __cxa_demangle(
+	if ((!UndecoratedName) || (!UndecoratedNameLen)) {
+		return false;
+	}
+
+	*UndecoratedNameLen = 0;
+	NameLen = DecoratedNameLen;
+
+	AsciiUndecoratedName = __cxa_demangle(
 		DecoratedNameAscii,
 		NULL,
-		NULL,
+		&NameLen,
 		&status
 	);
 
-	if (!status)
-	{
-		*UndecoratedNameLen = strlen(UndecoratedNameAscii) * sizeof(wchar_t);
-		*UndecoratedName = (wchar_t*) malloc(*UndecoratedNameLen + sizeof(wchar_t));
+	if (!status) {
+		mbstowcs_s(
+			&MbstowcsStatus,
+			*UndecoratedName,
+			*UndecoratedNameLen,
+			AsciiUndecoratedName,
+			*UndecoratedNameLen * sizeof(wchar_t)
+		);
+	}
 
-		swprintf_s(*UndecoratedName, *UndecoratedNameLen, L"%hs", UndecoratedNameAscii);
-		free(DecoratedNameAscii);
-		return true;	
+	free(DecoratedNameAscii);
+
+	// UNIX-style error code
+	return status == 0;
+}
+
+bool LLVMItaniumDemangleName(
+	_In_ UnmanagedSymPrv* obj,
+	_In_ wchar_t* DecoratedName,
+	_In_ size_t DecoratedNameLen,
+	_Out_ wchar_t** UndecoratedName,
+	_Out_ size_t* UndecoratedNameLen
+)
+{
+	size_t NameLen;
+	int status;
+	size_t MbstowcsStatus = 0;
+	char *AsciiUndecoratedName = NULL;
+
+
+	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen * sizeof(wchar_t));
+	sprintf_s(DecoratedNameAscii, DecoratedNameLen * sizeof(wchar_t), "%ws", DecoratedName);
+
+	if ((!UndecoratedName) || (!UndecoratedNameLen)) {
+		return false;
+	}
+
+	*UndecoratedNameLen = 0;
+	NameLen = DecoratedNameLen;
+
+	AsciiUndecoratedName = llvm::itaniumDemangle(
+		DecoratedNameAscii,
+		nullptr,
+		&NameLen,
+		&status
+	);
+
+	if (!status) {
+		mbstowcs_s(
+			&MbstowcsStatus,
+			*UndecoratedName,
+			*UndecoratedNameLen,
+			AsciiUndecoratedName,
+			*UndecoratedNameLen * sizeof(wchar_t)
+		);
+	}
+	
+	free(DecoratedNameAscii);
+
+	// UNIX-style error code
+	return status == 0;
+}
+
+bool LLVMMicrosoftDemangleName(
+	_In_ UnmanagedSymPrv* obj,
+	_In_ wchar_t* DecoratedName,
+	_In_ size_t DecoratedNameLen,
+	_Out_ wchar_t** UndecoratedName,
+	_Out_ size_t* UndecoratedNameLen
+)
+{
+	size_t NameLen;
+	int status;
+	size_t MbstowcsStatus = 0;
+	char *AsciiUndecoratedName = NULL;
+
+
+	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen * sizeof(wchar_t));
+	sprintf_s(DecoratedNameAscii, DecoratedNameLen * sizeof(wchar_t), "%ws", DecoratedName);
+
+	if ((!UndecoratedName) || (!UndecoratedNameLen)) {
+		return false;
+	}
+
+	*UndecoratedNameLen = 0;
+	NameLen = DecoratedNameLen;
+
+	AsciiUndecoratedName = llvm::microsoftDemangle(
+		DecoratedNameAscii,
+		nullptr,
+		&NameLen,
+		&status
+	);
+
+	if (!status) {
+		mbstowcs_s(
+			&MbstowcsStatus,
+			*UndecoratedName,
+			*UndecoratedNameLen,
+			AsciiUndecoratedName,
+			*UndecoratedNameLen * sizeof(wchar_t)
+		);
+	}
+
+	free(DecoratedNameAscii);
+
+	// UNIX-style error code
+	return status == 0;
+}
+
+bool UndecorateSymbolDemangleName(
+	_In_ UnmanagedSymPrv* obj,
+	_In_ wchar_t* DecoratedName,
+	_In_ size_t DecoratedNameLen,
+	_Out_ wchar_t** UndecoratedName,
+	_Out_ size_t* UndecoratedNameLen
+)
+{
+	PPH_STRING PhUndecoratedName = NULL;
+
+	if ((!UndecoratedName) || (!UndecoratedNameLen)) {
+		return false;
+	}
+
+	PhUndecoratedName = PhUndecorateNameW(
+		obj->m_SymbolProvider,
+		DecoratedName
+	);
+
+	if (!PhUndecoratedName)
+		return false;
+
+	*UndecoratedNameLen = PhUndecoratedName->Length;
+	*UndecoratedName = (wchar_t*)malloc(PhUndecoratedName->Length + sizeof(wchar_t));
+
+	memset(*UndecoratedName, 0, PhUndecoratedName->Length + sizeof(wchar_t));
+	memcpy(*UndecoratedName, PhUndecoratedName->Buffer, PhUndecoratedName->Length);
+
+	PhDereferenceObject(UndecoratedName);
+	return true;
+}
+
+bool UnmanagedSymPrv::DemangleName(
+	_In_ wchar_t* DecoratedName,
+	_In_ size_t DecoratedNameLen,
+	_Out_ wchar_t** UndecoratedName,
+	_Out_ size_t* UndecoratedNameLen
+)
+{
+
+	// try to undecorate GCC/LLVM symbols using demumble
+	if (DemumbleDemangleName(
+		this,
+		DecoratedName,
+		DecoratedNameLen,
+		UndecoratedName,
+		UndecoratedNameLen
+	)) {
+		return true;
 	}
 
 	// try llvm-demangler. the heuristic is copied from .\llvm-7.0.0.src\lib\DebugInfo\Symbolize\Symbolize.cpp: LLVMSymbolizer::DemangleName
-	if (!strncmp(DecoratedNameAscii, "_Z", 2))
+	if (!_wcsnicmp(DecoratedName, L"_Z", 2))
 	{ 
-		int LLVMDemanglerStatus = 0;
-		char *LLVMItaniumDemangled = llvm::itaniumDemangle(DecoratedNameAscii, nullptr, nullptr, &LLVMDemanglerStatus);
-		if (!LLVMDemanglerStatus)
-		{
-			size_t MbstowcsStatus = 0;
-
-			*UndecoratedNameLen = strlen(LLVMItaniumDemangled) * sizeof(wchar_t);
-			*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen + sizeof(wchar_t));
-
-			mbstowcs_s(
-				&MbstowcsStatus,
-				*UndecoratedName, 
-				*UndecoratedNameLen, 
-				LLVMItaniumDemangled,
-				*UndecoratedNameLen * sizeof(wchar_t)
-			);
-
-			free(DecoratedNameAscii);
+		if (LLVMItaniumDemangleName(
+			this,
+			DecoratedName,
+			DecoratedNameLen,
+			UndecoratedName,
+			UndecoratedNameLen
+		)) {
 			return true;
 		}
 	}
@@ -68,20 +218,23 @@ bool UnmanagedSymPrv::DemangleName(
 	// TODO : use llvm::microsoftDemangle if necessary
 	/*if (!strncmp(DecoratedNameAscii, "?", 1))
 	{
-		int LLVMDemanglerStatus = 0;
-		char *LLVMMicrosoftDemangled = llvm::microsoftDemangle(DecoratedNameAscii, nullptr, nullptr, &LLVMDemanglerStatus);
-		if (!LLVMDemanglerStatus)
+		if (LLVMMicrosoftDemangleName(
+			DecoratedNameAscii,
+			DecoratedNameLen,
+			&UndecoratedNameAscii,
+			&UndecoratedNameAsciiLen
+		))
 		{
 			size_t MbstowcsStatus = 0;
 
-			*UndecoratedNameLen = strlen(LLVMMicrosoftDemangled) + 1;
+			*UndecoratedNameLen = strlen(UndecoratedNameAscii) + 1;
 			*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen * sizeof(wchar_t));
 
 			mbstowcs_s(
 				&MbstowcsStatus,
 				*UndecoratedName,
 				*UndecoratedNameLen,
-				LLVMMicrosoftDemangled,
+				UndecoratedNameAscii,
 				*UndecoratedNameLen * sizeof(wchar_t)
 			);
 
@@ -90,23 +243,14 @@ bool UnmanagedSymPrv::DemangleName(
 		}
 	}*/
 
-
-	free(DecoratedNameAscii);
-
 	// try to undecorate MSVC symbols using UndecorateName  
-	PhUndecoratedName = PhUndecorateNameW(
-		this->m_SymbolProvider,
-		DecoratedName
-	);
-
-	if (PhUndecoratedName) {
-		*UndecoratedNameLen = PhUndecoratedName->Length;
-		*UndecoratedName = (wchar_t*) malloc(PhUndecoratedName->Length + sizeof(wchar_t));
-
-		memset(*UndecoratedName, 0, PhUndecoratedName->Length + sizeof(wchar_t));
-		memcpy(*UndecoratedName, PhUndecoratedName->Buffer, PhUndecoratedName->Length);
-		
-		PhDereferenceObject(UndecoratedName);
+	if (UndecorateSymbolDemangleName(
+		this,
+		DecoratedName,
+		DecoratedNameLen,
+		UndecoratedName,
+		UndecoratedNameLen
+	)) {
 		return true;
 	}
 

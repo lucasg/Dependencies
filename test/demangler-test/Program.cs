@@ -2,20 +2,50 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Dependencies.ClrPh;
+using System.Threading;
 using System.Diagnostics;
+
+using Dependencies.ClrPh;
 
 namespace Dependencies
 {
     namespace Test
-    { 
+    {
+        public class Demangler :  PhSymbolProvider
+        {
+            public Demangler(String demangler = "Default")
+            {
+                _demangler = demangler;
+            }
+
+            public override string UndecorateName(string DecoratedName)
+            {
+
+                switch (_demangler)
+                {
+                    case "Demumble":
+                        return base.UndecorateNameDemumble(DecoratedName);
+                    case "LLVMItanium":
+                        return base.UndecorateNameLLVMItanium(DecoratedName);
+                    case "LLVMMicrosoft":
+                        return base.UndecorateNameLLVMMicrosoft(DecoratedName);
+                    case "Microsoft":
+                        return base.UndecorateNamePh(DecoratedName);
+
+                    default:
+                    case "Default":
+                        return base.UndecorateName(DecoratedName);
+                }
+
+            }
+
+            private string _demangler;
+        }
+
         class Program
         {
-            static bool TestKnownInputs()
+            static bool TestKnownInputs(Demangler SymPrv)
             {
-                PhSymbolProvider SymPrv = new PhSymbolProvider();
-
                 Debug.Assert(SymPrv.UndecorateName("??1type_info@@UEAA@XZ") == "public: virtual __cdecl type_info::~type_info(void) __ptr64");
                 Debug.Assert(SymPrv.UndecorateName("?setbuf@strstreambuf@@UEAAPEAVstreambuf@@PEADH@Z") == "public: virtual class streambuf * __ptr64 __cdecl strstreambuf::setbuf(char * __ptr64,int) __ptr64");
                 Debug.Assert(SymPrv.UndecorateName("?CreateXBaby@XProvider@DirectUI@@UEAAJPEAVIXElementCP@2@PEAUHWND__@@PEAVElement@2@PEAKPEAPEAUIXBaby@2@@Z") == "public: virtual long __cdecl DirectUI::XProvider::CreateXBaby(class DirectUI::IXElementCP * __ptr64,struct HWND__ * __ptr64,class DirectUI::Element * __ptr64,unsigned long * __ptr64,struct DirectUI::IXBaby * __ptr64 * __ptr64) __ptr64");
@@ -28,9 +58,8 @@ namespace Dependencies
                 return true;
             }
 
-            static bool TestFilepath(string Filepath)
+            static bool TestFilepath(string Filepath, Demangler SymPrv)
             {
-                PhSymbolProvider SymPrv = new PhSymbolProvider();
 
                 PE Pe = new PE(Filepath);
                 if (!Pe.Load())
@@ -42,7 +71,13 @@ namespace Dependencies
                 foreach (PeExport Export in Pe.GetExports())
                 {
                     if (Export.Name.Length > 0)
-                        Console.WriteLine("\t Export : {0:s} -> {1:s}", Export.Name, SymPrv.UndecorateName(Export.Name));
+                    {
+                        //Console.WriteLine("\t Export : {0:s} -> {1:s}", Export.Name, SymPrv.UndecorateName(Export.Name));
+                        Console.Write("\t Export : {0:s} -> ", Export.Name);
+                        Console.Out.Flush();
+                        Console.WriteLine("{0:s}", SymPrv.UndecorateName(Export.Name));
+                    }
+                        
                 }
 
                 foreach (PeImportDll DllImport in Pe.GetImports())
@@ -51,8 +86,12 @@ namespace Dependencies
                     {
                         if (!Import.ImportByOrdinal)
                         {
-                            Console.WriteLine("\t Import from {0:s} : {1:s} -> {2:s}", DllImport.Name, Import.Name, SymPrv.UndecorateName(Import.Name));
+                            Console.Write("\t Import from {0:s} : {1:s} -> ", DllImport.Name, Import.Name);
+                            Console.Out.Flush();
+                            Console.WriteLine("{0:s}", SymPrv.UndecorateName(Import.Name));
+                            //Console.WriteLine("\t Import from {0:s} : {1:s} -> {2:s}", DllImport.Name, Import.Name, SymPrv.UndecorateName(Import.Name));
                         }
+
                     }
                 }
 
@@ -64,13 +103,37 @@ namespace Dependencies
                 // always the first call to make
                 Phlib.InitializePhLib();
 
-                if (args.Length == 0)
-                {
-                    TestKnownInputs();
-                    return;
-                }
+                Demangler demangler;
 
-                TestFilepath(args[0]);
+                switch(args.Length)
+                {
+                    case 0:
+                        demangler = new Demangler();
+                        TestKnownInputs(demangler);
+                        break;
+                    case 1:
+                        demangler = new Demangler();
+                        TestFilepath(args[0], demangler);
+                        
+                        break;
+
+                    default:
+                    case 2:
+                        string demanglerName = args[0].TrimStart(new char[] { '-' });
+                        string Filepath = args[1];
+
+                        demangler = new Demangler(demanglerName);
+                        if (NativeFile.Exists(Filepath))
+                        {
+                            TestFilepath(Filepath, demangler);
+                        }
+                        else
+                        {
+                            Console.WriteLine(demangler.UndecorateName(args[1]));
+                        }
+
+                        break;
+                }
             }
         }
     }
