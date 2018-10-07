@@ -27,12 +27,30 @@
     <ClInclude Include="lib\Demangle\Utility.h">
       <Filter>Fichiers sources</Filter>
     </ClInclude>
+    <ClInclude Include="include\llvm\Demangle\Compiler.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\llvm\Demangle\ItaniumDemangle.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\llvm\Demangle\StringView.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="include\llvm\Demangle\Utility.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Demangle\MicrosoftDemangleNodes.h">
+      <Filter>Fichiers sources</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\Demangle\ItaniumDemangle.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
     <ClCompile Include="lib\Demangle\MicrosoftDemangle.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Demangle\MicrosoftDemangleNodes.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>

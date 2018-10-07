@@ -27,14 +27,20 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\llvm\Demangle\Compiler.h" />
     <ClInclude Include="include\llvm\Demangle\Demangle.h" />
+    <ClInclude Include="include\llvm\Demangle\ItaniumDemangle.h" />
+    <ClInclude Include="include\llvm\Demangle\StringView.h" />
+    <ClInclude Include="include\llvm\Demangle\Utility.h" />
     <ClInclude Include="lib\Demangle\Compiler.h" />
+    <ClInclude Include="lib\Demangle\MicrosoftDemangleNodes.h" />
     <ClInclude Include="lib\Demangle\StringView.h" />
     <ClInclude Include="lib\Demangle\Utility.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lib\Demangle\ItaniumDemangle.cpp" />
     <ClCompile Include="lib\Demangle\MicrosoftDemangle.cpp" />
+    <ClCompile Include="lib\Demangle\MicrosoftDemangleNodes.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
@@ -138,6 +144,7 @@
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NDEBUG;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -153,6 +160,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions);_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NDEBUG;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -170,6 +178,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions);_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS;NDEBUG;</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(ProjectDir)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
