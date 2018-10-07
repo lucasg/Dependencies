@@ -106,7 +106,7 @@ namespace Dependencies
                 switch(args.Length)
                 {
                     case 0:
-                        demangler = new Demangler();
+                        demangler = new Demangler("Microsoft");
                         TestKnownInputs(demangler);
                         break;
                     case 1:

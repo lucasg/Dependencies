@@ -227,34 +227,6 @@ bool UnmanagedSymPrv::DemangleName(
 		}
 	}
 
-	// TODO : use llvm::microsoftDemangle if necessary
-	/*if (!strncmp(DecoratedNameAscii, "?", 1))
-	{
-		if (LLVMMicrosoftDemangleName(
-			DecoratedNameAscii,
-			DecoratedNameLen,
-			&UndecoratedNameAscii,
-			&UndecoratedNameAsciiLen
-		))
-		{
-			size_t MbstowcsStatus = 0;
-
-			*UndecoratedNameLen = strlen(UndecoratedNameAscii) + 1;
-			*UndecoratedName = (wchar_t*)malloc(*UndecoratedNameLen * sizeof(wchar_t));
-
-			mbstowcs_s(
-				&MbstowcsStatus,
-				*UndecoratedName,
-				*UndecoratedNameLen,
-				UndecoratedNameAscii,
-				*UndecoratedNameLen * sizeof(wchar_t)
-			);
-
-			free(DecoratedNameAscii);
-			return true;
-		}
-	}*/
-
 	// try to undecorate MSVC symbols using UndecorateName  
 	if (UndecorateSymbolDemangleName(
 		this,
@@ -266,6 +238,17 @@ bool UnmanagedSymPrv::DemangleName(
 		return true;
 	}
 
+	// use llvm::microsoftDemangle as a last chance
+	if (LLVMMicrosoftDemangleName(
+		this,
+		DecoratedName,
+		DecoratedNameLen,
+		UndecoratedName,
+		UndecoratedNameLen
+	)) {
+		return true;
+	}
+	
 
 	// Could not demangle name
 	*UndecoratedNameLen =  0;
