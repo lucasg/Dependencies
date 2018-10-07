@@ -72,7 +72,6 @@ namespace Dependencies
                 {
                     if (Export.Name.Length > 0)
                     {
-                        //Console.WriteLine("\t Export : {0:s} -> {1:s}", Export.Name, SymPrv.UndecorateName(Export.Name));
                         Console.Write("\t Export : {0:s} -> ", Export.Name);
                         Console.Out.Flush();
                         Console.WriteLine("{0:s}", SymPrv.UndecorateName(Export.Name));
@@ -89,7 +88,6 @@ namespace Dependencies
                             Console.Write("\t Import from {0:s} : {1:s} -> ", DllImport.Name, Import.Name);
                             Console.Out.Flush();
                             Console.WriteLine("{0:s}", SymPrv.UndecorateName(Import.Name));
-                            //Console.WriteLine("\t Import from {0:s} : {1:s} -> {2:s}", DllImport.Name, Import.Name, SymPrv.UndecorateName(Import.Name));
                         }
 
                     }

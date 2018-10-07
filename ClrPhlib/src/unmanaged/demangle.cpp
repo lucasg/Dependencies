@@ -41,13 +41,17 @@ bool DemumbleDemangleName(
 	);
 
 	if (!status) {
+		*UndecoratedName = (wchar_t*)malloc(NameLen * sizeof(wchar_t) + sizeof(wchar_t));
+
 		mbstowcs_s(
 			&MbstowcsStatus,
 			*UndecoratedName,
-			*UndecoratedNameLen,
+			NameLen,
 			AsciiUndecoratedName,
-			*UndecoratedNameLen * sizeof(wchar_t)
+			STRUNCATE
 		);
+
+		*UndecoratedNameLen = NameLen * sizeof(wchar_t);
 	}
 
 	free(DecoratedNameAscii);
@@ -88,13 +92,17 @@ bool LLVMItaniumDemangleName(
 	);
 
 	if (!status) {
+		*UndecoratedName = (wchar_t*)malloc(NameLen * sizeof(wchar_t) + sizeof(wchar_t));
+
 		mbstowcs_s(
 			&MbstowcsStatus,
 			*UndecoratedName,
-			*UndecoratedNameLen,
+			NameLen,
 			AsciiUndecoratedName,
-			*UndecoratedNameLen * sizeof(wchar_t)
+			STRUNCATE
 		);
+
+		*UndecoratedNameLen = NameLen * sizeof(wchar_t);
 	}
 	
 	free(DecoratedNameAscii);
@@ -135,13 +143,17 @@ bool LLVMMicrosoftDemangleName(
 	);
 
 	if (!status) {
+		*UndecoratedName = (wchar_t*)malloc(NameLen * sizeof(wchar_t) + sizeof(wchar_t));
+
 		mbstowcs_s(
 			&MbstowcsStatus,
 			*UndecoratedName,
-			*UndecoratedNameLen,
+			NameLen,
 			AsciiUndecoratedName,
-			*UndecoratedNameLen * sizeof(wchar_t)
+			STRUNCATE
 		);
+
+		*UndecoratedNameLen = NameLen * sizeof(wchar_t);
 	}
 
 	free(DecoratedNameAscii);
