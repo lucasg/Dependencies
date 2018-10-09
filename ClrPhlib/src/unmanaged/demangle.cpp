@@ -190,7 +190,7 @@ bool UndecorateSymbolDemangleName(
 	memset(*UndecoratedName, 0, PhUndecoratedName->Length + sizeof(wchar_t));
 	memcpy(*UndecoratedName, PhUndecoratedName->Buffer, PhUndecoratedName->Length);
 
-	PhDereferenceObject(UndecoratedName);
+	PhDereferenceObject(PhUndecoratedName);
 	return true;
 }
 
