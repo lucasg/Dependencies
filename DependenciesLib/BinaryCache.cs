@@ -187,6 +187,14 @@ namespace Dependencies
             string System32Folder = Environment.GetFolderPath(Environment.SpecialFolder.System);
             string SysWow64Folder = Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
 
+            // wow64.dll, wow64cpu.dll and wow64win.dll are listed as wow64 known dlls,
+            // but they are actually x64 binaries.
+            List<String> Wow64Dlls = new List<string>(new string[] {
+                "wow64.dll",
+                "wow64cpu.dll",
+                "wow64win.dll"
+            });
+
             // preload all well konwn dlls
             foreach (String KnownDll in Phlib.GetKnownDlls(false))
             {
@@ -195,7 +203,15 @@ namespace Dependencies
 
             foreach (String KnownDll in Phlib.GetKnownDlls(true))
             {
-                GetBinary(Path.Combine(SysWow64Folder, KnownDll));
+                if (Wow64Dlls.Contains(KnownDll))
+                {
+                    GetBinary(Path.Combine(System32Folder, KnownDll));
+                }
+                else
+                {
+                    GetBinary(Path.Combine(SysWow64Folder, KnownDll));
+                }
+                
             }
 
         }
