@@ -101,6 +101,10 @@ namespace Dependencies
                 // always the first call to make
                 Phlib.InitializePhLib();
 
+                // Redirect debug log to the console
+                Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
+                Debug.AutoFlush = true;
+
                 Demangler demangler;
 
                 switch(args.Length)
@@ -127,11 +131,14 @@ namespace Dependencies
                         }
                         else
                         {
-                            Console.WriteLine(demangler.UndecorateName(args[1]));
+                            string undecoratedName = demangler.UndecorateName(args[1]);
+                            Console.WriteLine(undecoratedName);
                         }
-
                         break;
                 }
+
+                // Force flushing out buffer
+                Console.Out.Flush();
             }
         }
     }
