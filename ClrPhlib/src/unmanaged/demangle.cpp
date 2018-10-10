@@ -23,8 +23,8 @@ bool DemumbleDemangleName(
 	char *AsciiUndecoratedName = NULL;
 
 
-	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen * sizeof(wchar_t));
-	sprintf_s(DecoratedNameAscii, DecoratedNameLen * sizeof(wchar_t), "%ws", DecoratedName);
+	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen + 1);
+	sprintf_s(DecoratedNameAscii, DecoratedNameLen + 1, "%ws", DecoratedName);
 
 	if ((!UndecoratedName) || (!UndecoratedNameLen)) {
 		return false;
@@ -48,7 +48,7 @@ bool DemumbleDemangleName(
 			*UndecoratedName,
 			NameLen,
 			AsciiUndecoratedName,
-			STRUNCATE
+			NameLen
 		);
 
 		*UndecoratedNameLen = NameLen * sizeof(wchar_t);
@@ -74,8 +74,8 @@ bool LLVMItaniumDemangleName(
 	char *AsciiUndecoratedName = NULL;
 
 
-	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen * sizeof(wchar_t));
-	sprintf_s(DecoratedNameAscii, DecoratedNameLen * sizeof(wchar_t), "%ws", DecoratedName);
+	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen + 1);
+	sprintf_s(DecoratedNameAscii, DecoratedNameLen + 1, "%ws", DecoratedName);
 
 	if ((!UndecoratedName) || (!UndecoratedNameLen)) {
 		return false;
@@ -99,7 +99,7 @@ bool LLVMItaniumDemangleName(
 			*UndecoratedName,
 			NameLen,
 			AsciiUndecoratedName,
-			STRUNCATE
+			NameLen
 		);
 
 		*UndecoratedNameLen = NameLen * sizeof(wchar_t);
@@ -125,8 +125,8 @@ bool LLVMMicrosoftDemangleName(
 	char *AsciiUndecoratedName = NULL;
 
 
-	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen * sizeof(wchar_t));
-	sprintf_s(DecoratedNameAscii, DecoratedNameLen * sizeof(wchar_t), "%ws", DecoratedName);
+	char *DecoratedNameAscii = (char*)malloc(DecoratedNameLen + 1);
+	sprintf_s(DecoratedNameAscii, DecoratedNameLen + 1, "%ws", DecoratedName);
 
 	if ((!UndecoratedName) || (!UndecoratedNameLen)) {
 		return false;
@@ -148,9 +148,9 @@ bool LLVMMicrosoftDemangleName(
 		mbstowcs_s(
 			&MbstowcsStatus,
 			*UndecoratedName,
-			NameLen,
+			NameLen, 
 			AsciiUndecoratedName,
-			STRUNCATE
+			NameLen 
 		);
 
 		*UndecoratedNameLen = NameLen * sizeof(wchar_t);

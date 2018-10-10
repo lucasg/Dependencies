@@ -111,7 +111,6 @@ String^ PhSymbolProvider::UndecorateNamePrv(
 	size_t PvDecoratedNameLen = wcslen(PvDecoratedName);
 	
 
-	//if (m_Impl->DemangleName(
 	if (Demangler(
 		this->m_Impl,
 		PvDecoratedName,
