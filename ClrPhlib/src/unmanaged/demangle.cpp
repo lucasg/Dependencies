@@ -1,6 +1,7 @@
 #include <UnmanagedSymPrv.h>
 #include <llvm/Demangle/Demangle.h>
 #include <stdlib.h>
+#using <System.dll>
 
 extern "C" {
 	char* __cxa_demangle(const char* mangled_name,
@@ -8,6 +9,40 @@ extern "C" {
 		size_t* n,
 		int* status);
 }
+
+#define DEMANGLER_DEBUGLOG_CAT ("demangler")
+#define DEMANGLER_DEBUGLOG_ONE (DemanglerDebugOneArg)
+#define DEMANGLER_DEBUGLOG_TWO (DemanglerDebugTwoArg)
+
+void DemanglerDebugOneArg(wchar_t *Format, wchar_t *Arg0)
+{
+	do																							
+	{																							
+		System::Diagnostics::Debug::WriteLine(													
+			System::String::Format(																
+				gcnew System::String(Format),													
+				gcnew System::String(Arg0)
+			),													
+			gcnew System::String(DEMANGLER_DEBUGLOG_CAT)
+		);																						
+	} while (false);																				
+}
+
+void DemanglerDebugTwoArg(wchar_t *Format, wchar_t *Arg0, wchar_t *Arg1)
+{
+	do
+	{
+		System::Diagnostics::Debug::WriteLine(
+			System::String::Format(
+				gcnew System::String(Format),
+				gcnew System::String(Arg0),
+				gcnew System::String(Arg1)
+			),
+			gcnew System::String(DEMANGLER_DEBUGLOG_CAT)
+		);
+	} while (false);
+}
+
 
 bool DemumbleDemangleName(
 	_In_ UnmanagedSymPrv* obj,
@@ -213,6 +248,7 @@ bool UnmanagedSymPrv::DemangleName(
 		UndecoratedName,
 		UndecoratedNameLen
 	)) {
+		DEMANGLER_DEBUGLOG_TWO(L"Demumble {0:s} -> {1:s}", DecoratedName, *UndecoratedName);
 		return true;
 	}
 
@@ -226,6 +262,7 @@ bool UnmanagedSymPrv::DemangleName(
 			UndecoratedName,
 			UndecoratedNameLen
 		)) {
+			DEMANGLER_DEBUGLOG_TWO(L"LLVM Itanium {0:s} -> {1:s}", DecoratedName, *UndecoratedName);
 			return true;
 		}
 	}
@@ -238,6 +275,7 @@ bool UnmanagedSymPrv::DemangleName(
 		UndecoratedName,
 		UndecoratedNameLen
 	)) {
+		DEMANGLER_DEBUGLOG_TWO(L"Microsoft {0:s} -> {1:s}", DecoratedName, *UndecoratedName);
 		return true;
 	}
 
@@ -249,6 +287,7 @@ bool UnmanagedSymPrv::DemangleName(
 		UndecoratedName,
 		UndecoratedNameLen
 	)) {
+		DEMANGLER_DEBUGLOG_TWO(L"LLVM Microsoft {0:s} -> {1:s}", DecoratedName, *UndecoratedName);
 		return true;
 	}
 	
@@ -256,8 +295,7 @@ bool UnmanagedSymPrv::DemangleName(
 	// Could not demangle name
 	*UndecoratedNameLen =  0;
 	*UndecoratedName = NULL;
+	DEMANGLER_DEBUGLOG_ONE(L"Could not demangle \"{0:s}\" properly", DecoratedName);
 	return false;
 }
-
-
 
