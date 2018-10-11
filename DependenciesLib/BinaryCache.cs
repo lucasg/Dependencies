@@ -163,6 +163,7 @@ namespace Dependencies
         {
             
             BinaryDatabase = new Dictionary<string, PE>();
+            FilepathDatabase = new Dictionary<string, PE>();
             BinaryDatabaseLock = new Object();
             LruCache = new List<string>();
 
@@ -250,6 +251,7 @@ namespace Dependencies
 
             // flush the cache
             BinaryDatabase.Clear();
+            FilepathDatabase.Clear();
         }
 
         public PE GetBinary(string PePath)
@@ -260,6 +262,15 @@ namespace Dependencies
             {
                 Debug.WriteLine(String.Format("File not present on the filesystem : {0:s} ", PePath), "BinaryCache");
                 return null;
+            }
+
+            string Fullpath = Path.GetFullPath(PePath);
+            if (FilepathDatabase.ContainsKey(Fullpath))
+            {
+                // TODO : update LRU cache
+                PE sShadowBinary = FilepathDatabase[Fullpath];
+                sShadowBinary.Filepath = Fullpath;
+                return sShadowBinary;
             }
 
             string PeHash = GetBinaryHash(PePath);
@@ -287,6 +298,7 @@ namespace Dependencies
 
                     LruCache.Add(PeHash);
                     BinaryDatabase.Add(PeHash, NewShadowBinary);
+                    FilepathDatabase.Add(Fullpath, NewShadowBinary);
                 }
             }
 
@@ -322,6 +334,7 @@ namespace Dependencies
 
         private List<string> LruCache;
         private Dictionary<string, PE> BinaryDatabase;
+        private Dictionary<string, PE> FilepathDatabase;
         private Object BinaryDatabaseLock; 
 
         private string BinaryCacheFolderPath;
