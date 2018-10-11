@@ -25,9 +25,9 @@ namespace Dependencies
                 PE ModuleImport = Dependencies.LoadImport(DllImport.Name, null, DllImport.IsDelayLoad() );
                 string ModuleFilepath = (ModuleImport != null) ? ModuleImport.Filepath : null;
 
-                foreach (PeImport Import in DllImport.ImportList)
+                foreach( var Import in BinaryCache.LookupImports(DllImport, ModuleFilepath))
                 {
-                    this.Items.Add(new DisplayPeImport(Import, SymPrv, ModuleFilepath));
+                    this.Items.Add(new DisplayPeImport(Import.Item1, SymPrv, ModuleFilepath, Import.Item2));
                 }
             }
         }
