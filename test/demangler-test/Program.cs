@@ -19,19 +19,19 @@ namespace Dependencies
                 _demangler = demangler;
             }
 
-            public override string UndecorateName(string DecoratedName)
+            public override Tuple<CLRPH_DEMANGLER, string> UndecorateName(string DecoratedName)
             {
 
                 switch (_demangler)
                 {
                     case CLRPH_DEMANGLER.Demumble:
-                        return base.UndecorateNameDemumble(DecoratedName);
+                        return new Tuple<CLRPH_DEMANGLER, string>(CLRPH_DEMANGLER.Demumble, base.UndecorateNameDemumble(DecoratedName));
                     case CLRPH_DEMANGLER.LLVMItanium:
-                        return base.UndecorateNameLLVMItanium(DecoratedName);
+                        return new Tuple<CLRPH_DEMANGLER, string>(CLRPH_DEMANGLER.LLVMItanium, base.UndecorateNameLLVMItanium(DecoratedName));
                     case CLRPH_DEMANGLER.LLVMMicrosoft:
-                        return base.UndecorateNameLLVMMicrosoft(DecoratedName);
+                        return new Tuple<CLRPH_DEMANGLER, string>(CLRPH_DEMANGLER.LLVMMicrosoft, base.UndecorateNameLLVMMicrosoft(DecoratedName));
                     case CLRPH_DEMANGLER.Microsoft:
-                        return base.UndecorateNamePh(DecoratedName);
+                        return new Tuple<CLRPH_DEMANGLER, string>(CLRPH_DEMANGLER.Microsoft, base.UndecorateNamePh(DecoratedName));
 
                     default:
                     case CLRPH_DEMANGLER.Default:
@@ -76,13 +76,13 @@ namespace Dependencies
 
             static bool TestKnownInputs(Demangler SymPrv)
             {
-                Debug.Assert(SymPrv.UndecorateName("??1type_info@@UEAA@XZ") == "public: virtual __cdecl type_info::~type_info(void) __ptr64");
-                Debug.Assert(SymPrv.UndecorateName("?setbuf@strstreambuf@@UEAAPEAVstreambuf@@PEADH@Z") == "public: virtual class streambuf * __ptr64 __cdecl strstreambuf::setbuf(char * __ptr64,int) __ptr64");
-                Debug.Assert(SymPrv.UndecorateName("?CreateXBaby@XProvider@DirectUI@@UEAAJPEAVIXElementCP@2@PEAUHWND__@@PEAVElement@2@PEAKPEAPEAUIXBaby@2@@Z") == "public: virtual long __cdecl DirectUI::XProvider::CreateXBaby(class DirectUI::IXElementCP * __ptr64,struct HWND__ * __ptr64,class DirectUI::Element * __ptr64,unsigned long * __ptr64,struct DirectUI::IXBaby * __ptr64 * __ptr64) __ptr64");
-                Debug.Assert(SymPrv.UndecorateName("??0exception@@QEAA@AEBQEBDH@Z") == "public: __cdecl exception::exception(char const * __ptr64 const & __ptr64,int) __ptr64");
-                Debug.Assert(SymPrv.UndecorateName("?what@exception@@UEBAPEBDXZ") == "public: virtual char const * __ptr64 __cdecl exception::what(void)const __ptr64");
-                Debug.Assert(SymPrv.UndecorateName("?_Execute_once@std@@YAHAEAUonce_flag@1@P6AHPEAX1PEAPEAX@Z1@Z") == "int __cdecl std::_Execute_once(struct std::once_flag & __ptr64,int (__cdecl*)(void * __ptr64,void * __ptr64,void * __ptr64 * __ptr64),void * __ptr64)");
-                Debug.Assert(SymPrv.UndecorateName("?swap@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@IEAAXAEAV12@@Z") == "protected: void __cdecl std::basic_streambuf<wchar_t,struct std::char_traits<wchar_t> >::swap(class std::basic_streambuf<wchar_t,struct std::char_traits<wchar_t> > & __ptr64) __ptr64");
+                Debug.Assert(SymPrv.UndecorateName("??1type_info@@UEAA@XZ").Item2 == "public: virtual __cdecl type_info::~type_info(void) __ptr64");
+                Debug.Assert(SymPrv.UndecorateName("?setbuf@strstreambuf@@UEAAPEAVstreambuf@@PEADH@Z").Item2 == "public: virtual class streambuf * __ptr64 __cdecl strstreambuf::setbuf(char * __ptr64,int) __ptr64");
+                Debug.Assert(SymPrv.UndecorateName("?CreateXBaby@XProvider@DirectUI@@UEAAJPEAVIXElementCP@2@PEAUHWND__@@PEAVElement@2@PEAKPEAPEAUIXBaby@2@@Z").Item2 == "public: virtual long __cdecl DirectUI::XProvider::CreateXBaby(class DirectUI::IXElementCP * __ptr64,struct HWND__ * __ptr64,class DirectUI::Element * __ptr64,unsigned long * __ptr64,struct DirectUI::IXBaby * __ptr64 * __ptr64) __ptr64");
+                Debug.Assert(SymPrv.UndecorateName("??0exception@@QEAA@AEBQEBDH@Z").Item2 == "public: __cdecl exception::exception(char const * __ptr64 const & __ptr64,int) __ptr64");
+                Debug.Assert(SymPrv.UndecorateName("?what@exception@@UEBAPEBDXZ").Item2 == "public: virtual char const * __ptr64 __cdecl exception::what(void)const __ptr64");
+                Debug.Assert(SymPrv.UndecorateName("?_Execute_once@std@@YAHAEAUonce_flag@1@P6AHPEAX1PEAPEAX@Z1@Z").Item2 == "int __cdecl std::_Execute_once(struct std::once_flag & __ptr64,int (__cdecl*)(void * __ptr64,void * __ptr64,void * __ptr64 * __ptr64),void * __ptr64)");
+                Debug.Assert(SymPrv.UndecorateName("?swap@?$basic_streambuf@_WU?$char_traits@_W@std@@@std@@IEAAXAEAV12@@Z").Item2 == "protected: void __cdecl std::basic_streambuf<wchar_t,struct std::char_traits<wchar_t> >::swap(class std::basic_streambuf<wchar_t,struct std::char_traits<wchar_t> > & __ptr64) __ptr64");
 
                 Console.WriteLine("demangler-test : all known inputs OK");
                 return true;
@@ -175,7 +175,7 @@ namespace Dependencies
                         }
                         else
                         {
-                            string undecoratedName = demangler.UndecorateName(args[1]);
+                            string undecoratedName = demangler.UndecorateName(args[1]).Item2;
                             Console.WriteLine(undecoratedName);
                         }
 

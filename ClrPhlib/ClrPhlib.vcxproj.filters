@@ -39,6 +39,9 @@
     <ClInclude Include="include\UnmanagedSymPrv.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="include\ClrPhSymbolProvider.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ClrPhlib.cpp">

@@ -1,5 +1,6 @@
 #include <ClrPhlib.h>
 #include <UnmanagedPh.h>
+#include <ClrPhSymbolProvider.h>
 
 using namespace Dependencies;
 using namespace ClrPh;
@@ -51,14 +52,15 @@ String^ PhSymbolProvider::UndecorateNamePh(_In_ String ^DecoratedName)
 	return UndecorateNamePrv(DecoratedName, UndecorateSymbolDemangleName);
 }
 
-String^ PhSymbolProvider::UndecorateName(_In_ String ^DecoratedName)
+Tuple<CLRPH_DEMANGLER, String^>^  PhSymbolProvider::UndecorateName(_In_ String ^DecoratedName)
 {
 	String ^ManagedUndName;
 	wchar_t* UndecoratedName = NULL;
 	size_t UndecoratedNameLen = 0;
+	CLRPH_DEMANGLER Demangler = CLRPH_DEMANGLER::None;
 
 	if (!m_Impl || DecoratedName->Length == 0) {
-		return gcnew String("");
+		return gcnew Tuple<CLRPH_DEMANGLER, String^> (Demangler, gcnew String(""));
 	}
 
 	wchar_t* PvDecoratedName = (wchar_t*)(Marshal::StringToHGlobalUni(DecoratedName)).ToPointer();
@@ -69,7 +71,8 @@ String^ PhSymbolProvider::UndecorateName(_In_ String ^DecoratedName)
 		PvDecoratedName,
 		PvDecoratedNameLen,
 		&UndecoratedName,
-		&UndecoratedNameLen
+		&UndecoratedNameLen,
+		&Demangler
 	))
 	{
 		ManagedUndName = gcnew String(UndecoratedName);
@@ -90,7 +93,7 @@ String^ PhSymbolProvider::UndecorateName(_In_ String ^DecoratedName)
 	}
 
 
-	return ManagedUndName;
+	return gcnew Tuple<CLRPH_DEMANGLER, String^>(Demangler, ManagedUndName);
 }
 
 String^ PhSymbolProvider::UndecorateNamePrv(

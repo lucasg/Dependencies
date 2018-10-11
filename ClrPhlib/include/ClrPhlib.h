@@ -3,17 +3,16 @@
 #pragma once
 
 #include <UnmanagedPh.h>
-#include <UnmanagedSymPrv.h>
 #using <System.dll>
 
 using namespace System;
+using namespace Collections::Generic;
 
 namespace Dependencies {
 
-	using namespace Collections::Generic;
-
     namespace ClrPh {
 
+		#pragma region ENUMS
 		public enum class CLRPH_ARCH
 		{
 			x86,
@@ -21,12 +20,25 @@ namespace Dependencies {
 			WOW64
 		};
 
+		public enum class CLRPH_DEMANGLER
+		{
+			None,
+			Demumble,
+			LLVMItanium,
+			LLVMMicrosoft,
+			Microsoft,
+			Default			// Synthetic demangler using all the previous ones
+		};
+		#pragma endregion ENUMS
 
+		#pragma region TYPES
         public ref class ApiSetTarget : List<String^>
         {};
 
         public ref class ApiSetSchema : Dictionary<String^, ApiSetTarget^>
         {};
+		#pragma endregion TYPES
+
 
         public ref class Phlib {
         public:
@@ -188,40 +200,7 @@ namespace Dependencies {
             bool m_ExportsInit;
             bool m_ImportsInit;
         };
-
-		public enum class CLRPH_DEMANGLER
-		{
-			Demumble,
-			LLVMItanium,
-			LLVMMicrosoft,
-			Microsoft,
-			Default			// Synthetic demangler using all the previous ones
-		};
-
-        // Symbol resolution and undecoration utility class
-        public ref class PhSymbolProvider
-        {
-        public:
-            PhSymbolProvider();
-            ~PhSymbolProvider();
-            !PhSymbolProvider();
-
-            virtual String^ UndecorateName(_In_ String ^DecoratedName);
-
-		protected:
-
-			String^ UndecorateNameDemumble(_In_ String ^DecoratedName);
-			String^ UndecorateNameLLVMItanium(_In_ String ^DecoratedName);
-			String^ UndecorateNameLLVMMicrosoft(_In_ String ^DecoratedName);
-			String^ UndecorateNamePh(_In_ String ^DecoratedName);
-
-
-        private:
-			String ^ UndecorateNamePrv(_In_ String ^DecoratedName, _In_ DemangleNameFn Demangler);
-
-            UnmanagedSymPrv *m_Impl;
-
-        };
+        
     }
 
 }

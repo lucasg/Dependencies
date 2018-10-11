@@ -4,6 +4,7 @@
 
 #include <ph.h>
 #include <symprv.h>
+#include <ClrPhlib.h>
 
 
 // Native Symbol Provider class.
@@ -13,19 +14,21 @@ class UnmanagedSymPrv {
 public:
 
 	// Initialize a new provider.
-    static UnmanagedSymPrv* Create();
+	static UnmanagedSymPrv* Create();
 
 	// Attempt to demangle a C/C++ name. Return false if the name is not mangled.
 	bool DemangleName(
 		_In_ wchar_t* DecoratedName,
 		_In_ size_t DecoratedNameLen,
 		_Out_ wchar_t** UndecoratedName,
-		_Out_ size_t* UndecoratedNameLen
+		_Out_ size_t* UndecoratedNameLen,
+		_Out_ Dependencies::ClrPh::CLRPH_DEMANGLER *Demangler
 	);
 
 public:
-    PPH_SYMBOL_PROVIDER m_SymbolProvider;
+	PPH_SYMBOL_PROVIDER m_SymbolProvider;
 };
+
 
 
 

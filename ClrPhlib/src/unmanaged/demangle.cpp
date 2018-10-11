@@ -236,7 +236,8 @@ bool UnmanagedSymPrv::DemangleName(
 	_In_ wchar_t* DecoratedName,
 	_In_ size_t DecoratedNameLen,
 	_Out_ wchar_t** UndecoratedName,
-	_Out_ size_t* UndecoratedNameLen
+	_Out_ size_t* UndecoratedNameLen,
+	_Out_ Dependencies::ClrPh::CLRPH_DEMANGLER *Demangler
 )
 {
 
@@ -248,6 +249,7 @@ bool UnmanagedSymPrv::DemangleName(
 		UndecoratedName,
 		UndecoratedNameLen
 	)) {
+		*Demangler = Dependencies::ClrPh::CLRPH_DEMANGLER::Demumble;
 		DEMANGLER_DEBUGLOG_TWO(L"Demumble {0:s} -> {1:s}", DecoratedName, *UndecoratedName);
 		return true;
 	}
@@ -262,6 +264,7 @@ bool UnmanagedSymPrv::DemangleName(
 			UndecoratedName,
 			UndecoratedNameLen
 		)) {
+			*Demangler = Dependencies::ClrPh::CLRPH_DEMANGLER::LLVMItanium;
 			DEMANGLER_DEBUGLOG_TWO(L"LLVM Itanium {0:s} -> {1:s}", DecoratedName, *UndecoratedName);
 			return true;
 		}
@@ -275,6 +278,7 @@ bool UnmanagedSymPrv::DemangleName(
 		UndecoratedName,
 		UndecoratedNameLen
 	)) {
+		*Demangler = Dependencies::ClrPh::CLRPH_DEMANGLER::Microsoft;
 		DEMANGLER_DEBUGLOG_TWO(L"Microsoft {0:s} -> {1:s}", DecoratedName, *UndecoratedName);
 		return true;
 	}
@@ -287,6 +291,7 @@ bool UnmanagedSymPrv::DemangleName(
 		UndecoratedName,
 		UndecoratedNameLen
 	)) {
+		*Demangler = Dependencies::ClrPh::CLRPH_DEMANGLER::LLVMMicrosoft;
 		DEMANGLER_DEBUGLOG_TWO(L"LLVM Microsoft {0:s} -> {1:s}", DecoratedName, *UndecoratedName);
 		return true;
 	}
@@ -295,6 +300,7 @@ bool UnmanagedSymPrv::DemangleName(
 	// Could not demangle name
 	*UndecoratedNameLen =  0;
 	*UndecoratedName = NULL;
+	*Demangler = Dependencies::ClrPh::CLRPH_DEMANGLER::None;
 	DEMANGLER_DEBUGLOG_ONE(L"Could not demangle \"{0:s}\" properly", DecoratedName);
 	return false;
 }

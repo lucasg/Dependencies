@@ -1,5 +1,5 @@
-#include <ClrPhlib.h>
-#include <UnmanagedPh.h>
+#include <UnmanagedSymPrv.h>
+
 
 using namespace System;
 using namespace Dependencies::ClrPh;

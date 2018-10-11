@@ -235,6 +235,7 @@
   <ItemGroup>
     <ClInclude Include="include\ApiSet.h" />
     <ClInclude Include="include\ClrPhlib.h" />
+    <ClInclude Include="include\ClrPhSymbolProvider.h" />
     <ClInclude Include="include\NativeFile.h" />
     <ClInclude Include="include\UnmanagedPh.h" />
     <ClInclude Include="include\UnmanagedSymPrv.h" />
