@@ -189,6 +189,15 @@ namespace Dependencies {
             bool m_ImportsInit;
         };
 
+		public enum class CLRPH_DEMANGLER
+		{
+			Demumble,
+			LLVMItanium,
+			LLVMMicrosoft,
+			Microsoft,
+			Default			// Synthetic demangler using all the previous ones
+		};
+
         // Symbol resolution and undecoration utility class
         public ref class PhSymbolProvider
         {

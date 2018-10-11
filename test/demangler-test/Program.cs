@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Diagnostics;
 
+using NDesk.Options;
 using Dependencies.ClrPh;
 
 namespace Dependencies
@@ -13,7 +14,7 @@ namespace Dependencies
     {
         public class Demangler :  PhSymbolProvider
         {
-            public Demangler(String demangler = "Default")
+            public Demangler(CLRPH_DEMANGLER demangler = CLRPH_DEMANGLER.Default)
             {
                 _demangler = demangler;
             }
@@ -23,27 +24,56 @@ namespace Dependencies
 
                 switch (_demangler)
                 {
-                    case "Demumble":
+                    case CLRPH_DEMANGLER.Demumble:
                         return base.UndecorateNameDemumble(DecoratedName);
-                    case "LLVMItanium":
+                    case CLRPH_DEMANGLER.LLVMItanium:
                         return base.UndecorateNameLLVMItanium(DecoratedName);
-                    case "LLVMMicrosoft":
+                    case CLRPH_DEMANGLER.LLVMMicrosoft:
                         return base.UndecorateNameLLVMMicrosoft(DecoratedName);
-                    case "Microsoft":
+                    case CLRPH_DEMANGLER.Microsoft:
                         return base.UndecorateNamePh(DecoratedName);
 
                     default:
-                    case "Default":
+                    case CLRPH_DEMANGLER.Default:
                         return base.UndecorateName(DecoratedName);
                 }
 
             }
 
-            private string _demangler;
+            private CLRPH_DEMANGLER _demangler;
         }
 
         class Program
         {
+            static void ShowHelp(OptionSet p)
+            {
+                Console.WriteLine("Usage: demangler [options] FILE_OR_SYMBOL");
+                Console.WriteLine();
+                Console.WriteLine("Options:");
+                p.WriteOptionDescriptions(Console.Out);
+            }
+
+            static CLRPH_DEMANGLER ParseDemanglerName(string v)
+            {
+                switch (v)
+                {
+                    case "Default":
+                        return CLRPH_DEMANGLER.Default;
+                    case "Demumble":
+                        return CLRPH_DEMANGLER.Demumble;
+                    case "LLVMItanium":
+                        return CLRPH_DEMANGLER.LLVMItanium;
+                    case "LLVMMicrosoft":
+                        return CLRPH_DEMANGLER.LLVMMicrosoft;
+                    case "Microsoft":
+                        return CLRPH_DEMANGLER.Microsoft;
+
+                    default:
+                        string msg = String.Format("Unknown demangler '{0}'. Only 'Default', 'Demumble', 'LLVMItanium', 'LLVMMicrosoft' and 'Microsoft' are supported.", v);
+                        throw new OptionException(msg, "severity");
+                }
+            }
+
             static bool TestKnownInputs(Demangler SymPrv)
             {
                 Debug.Assert(SymPrv.UndecorateName("??1type_info@@UEAA@XZ") == "public: virtual __cdecl type_info::~type_info(void) __ptr64");
@@ -98,33 +128,47 @@ namespace Dependencies
 
             static void Main(string[] args)
             {
+                bool is_verbose = false;
+                bool show_help = false;
+                CLRPH_DEMANGLER demangler_name = CLRPH_DEMANGLER.Default;
+
+                OptionSet opts = new OptionSet() {
+                            { "v|verbose", "redirect debug traces to console", v => is_verbose = v != null },
+                            { "h|help",  "show this message and exit", v => show_help = v != null },
+                            { "d=|demangler=",  "Choose demangler name", v => demangler_name = ParseDemanglerName(v) },
+                        };
+
+                List<string> eps = opts.Parse(args);
+
+                if (show_help)
+                {
+                    ShowHelp(opts);
+                    return;
+                }
+
+                if (is_verbose)
+                {
+                    // Redirect debug log to the console
+                    Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
+                    Debug.AutoFlush = true;
+                }
+
                 // always the first call to make
                 Phlib.InitializePhLib();
-
-                // Redirect debug log to the console
-                Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
-                Debug.AutoFlush = true;
-
                 Demangler demangler;
 
                 switch(args.Length)
                 {
                     case 0:
-                        demangler = new Demangler("Microsoft");
+                        demangler = new Demangler(CLRPH_DEMANGLER.Microsoft);
                         TestKnownInputs(demangler);
-                        break;
-                    case 1:
-                        demangler = new Demangler();
-                        TestFilepath(args[0], demangler);
-                        
                         break;
 
                     default:
-                    case 2:
-                        string demanglerName = args[0].TrimStart(new char[] { '-' });
+                    case 1:
+                        demangler = new Demangler(demangler_name);
                         string Filepath = args[1];
 
-                        demangler = new Demangler(demanglerName);
                         if (NativeFile.Exists(Filepath))
                         {
                             TestFilepath(Filepath, demangler);
@@ -134,6 +178,7 @@ namespace Dependencies
                             string undecoratedName = demangler.UndecorateName(args[1]);
                             Console.WriteLine(undecoratedName);
                         }
+
                         break;
                 }
 
