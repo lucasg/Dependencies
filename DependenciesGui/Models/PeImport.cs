@@ -11,7 +11,8 @@ public class DisplayPeImport : SettingBindingHandler
     public DisplayPeImport(
         PeImport PeImport,
         PhSymbolProvider SymPrv,
-        string ModuleFilePath
+        string ModuleFilePath,
+        bool ImportFound
     )
     {
        Info.ordinal = PeImport.Ordinal;
@@ -19,7 +20,10 @@ public class DisplayPeImport : SettingBindingHandler
        Info.name = PeImport.Name;
        Info.moduleName = PeImport.ModuleName;
        Info.modulePath = ModuleFilePath;
-       Info.UndecoratedName = SymPrv.UndecorateName(PeImport.Name);
+
+       Tuple<CLRPH_DEMANGLER, string> DemanglingInfos = SymPrv.UndecorateName(PeImport.Name);
+       Info.Demangler = Enum.GetName(typeof(CLRPH_DEMANGLER), DemanglingInfos.Item1); 
+       Info.UndecoratedName = DemanglingInfos.Item2;
 
        Info.delayedImport = PeImport.DelayImport;
        Info.importAsCppName = (PeImport.Name.Length > 0 && PeImport.Name[0] == '?');
@@ -88,6 +92,7 @@ public class DisplayPeImport : SettingBindingHandler
 
     public Boolean DelayImport { get { return Info.delayedImport; } }
 
+    public string Demangler { get { return this.Info.Demangler; } }
 
     protected string GetDisplayName(bool UndecorateName)
     {
@@ -176,7 +181,9 @@ public struct PeImportInfo
    public string name;
    public string moduleName;
    public string modulePath;
+
    public string UndecoratedName;
+   public string Demangler;
 
    public Boolean delayedImport;
    public Boolean importByOrdinal;

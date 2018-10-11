@@ -62,6 +62,7 @@
             </GridViewColumn>
             <GridViewColumn Header="Function" Width="250" DisplayMemberBinding="{Binding Name}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
             <GridViewColumn Header="VirtualAddress" Width="100" DisplayMemberBinding="{Binding VirtualAddress, StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="VirtualAddress" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
+            <GridViewColumn Header="Demangler" Width="250" DisplayMemberBinding="{Binding Demangler}" util:GridViewSort.PropertyName="Name" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
         </GridView>
     </local:DependencyCustomListView.View>
 </local:DependencyCustomListView>

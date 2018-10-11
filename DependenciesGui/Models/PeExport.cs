@@ -21,7 +21,11 @@ public class DisplayPeExport : SettingBindingHandler
         PeInfo.forwardedExport = PeExport.ForwardedName.Length > 0;
         PeInfo.exportAsCppName = (PeExport.Name.Length > 0 && PeExport.Name[0] == '?');
         PeInfo.virtualAddress = PeExport.VirtualAddress;
-        PeInfo.UndecoratedName = SymPrv.UndecorateName(PeExport.Name);
+        
+
+        Tuple<CLRPH_DEMANGLER, string> DemanglingInfos = SymPrv.UndecorateName(PeExport.Name);
+        PeInfo.Demangler = Enum.GetName(typeof(CLRPH_DEMANGLER), DemanglingInfos.Item1);
+        PeInfo.UndecoratedName = DemanglingInfos.Item2;
 
         AddNewEventHandler("Undecorate", "Undecorate", "Name", this.GetDisplayName);
     }
@@ -67,7 +71,7 @@ public class DisplayPeExport : SettingBindingHandler
 
     public string VirtualAddress { get { return String.Format("0x{0:x8}", PeInfo.virtualAddress); } }
 
-
+    public string Demangler { get { return PeInfo.Demangler; } }
 
     protected string GetDisplayName(bool Undecorate)
     { 
@@ -155,4 +159,5 @@ public struct PeExportInfo
     public string name;
     public string ForwardName;
     public string UndecoratedName;
+    public string Demangler;
 }
