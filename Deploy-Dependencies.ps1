@@ -8,8 +8,8 @@ function Get-PeviewBinary {
   $PeviewBinaryFile = "";
 
   # use temporary folder for download
-  New-Item -ItemType Directory -Force -Path "tmp";
-  Set-Location "tmp";
+  New-Item -ItemType Directory -Force -Path "$($env:TEMP)/tmp";
+  Set-Location "$($env:TEMP)/tmp";
 
   &wget $Url -OutFile "processhacker-2.39-bin.zip";
   $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path "./processhacker-2.39-bin.zip").Hash;
@@ -109,7 +109,7 @@ Write-Host "Test if the binary (and the underlying lib) actually works"
 Write-Host "Tests done."
 
 Write-Host "Zipping everything"
-&7z.exe a Dependencies_$($env:platform)_$($env:CONFIGURATION).zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DepsFolder/*.exe;
+&7z.exe a "Dependencies_$($env:platform)_$($env:CONFIGURATION).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DepsFolder/*.exe;
 &7z.exe a "Dependencies_$($env:platform)_$($env:CONFIGURATION)_(without peview.exe).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $DepsFolder/*.exe;
 
 # APPX packaging
