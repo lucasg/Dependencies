@@ -84,8 +84,8 @@ function Get-DependenciesDeps {
 }
 
 $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)$($env:platform)";
+$DepsFolder="deps_$($env:CONFIGURATION)$_($env:platform)";
 $OutputFolder="output";
-$DepsFolder="deps";
 
 # Creating output directory
 New-Item -ItemType Directory -Force -Path $DepsFolder;
