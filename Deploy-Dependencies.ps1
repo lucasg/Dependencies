@@ -24,30 +24,81 @@ function Get-PeviewBinary {
   return $PeviewBinaryFile;
 }
 
-# Download external dependencies like peview
-$ProcessHackerReleaseUrl = "https://github.com/processhacker2/processhacker2/releases/download/v2.39/processhacker-2.39-bin.zip";
-$PeviewReleaseHash = "2afb5303e191dde688c5626c3ee545e32e52f09da3b35b20f5e0d29a418432f5";
-$PEVIEW_BIN= Get-PeviewBinary -Url $ProcessHackerReleaseUrl -Hash $PeviewReleaseHash;
+function Copy-SystemDll {
+  param(
+    [String] $DllName,
+    [String] $OutputFolder
+  )
 
-if (-not $PEVIEW_BIN)
-{
-  Write-Error "[x] Peview binary has not correctly been downloaded."
+  $SystemFolder = [System.Environment]::GetFolderPath('SystemX86');
+  if ($env:os -eq "x64")
+  {
+    $SystemFolder = [System.Environment]::GetFolderPath('System');
+  }
+
+  $DllPath="$($SystemFolder)\$(DllName)";
+  if (Test-Path $DllPath) {
+    Copy-Item (Resolve-Path $DllPath).Path -Destination $OutputFolder;
+  }
 }
 
+function Get-DependenciesDeps {
+  param(
+    [String] $Binpath,
+    [String] $OutputFolder
+  )
 
-# Bundling dbghelp.dll along for undecorating names
-$DbgHelpDll="$env:SystemRoot\System32\dbghelp.dll";
-if (Test-Path $DbgHelpDll) {
-  $DbgHelpDll=(Resolve-Path $DbgHelpDll).Path;
+  # Download external dependencies like peview
+  $ProcessHackerReleaseUrl = "https://github.com/processhacker2/processhacker2/releases/download/v2.39/processhacker-2.39-bin.zip";
+  $PeviewReleaseHash = "2afb5303e191dde688c5626c3ee545e32e52f09da3b35b20f5e0d29a418432f5";
+  $PEVIEW_BIN= Get-PeviewBinary -Url $ProcessHackerReleaseUrl -Hash $PeviewReleaseHash;
+
+  if (-not $PEVIEW_BIN)
+  {
+    Write-Error "[x] Peview binary has not correctly been downloaded."
+  }
+
+
+  # Bundling dbghelp.dll along for undecorating names
+  Copy-SystemDll -DllName "dbghelp.dll" -OutputFolder $OutputFolder;
+
+  # Bundling every msvc redistribuables
+  $ClrPhLibPath = "$($Binpath)/ClrPhLib.dll";
+  $ClrPhLibImports = &"$($Binpath)/Dependencies.exe" -json -imports $ClrPhLibPath | ConvertFrom-Json;
+  foreach($DllImport in $ClrPhLibImports.Imports) {
+    
+    # vcruntime
+    if ($DllImport.Name.ToLower().StartsWith("vcruntime"))
+    {
+      Copy-SystemDll -DllName $DllImport.Name -OutputFolder $OutputFolder;
+    }
+
+    # mscvp
+    if ($DllImport.Name.ToLower().StartsWith("mscvp"))
+    {
+      Copy-SystemDll -DllName $DllImport.Name -OutputFolder $OutputFolder;
+    }
+  }
+
+  return $PEVIEW_BIN;
 }
-
-
-# Creating output directory
-New-Item -ItemType Directory -Force -Path "output";
-cd output;
 
 $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)$($env:platform)";
+$OutputFolder="output";
+$DepsFolder="deps";
 
+# Creating output directory
+New-Item -ItemType Directory -Force -Path $DepsFolder;
+New-Item -ItemType Directory -Force -Path $OutputFolder;
+$OutputFolder=(Resolve-Path $OutputFolder).Path;
+$DepsFolder=(Resolve-Path $DepsFolder).Path;
+
+
+# Retrieve all dependencies that need to be packaged
+$PEVIEW_BIN = Get-DependenciesDeps -Binpath $BINPATH -OutputFolder $DepsFolder;
+
+
+cd $OutputFolder;
 Write-Host "Test if the binary (and the underlying lib) actually works"
 &"$BINPATH/Dependencies.exe" -knowndll
 &"$BINPATH/Dependencies.exe" -apisets
@@ -58,8 +109,8 @@ Write-Host "Test if the binary (and the underlying lib) actually works"
 Write-Host "Tests done."
 
 Write-Host "Zipping everything"
-&7z.exe a Dependencies_$($env:platform)_$($env:CONFIGURATION).zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DbgHelpDll;
-&7z.exe a "Dependencies_$($env:platform)_$($env:CONFIGURATION)_(without peview.exe).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $DbgHelpDll;
+&7z.exe a Dependencies_$($env:platform)_$($env:CONFIGURATION).zip $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DepsFolder/*.exe;
+&7z.exe a "Dependencies_$($env:platform)_$($env:CONFIGURATION)_(without peview.exe).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $DepsFolder/*.exe;
 
 # APPX packaging
 if (( $($env:CONFIGURATION) -eq "Release") -and ($env:APPVEYOR_REPO_TAG)) {
