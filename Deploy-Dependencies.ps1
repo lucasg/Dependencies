@@ -36,7 +36,7 @@ function Copy-SystemDll {
     $SystemFolder = [System.Environment]::GetFolderPath('System');
   }
 
-  $DllPath="$($SystemFolder)\$(DllName)";
+  $DllPath="$($SystemFolder)\$($DllName)";
   if (Test-Path $DllPath) {
     Copy-Item (Resolve-Path $DllPath).Path -Destination $OutputFolder;
   }
