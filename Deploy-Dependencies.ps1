@@ -15,13 +15,13 @@ function Get-PeviewBinary {
   $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path "./processhacker-2.39-bin.zip").Hash;
 
   if ($PhArchiveHash -eq "2afb5303e191dde688c5626c3ee545e32e52f09da3b35b20f5e0d29a418432f5") {
-    &7z.exe x ./processhacker-2.39-bin.zip $($env:platform)/peview.exe
-    $PeviewBinaryFile = (Resolve-Path ./$($env:platform)/peview.exe).Path;
+    &7z.exe x "./processhacker-2.39-bin.zip" "$($env:platform)/peview.exe";
+    $PeviewBinaryFile = (Resolve-Path "./$($env:platform)/peview.exe").Path;
   }
 
+  # Because of wacky Powershell "return" behavior, it's better to store the result in a env variable.
+  $env:PEVIEW_PATH = $PeviewBinaryFile;
   Pop-Location;
-
-  return $PeviewBinaryFile;
 }
 
 function Copy-SystemDll {
@@ -51,9 +51,8 @@ function Get-DependenciesDeps {
   # Download external dependencies like peview
   $ProcessHackerReleaseUrl = "https://github.com/processhacker2/processhacker2/releases/download/v2.39/processhacker-2.39-bin.zip";
   $PeviewReleaseHash = "2afb5303e191dde688c5626c3ee545e32e52f09da3b35b20f5e0d29a418432f5";
-  $PEVIEW_BIN= Get-PeviewBinary -Url $ProcessHackerReleaseUrl -Hash $PeviewReleaseHash;
-
-  if (-not $PEVIEW_BIN)
+  Get-PeviewBinary -Url $ProcessHackerReleaseUrl -Hash $PeviewReleaseHash;
+  if (-not $env:PEVIEW_PATH)
   {
     Write-Error "[x] Peview binary has not correctly been downloaded."
   }
@@ -73,32 +72,29 @@ function Get-DependenciesDeps {
       Copy-SystemDll -DllName $DllImport.Name -OutputFolder $OutputFolder;
     }
 
-    # mscvp
-    if ($DllImport.Name.ToLower().StartsWith("mscvp"))
+    # msvc
+    if ($DllImport.Name.ToLower().StartsWith("msvc"))
     {
       Copy-SystemDll -DllName $DllImport.Name -OutputFolder $OutputFolder;
     }
   }
 
-  return $PEVIEW_BIN;
+  return [string]$PeviewBinaryFile;
 }
 
 $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)$($env:platform)";
-$DepsFolder="deps_$($env:CONFIGURATION)$_($env:platform)";
-$OutputFolder="output";
+$DepsFolder="C:/projects/dependencies/deps/$($env:CONFIGURATION)$($env:platform)";
+$OutputFolder="C:/projects/dependencies/output";
 
 # Creating output directory
 New-Item -ItemType Directory -Force -Path $DepsFolder;
 New-Item -ItemType Directory -Force -Path $OutputFolder;
-$OutputFolder=(Resolve-Path $OutputFolder).Path;
-$DepsFolder=(Resolve-Path $DepsFolder).Path;
 
 
 # Retrieve all dependencies that need to be packaged
-$PEVIEW_BIN = Get-DependenciesDeps -Binpath $BINPATH -OutputFolder $DepsFolder;
+Get-DependenciesDeps -Binpath $BINPATH -OutputFolder $DepsFolder;
 
 
-cd $OutputFolder;
 Write-Host "Test if the binary (and the underlying lib) actually works"
 &"$BINPATH/Dependencies.exe" -knowndll
 &"$BINPATH/Dependencies.exe" -apisets
@@ -109,8 +105,8 @@ Write-Host "Test if the binary (and the underlying lib) actually works"
 Write-Host "Tests done."
 
 Write-Host "Zipping everything"
-&7z.exe a "Dependencies_$($env:platform)_$($env:CONFIGURATION).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $PEVIEW_BIN $DepsFolder/*.exe;
-&7z.exe a "Dependencies_$($env:platform)_$($env:CONFIGURATION)_(without peview.exe).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $DepsFolder/*.exe;
+&7z.exe a "$($OutputFolder)/Dependencies_$($env:platform)_$($env:CONFIGURATION).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $DepsFolder/* $env:PEVIEW_PATH;
+&7z.exe a "$($OutputFolder)/Dependencies_$($env:platform)_$($env:CONFIGURATION)_(without peview.exe).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $DepsFolder/*;
 
 # APPX packaging
 if (( $($env:CONFIGURATION) -eq "Release") -and ($env:APPVEYOR_REPO_TAG)) {
