@@ -173,8 +173,13 @@
                    Margin="0" 
                    VerticalAlignment="Bottom" 
                    Visibility="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}"
-                   />
-                   
-                  
+                   >
+            <StatusBarItem 
+                x:Name="AppStatusBarMessage">
+                "Welcome to Dependencies !"
+            </StatusBarItem>
+        </StatusBar>
+
+
     </Grid>
 </Window>

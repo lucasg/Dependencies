@@ -188,7 +188,7 @@ namespace Dependencies
             get { 
             
                 if (_Imports == null) {
-                    _Imports = BinaryCache.LoadPe(Filepath).GetImports();
+                    _Imports = (System.Windows.Application.Current as App).LoadBinary(Filepath).GetImports();
                 }
             
                 return _Imports;  
@@ -200,7 +200,7 @@ namespace Dependencies
             get { 
             
                 if (_Exports == null) {
-                    _Exports = BinaryCache.LoadPe(Filepath).GetExports();
+                    _Exports = (System.Windows.Application.Current as App).LoadBinary(Filepath).GetExports();
                 }
 
                 return _Exports;

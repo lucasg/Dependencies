@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Shell;
+using System.ComponentModel;
 
 using Dependencies.ClrPh;
 
@@ -9,15 +10,63 @@ namespace Dependencies
     /// <summary>
     /// Application instance
     /// </summary>
-    public partial class App : Application
+    public partial class App : Application, INotifyPropertyChanged
     {
+        private string statusBarMessage = "";
+        private MainWindow mainWindow;
+
+        public string StatusBarMessage
+        {
+            get { return statusBarMessage; }
+            set
+            {
+                if (statusBarMessage != value)
+                {
+                    statusBarMessage = value;
+                    OnPropertyChanged("StatusBarMessage");
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void App_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "StatusBarMessage")
+            {
+                mainWindow.AppStatusBarMessage.Content = (object)StatusBarMessage;
+            }
+        }
+
+        public PE LoadBinary(string path)
+        {
+            StatusBarMessage = String.Format("Loading module {0:s} ...", path);
+            PE pe = BinaryCache.LoadPe(path);
+
+            if (!pe.LoadSuccessful)
+            {
+                StatusBarMessage = String.Format("Loading module {0:s} failed.", path);
+            }
+            else
+            {
+                StatusBarMessage = String.Format("Loading PE file \"{0:s}\" successful.", pe.Filepath);
+            }
+            
+            return pe;
+        }
+
         void App_Startup(object sender, StartupEventArgs e)
         {
+            (Application.Current as App).PropertyChanged += App_PropertyChanged;
+
             Phlib.InitializePhLib();
-            
             BinaryCache.Instance.Load();
 
-            MainWindow mainWindow = new MainWindow();
+            mainWindow = new MainWindow();
             mainWindow.IsMaster = true;
 
             switch(Phlib.GetClrPhArch())

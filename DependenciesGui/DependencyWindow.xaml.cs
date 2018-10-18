@@ -286,7 +286,7 @@ namespace Dependencies
 
         public void InitializeView()
         {
-            this.Pe = BinaryCache.LoadPe(this.Filename);
+            this.Pe = (Application.Current as App).LoadBinary(this.Filename);
 
             if (!this.Pe.LoadSuccessful)
             {
@@ -543,7 +543,7 @@ namespace Dependencies
 
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, string FilePath, int RecursionLevel = 0)
         {
-            PE CurrentPE = BinaryCache.LoadPe(FilePath);
+            PE CurrentPE = (Application.Current as App).LoadBinary(FilePath);
 
             if (null == CurrentPE)
             {
