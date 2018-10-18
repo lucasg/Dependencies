@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
 using Dependencies.ClrPh;
+using System.ComponentModel;
 
 namespace Dependencies
 {
@@ -238,7 +239,7 @@ namespace Dependencies
             // "warm up" the cache
             foreach (var CachedBinary in Directory.EnumerateFiles(BinaryCacheFolderPath))
             {
-                GetBinary(CachedBinary);
+                GetBinaryAsync(CachedBinary);
             }
 
             string System32Folder = Environment.GetFolderPath(Environment.SpecialFolder.System);
@@ -255,18 +256,18 @@ namespace Dependencies
             // preload all well konwn dlls
             foreach (String KnownDll in Phlib.GetKnownDlls(false))
             {
-                GetBinary(Path.Combine(System32Folder, KnownDll));
+                GetBinaryAsync(Path.Combine(System32Folder, KnownDll));
             }
 
             foreach (String KnownDll in Phlib.GetKnownDlls(true))
             {
                 if (Wow64Dlls.Contains(KnownDll))
                 {
-                    GetBinary(Path.Combine(System32Folder, KnownDll));
+                    GetBinaryAsync(Path.Combine(System32Folder, KnownDll));
                 }
                 else
                 {
-                    GetBinary(Path.Combine(SysWow64Folder, KnownDll));
+                    GetBinaryAsync(Path.Combine(SysWow64Folder, KnownDll));
                 }
                 
             }
@@ -308,6 +309,23 @@ namespace Dependencies
             // flush the cache
             BinaryDatabase.Clear();
             FilepathDatabase.Clear();
+        }
+
+        public void GetBinaryAsync(string PePath, RunWorkerCompletedEventHandler Callback = null)
+        {
+            BackgroundWorker bw = new BackgroundWorker();
+            bw.DoWork += (sender, e) => {
+
+                GetBinary(PePath);
+            };
+
+            if (Callback != null)
+            {
+                bw.RunWorkerCompleted += Callback;
+            }
+            
+
+            bw.RunWorkerAsync();
         }
 
         public PE GetBinary(string PePath)
