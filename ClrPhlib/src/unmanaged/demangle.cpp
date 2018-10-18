@@ -10,12 +10,16 @@ extern "C" {
 		int* status);
 }
 
+#define DEMANGLER_DEBUGLOG_ON		(false)
 #define DEMANGLER_DEBUGLOG_CAT ("demangler")
 #define DEMANGLER_DEBUGLOG_ONE (DemanglerDebugOneArg)
 #define DEMANGLER_DEBUGLOG_TWO (DemanglerDebugTwoArg)
 
 void DemanglerDebugOneArg(wchar_t *Format, wchar_t *Arg0)
 {
+	if (!DEMANGLER_DEBUGLOG_ON)
+		return;
+
 	do																							
 	{																							
 		System::Diagnostics::Debug::WriteLine(													
@@ -30,6 +34,9 @@ void DemanglerDebugOneArg(wchar_t *Format, wchar_t *Arg0)
 
 void DemanglerDebugTwoArg(wchar_t *Format, wchar_t *Arg0, wchar_t *Arg1)
 {
+	if (!DEMANGLER_DEBUGLOG_ON)
+		return;
+
 	do
 	{
 		System::Diagnostics::Debug::WriteLine(
