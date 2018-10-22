@@ -112,6 +112,7 @@ namespace Dependencies
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             string Filepath = (string) value;
+            
             Icon icon = ShellIcon.GetSmallIcon(Filepath);
 
             if (NativeFile.Exists(Filepath) && (icon != null))
