@@ -86,5 +86,5 @@ after_test:
       
 
 test_script: # should be on_finish, but it need to be executed before artifacts is
-  - ps: .\Deploy-Dependencies.ps1 
+  - ps: Write-Host "TEST_VAR : $($env:TEST_VAR)" #.\Deploy-Dependencies.ps1 
   - ps: Write-Host "Building artifact done"
