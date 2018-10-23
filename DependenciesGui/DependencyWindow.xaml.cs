@@ -342,7 +342,7 @@ namespace Dependencies
         /// </summary>
         /// <param name="NewTreeContexts"> This variable is passed as reference to be updated since this function is run in a separate thread. </param>
         /// <param name="newPe"> Current PE file analyzed </param>
-        private void ProcessPe(List<ImportContext> NewTreeContexts, PE newPe)
+        private void ProcessPe(Dictionary<string, ImportContext> NewTreeContexts, PE newPe)
         {
             List<PeImportDll> PeImports = newPe.GetImports();
 
@@ -365,8 +365,11 @@ namespace Dependencies
                 {
                     ImportModule.Flags |= ModuleFlag.DelayLoad;
                 }
-                
 
+                if (NewTreeContexts.ContainsKey(DllImport.Name))
+                { 
+                    continue;
+                }
 
                 // Find Dll in "paths"
                 Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(this.Pe, DllImport.Name, this.SxsEntriesCache);
@@ -398,7 +401,7 @@ namespace Dependencies
 
                 }
 
-                NewTreeContexts.Add(ImportModule);
+                NewTreeContexts.Add(DllImport.Name, ImportModule);
 
 
                 // AppInitDlls are triggered by user32.dll, so if the binary does not import user32.dll they are not loaded.
@@ -424,6 +427,11 @@ namespace Dependencies
                                 continue;
                             }
 
+                            if (NewTreeContexts.ContainsKey(AppInitDll))
+                            { 
+                                continue;
+                            }
+
                             ImportContext AppInitImportModule = new ImportContext();
                             AppInitImportModule.PeFilePath = null;
                             AppInitImportModule.PeProperties = null;
@@ -441,7 +449,7 @@ namespace Dependencies
                                 AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
                             }
 
-                            NewTreeContexts.Add(AppInitImportModule);
+                            NewTreeContexts.Add(AppInitDll, AppInitImportModule);
                         }
                     }
                 }
@@ -487,7 +495,10 @@ namespace Dependencies
                                     AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
                                 }
 
-                                NewTreeContexts.Add(AppInitImportModule);
+                                if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
+                                {
+                                    NewTreeContexts.Add(AppInitImportModule.ModuleName, AppInitImportModule);
+                                }
                             }
 
                         }
@@ -526,7 +537,10 @@ namespace Dependencies
                                 AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
                             }
 
-                            NewTreeContexts.Add(AppInitImportModule);
+                            if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
+                            {
+                                NewTreeContexts.Add(AppInitImportModule.ModuleName, AppInitImportModule);
+                            }
                         }
                     }
                 }
@@ -556,7 +570,7 @@ namespace Dependencies
         private void ConstructDependencyTree(ModuleTreeViewItem RootNode, PE CurrentPE, int RecursionLevel = 0)
         {
             // "Closured" variables (it 's a scope hack really).
-            List<ImportContext> NewTreeContexts = new List<ImportContext>();
+            Dictionary<string, ImportContext> NewTreeContexts = new Dictionary<string, ImportContext>();
 
             BackgroundWorker bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true; // useless here for now
@@ -580,7 +594,7 @@ namespace Dependencies
                 // which is authorized to manipulate UI elements. The BackgroundWorker is not.
                 //
 
-                foreach (ImportContext NewTreeContext in NewTreeContexts)
+                foreach (ImportContext NewTreeContext in NewTreeContexts.Values)
                 {
                     ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
                     DependencyNodeContext childTreeNodeContext = new DependencyNodeContext();
