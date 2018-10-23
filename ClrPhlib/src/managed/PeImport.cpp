@@ -53,6 +53,9 @@ PeImportDll::PeImportDll(
 
 	if (!NT_SUCCESS(PhGetMappedImageImportDll(PvMappedImports, (ULONG)ImportDllIndex, ImportDll)))
 	{
+		Flags = 0;
+		Name = gcnew String("## PeImportDll error: Invalid DllName ##");
+		NumberOfEntries = 0;
 		return;
 	}
 
