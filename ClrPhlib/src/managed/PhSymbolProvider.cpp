@@ -59,7 +59,7 @@ Tuple<CLRPH_DEMANGLER, String^>^  PhSymbolProvider::UndecorateName(_In_ String ^
 	size_t UndecoratedNameLen = 0;
 	CLRPH_DEMANGLER Demangler = CLRPH_DEMANGLER::None;
 
-	if (!m_Impl || DecoratedName->Length == 0) {
+	if (!m_Impl || !DecoratedName || DecoratedName->Length == 0) {
 		return gcnew Tuple<CLRPH_DEMANGLER, String^> (Demangler, gcnew String(""));
 	}
 
