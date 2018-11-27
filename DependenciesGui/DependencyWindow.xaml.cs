@@ -275,12 +275,23 @@ namespace Dependencies
         DisplayModuleInfo _SelectedModule;
         bool _DisplayWarning;
 
+		public List<string> CustomSearchFolders;
+
         #region PublicAPI
-        public DependencyWindow(String Filename)
+        public DependencyWindow(String Filename, List<string> CustomSearchFolders = null)
         {
             InitializeComponent();
 
-            this.Filename = Filename;
+			if (CustomSearchFolders != null)
+			{
+				this.CustomSearchFolders = CustomSearchFolders;
+			}
+			else
+			{
+				this.CustomSearchFolders = new List<string>();
+			}
+			
+			this.Filename = Filename;
             InitializeView();
         }
 
@@ -371,8 +382,14 @@ namespace Dependencies
                     continue;
                 }
 
-                // Find Dll in "paths"
-                Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(this.Pe, DllImport.Name, this.SxsEntriesCache);
+				// Find Dll in "paths"
+				Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(
+					this.Pe,
+					DllImport.Name,
+					this.SxsEntriesCache,
+					this.CustomSearchFolders
+				);
+
                 ImportModule.ModuleLocation = ResolvedModule.Item1;
                 if (ImportModule.ModuleLocation != ModuleSearchStrategy.NOT_FOUND)
                 {
@@ -442,7 +459,12 @@ namespace Dependencies
 
                             
 
-                            Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, AppInitDll, this.SxsEntriesCache);
+                            Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(
+								this.Pe, 
+								AppInitDll, 
+								this.SxsEntriesCache,
+								this.CustomSearchFolders
+							);
                             if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
                             {
                                 AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
@@ -488,7 +510,12 @@ namespace Dependencies
                                 AppInitImportModule.Flags = ModuleFlag.ClrReference;
                                 AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
 
-                                Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, AssemblyModule.FileName, this.SxsEntriesCache);
+                                Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(
+									this.Pe, 
+									AssemblyModule.FileName, 
+									this.SxsEntriesCache,
+									this.CustomSearchFolders
+								);
                                 if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
                                 {
                                     AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
@@ -530,7 +557,12 @@ namespace Dependencies
                             AppInitImportModule.Flags = ModuleFlag.ClrReference;
                             AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
 
-                            Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(this.Pe, UnmanagedModule.Name, this.SxsEntriesCache);
+                            Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(
+								this.Pe, 
+								UnmanagedModule.Name, 
+								this.SxsEntriesCache,
+								this.CustomSearchFolders
+							);
                             if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
                             {
                                 AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
@@ -780,7 +812,12 @@ namespace Dependencies
                 CurrentModule = this._SelectedModule;
             }
 
-            Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(this.Pe, ModuleName, this.SxsEntriesCache);
+            Tuple<ModuleSearchStrategy, PE> ResolvedModule = BinaryCache.ResolveModule(
+				this.Pe, 
+				ModuleName, 
+				this.SxsEntriesCache,
+				this.CustomSearchFolders
+			);
             string ModuleFilepath = (ResolvedModule.Item2 != null) ? ResolvedModule.Item2.Filepath : null;
 
             ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);

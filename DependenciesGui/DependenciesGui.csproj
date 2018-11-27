@@ -147,6 +147,9 @@
     <Compile Include="ModuleSearchOrder.xaml.cs">
       <DependentUpon>ModuleSearchOrder.xaml</DependentUpon>
     </Compile>
+    <Compile Include="SearchFolder.xaml.cs">
+      <DependentUpon>SearchFolder.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="Shell32IconExtractor.cs" />
     <Compile Include="UserSettings.xaml.cs">
@@ -197,6 +200,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="ModuleSearchOrder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="SearchFolder.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

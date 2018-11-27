@@ -42,10 +42,13 @@ namespace Dependencies
     {
         public static readonly RoutedUICommand OpenAboutCommand = new RoutedUICommand();
         public static readonly RoutedUICommand OpenUserSettingsCommand = new RoutedUICommand();
-        private readonly IInterTabClient _interTabClient = new DependenciesInterTabClient();
+		public static readonly RoutedUICommand OpenCustomizeSearchFolderCommand = new RoutedUICommand();
+
+		private readonly IInterTabClient _interTabClient = new DependenciesInterTabClient();
 
         private About AboutPage;
         private UserSettings UserSettings;
+		private SearchFolder SearchFolder;
         private bool _Master;
 
         #region PublicAPI
@@ -58,9 +61,10 @@ namespace Dependencies
 
             this.AboutPage = new About();
             this.UserSettings = new UserSettings();
+			this.SearchFolder = null;
 
-            // TODO : understand how to reliably bind in xaml
-            this.TabControl.InterTabController.InterTabClient = DoNothingInterTabClient;
+			// TODO : understand how to reliably bind in xaml
+			this.TabControl.InterTabController.InterTabClient = DoNothingInterTabClient;
             this.TabControl.IsEmptyChanged += MainWindow_TabControlIsEmptyHandler;
 
             this._Master = false;
@@ -200,7 +204,21 @@ namespace Dependencies
             this.UserSettings.Show();
         }
 
-        private void RefreshCommandBinding_Executed(object sender, RoutedEventArgs e)
+		private void OpenCustomizeSearchFolderCommand_Executed(object sender, RoutedEventArgs e)
+		{
+			DependencyWindow SelectedItem = this.TabControl.SelectedItem as DependencyWindow;
+
+			if (this.SearchFolder != null)
+			{
+				this.SearchFolder.Close();
+			}
+			
+			this.SearchFolder = new SearchFolder(SelectedItem);
+			this.SearchFolder.Show();
+		}
+
+
+		private void RefreshCommandBinding_Executed(object sender, RoutedEventArgs e)
         {
             (this.TabControl.SelectedItem as DependencyWindow).InitializeView();
         }
@@ -215,8 +233,10 @@ namespace Dependencies
         {
             this.UserSettings.Close();
             this.AboutPage.Close();
+			this.SearchFolder.Close();
 
-            base.OnClosing(e);
+
+			base.OnClosing(e);
         }
 
         /// <summary>

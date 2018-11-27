@@ -22,7 +22,8 @@ namespace Dependencies
         Fullpath = 9,
         ClrAssembly = 10,
 
-        NOT_FOUND = 0xff
+		UserDefined = 0xfe,
+		NOT_FOUND = 0xff
     };
 
     #region FindPe
@@ -61,7 +62,7 @@ namespace Dependencies
         //      5. %pwd%
         //      6. AppDatas
         //      }
-        public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache)
+        public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders)
         {
             bool Wow64Dll = RootPe.IsWow64Dll();
             string RootPeFolder = Path.GetDirectoryName(RootPe.Filepath);
@@ -160,7 +161,18 @@ namespace Dependencies
             }
 
 
-            return new Tuple<ModuleSearchStrategy, string>(
+			// 0xff. Allow the user to supply custom search folders, to take into account
+			// specific cases.
+			FoundPePath = FindPeFromPath(ModuleName, CustomSearchFolders, Wow64Dll);
+			if (FoundPePath != null)
+			{
+				return new Tuple<ModuleSearchStrategy, string>(
+					ModuleSearchStrategy.UserDefined,
+				   FoundPePath
+				);
+			}
+
+			return new Tuple<ModuleSearchStrategy, string>(
                 ModuleSearchStrategy.NOT_FOUND,
                 null
             );
