@@ -62,7 +62,7 @@ namespace Dependencies
         //      5. %pwd%
         //      6. AppDatas
         //      }
-        public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders)
+        public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders, string WorkingDirectory)
         {
             bool Wow64Dll = RootPe.IsWow64Dll();
             string RootPeFolder = Path.GetDirectoryName(RootPe.Filepath);
@@ -128,18 +128,25 @@ namespace Dependencies
                 );
             }
 
-            // 5. Look in current directory
-            // Ignored for the time being since we can't know from
-            // where the exe is run
-            // TODO : Add a user supplied path emulating %cwd%
+			// 5. Look in current directory
+			// Ignored for the time being since we can't know from
+			// where the exe is run
+			// TODO : Add a user supplied path emulating %cwd%
+			FoundPePath = FindPeFromPath(ModuleName, new List<string>(new string[] { WorkingDirectory }), Wow64Dll);
+			if (FoundPePath != null)
+			{
+				return new Tuple<ModuleSearchStrategy, string>(
+					ModuleSearchStrategy.WorkingDirectory,
+				   FoundPePath
+				);
+			}
+
+			// 6. Look in local app data (check for python for exemple)
 
 
-            // 6. Look in local app data (check for python for exemple)
 
-
-
-            // 7. Find in PATH
-            string PATH = Environment.GetEnvironmentVariable("PATH");
+			// 7. Find in PATH
+			string PATH = Environment.GetEnvironmentVariable("PATH");
             List<String> PATHFolders = new List<string>(PATH.Split(';'));
             FoundPePath = FindPeFromPath(ModuleName, PATHFolders, Wow64Dll);
             if (FoundPePath != null)

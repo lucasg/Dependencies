@@ -267,8 +267,9 @@ namespace Dependencies
     { 
 
         PE Pe;
-        string RootFolder;
-        string Filename;
+		public string RootFolder;
+		public string WorkingDirectory;
+		string Filename;
         PhSymbolProvider SymPrv;
         SxsEntries SxsEntriesCache;
         ApiSetSchema ApiSetmapCache;
@@ -293,7 +294,8 @@ namespace Dependencies
 			}
 			
 			this.Filename = Filename;
-            InitializeView();
+			this.WorkingDirectory = Path.GetDirectoryName(this.Filename);
+			InitializeView();
         }
 
         public void InitializeView()
@@ -388,7 +390,8 @@ namespace Dependencies
 					this.Pe,
 					DllImport.Name,
 					this.SxsEntriesCache,
-					this.CustomSearchFolders
+					this.CustomSearchFolders,
+					this.WorkingDirectory
 				);
 
                 ImportModule.ModuleLocation = ResolvedModule.Item1;
@@ -464,7 +467,8 @@ namespace Dependencies
 								this.Pe, 
 								AppInitDll, 
 								this.SxsEntriesCache,
-								this.CustomSearchFolders
+								this.CustomSearchFolders,
+								this.WorkingDirectory
 							);
                             if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
                             {
@@ -515,7 +519,8 @@ namespace Dependencies
 									this.Pe, 
 									AssemblyModule.FileName, 
 									this.SxsEntriesCache,
-									this.CustomSearchFolders
+									this.CustomSearchFolders,
+									this.WorkingDirectory
 								);
                                 if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
                                 {
@@ -562,7 +567,8 @@ namespace Dependencies
 								this.Pe, 
 								UnmanagedModule.Name, 
 								this.SxsEntriesCache,
-								this.CustomSearchFolders
+								this.CustomSearchFolders,
+								this.WorkingDirectory
 							);
                             if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
                             {
@@ -860,7 +866,8 @@ namespace Dependencies
 				this.Pe, 
 				ModuleName, 
 				this.SxsEntriesCache,
-				this.CustomSearchFolders
+				this.CustomSearchFolders,
+				this.WorkingDirectory
 			);
             string ModuleFilepath = (ResolvedModule.Item2 != null) ? ResolvedModule.Item2.Filepath : null;
 

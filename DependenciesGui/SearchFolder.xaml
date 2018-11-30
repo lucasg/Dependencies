@@ -10,13 +10,45 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="5*"/>
+            <RowDefinition Height="33*"/>
             <RowDefinition Height="70*"/>
             <RowDefinition Height="5*"/>
             <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
+        
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="100"/>
+                <ColumnDefinition Width="80*"/>
+                <ColumnDefinition Width="30"/>
+            </Grid.ColumnDefinitions>
+
+            <Label Content="Binary cwd:" 
+                   HorizontalAlignment="Left" 
+                   VerticalAlignment="Center"
+                   Grid.Column="0"
+                   Height="25"
+                   />
+
+            <TextBox Text=""
+                    TextWrapping="Wrap" 
+                    HorizontalContentAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    Height="20"
+                    Width="auto" 
+                    Grid.Column="1"
+                    />
+
+            <Button Content="..." 
+                    Height="20"
+                    Margin="2 0 0 0"
+                    Click="OnBinaryWorkindDirectoryChange"
+                    Grid.Column="2"/>
+        </Grid>
+
 
         <ListBox ItemsSource="{Binding Path=SearchFolders}" 
-                 Grid.Row="1" 
+                 Grid.Row="2" 
                  Name="SearchFoldersList" 
                  Height="auto" 
                  Margin="0,0,0,0" 

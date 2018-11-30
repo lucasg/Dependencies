@@ -375,7 +375,13 @@ namespace Dependencies
 
         public Tuple<ModuleSearchStrategy, PE> ResolveModule(string ModuleName)
         {
-            return BinaryCache.ResolveModule(RootPe, ModuleName /*DllImport.Name*/, SxsEntriesCache, new List<string>());
+            return BinaryCache.ResolveModule(
+				RootPe, 
+				ModuleName /*DllImport.Name*/, 
+				SxsEntriesCache, 
+				new List<string>(),
+				Path.GetDirectoryName(RootPe.Filepath)
+			);
         }
 
         public PeDependencyItem GetModuleItem(string ModuleName, string ModuleFilepath, ModuleSearchStrategy SearchStrategy, int RecursionLevel)

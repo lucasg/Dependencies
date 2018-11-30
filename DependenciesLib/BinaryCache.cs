@@ -58,7 +58,7 @@ namespace Dependencies
             return Instance.GetBinary(PePath);
         }
 
-        public static Tuple<ModuleSearchStrategy, PE> ResolveModule(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders)
+        public static Tuple<ModuleSearchStrategy, PE> ResolveModule(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders, string WorkingDirectory)
         {
             Tuple<ModuleSearchStrategy, string> ResolvedFilepath;
 
@@ -74,7 +74,7 @@ namespace Dependencies
                 ModuleName = ApiSetName;
             }
 
-            ResolvedFilepath = FindPe.FindPeFromDefault(RootPe, ModuleName, SxsCache, CustomSearchFolders);
+            ResolvedFilepath = FindPe.FindPeFromDefault(RootPe, ModuleName, SxsCache, CustomSearchFolders, WorkingDirectory);
 
             // ApiSet override the underneath search location if found
             ModuleSearchStrategy ModuleLocation = ResolvedFilepath.Item1;

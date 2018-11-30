@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using System.Windows.Forms;
 
 namespace Dependencies
 {
@@ -22,10 +23,12 @@ namespace Dependencies
 	{
 		private DependencyWindow _SelectedItem;
 		private ObservableCollection<string> _CustomSearchFolders;
+		private string _working_directory;
 
 		public SearchFolder(DependencyWindow SelectedItem)
 		{
 			_SelectedItem = SelectedItem;
+			_working_directory = SelectedItem.RootFolder;
 			_CustomSearchFolders = new ObservableCollection<string>(SelectedItem.CustomSearchFolders);
 			
 			// bind window to observable collections
@@ -41,6 +44,27 @@ namespace Dependencies
 			}
 		}
 
+		public string WorkingDirectory
+		{
+			get { return _working_directory; }
+		}
+
+		private void OnBinaryWorkindDirectoryChange(object sender, RoutedEventArgs e)
+		{
+			OpenFileDialog InputFileNameDlg = new OpenFileDialog()
+			{
+				Filter = "exe files (*.exe, *.dll)| *.exe;*.dll; | All files (*.*)|*.*",
+				FilterIndex = 0,
+				RestoreDirectory = true,
+				InitialDirectory = _working_directory
+			};
+
+
+			if (InputFileNameDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+				return;
+
+			_working_directory = InputFileNameDlg.FileName;
+		}
 
 		private void OnCancel(object sender, RoutedEventArgs e)
 		{
@@ -63,31 +87,31 @@ namespace Dependencies
 			}
 		}
 
-		private void SearchFolder_DragOver(object sender, DragEventArgs e)
+		private void SearchFolder_DragOver(object sender, System.Windows.DragEventArgs e)
 		{
-			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+			if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
 			{
-				e.Effects = DragDropEffects.Copy;
-				var listbox = sender as ListBox;
+				e.Effects = System.Windows.DragDropEffects.Copy;
+				var listbox = sender as System.Windows.Controls.ListBox;
 				listbox.Background = new SolidColorBrush(Color.FromRgb(155, 155, 155));
 			}
 			else
 			{
-				e.Effects = DragDropEffects.None;
+				e.Effects = System.Windows.DragDropEffects.None;
 			}
 		}
 
-		private void SearchFolder_DragLeave(object sender, DragEventArgs e)
+		private void SearchFolder_DragLeave(object sender, System.Windows.DragEventArgs e)
 		{
-			var listbox = sender as ListBox;
+			var listbox = sender as System.Windows.Controls.ListBox;
 			listbox.Background = new SolidColorBrush(Color.FromRgb(226, 226, 226));
 		}
 
-		private void SearchFolder_Drop(object sender, DragEventArgs e)
+		private void SearchFolder_Drop(object sender, System.Windows.DragEventArgs e)
 		{
-			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+			if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
 			{
-				string[] folders = (string[]) e.Data.GetData(DataFormats.FileDrop);
+				string[] folders = (string[]) e.Data.GetData(System.Windows.DataFormats.FileDrop);
 
 				foreach (string FolderPath in folders)
 				{
@@ -98,7 +122,7 @@ namespace Dependencies
 				}
 			}
 
-			var listbox = sender as ListBox;
+			var listbox = sender as System.Windows.Controls.ListBox;
 			listbox.Background = new SolidColorBrush(Color.FromRgb(226, 226, 226));
 		}
 	}
