@@ -6,20 +6,20 @@
         xmlns:local="clr-namespace:Dependencies"
         mc:Ignorable="d"
         Title="SearchFolder" Height="350" Width="600">
-    <Grid Margin="10 20 20 10" MinHeight="100"  MinWidth="570">
+    <Grid Margin="10 20 10 20" MinHeight="100"  MinWidth="560">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="5*"/>
             <RowDefinition Height="70*"/>
             <RowDefinition Height="5*"/>
-            <RowDefinition Height="20*"/>
+            <RowDefinition Height="10*"/>
         </Grid.RowDefinitions>
 
         <ListBox ItemsSource="{Binding Path=SearchFolders}" 
                  Grid.Row="1" 
                  Name="SearchFoldersList" 
                  Height="auto" 
-                 Margin="10,0,0,0" 
+                 Margin="0,0,0,0" 
                  VerticalAlignment="Stretch"
                  VerticalContentAlignment="Stretch"
                  HorizontalContentAlignment="Stretch"
@@ -55,8 +55,8 @@
         <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150*"/>
-                <ColumnDefinition Width="60"/>
-                <ColumnDefinition Width="60"/>
+                <ColumnDefinition Width="70"/>
+                <ColumnDefinition Width="70"/>
             </Grid.ColumnDefinitions>
 
             <Button Content="Cancel" 
