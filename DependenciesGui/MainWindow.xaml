@@ -85,7 +85,7 @@
                 <MenuItem x:Name="_StatusBarItem" Header="Status Bar" Height="25" IsCheckable="True" Margin="0" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=TwoWay}"/>
             </MenuItem>
             <MenuItem x:Name="OptionsItem" Header="_Options" Height="25" Width="54">
-                <MenuItem x:Name="CustomizeSearchFoldersItem" Header="_Customize search folders" Height="25" Margin="0" Command="local:MainWindow.OpenCustomizeSearchFolderCommand"/>
+                <MenuItem x:Name="CustomizeSearchFoldersItem" Header="_Customize search folders" Height="25" Margin="0" Command="local:MainWindow.OpenCustomizeSearchFolderCommand" IsEnabled="{Binding Path=DataContext.EnableSearchFolderCustomization, Source=OneWay}"/>
                 <Separator Height="3" Margin="0"/>
                 <MenuItem x:Name="UserSettingsItem" Header="_Properties" Height="25" Margin="0" Command="local:MainWindow.OpenUserSettingsCommand"/>
             </MenuItem>

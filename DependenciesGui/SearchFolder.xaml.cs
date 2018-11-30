@@ -49,11 +49,18 @@ namespace Dependencies
 
 		private void OnValidate(object sender, RoutedEventArgs e)
 		{
-			_SelectedItem.CustomSearchFolders = _CustomSearchFolders.ToList();
+			// do not launch analysis again if there is no modifications
+			bool searchFoldersChanged = (_SelectedItem.CustomSearchFolders == _CustomSearchFolders.ToList());
+			
 			this.Close();
 
-			// Force refresh
-			_SelectedItem.InitializeView();
+			if (searchFoldersChanged)
+			{
+				_SelectedItem.CustomSearchFolders = _CustomSearchFolders.ToList();
+
+				// Force refresh
+				_SelectedItem.InitializeView();
+			}
 		}
 
 		private void SearchFolder_DragOver(object sender, DragEventArgs e)

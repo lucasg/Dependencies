@@ -49,10 +49,12 @@ namespace Dependencies
         private About AboutPage;
         private UserSettings UserSettings;
 		private SearchFolder SearchFolder;
-        private bool _Master;
 
-        #region PublicAPI
-        public MainWindow()
+        private bool _Master;
+		private bool _EnableSearchFolderCustomization;
+
+		#region PublicAPI
+		public MainWindow()
         {
 
             InitializeComponent();
@@ -68,6 +70,7 @@ namespace Dependencies
             this.TabControl.IsEmptyChanged += MainWindow_TabControlIsEmptyHandler;
 
             this._Master = false;
+			this.DataContext = this;
         }
 
         /// <summary>
@@ -96,13 +99,21 @@ namespace Dependencies
             get { return _interTabClient; }
         }
 
-        /// <summary>
-        /// When closing all tabs on a particular MainWindow instances, we want
-        /// to know if it's okay to close the application also. the MainWindow created
-        /// by the "App" entry point is marked as "master" and is not closed,
-        /// whereas all the others are.
-        /// </summary>
-        public bool IsMaster
+		
+		public bool EnableSearchFolderCustomization
+		{
+			// find a way to update the toggle based on the number of window opened without relying on
+			// creating a custom IsEnabledChanged event
+			get { return true;/*this.TabControl.SelectedItem != null;*/ }
+		}
+
+		/// <summary>
+		/// When closing all tabs on a particular MainWindow instances, we want
+		/// to know if it's okay to close the application also. the MainWindow created
+		/// by the "App" entry point is marked as "master" and is not closed,
+		/// whereas all the others are.
+		/// </summary>
+		public bool IsMaster
         {
             get { return _Master; }
             set { _Master = value; }
@@ -235,7 +246,12 @@ namespace Dependencies
         {
             this.UserSettings.Close();
             this.AboutPage.Close();
-			this.SearchFolder.Close();
+
+			if (this.SearchFolder!= null)
+			{
+				this.SearchFolder.Close();
+			}
+			
 
 
 			base.OnClosing(e);
