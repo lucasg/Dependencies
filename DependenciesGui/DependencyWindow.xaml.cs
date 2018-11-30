@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -770,28 +771,61 @@ namespace Dependencies
             if (SelectedModule == null)
                 return;
 
-            UpdateImportExportLists(SelectedModule);
+			ModuleTreeViewItem TreeRootItem = this.DllTreeView.Items[0] as ModuleTreeViewItem;
+			ModuleTreeViewItem foundTreeItem = FindModuleInTree(TreeRootItem, SelectedModule, false) as ModuleTreeViewItem;
+
+			if (TreeRootItem == foundTreeItem)
+			{
+				UpdateImportExportLists(SelectedModule, null);
+			}
+
+			DependencyNodeContext foundTreeContext = (DependencyNodeContext) foundTreeItem.DataContext;
+			DisplayModuleInfo foundModule = foundTreeContext.ModuleInfo.Target as DisplayModuleInfo;
+
+
+			DependencyNodeContext parentTreeContext = ((DependencyNodeContext)(VisualTreeHelper.GetParent(foundTreeItem) as ModuleTreeViewItem).DataContext);
+			DisplayModuleInfo parentModule = parentTreeContext.ModuleInfo.Target as DisplayModuleInfo;
+
+			UpdateImportExportLists(SelectedModule, parentModule);
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (this.DllTreeView.SelectedItem == null)
             {
-                UpdateImportExportLists(null);
+                UpdateImportExportLists(null, null);
                 return;
             }
-
-            DependencyNodeContext childTreeContext = ((DependencyNodeContext)(this.DllTreeView.SelectedItem as ModuleTreeViewItem).DataContext);
+			
+			DependencyNodeContext childTreeContext = ((DependencyNodeContext)(this.DllTreeView.SelectedItem as ModuleTreeViewItem).DataContext);
             DisplayModuleInfo SelectedModule = childTreeContext.ModuleInfo.Target as DisplayModuleInfo;
 
-            // Selected Pe has not been found on disk
-            if (SelectedModule == null)
+			// Selected Pe has not been found on disk
+			if (SelectedModule == null)
                 return;
 
-            UpdateImportExportLists(SelectedModule);
+			// Root Item : no parent
+			ModuleTreeViewItem TreeRootItem = this.DllTreeView.Items[0] as ModuleTreeViewItem;
+			ModuleTreeViewItem SelectedItem = this.DllTreeView.SelectedItem as ModuleTreeViewItem;
+			if (SelectedItem == TreeRootItem)
+			{
+				UpdateImportExportLists(SelectedModule, null);
+				return;
+			}
+
+			var parent = VisualTreeHelper.GetParent(SelectedItem as DependencyObject);
+			while ((parent as TreeViewItem) == null)
+			{
+				parent = VisualTreeHelper.GetParent(parent);
+			}
+
+			DependencyNodeContext parentTreeContext = ((DependencyNodeContext)(parent as ModuleTreeViewItem).DataContext);
+			DisplayModuleInfo parentModule = parentTreeContext.ModuleInfo.Target as DisplayModuleInfo;
+
+			UpdateImportExportLists(SelectedModule, parentModule);
         }
 
-        private void UpdateImportExportLists(DisplayModuleInfo SelectedModule)
+        private void UpdateImportExportLists(DisplayModuleInfo SelectedModule, DisplayModuleInfo Parent)
         {
             if (SelectedModule == null)
             {
@@ -800,8 +834,18 @@ namespace Dependencies
             }
             else
             {
-                this.ImportList.SetImports(SelectedModule.Imports, SymPrv, this);
-                this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
+				if (Parent == null) // root module
+				{
+					this.ImportList.SetRootImports(SelectedModule.Imports, SymPrv, this);
+					this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
+				}
+				else
+				{
+					var machingImports = Parent.Imports.FindAll(imp => imp.Name == SelectedModule._Name);
+
+					this.ImportList.SetImports(SelectedModule.Filepath, SelectedModule.Exports, machingImports, SymPrv, this);
+					this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
+				}
             }
         }
 
@@ -915,17 +959,20 @@ namespace Dependencies
         /// </summary>
         /// <param name="Item"></param>
         /// <param name="ExpandNode"></param>
-        private bool FindModuleInTree(ModuleTreeViewItem Item, DisplayModuleInfo Module)
+        private ModuleTreeViewItem FindModuleInTree(ModuleTreeViewItem Item, DisplayModuleInfo Module, bool Highlight=false)
         {
             
             if (Item.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath) == Module.ModuleName)
             {
-                ExpandAllParentNode(Item.Parent as ModuleTreeViewItem);
-                Item.IsSelected = true;
-                Item.BringIntoView();
-                Item.Focus();
+				if (Highlight)
+				{ 
+					ExpandAllParentNode(Item.Parent as ModuleTreeViewItem);
+					Item.IsSelected = true;
+					Item.BringIntoView();
+					Item.Focus();
+				}
 
-                return true;
+				return Item;
             }
 
             // BFS style search -> return the first matching node with the lowest "depth"
@@ -933,22 +980,28 @@ namespace Dependencies
             {
                 if(ChildItem.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath) == Module.ModuleName)
                 {
-                    ExpandAllParentNode(Item);
-                    ChildItem.IsSelected = true;
-                    ChildItem.BringIntoView();
-                    ChildItem.Focus();
-                    return true;
+					if (Highlight)
+					{
+						ExpandAllParentNode(Item);
+						ChildItem.IsSelected = true;
+						ChildItem.BringIntoView();
+						ChildItem.Focus();
+					}
+
+                    return Item;
                 }
             }
 
             foreach (ModuleTreeViewItem ChildItem in Item.Items)
             {
-                // early exit as soon as we find a matching node
-                if (FindModuleInTree(ChildItem, Module))
-                    return true;
+				ModuleTreeViewItem matchingItem = FindModuleInTree(ChildItem, Module, Highlight);
+				
+				// early exit as soon as we find a matching node
+				if (matchingItem != null)
+                    return matchingItem;
             }
 
-            return false;
+            return null;
         }
 
         
@@ -961,7 +1014,7 @@ namespace Dependencies
                     DisplayModuleInfo SelectedModule = (param as DisplayModuleInfo);
                     ModuleTreeViewItem TreeRootItem = this.DllTreeView.Items[0] as ModuleTreeViewItem;
 
-                    FindModuleInTree(TreeRootItem, SelectedModule);
+                    FindModuleInTree(TreeRootItem, SelectedModule, true);
                 });
             }
         }

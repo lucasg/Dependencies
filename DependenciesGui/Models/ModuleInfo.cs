@@ -385,7 +385,7 @@ namespace Dependencies
         /// Name : string to identify the module.
         /// This is the only "mandatory" data, the rest can be private.
         /// </summary>
-        protected string _Name;
+        public string _Name;
         protected string _Filepath;
         protected ModuleFlag _Flags;
 

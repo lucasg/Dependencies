@@ -53,7 +53,7 @@
                                 IsEnabled="True" />
             <Separator Height="3" Margin="-1,0,0,0"/>
             <MenuItem x:Name="ModuleSearchOrderItem" 
-                      Header="Configure _Module search order" 
+                      Header="View _Module search order" 
                       Command="{Binding DataContext.ConfigureSearchOrderCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       CommandParameter ="{Binding Path=PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu} }"
                       InputGestureText="Maj+M" 

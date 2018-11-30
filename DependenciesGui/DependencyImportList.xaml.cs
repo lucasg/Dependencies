@@ -15,7 +15,20 @@ namespace Dependencies
             InitializeComponent();
         }
 
-        public void SetImports(List<PeImportDll> Imports, PhSymbolProvider SymPrv, DependencyWindow Dependencies)
+		public void SetImports(string ModuleFilepath, List<PeExport> Exports, List<PeImportDll> ParentImports, PhSymbolProvider SymPrv, DependencyWindow Dependencies)
+		{
+			this.Items.Clear();
+
+			foreach (PeImportDll DllImport in ParentImports)
+			{
+				foreach (var Import in BinaryCache.LookupImports(DllImport, Exports))
+				{
+					this.Items.Add(new DisplayPeImport(Import.Item1, SymPrv, ModuleFilepath, Import.Item2));
+				}
+			}
+		}
+
+        public void SetRootImports(List<PeImportDll> Imports, PhSymbolProvider SymPrv, DependencyWindow Dependencies)
         {
             this.Items.Clear();
 

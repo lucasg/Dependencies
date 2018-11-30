@@ -153,11 +153,54 @@ namespace Dependencies
             return false;
         }
 
-        public static List<Tuple<PeImport, bool>> LookupImports(PeImportDll ModuleImport, string ModuleFilePath)
-        {
-            List<Tuple<PeImport, bool>> Result = new List<Tuple<PeImport, bool>>();
+		public static List<Tuple<PeImport, bool>> LookupImports(PeImportDll ParentImports, List<PeExport> ModuleExports)
+		{
+			List<Tuple<PeImport, bool>> Result = new List<Tuple<PeImport, bool>>();
 
-            if (ModuleFilePath == null)
+			foreach (PeImport Import in ParentImports.ImportList)
+			{
+				bool bFoundImport = false;
+
+				foreach (var export in ModuleExports)
+				{
+					if (Import.ImportByOrdinal)
+					{
+						if ((export.Ordinal == Import.Ordinal) && export.ExportByOrdinal)
+						{
+							bFoundImport = true;
+							break;
+						}
+
+					}
+					else
+					{
+						if (export.ForwardedName == Import.Name)
+						{
+							bFoundImport = true;
+							break;
+						}
+
+
+						if (export.Name == Import.Name)
+						{
+							bFoundImport = true;
+							break;
+						}
+
+					}
+				}
+
+				Result.Add(new Tuple<PeImport, bool>(Import, bFoundImport));
+			}
+
+			return Result;
+		}
+
+		public static List<Tuple<PeImport, bool>> LookupImports(PeImportDll ModuleImport, string ModuleFilePath)
+        {
+			List<Tuple<PeImport, bool>> Result = new List<Tuple<PeImport, bool>>();
+
+			if (ModuleFilePath == null)
                 return Result;
 
             string ApiSetName = LookupApiSetLibrary(ModuleFilePath);
@@ -170,44 +213,9 @@ namespace Dependencies
             if (Module == null)
                 return Result;
 
-            foreach (PeImport Import in ModuleImport.ImportList)
-            {
-                bool bFoundImport = false;
+			return LookupImports(ModuleImport, Module.GetExports());
 
-                foreach (var export in Module.GetExports())
-                {
-                    if (Import.ImportByOrdinal)
-                    {
-                        if ((export.Ordinal == Import.Ordinal) && export.ExportByOrdinal)
-                        {
-                            bFoundImport = true;
-                            break;
-                        }
-                            
-                    }
-                    else
-                    {
-                        if (export.ForwardedName == Import.Name)
-                        {
-                            bFoundImport = true;
-                            break;
-                        }
-                            
-
-                        if (export.Name == Import.Name)
-                        {
-                            bFoundImport = true;
-                            break;
-                        }
-
-                    }
-                }
-
-                Result.Add(new Tuple<PeImport, bool>(Import, bFoundImport));
-            }
-
-            return Result;
-        }
+		}
 
         #endregion PublicAPI
 
