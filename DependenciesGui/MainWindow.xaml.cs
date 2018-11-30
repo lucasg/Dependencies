@@ -207,6 +207,8 @@ namespace Dependencies
 		private void OpenCustomizeSearchFolderCommand_Executed(object sender, RoutedEventArgs e)
 		{
 			DependencyWindow SelectedItem = this.TabControl.SelectedItem as DependencyWindow;
+			if (SelectedItem == null)
+				return;
 
 			if (this.SearchFolder != null)
 			{
