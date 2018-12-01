@@ -49,9 +49,20 @@ namespace Dependencies
         public UInt64 Filesize;
     }
 
+	public class ApiSetNotFoundModuleInfo : NotFoundModuleInfo
+	{
+		public ApiSetNotFoundModuleInfo(string ApiSetModuleName, string NotFoundHostModule)
+		:base(ApiSetModuleName)
+		{
+			_HostName = NotFoundHostModule;
+		}
 
+		public override string ModuleName { get { return String.Format("{0:s} -> {1:s}", this._Name, _HostName); } }
 
-    public class NotFoundModuleInfo : DisplayModuleInfo
+		private string _HostName;
+	}
+
+	public class NotFoundModuleInfo : DisplayModuleInfo
     {
         public NotFoundModuleInfo(string NotFoundModuleName)
         : base(NotFoundModuleName)

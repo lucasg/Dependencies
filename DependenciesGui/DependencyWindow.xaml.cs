@@ -398,7 +398,9 @@ namespace Dependencies
                 if (ImportModule.ModuleLocation != ModuleSearchStrategy.NOT_FOUND)
                 {
                     ImportModule.PeProperties = ResolvedModule.Item2;
-                    ImportModule.PeFilePath = ResolvedModule.Item2.Filepath;
+
+					if (ResolvedModule.Item2 != null)
+						ImportModule.PeFilePath = ResolvedModule.Item2.Filepath;
                 }
 
                 // special case for apiset schema
@@ -649,7 +651,15 @@ namespace Dependencies
                         // Missing module "found"
                         if ((NewTreeContext.PeFilePath == null) || !NativeFile.Exists(NewTreeContext.PeFilePath)) 
                         {
-                            this.ProcessedModulesCache[ModuleKey] = new NotFoundModuleInfo(ModuleName);
+							if (NewTreeContext.IsApiSet)
+							{
+								this.ProcessedModulesCache[ModuleKey] = new ApiSetNotFoundModuleInfo(ModuleName, NewTreeContext.ApiSetModuleName);
+							}
+							else
+							{
+								this.ProcessedModulesCache[ModuleKey] = new NotFoundModuleInfo(ModuleName);
+							}
+								
                         }
                         else
                         {

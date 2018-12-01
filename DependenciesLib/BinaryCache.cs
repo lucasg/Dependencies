@@ -86,9 +86,9 @@ namespace Dependencies
 
             ResolvedFilepath = FindPe.FindPeFromDefault(RootPe, ModuleName, SxsCache, CustomSearchFolders, WorkingDirectory);
 
-            // ApiSet override the underneath search location if found
+            // ApiSet override the underneath search location if found or not
             ModuleSearchStrategy ModuleLocation = ResolvedFilepath.Item1;
-            if ((ApiSetName != null) && (ResolvedFilepath.Item2 != null))
+            if ((ApiSetName != null) /*&& (ResolvedFilepath.Item2 != null)*/)
                 ModuleLocation = ModuleSearchStrategy.ApiSetSchema;
 
             // 
