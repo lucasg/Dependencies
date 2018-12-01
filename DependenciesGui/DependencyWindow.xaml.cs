@@ -395,21 +395,33 @@ namespace Dependencies
 				);
 
                 ImportModule.ModuleLocation = ResolvedModule.Item1;
-                if (ImportModule.ModuleLocation != ModuleSearchStrategy.NOT_FOUND)
-                {
-                    ImportModule.PeProperties = ResolvedModule.Item2;
+				if (ImportModule.ModuleLocation != ModuleSearchStrategy.NOT_FOUND)
+				{
+					ImportModule.PeProperties = ResolvedModule.Item2;
 
 					if (ResolvedModule.Item2 != null)
 						ImportModule.PeFilePath = ResolvedModule.Item2.Filepath;
-                }
+				}
+				else
+				{
+					ImportModule.Flags |= ModuleFlag.NotFound;
+				}
 
                 // special case for apiset schema
                 ImportModule.IsApiSet = (ImportModule.ModuleLocation == ModuleSearchStrategy.ApiSetSchema);
                 if (ImportModule.IsApiSet)
-                    ImportModule.ApiSetModuleName = BinaryCache.LookupApiSetLibrary(DllImport.Name);
+				{
+					ImportModule.Flags |= ModuleFlag.ApiSet;
+					ImportModule.ApiSetModuleName = BinaryCache.LookupApiSetLibrary(DllImport.Name);
 
-                // add warning for appv isv applications 
-                if (String.Compare(DllImport.Name, "AppvIsvSubsystems32.dll", StringComparison.OrdinalIgnoreCase) == 0 ||
+					if (DllImport.Name.StartsWith("ext-"))
+					{
+						ImportModule.Flags |= ModuleFlag.ApiSetExt;
+					}
+				}
+
+				// add warning for appv isv applications 
+				if (String.Compare(DllImport.Name, "AppvIsvSubsystems32.dll", StringComparison.OrdinalIgnoreCase) == 0 ||
                     String.Compare(DllImport.Name, "AppvIsvSubsystems64.dll", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     if (!this._DisplayWarning)
@@ -477,6 +489,10 @@ namespace Dependencies
                                 AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
                                 AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
                             }
+							else
+							{
+								AppInitImportModule.Flags |= ModuleFlag.NotFound;
+							}
 
                             NewTreeContexts.Add(AppInitDll, AppInitImportModule);
                         }
@@ -529,6 +545,10 @@ namespace Dependencies
                                     AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
                                     AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
                                 }
+								else
+								{
+									AppInitImportModule.Flags |= ModuleFlag.NotFound;
+								}
 
                                 if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
                                 {

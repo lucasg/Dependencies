@@ -20,6 +20,8 @@ public enum ModuleFlag
     DelayLoad = 0x01,
     ClrReference = 0x02,
     ApiSet = 0x04,
+	ApiSetExt = 0x08,
+	NotFound = 0x10,
 }
 
 namespace Dependencies
@@ -55,6 +57,13 @@ namespace Dependencies
 		:base(ApiSetModuleName)
 		{
 			_HostName = NotFoundHostModule;
+
+			_Flags |= ModuleFlag.ApiSet;
+			_Flags |= ModuleFlag.NotFound;
+			if (ApiSetModuleName.StartsWith("ext-"))
+			{
+				_Flags |= ModuleFlag.ApiSetExt;
+			}
 		}
 
 		public override string ModuleName { get { return String.Format("{0:s} -> {1:s}", this._Name, _HostName); } }
@@ -67,6 +76,7 @@ namespace Dependencies
         public NotFoundModuleInfo(string NotFoundModuleName)
         : base(NotFoundModuleName)
         {
+			_Flags |= ModuleFlag.NotFound;
         }
 
         public override string Filepath { get { return _Name; } }
@@ -94,7 +104,13 @@ namespace Dependencies
         : base(ApiSetModuleName)
         {
             UnderlyingModule = _UnderlyingModule;
-        }
+
+			_Flags |= ModuleFlag.ApiSet;
+			if (ApiSetModuleName.StartsWith("ext-"))
+			{
+				_Flags |= ModuleFlag.ApiSetExt;
+			}
+		}
 
         public override string ModuleName { get { return String.Format("{0:s} -> {1:s}", this._Name, UnderlyingModule.ModuleName);}}
         public override string Filepath { get { return UnderlyingModule.Filepath; } }

@@ -149,6 +149,12 @@ namespace Dependencies
                 return "Images/Reference.png";
             }
 
+			// ext-ms api are considered optional
+			if (((Flags & ModuleFlag.NotFound) != 0) && ((Flags & ModuleFlag.ApiSetExt) == 0))
+			{
+				return "Images/Invalid.png";
+			}
+
             return null;
         }
 
