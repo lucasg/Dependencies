@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Windows;
+using System.Collections.Generic;
 
 using Dependencies;
 using Dependencies.ClrPh;
@@ -29,10 +30,23 @@ public class DisplayPeExport : SettingBindingHandler
 
         AddNewEventHandler("Undecorate", "Undecorate", "Name", this.GetDisplayName);
     }
-    # endregion Constructors
+	#endregion Constructors
 
-    # region PublicAPI
-    public string IconUri
+	#region PublicAPI
+	public override string ToString()
+	{
+		List<string> members = new List<string>() {
+			Ordinal != null ? String.Format("{0} (0x{0:x08})", Ordinal) : "N/A",
+			Hint != 0 ? String.Format("{0} (0x{0:x08})", Hint) : "N/A",
+			Name,
+			VirtualAddress,
+			Demangler
+		};
+
+		return String.Join(", ", members.ToArray());
+	}
+
+	public string IconUri
     {
         get
         {

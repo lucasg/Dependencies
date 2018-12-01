@@ -66,10 +66,11 @@ namespace Dependencies
         {
             System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
+			bool ShiftKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightShift);
 
-            Debug.WriteLine("[DependencyCustomListView] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
-            if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown)
-            {
+			Debug.WriteLine("[DependencyCustomListView] Key Pressed : " + e.Key + ". Ctrl Key down : " + CtrlKeyDown);
+            if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown && !ShiftKeyDown)
+			{
                 List<string> StrToCopy = new List<string>();
                 foreach (object SelectItem in ListView.SelectedItems)
                 {
@@ -77,8 +78,14 @@ namespace Dependencies
                 }
 
                 System.Windows.Clipboard.Clear();
-                System.Windows.Clipboard.SetText(String.Join("\n", StrToCopy.ToArray()), System.Windows.TextDataFormat.Text);
-                return;
+
+				// sometimes another process has "opened" the clipboard, so we need to wait for it
+				try
+				{
+					Clipboard.SetText((string)String.Join("\n", StrToCopy), TextDataFormat.Text);
+					return;
+				}
+				catch { }
             }
 
             else if ((e.Key == System.Windows.Input.Key.F) && CtrlKeyDown)

@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
+using System.Windows;
+using System.Collections.Generic;
+using System.Windows.Input;
 
 using Dependencies.ClrPh;
 
@@ -9,8 +13,9 @@ namespace Dependencies
     /// </summary>
     public partial class DependencyImportList : DependencyCustomListView
     {
+		public static readonly RoutedUICommand CopyValuesCommand = new RoutedUICommand();
 
-        public DependencyImportList()
+		public DependencyImportList()
         {
             InitializeComponent();
         }
@@ -52,7 +57,31 @@ namespace Dependencies
                 return "";
             }
 
-            return (SelectedItem as DisplayPeImport).Name;
+            return (SelectedItem as DisplayPeImport).ToString();
         }
-    }
+
+		private void ImportListCopySelectedValues(object sender, RoutedEventArgs e)
+		{
+			if (this.SelectedItems.Count == 0)
+				return;
+
+			List<DisplayPeImport> selectedImports = new List<DisplayPeImport>();
+			foreach (var import in this.SelectedItems)
+			{
+				selectedImports.Add((import as DisplayPeImport));
+			}
+
+			string SelectedValues = String.Join("\n", selectedImports.Select( imp => imp.ToString()));
+
+			Clipboard.Clear();
+			// sometimes another process has "opened" the clipboard, so we need to wait for it
+			try
+			{
+				Clipboard.SetText((string)SelectedValues, TextDataFormat.Text);
+				return;
+			}
+			catch { }
+			
+		}
+	}
 }
