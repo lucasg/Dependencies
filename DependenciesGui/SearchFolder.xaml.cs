@@ -47,23 +47,21 @@ namespace Dependencies
 		public string WorkingDirectory
 		{
 			get { return _working_directory; }
+			set { _working_directory = value; this.WorkingDirectoryTextBox.Text = value;}
 		}
 
 		private void OnBinaryWorkindDirectoryChange(object sender, RoutedEventArgs e)
 		{
-			OpenFileDialog InputFileNameDlg = new OpenFileDialog()
+			FolderBrowserDialog InputFileNameDlg = new FolderBrowserDialog()
 			{
-				Filter = "exe files (*.exe, *.dll)| *.exe;*.dll; | All files (*.*)|*.*",
-				FilterIndex = 0,
-				RestoreDirectory = true,
-				InitialDirectory = _working_directory
+				SelectedPath = WorkingDirectory
 			};
 
 
 			if (InputFileNameDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
 				return;
 
-			_working_directory = InputFileNameDlg.FileName;
+			WorkingDirectory = InputFileNameDlg.SelectedPath;
 		}
 
 		private void OnCancel(object sender, RoutedEventArgs e)
@@ -74,13 +72,14 @@ namespace Dependencies
 		private void OnValidate(object sender, RoutedEventArgs e)
 		{
 			// do not launch analysis again if there is no modifications
-			bool searchFoldersChanged = (_SelectedItem.CustomSearchFolders == _CustomSearchFolders.ToList());
+			bool searchFoldersChanged = (_SelectedItem.CustomSearchFolders == _CustomSearchFolders.ToList()) || (WorkingDirectory != _SelectedItem.WorkingDirectory);
 			
 			this.Close();
 
 			if (searchFoldersChanged)
 			{
 				_SelectedItem.CustomSearchFolders = _CustomSearchFolders.ToList();
+				_SelectedItem.WorkingDirectory = WorkingDirectory;
 
 				// Force refresh
 				_SelectedItem.InitializeView();
