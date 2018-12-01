@@ -776,23 +776,9 @@ namespace Dependencies
             // Selected Pe has not been found on disk
             if (SelectedModule == null)
                 return;
-
-			ModuleTreeViewItem TreeRootItem = this.DllTreeView.Items[0] as ModuleTreeViewItem;
-			ModuleTreeViewItem foundTreeItem = FindModuleInTree(TreeRootItem, SelectedModule, false) as ModuleTreeViewItem;
-
-			if (TreeRootItem == foundTreeItem)
-			{
-				UpdateImportExportLists(SelectedModule, null);
-			}
-
-			DependencyNodeContext foundTreeContext = (DependencyNodeContext) foundTreeItem.DataContext;
-			DisplayModuleInfo foundModule = foundTreeContext.ModuleInfo.Target as DisplayModuleInfo;
-
-
-			DependencyNodeContext parentTreeContext = ((DependencyNodeContext)(VisualTreeHelper.GetParent(foundTreeItem) as ModuleTreeViewItem).DataContext);
-			DisplayModuleInfo parentModule = parentTreeContext.ModuleInfo.Target as DisplayModuleInfo;
-
-			UpdateImportExportLists(SelectedModule, parentModule);
+			
+			// Display module as root (since we can't know which parent it's attached to)
+			UpdateImportExportLists(SelectedModule, null);
         }
 
         private void OnTreeViewSelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -819,6 +805,7 @@ namespace Dependencies
 				return;
 			}
 
+			// find parent. TODO : add parent ref to treeview context
 			var parent = VisualTreeHelper.GetParent(SelectedItem as DependencyObject);
 			while ((parent as TreeViewItem) == null)
 			{
@@ -843,16 +830,16 @@ namespace Dependencies
 				if (Parent == null) // root module
 				{
 					this.ImportList.SetRootImports(SelectedModule.Imports, SymPrv, this);
-					this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
 				}
 				else
 				{
+					// Imports from the same dll are not necessarly sequential (see: HDDGuru\RawCopy.exe)
 					var machingImports = Parent.Imports.FindAll(imp => imp.Name == SelectedModule._Name);
-
 					this.ImportList.SetImports(SelectedModule.Filepath, SelectedModule.Exports, machingImports, SymPrv, this);
-					this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
 				}
-            }
+
+				this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
+			}
         }
 
         public PE LoadImport(string ModuleName, DisplayModuleInfo CurrentModule = null, bool DelayLoad = false)

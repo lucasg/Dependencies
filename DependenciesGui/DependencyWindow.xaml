@@ -154,8 +154,8 @@
 
         <local:DependencyModuleList x:Name="ModulesList"
                                     Grid.Row="2"
+                                    SelectedModuleChanged="OnModuleViewSelectedItemChanged"
                                     />
-                                    <!--SelectedModuleChanged="OnModuleViewSelectedItemChanged"-->
                                     
 
 
