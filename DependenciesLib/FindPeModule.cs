@@ -49,20 +49,35 @@ namespace Dependencies
             return null;
         }
 
-        // default search order : 
-        // https://msdn.microsoft.com/en-us/library/windows/desktop/ms682586(v=vs.85).aspx
-        // 
-        // if (SafeDllSearchMode) {
-        //      -1. Sxs manifests
-        //      0. KnownDlls list
-        //      1. Loaded PE folder
-        //      2. C:\Windows\(System32 | SysWow64 )
-        //      3. 16-bit system directory   <-- ignored
-        //      4. C:\Windows
-        //      5. %pwd%
-        //      6. AppDatas
-        //      }
-        public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders, string WorkingDirectory)
+		public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName)
+		{
+			string WorkingDirectory = Path.GetDirectoryName(RootPe.Filepath);
+			List<string> CustomSearchFolders = new List<string>();
+			SxsEntries SxsCache = SxsManifest.GetSxsEntries(RootPe);
+
+			return FindPeFromDefault(
+				RootPe,
+				ModuleName,
+				SxsCache,
+				CustomSearchFolders,
+				WorkingDirectory
+			);
+		}
+
+		// default search order : 
+		// https://msdn.microsoft.com/en-us/library/windows/desktop/ms682586(v=vs.85).aspx
+		// 
+		// if (SafeDllSearchMode) {
+		//      -1. Sxs manifests
+		//      0. KnownDlls list
+		//      1. Loaded PE folder
+		//      2. C:\Windows\(System32 | SysWow64 )
+		//      3. 16-bit system directory   <-- ignored
+		//      4. C:\Windows
+		//      5. %pwd%
+		//      6. AppDatas
+		//      }
+		public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders, string WorkingDirectory)
         {
             bool Wow64Dll = RootPe.IsWow64Dll();
             string RootPeFolder = Path.GetDirectoryName(RootPe.Filepath);

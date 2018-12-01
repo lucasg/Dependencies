@@ -58,7 +58,17 @@ namespace Dependencies
             return Instance.GetBinary(PePath);
         }
 
-        public static Tuple<ModuleSearchStrategy, PE> ResolveModule(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders, string WorkingDirectory)
+		public static Tuple<ModuleSearchStrategy, PE> ResolveModule(PE RootPe, string ModuleName)
+		{
+			string WorkingDirectory = Path.GetDirectoryName(RootPe.Filepath);
+			List<string> CustomSearchFolders = new List<string>();
+			SxsEntries SxsCache = SxsManifest.GetSxsEntries(RootPe);
+
+			return ResolveModule(RootPe, ModuleName, SxsCache, CustomSearchFolders, WorkingDirectory);
+		}
+
+
+		public static Tuple<ModuleSearchStrategy, PE> ResolveModule(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders, string WorkingDirectory)
         {
             Tuple<ModuleSearchStrategy, string> ResolvedFilepath;
 

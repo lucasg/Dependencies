@@ -377,10 +377,7 @@ namespace Dependencies
         {
             return BinaryCache.ResolveModule(
 				RootPe, 
-				ModuleName /*DllImport.Name*/, 
-				SxsEntriesCache, 
-				new List<string>(),
-				Path.GetDirectoryName(RootPe.Filepath)
+				ModuleName /*DllImport.Name*/ 
 			);
         }
 
