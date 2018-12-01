@@ -72,7 +72,7 @@ namespace Dependencies
 		private void OnValidate(object sender, RoutedEventArgs e)
 		{
 			// do not launch analysis again if there is no modifications
-			bool searchFoldersChanged = (_SelectedItem.CustomSearchFolders == _CustomSearchFolders.ToList()) || (WorkingDirectory != _SelectedItem.WorkingDirectory);
+			bool searchFoldersChanged = (_SelectedItem.CustomSearchFolders != _CustomSearchFolders.ToList()) || (WorkingDirectory != _SelectedItem.WorkingDirectory);
 			
 			this.Close();
 
