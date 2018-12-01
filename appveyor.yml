@@ -53,7 +53,10 @@ artifacts:
 deploy:
   # Deploy to GitHub Releases
   - provider: GitHub
+    description: "Dependencies v$(APPVEYOR_REPO_TAG_NAME)"
     artifact: Dependencies
+    auth_token:
+      secure: 2QjekNwJsIupEgFBXAcsfMXsJIpb0kU8ijjsEEjsGNJkW3SVf31ho4aSBnoku1y6
     draft: false
     prerelease: false
     on:
