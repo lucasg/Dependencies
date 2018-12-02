@@ -137,6 +137,17 @@ namespace Dependencies
         {
             ModuleFlag Flags = (ModuleFlag)value;
 
+			if ((string) parameter == "Overlay")
+			{
+				// ext-ms api are considered optional
+				if (((Flags & ModuleFlag.NotFound) != 0) && ((Flags & ModuleFlag.ApiSetExt) == 0))
+				{
+					return "Images/Invalid.png";
+				}
+
+				return null;
+			}
+
             bool DelayLoadModule = (Flags & ModuleFlag.DelayLoad) != 0;
             if (DelayLoadModule)
             {
@@ -148,12 +159,6 @@ namespace Dependencies
             {
                 return "Images/Reference.png";
             }
-
-			// ext-ms api are considered optional
-			if (((Flags & ModuleFlag.NotFound) != 0) && ((Flags & ModuleFlag.ApiSetExt) == 0))
-			{
-				return "Images/Invalid.png";
-			}
 
             return null;
         }
