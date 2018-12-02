@@ -1,7 +1,7 @@
 # Dependencies - An open-source modern Dependency Walker
 [![Build status](https://ci.appveyor.com/api/projects/status/wtr5v8ksndbkkqxg?svg=true)](https://ci.appveyor.com/project/lucasg/dependencies)
 
-### [Download here](https://github.com/lucasg/Dependencies/releases/download/v1.8/Dependencies_x64_Release.zip)
+### [Download here](https://github.com/lucasg/Dependencies/releases/download/v1.9/Dependencies_x64_Release.zip)
 
 NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/library/ffkc918h.aspx), `Dependencies` needs [Visual C++  Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) installed to run properly.
 
@@ -15,6 +15,14 @@ NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/l
 `Dependencies` can help Windows developers troubleshooting their dll load dependencies issues.
 
 ## Releases
+* [v1.9](https://github.com/lucasg/Dependencies/releases/download/v1.9/Dependencies_x64_Release.zip) :
+	* Display imports and exports the way Depends.exe does.
+	* Added user customization for search folders and working directory
+	* Added LLVM demangler to availables symbol demangling
+	* Fixed Wow64 FsRedirection bugs
+	* F5 can now refresh the analysis
+	* Added CLR assembly dependencies enumeration
+	* Added a packaging option without Peview.exe (which triggers some AV).
 * [v1.8](https://github.com/lucasg/Dependencies/releases/download/v1.8/Dependencies_x64_Release.zip) :
 	* Add x86/x64 variants for Dependencies
 * [v1.7](https://github.com/lucasg/Dependencies/releases/download/v1.7/Dependencies.zip) :
