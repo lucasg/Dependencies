@@ -98,6 +98,23 @@
                         </Setter>
                     </Style>
                 </ListBox.ItemContainerStyle>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid Margin="0,2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="30" />
+                                <ColumnDefinition Width="30" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock 
+                                Text="{Binding Path=Folder}"
+                             />
+                            <Button Grid.Column="1" Content="..." Click="OnChangeSearchFolder" DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" /> 
+                            <Button Grid.Column="2" Content="x" Click="OnRemoveSearchFolder" DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
 
