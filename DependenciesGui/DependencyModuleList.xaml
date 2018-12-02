@@ -18,7 +18,7 @@
 
     <local:DependencyCustomListView.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
-        <local:AlternateImageToHeaderConverter x:Key="img_alternate"/>
+        <local:OverlayImageToHeaderConverter x:Key="img_overlay"/>
 
         <ContextMenu x:Key="ItemContextMenu">
 
@@ -71,16 +71,12 @@
                     <DataTemplate>
                         <Grid Margin="0,2">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="16" />
-                                <ColumnDefinition Width="16" />
+                                <ColumnDefinition Width="24" />
                                 <ColumnDefinition Width="3" />
                             </Grid.ColumnDefinitions>
 
-                            <Image Grid.Column="0" Width="16" Height="16" Margin="0,0,1,0" Source="{Binding  Flags, Converter={StaticResource img_alternate} }"></Image>
-                            <Image Grid.Column="1" Width="16" Height="16" Margin="0,0,0,0" Source="{Binding  Filepath, Converter={StaticResource img}}"></Image>
-                            <Image Grid.Column="1" Width="16" Height="16" Margin="0,0,0,0" 
-                                    Source="{Binding  Flags, Converter={StaticResource img_alternate}, ConverterParameter='Overlay' }"
-                            ></Image>
+                            <Image Grid.Column="0" Width="16" Height="16" Margin="0,0,0,0" Source="{Binding  Filepath, Converter={StaticResource img}}"></Image>
+                            <Image Grid.Column="0" Width="16" Height="16" Margin="4,0,0,0" Source="{Binding  Flags, Converter={StaticResource img_overlay}}"></Image>
                         </Grid>
                     </DataTemplate>
                 </GridViewColumn.CellTemplate>

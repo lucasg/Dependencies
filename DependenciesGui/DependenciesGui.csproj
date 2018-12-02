@@ -297,7 +297,12 @@
     <Resource Include="Images\Reference.png" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\Invalid.png" />
+    <Resource Include="Images\InvalidOverlay.png" />
+    <Resource Include="Images\QuestionOverlay.png" />
+    <Resource Include="Images\ReferenceOverlay.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\HourglassOverlay.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

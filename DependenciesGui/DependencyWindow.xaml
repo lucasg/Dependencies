@@ -9,7 +9,7 @@
 
     <TabItem.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
-        <local:AlternateImageToHeaderConverter x:Key="img_alternate"/>
+        <local:OverlayImageToHeaderConverter x:Key="img_overlay"/>
 
         <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
@@ -90,21 +90,16 @@
                         <Setter Property="HeaderTemplate">
                             <Setter.Value>
                                 <DataTemplate>
-                                    <Grid Margin="0,2">
+                                    <Grid Margin="0,0,5,0">
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="16" />
-                                            <ColumnDefinition Width="16" />
+                                            <ColumnDefinition Width="24"/>
                                             <ColumnDefinition Width="3" />
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <Image Grid.Column="0" Width="16" Height="16" Margin="0,0,1,0" Source="{Binding Path=(local:ModuleTreeViewItem.Flags), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img_alternate} }"></Image>
-
-                                        <Image Grid.Column="1" Width="16" Height="16" Margin="0,0,0,0" Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
-                                        <Image Grid.Column="1" Width="16" Height="16" Margin="0,0,0,0" 
-                                               Source="{Binding Path=(local:ModuleTreeViewItem.Flags), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img_alternate}, ConverterParameter='Overlay' }"
-                                        ></Image>
-                                        <TextBlock Grid.Column="3" Text="{Binding}"></TextBlock>
+                                        <Image Grid.Column="0" Width="16" Height="16" Margin="0,0,0,0" Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
+                                        <Image Grid.Column="0" Width="16" Height="16" Margin="4,0,0,0" Source="{Binding Path=(local:ModuleTreeViewItem.Flags), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img_overlay} }"></Image>
+                                        <TextBlock Grid.Column="2" Text="{Binding}"></TextBlock>
                                     </Grid>
                                 </DataTemplate>
                             </Setter.Value>

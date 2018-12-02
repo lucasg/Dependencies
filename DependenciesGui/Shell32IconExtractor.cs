@@ -131,37 +131,32 @@ namespace Dependencies
         }
     }
 
-    public class AlternateImageToHeaderConverter : IValueConverter
+    public class OverlayImageToHeaderConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             ModuleFlag Flags = (ModuleFlag)value;
 
-			if ((string) parameter == "Overlay")
+			// ext-ms api are considered optional
+			if (((Flags & ModuleFlag.NotFound) != 0) && ((Flags & ModuleFlag.ApiSetExt) == 0))
 			{
-				// ext-ms api are considered optional
-				if (((Flags & ModuleFlag.NotFound) != 0) && ((Flags & ModuleFlag.ApiSetExt) == 0))
-				{
-					return "Images/Invalid.png";
-				}
-
-				return null;
+				return "Images/InvalidOverlay.png";
 			}
 
-            bool DelayLoadModule = (Flags & ModuleFlag.DelayLoad) != 0;
+			bool DelayLoadModule = (Flags & ModuleFlag.DelayLoad) != 0;
             if (DelayLoadModule)
             {
-                return "Images/Hourglass.png";
+                return "Images/HourglassOverlay.png";
             }
 
             bool ClrAssembly = (Flags & ModuleFlag.ClrReference) != 0;
             if (ClrAssembly)
             {
-                return "Images/Reference.png";
+                return "Images/ReferenceOverlay.png";
             }
 
-            return null;
-        }
+			return null;
+		}
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
