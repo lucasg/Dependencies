@@ -233,7 +233,11 @@ namespace Dependencies
 
 		private void RefreshCommandBinding_Executed(object sender, RoutedEventArgs e)
         {
-            (this.TabControl.SelectedItem as DependencyWindow).InitializeView();
+			DependencyWindow SelectedItem = this.TabControl.SelectedItem as DependencyWindow;
+			if (SelectedItem == null)
+				return;
+
+			SelectedItem.InitializeView();
         }
         #endregion Commands
 
