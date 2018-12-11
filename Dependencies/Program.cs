@@ -293,7 +293,7 @@ namespace Dependencies
 
                 if (Strategy != ModuleSearchStrategy.NOT_FOUND)
                 {
-                    ModuleFilepath = ResolvedModule.Item2.Filepath;
+                    ModuleFilepath = ResolvedModule.Item2?.Filepath;
                 }
 
 
