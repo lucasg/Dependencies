@@ -83,15 +83,20 @@ public class DisplayPeExport : SettingBindingHandler
         get { return GetDisplayName(Dependencies.Properties.Settings.Default.Undecorate); }
     }
 
-    public string VirtualAddress { get { return String.Format("0x{0:x8}", PeInfo.virtualAddress); } }
+    public string VirtualAddress
+    {
+        get
+        {
+            if (PeInfo.forwardedExport)
+                return PeInfo.ForwardName;
+            return String.Format("0x{0:x8}", PeInfo.virtualAddress);
+        }
+    }
 
     public string Demangler { get { return PeInfo.Demangler; } }
 
     protected string GetDisplayName(bool Undecorate)
     { 
-        if (PeInfo.forwardedExport)
-            return PeInfo.ForwardName;
-
         if (PeInfo.exportByOrdinal)
             return String.Format("Ordinal_{0:d}", PeInfo.ordinal);
 
