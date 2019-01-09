@@ -36,7 +36,7 @@ public class DisplayPeExport : SettingBindingHandler
 	public override string ToString()
 	{
 		List<string> members = new List<string>() {
-			Ordinal != null ? String.Format("{0} (0x{0:x08})", Ordinal) : "N/A",
+			String.Format("{0} (0x{0:x04})", Ordinal),
 			Hint != 0 ? String.Format("{0} (0x{0:x08})", Hint) : "N/A",
 			Name,
 			VirtualAddress,
@@ -76,7 +76,7 @@ public class DisplayPeExport : SettingBindingHandler
         }
     }
     public int Hint { get { return PeInfo.hint; } }
-    public int? Ordinal { get { if (PeInfo.exportByOrdinal) { return PeInfo.ordinal; } return null; } }
+    public int Ordinal { get { return PeInfo.ordinal; } }
 
     public string Name
     {
