@@ -292,6 +292,19 @@ namespace Dependencies
                 return String.Join("; ", TypeList.ToArray());
             }
         }
+
+		public bool HasErrors
+		{
+			get
+			{
+				return _ErrorImport;
+			}
+			set
+			{
+				_ErrorImport = value;
+			}
+		}
+
     
         public virtual UInt64? Filesize { get { return _Info.Filesize; } }
         public virtual UInt64? ImageBase { get { return _Info.ImageBase; } }
