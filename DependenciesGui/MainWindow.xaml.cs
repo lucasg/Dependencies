@@ -289,7 +289,7 @@ namespace Dependencies
     /// Converter to transform a boolean into a Visibility settings. 
     /// Why is this not part of the WPF standard lib ? Everybody ends up coding one in every project.
     /// </summary>
-    public class BooleanToVisbilityConverter : IValueConverter
+    public class BooleanToVisibilityConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
