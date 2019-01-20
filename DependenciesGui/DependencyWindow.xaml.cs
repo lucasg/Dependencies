@@ -133,17 +133,27 @@ namespace Dependencies
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ModuleTreeViewItem()
+		public ModuleTreeViewItem()
+		{
+			_importsVerified = false;
+			_Parent = null;
+			Dependencies.Properties.Settings.Default.PropertyChanged += this.ModuleTreeViewItem_PropertyChanged;
+		}
+
+		public ModuleTreeViewItem(ModuleTreeViewItem Parent)
         {
-            Dependencies.Properties.Settings.Default.PropertyChanged += this.ModuleTreeViewItem_PropertyChanged;
+			_importsVerified = false;
+			_Parent = Parent;
+			Dependencies.Properties.Settings.Default.PropertyChanged += this.ModuleTreeViewItem_PropertyChanged;
         }
 
-        public ModuleTreeViewItem(ModuleTreeViewItem Other)
+        public ModuleTreeViewItem(ModuleTreeViewItem Other, ModuleTreeViewItem Parent)
         {
-            Dependencies.Properties.Settings.Default.PropertyChanged += this.ModuleTreeViewItem_PropertyChanged;
-
-            this.DataContext = new DependencyNodeContext( (DependencyNodeContext) Other.DataContext );
-        }
+			_importsVerified = false;
+			_Parent = Parent;
+			this.DataContext = new DependencyNodeContext( (DependencyNodeContext) Other.DataContext );
+			Dependencies.Properties.Settings.Default.PropertyChanged += this.ModuleTreeViewItem_PropertyChanged;
+		}
 
         #region PropertyEventHandlers 
         public virtual void OnPropertyChanged(string propertyName)
@@ -175,15 +185,24 @@ namespace Dependencies
             }
         }
 
-        public ModuleFlag Flags
+		public ModuleTreeViewItem ParentModule
+		{
+			get
+			{
+				return _Parent;
+			}
+		}
+
+
+		public ModuleFlag Flags
         {
             get
             {
-                return (((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo).Flags;
+                return ModuleInfo.Flags;
             }
         }
 
-		public bool hasErrors
+		public bool HasErrors
 		{
             get
             {
@@ -191,11 +210,11 @@ namespace Dependencies
 			}
 		}
 
-	#endregion Getters
+		#endregion Getters
 
 
-	#region Commands 
-	public RelayCommand OpenPeviewerCommand
+		#region Commands 
+		public RelayCommand OpenPeviewerCommand
         {
             get
             {
@@ -264,8 +283,11 @@ namespace Dependencies
 
         private RelayCommand _OpenPeviewerCommand;
         private RelayCommand _OpenNewAppCommand;
-        
-    }
+		private ModuleTreeViewItem _Parent;
+		private bool _importsVerified;
+
+
+	}
 
 
     /// <summary>
@@ -356,6 +378,8 @@ namespace Dependencies
             ConstructDependencyTree(treeNode, this.Pe);
         }
         #endregion PublicAPI
+
+		
 
         #region TreeConstruction
         /// <summary>
@@ -665,7 +689,7 @@ namespace Dependencies
 
                 foreach (ImportContext NewTreeContext in NewTreeContexts.Values)
                 {
-                    ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem();
+                    ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem(RootNode);
                     DependencyNodeContext childTreeNodeContext = new DependencyNodeContext();
                     childTreeNodeContext.IsDummy = false;
 
@@ -844,14 +868,14 @@ namespace Dependencies
 			}
 
 			// find parent. TODO : add parent ref to treeview context
-			var parent = VisualTreeHelper.GetParent(SelectedItem as DependencyObject);
-			while ((parent as TreeViewItem) == null)
-			{
-				parent = VisualTreeHelper.GetParent(parent);
-			}
+			//var parent = VisualTreeHelper.GetParent(SelectedItem as DependencyObject);
+			//while ((parent as TreeViewItem) == null)
+			//{
+			//	parent = VisualTreeHelper.GetParent(parent);
+			//}
 
-			DependencyNodeContext parentTreeContext = ((DependencyNodeContext)(parent as ModuleTreeViewItem).DataContext);
-			DisplayModuleInfo parentModule = parentTreeContext.ModuleInfo.Target as DisplayModuleInfo;
+			//DependencyNodeContext parentTreeContext = ((DependencyNodeContext)(SelectedItem.ParentModule).DataContext);
+			DisplayModuleInfo parentModule = SelectedItem.ParentModule.ModuleInfo;// parentTreeContext.ModuleInfo.Target as DisplayModuleInfo;
 
 			UpdateImportExportLists(SelectedModule, parentModule);
         }
