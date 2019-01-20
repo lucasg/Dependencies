@@ -206,8 +206,62 @@ namespace Dependencies
 		{
             get
             {
-				return /*(((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo).Flags*/ false;
+				if (_importsVerified)
+				{
+					return ModuleInfo.HasErrors;
+				}
+
+				VerifyModuleImports();
+				_importsVerified = true;
+				return ModuleInfo.HasErrors;
 			}
+		}
+
+		public DisplayModuleInfo ModuleInfo
+		{
+			get
+			{
+				return (((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo);
+			}
+		}
+
+
+		private void VerifyModuleImports()
+		{
+			// no parent : it's probably the root item
+			ModuleTreeViewItem ParentModule = this.ParentModule;
+			if (ParentModule == null)
+			{
+				ModuleInfo.HasErrors = false;
+				return;
+			}
+
+
+			foreach (PeImportDll DllImport in ParentModule.ModuleInfo.Imports)
+			{
+				if (DllImport.Name != ModuleInfo._Name)
+					continue;
+
+
+
+				List<Tuple<PeImport, bool>> resolvedImports = BinaryCache.LookupImports(DllImport, ModuleInfo.Filepath);
+				if (resolvedImports.Count == 0)
+				{
+					ModuleInfo.HasErrors = true;
+					return;
+				}
+
+				foreach (var Import in resolvedImports)
+				{
+					if (!Import.Item2)
+					{
+						ModuleInfo.HasErrors = true;
+						return;
+					}
+				}
+			}
+
+			ModuleInfo.HasErrors = false;
 		}
 
 		#endregion Getters
