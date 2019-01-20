@@ -39,7 +39,7 @@
 
 
             <!-- Hide/Show the status bar based on a global switch -->
-            <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
+            <local:BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
 
             <dragablz:InterTabController  x:Key="DependenciesInterTabController" x:Shared="False"  Partition="2AE89D18-F236-4D20-9605-6C03319038E6"/>
 
@@ -175,7 +175,7 @@
                    Panel.ZIndex="1" 
                    Margin="0" 
                    VerticalAlignment="Bottom" 
-                   Visibility="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}"
+                   Visibility="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=OneWay, Converter={StaticResource BooleanToVisibility}}"
                    >
             <StatusBarItem 
                 x:Name="AppStatusBarMessage">

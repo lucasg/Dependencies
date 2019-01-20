@@ -12,7 +12,7 @@
         <local:OverlayImageToHeaderConverter x:Key="img_overlay"/>
         
         <!-- Hide/Show the status bar based on a global switch -->
-        <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
+        <local:BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
 
         <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
@@ -110,7 +110,9 @@
                                         <Image Grid.Column="0" Width="16" Height="16" Margin="4,0,0,0" Source="{Binding Path=(local:ModuleTreeViewItem.Flags), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img_overlay} }"></Image>
 
                                         <!--Another red rectangle overlay on modules issues-->
-                                        <Rectangle x:Name="ErrorModule"  Grid.Column="0" Width="16" Height="16" Visibility="{Binding Path=(local:ModuleTreeViewItem.hasErrors), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}">
+                                        <Rectangle x:Name="ErrorModule"  Grid.Column="0" Width="14" Height="14" 
+                                                   Visibility="{Binding Path=(local:ModuleTreeViewItem.HasErrors), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource BooleanToVisibility}}"
+                                                   >
                                             <Rectangle.Fill>
                                                 <SolidColorBrush Color="Red" />
                                             </Rectangle.Fill>
