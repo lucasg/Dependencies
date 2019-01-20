@@ -531,6 +531,12 @@ namespace Dependencies
 
         static void Main(string[] args)
         {
+			if (args.Length == 0)
+			{
+				DumpUsage();
+				return; 
+			}
+
             String FileName = null;
             var ProgramArgs = ParseArgs(args);
             Action<IPrettyPrintable> ObjectPrinter = PrettyPrinter;
@@ -550,7 +556,7 @@ namespace Dependencies
                 
 
             // no need to load PE for those commands
-            if ((args.Length == 0) || ProgramArgs.ContainsKey("-h") || ProgramArgs.ContainsKey("-help"))
+            if (ProgramArgs.ContainsKey("-h") || ProgramArgs.ContainsKey("-help"))
             {
                 DumpUsage();
                 return;
