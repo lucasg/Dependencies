@@ -146,7 +146,7 @@ namespace Dependencies
         public DisplayModuleInfo(string ModuleName)
         {
 
-            _Name = ModuleName;
+			_Name = ModuleName;
             _Filepath = null;
             _Flags = 0;
 
@@ -156,7 +156,8 @@ namespace Dependencies
         public DisplayModuleInfo(string ModuleName, PE Pe, ModuleSearchStrategy Location, ModuleFlag Flags = 0)
         {
 
-            _Name = ModuleName;
+
+			_Name = ModuleName;
             _Filepath = Pe.Filepath;
             _Flags = Flags;
             
@@ -191,6 +192,8 @@ namespace Dependencies
             AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);
         }
         #endregion // Constructors 
+
+
 
         #region PublicAPI
         public virtual string ModuleName
@@ -303,7 +306,9 @@ namespace Dependencies
 
         #endregion PublicAPI
 
-            #region Commands 
+
+
+        #region Commands 
         private RelayCommand _DoFindModuleInTreeCommand;
         private RelayCommand _ConfigureSearchOrderCommand;
 
@@ -422,6 +427,7 @@ namespace Dependencies
         private ModuleSearchStrategy _Location;
         private List<PeImportDll> _Imports;
         private List<PeExport> _Exports;
+		private bool _ErrorImport;
 
 
         private RelayCommand _OpenPeviewerCommand;
