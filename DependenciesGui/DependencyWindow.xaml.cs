@@ -183,11 +183,19 @@ namespace Dependencies
             }
         }
 
-        #endregion Getters
+		public bool hasErrors
+		{
+            get
+            {
+				return /*(((DependencyNodeContext)this.DataContext).ModuleInfo.Target as DisplayModuleInfo).Flags*/ false;
+			}
+		}
+
+	#endregion Getters
 
 
-        #region Commands 
-        public RelayCommand OpenPeviewerCommand
+	#region Commands 
+	public RelayCommand OpenPeviewerCommand
         {
             get
             {

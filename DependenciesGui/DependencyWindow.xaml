@@ -10,6 +10,9 @@
     <TabItem.Resources>
         <local:ImageToHeaderConverter x:Key="img"/>
         <local:OverlayImageToHeaderConverter x:Key="img_overlay"/>
+        
+        <!-- Hide/Show the status bar based on a global switch -->
+        <local:BooleanToVisbilityConverter x:Key="BooleanToVisbility"/>
 
         <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}">
             <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
@@ -97,8 +100,35 @@
                                             <ColumnDefinition Width="*" />
                                         </Grid.ColumnDefinitions>
 
-                                        <Image Grid.Column="0" Width="16" Height="16" Margin="0,0,0,0" Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"></Image>
+                                        
+                                        <!--System icon for the current module-->
+                                        <Image Grid.Column="0" Width="16" Height="16" Margin="0,0,0,0" 
+                                               Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"
+                                        ></Image>
+                                        
+                                        <!--Overlay for additional flags (delay import, apiset, etc.)-->
                                         <Image Grid.Column="0" Width="16" Height="16" Margin="4,0,0,0" Source="{Binding Path=(local:ModuleTreeViewItem.Flags), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img_overlay} }"></Image>
+
+                                        <!--Another red rectangle overlay on modules issues-->
+                                        <Rectangle x:Name="ErrorModule"  Grid.Column="0" Width="16" Height="16" Visibility="{Binding Path=(local:ModuleTreeViewItem.hasErrors), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Mode=OneWay, Converter={StaticResource BooleanToVisbility}}">
+                                            <Rectangle.Fill>
+                                                <SolidColorBrush Color="Red" />
+                                            </Rectangle.Fill>
+                                            <Rectangle.OpacityMask>
+                                                <DrawingBrush AlignmentX="Left" AlignmentY="Top">
+                                                    <DrawingBrush.Drawing>
+                                                        <DrawingGroup>
+                                                            <GeometryDrawing Brush="#33000000">
+                                                                <GeometryDrawing.Geometry>
+                                                                    <RectangleGeometry Rect="0,0,40,40" />
+                                                                </GeometryDrawing.Geometry>
+                                                            </GeometryDrawing>
+                                                        </DrawingGroup>
+                                                    </DrawingBrush.Drawing>
+                                                </DrawingBrush>
+                                            </Rectangle.OpacityMask>
+                                        </Rectangle>
+                                        
                                         <TextBlock Grid.Column="2" Text="{Binding}"></TextBlock>
                                     </Grid>
                                 </DataTemplate>
