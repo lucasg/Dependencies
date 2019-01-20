@@ -15,7 +15,7 @@ for:
   configuration:
     - Release
     - Debug
-    - Appx
+    #- Appx
 
 # Do not package appx on pull requests
 - 
@@ -76,8 +76,8 @@ environment:
 before_build:
   - ps: |
       # extracting signing cert
-      &nuget install secure-file -ExcludeVersion;
-      &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret "$($env:certsecret)" -out "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx";
+      # &nuget install secure-file -ExcludeVersion;
+      # &secure-file/tools/secure-file -decrypt "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx.enc" -secret "$($env:certsecret)" -out "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx";
   
       # download all the necessary packages
       nuget restore 
@@ -85,7 +85,7 @@ before_build:
 after_test:
  - ps: |
       # remove decoded cert as soon as it is not useful anymore
-      Remove-Item -Force "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx"
+      # Remove-Item -Force "C:/projects/dependencies/DependenciesAppx/DependenciesAppx_TemporaryKey.pfx"
       
 
 test_script: # should be on_finish, but it need to be executed before artifacts is
