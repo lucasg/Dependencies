@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Diagnostics;
 
+using NDesk.Options;
 using Newtonsoft.Json;
 using Dependencies.ClrPh;
 
@@ -528,96 +529,62 @@ namespace Dependencies
             Console.WriteLine(Usage);
         }
 
+		static Action<IPrettyPrintable> GetObjectPrinter(bool export_as_json)
+		{
+			if (export_as_json)
+				return JsonPrinter;
 
-        static void Main(string[] args)
+			return PrettyPrinter;
+		}
+
+
+		public delegate void DumpCommand(PE Application, Action<IPrettyPrintable> Printer);
+
+		static void Main(string[] args)
         {
-			if (args.Length == 0)
+			// always the first call to make
+			Phlib.InitializePhLib();
+
+			bool early_exit = false;
+			bool show_help = false;
+			bool export_as_json = false;
+			DumpCommand command = null;
+
+			OptionSet opts = new OptionSet() {
+							{ "h|help",  "show this message and exit", v => show_help = v != null },
+							{ "json",  "Export results in json format", v => export_as_json = v != null },
+							{ "knowndll", "List all known dlls", v => { DumpKnownDlls(GetObjectPrinter(export_as_json));  early_exit = true; } },
+							{ "apisets", "List apisets redirections", v => { DumpApiSets(GetObjectPrinter(export_as_json));  early_exit = true; } },
+                            { "manifest", "show manifest information embedded in PE file", v => command = DumpManifest },
+                            { "sxsentries", "dump all of FILE's sxs dependencies", v => command = DumpSxsEntries },
+                            { "imports", "dump FILE imports", v => command = DumpImports },
+                            { "exports", "dump  FILE exports", v => command = DumpExports },
+                            { "chain", "dump FILE resolved modules", v => command = DumpDependencyChain },
+                            { "modules", "dump FILE whole dependency chain", v => command = DumpModules },
+						};
+
+			List<string> eps = opts.Parse(args);
+
+			if ((show_help) || (args.Length == 0))
 			{
 				DumpUsage();
-				return; 
+				return;
 			}
 
-            String FileName = null;
-            var ProgramArgs = ParseArgs(args);
-            Action<IPrettyPrintable> ObjectPrinter = PrettyPrinter;
+			if (early_exit)
+				return;
 
-            // always the first call to make
-            Phlib.InitializePhLib();
-            
-            if (ProgramArgs.ContainsKey("file"))
-            { 
-                FileName = ProgramArgs["file"];
-            }
-
-            if (ProgramArgs.ContainsKey("-json"))
-            {
-                ObjectPrinter = JsonPrinter;
-            }
-                
-
-            // no need to load PE for those commands
-            if (ProgramArgs.ContainsKey("-h") || ProgramArgs.ContainsKey("-help"))
-            {
-                DumpUsage();
-                return;
-            }
-
-            if (ProgramArgs.ContainsKey("-knowndll"))
-            {
-                DumpKnownDlls(ObjectPrinter);
-                return;
-            }
-
-            if (ProgramArgs.ContainsKey("-apisets"))
-            {
-                DumpApiSets(ObjectPrinter);
-                return;
-            }
-
-            //Console.WriteLine("[-] Loading file {0:s} ", FileName);
-            PE Pe = new PE(FileName);
+			String FileName = eps[0];
+			//Console.WriteLine("[-] Loading file {0:s} ", FileName);
+			PE Pe = new PE(FileName);
             if (!Pe.Load())
             {
                 Console.Error.WriteLine("[x] Could not load file {0:s} as a PE", FileName);
                 return;
             }
 
-            
-            if (ProgramArgs.ContainsKey("-manifest"))
-                DumpManifest(Pe, ObjectPrinter);
-            else if (ProgramArgs.ContainsKey("-sxsentries"))
-                DumpSxsEntries(Pe, ObjectPrinter);
-            else if (ProgramArgs.ContainsKey("-imports"))
-                DumpImports(Pe, ObjectPrinter);
-            else if (ProgramArgs.ContainsKey("-exports"))
-                DumpExports(Pe, ObjectPrinter);
-            else if (ProgramArgs.ContainsKey("-chain"))
-                DumpDependencyChain(Pe, ObjectPrinter);
-            else if (ProgramArgs.ContainsKey("-modules"))
-                DumpModules(Pe, ObjectPrinter);
+            command(Pe, GetObjectPrinter(export_as_json));
 
-
-        }
-
-        private static Dictionary<string, string> ParseArgs(string[] args)
-        {
-            var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-
-            foreach (string s in args)
-            {
-                if (s.StartsWith("-", StringComparison.OrdinalIgnoreCase))
-                {
-                    if (!dict.ContainsKey(s))
-                        dict.Add(s, string.Empty);
-
-                }
-                else
-                {
-                    dict.Add("file", s);
-                }
-            }
-
-            return dict;
         }
     }
 }
