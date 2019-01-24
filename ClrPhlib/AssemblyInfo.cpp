@@ -5,9 +5,9 @@ using namespace System::Runtime::InteropServices;
 using namespace System::Security::Permissions;
 
 //
-// Les informations générales relatives à un assembly dépendent de
+// Les informations gÃ©nÃ©rales relatives Ã  un assembly dÃ©pendent de
 // l'ensemble d'attributs suivant. Changez les valeurs de ces attributs pour modifier les informations
-// associées à un assembly.
+// associÃ©es Ã  un assembly.
 //
 [assembly:AssemblyTitleAttribute(L"ClrPhlib")];
 [assembly:AssemblyDescriptionAttribute(L"")];
@@ -19,15 +19,15 @@ using namespace System::Security::Permissions;
 [assembly:AssemblyCultureAttribute(L"")];
 
 //
-// Les informations de version pour un assembly se composent des quatre valeurs suivantes :
+// Les informations de version pour un assembly se composent des quatre valeurs suivantesÂ :
 //
 //      Version principale
 //      Version secondaire
-//      Numéro de build
-//      Révision
+//      NumÃ©ro de build
+//      RÃ©vision
 //
-// Vous pouvez spécifier toutes les valeurs ou indiquer les numéros de révision et de build par défaut
-// en utilisant '*', comme indiqué ci-dessous :
+// Vous pouvez spÃ©cifier toutes les valeurs ou indiquer les numÃ©ros de rÃ©vision et de build par dÃ©faut
+// en utilisant '*', comme indiquÃ© ci-dessousÂ :
 
 [assembly:AssemblyVersionAttribute("1.9.*")];
 
