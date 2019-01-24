@@ -408,14 +408,14 @@ namespace Dependencies
             }
             catch (RethrownException rex)
             {
-                Console.WriteLine(" - \"{0:s}\"", Filepath);
+                Console.Error.WriteLine(" - \"{0:s}\"", Filepath);
                 throw rex;
             }
             catch (Exception ex)
             {
-                Console.WriteLine("[!] Unhandled exception occured while processing \"{1:s}\"", RecursionLevel, Filepath);
-                Console.WriteLine("Stacktrace:\n{0:s}\n", ex.StackTrace);
-                Console.WriteLine("Modules backtrace:");
+                Console.Error.WriteLine("[!] Unhandled exception occured while processing \"{1:s}\"", RecursionLevel, Filepath);
+                Console.Error.WriteLine("Stacktrace:\n{0:s}\n", ex.StackTrace);
+                Console.Error.WriteLine("Modules backtrace:");
                 throw new RethrownException(ex);
             }
             finally
