@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 using Dependencies.ClrPh;
 
@@ -163,7 +164,13 @@ namespace Dependencies
 			// 7. Find in PATH
 			string PATH = Environment.GetEnvironmentVariable("PATH");
             List<String> PATHFolders = new List<string>(PATH.Split(';'));
-            FoundPePath = FindPeFromPath(ModuleName, PATHFolders, Wow64Dll);
+
+			// Filter out empty paths, since it resolve to the current working directory
+			// fix https://github.com/lucasg/Dependencies/issues/51
+			PATHFolders = PATHFolders.Where(path => path.Length != 0).ToList();
+
+
+			FoundPePath = FindPeFromPath(ModuleName, PATHFolders, Wow64Dll);
             if (FoundPePath != null)
             {
                 return new Tuple<ModuleSearchStrategy, string>(
@@ -174,7 +181,7 @@ namespace Dependencies
 
 
             // 8. Check if it's an absolute import
-            if (File.Exists(ModuleName))
+            if ((Path.GetFullPath(ModuleName) == ModuleName) && File.Exists(ModuleName))
             {
                 return new Tuple<ModuleSearchStrategy, string>(
                    ModuleSearchStrategy.Fullpath,
