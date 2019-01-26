@@ -34,13 +34,37 @@ namespace Dependencies
     /// </summary>
     public class FindPe
     {
+		static bool IsFilepathInvalid(string Filepath)
+		{
+			foreach (char InvalidChar in System.IO.Path.GetInvalidFileNameChars())
+			{
+				// do not treat these characters as invalid since the are necessary
+				// for absolute imports
+				if (InvalidChar == ':' || InvalidChar == '\\')
+					continue;
+
+				if (Filepath.IndexOf(InvalidChar) != -1)
+					return true;
+			}
+
+			return false;
+		}
+
         static string FindPeFromPath(string ModuleName, List<string> CandidateFolders, bool Wow64Dll = false)
         {
             string PeFilePath = null;
 
-            foreach (String CandidatePath in CandidateFolders)
-            {
-                PeFilePath = Path.Combine(CandidatePath, ModuleName);
+			// Filter out "problematic" search paths before it triggers an exception from Path.Combine
+			// see https://github.com/lucasg/Dependencies/issues/49
+			var CuratedCandidateFolders = CandidateFolders.Where(
+				path => !IsFilepathInvalid(path)
+			);
+
+
+			foreach (String CandidatePath in CuratedCandidateFolders)
+			{
+	
+				PeFilePath = Path.Combine(CandidatePath, ModuleName);
                 PE TestPe = BinaryCache.LoadPe(PeFilePath);
 
                 if ((TestPe != null) && (TestPe.LoadSuccessful) && (TestPe.IsWow64Dll() == Wow64Dll))
