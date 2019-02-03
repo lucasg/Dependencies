@@ -15,7 +15,7 @@ for:
   configuration:
     - Release
     - Debug
-    - Appx
+    # - Appx
 
 # Do not package appx on pull requests
 - 
