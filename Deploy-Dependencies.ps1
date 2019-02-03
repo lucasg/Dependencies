@@ -82,6 +82,28 @@ function Get-DependenciesDeps {
   return [string]$PeviewBinaryFile;
 }
 
+function Run-RegressTests {
+  param(
+    [String] $Binpath
+  )
+
+  Write-Host "Test if the binary (and the underlying lib) actually works"
+  
+  Write-Host "Test basic functionnality"
+  &"$($Binpath)/Dependencies.exe" -knowndll
+  &"$($Binpath)/Dependencies.exe" -apisets
+  &"$($Binpath)/Dependencies.exe" -sxsentries "$($env:windir)/System32/ctfmon.exe" 
+
+
+  Write-Host "Test manifest parsing"
+  ./test/manifest-regress/Test-ManifestRegress.ps1 $($Binpath)
+
+  # deactivated since it's too long
+  # &"$BINPATH/demangler-test.exe"
+
+  Write-Host "Tests done."
+}
+
 $BINPATH="C:/projects/dependencies/bin/$($env:CONFIGURATION)$($env:platform)";
 $DepsFolder="C:/projects/dependencies/deps/$($env:CONFIGURATION)$($env:platform)";
 $OutputFolder="C:/projects/dependencies/output";
@@ -94,15 +116,9 @@ New-Item -ItemType Directory -Force -Path $OutputFolder;
 # Retrieve all dependencies that need to be packaged
 Get-DependenciesDeps -Binpath $BINPATH -OutputFolder $DepsFolder;
 
+# Running regress tests
+Run-RegressTests -Binpath $BINPATH;
 
-Write-Host "Test if the binary (and the underlying lib) actually works"
-&"$BINPATH/Dependencies.exe" -knowndll
-&"$BINPATH/Dependencies.exe" -apisets
-&"$BINPATH/Dependencies.exe" -manifest "$($env:windir)/System32/shell32.dll" 
-&"$BINPATH/Dependencies.exe" -sxsentries "$($env:windir)/System32/ctfmon.exe" 
-
-# &"$BINPATH/demangler-test.exe"
-Write-Host "Tests done."
 
 Write-Host "Zipping everything"
 &7z.exe a "$($OutputFolder)/Dependencies_$($env:platform)_$($env:CONFIGURATION).zip" $BINPATH/*.dll $BINPATH/*.exe $BINPATH/*.config $BINPATH/*.pdb $DepsFolder/* $env:PEVIEW_PATH;
