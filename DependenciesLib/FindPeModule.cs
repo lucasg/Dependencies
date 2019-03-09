@@ -205,7 +205,7 @@ namespace Dependencies
 
 
             // 8. Check if it's an absolute import
-            if ((Path.GetFullPath(ModuleName) == ModuleName) && File.Exists(ModuleName))
+            if (ModuleName != "" && (Path.GetFullPath(ModuleName) == ModuleName) && File.Exists(ModuleName))
             {
                 return new Tuple<ModuleSearchStrategy, string>(
                    ModuleSearchStrategy.Fullpath,

@@ -105,12 +105,13 @@ namespace Dependencies
         {
             UnderlyingModule = _UnderlyingModule;
 
-			_Flags |= ModuleFlag.ApiSet;
-			if (ApiSetModuleName.StartsWith("ext-"))
-			{
-				_Flags |= ModuleFlag.ApiSetExt;
-			}
-		}
+            _Flags = _UnderlyingModule.Flags;
+            _Flags |= ModuleFlag.ApiSet;
+            if (ApiSetModuleName.StartsWith("ext-"))
+            {
+                _Flags |= ModuleFlag.ApiSetExt;
+            }
+        }
 
         public override string ModuleName { get { return String.Format("{0:s} -> {1:s}", this._Name, UnderlyingModule.ModuleName);}}
         public override string Filepath { get { return UnderlyingModule.Filepath; } }
