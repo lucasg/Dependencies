@@ -513,7 +513,29 @@ namespace Dependencies
                         // Process CLR referenced assemblies
                         foreach (var assembly in module.AssemblyReferences)
                         {
-                            AssemblyDefinition definition = resolver.Resolve(assembly);
+                            AssemblyDefinition definition;
+                            try
+                            {
+                                definition = resolver.Resolve(assembly);
+                            }
+                            catch (AssemblyResolutionException)
+                            {
+                                ImportContext AppInitImportModule = new ImportContext();
+                                AppInitImportModule.PeFilePath = null;
+                                AppInitImportModule.PeProperties = null;
+                                AppInitImportModule.ModuleName = Path.GetFileName(assembly.Name);
+                                AppInitImportModule.ApiSetModuleName = null;
+                                AppInitImportModule.Flags = ModuleFlag.ClrReference;
+                                AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
+                                AppInitImportModule.Flags |= ModuleFlag.NotFound;
+
+                                if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
+                                {
+                                    NewTreeContexts.Add(AppInitImportModule.ModuleName, AppInitImportModule);
+                                }
+
+                                continue;
+                            }
 
                             foreach (var AssemblyModule in definition.Modules)
                             { 
