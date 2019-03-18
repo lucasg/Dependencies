@@ -79,7 +79,7 @@ namespace Dependencies
             }
 
             string ApiSetName = LookupApiSetLibrary(ModuleName);
-            if (ApiSetName != null)
+            if (!string.IsNullOrEmpty(ApiSetName))
             {
                 ModuleName = ApiSetName;
             }
@@ -88,7 +88,7 @@ namespace Dependencies
 
             // ApiSet override the underneath search location if found or not
             ModuleSearchStrategy ModuleLocation = ResolvedFilepath.Item1;
-            if ((ApiSetName != null) /*&& (ResolvedFilepath.Item2 != null)*/)
+            if (!string.IsNullOrEmpty(ApiSetName) /*&& (ResolvedFilepath.Item2 != null)*/)
                 ModuleLocation = ModuleSearchStrategy.ApiSetSchema;
 
             // 
