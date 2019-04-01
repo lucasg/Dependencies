@@ -399,8 +399,19 @@ namespace Dependencies
 				{
 					ImportModule.PeProperties = ResolvedModule.Item2;
 
-					if (ResolvedModule.Item2 != null)
-						ImportModule.PeFilePath = ResolvedModule.Item2.Filepath;
+                    if (ResolvedModule.Item2 != null)
+                    {
+                        ImportModule.PeFilePath = ResolvedModule.Item2.Filepath;
+                        foreach (var Import in BinaryCache.LookupImports(DllImport, ImportModule.PeFilePath))
+                        {
+                            if (!Import.Item2)
+                            {
+                                ImportModule.Flags |= ModuleFlag.MissingImports;
+                                break;
+                            }
+
+                        }
+                    }
 				}
 				else
 				{

@@ -149,6 +149,12 @@ namespace Dependencies
                 return "Images/HourglassOverlay.png";
             }
 
+            // How to handle delay-load + missing import?
+            if ((Flags & ModuleFlag.MissingImports) != 0)
+            {
+                return "Images/InvalidOverlay.png";
+            }
+
             bool ClrAssembly = (Flags & ModuleFlag.ClrReference) != 0;
             if (ClrAssembly)
             {
