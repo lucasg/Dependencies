@@ -22,6 +22,7 @@ public enum ModuleFlag
     ApiSet = 0x04,
 	ApiSetExt = 0x08,
 	NotFound = 0x10,
+    MissingImports = 0x20,
 }
 
 namespace Dependencies
