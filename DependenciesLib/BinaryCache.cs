@@ -103,12 +103,17 @@ namespace Dependencies
 
         private static ApiSetSchema ApiSetmapCache = Phlib.GetApiSetSchema();
 
+        /// <summary>
+        /// Attempt to query the HostDll pointed by the Apiset contract.
+        /// </summary>
+        /// <param name="ImportDllName"> DLL name as in the parent import entry. May or may not be an apiset contract </param>
+        /// <returns> Return the first host dll pointed by the apiset contract if found, otherwise it return an empty string.</returns>
         public static string LookupApiSetLibrary(string ImportDllName)
         {
             
             // Look for api set target 
             if (!ImportDllName.StartsWith("api-") && !ImportDllName.StartsWith("ext-"))
-                return null;
+                return "";
            
             // Strip the .dll extension and the last number (which is probably a build counter)
             string ImportDllNameWithoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
@@ -123,7 +128,7 @@ namespace Dependencies
                 }
             }
             
-            return null;
+            return "";
         }
 
         public static bool LookupImport(string ModuleFilePath, string ImportName, int ImportOrdinal, bool ImportByOrdinal)
