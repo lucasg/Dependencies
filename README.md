@@ -11,7 +11,7 @@ NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/l
 
 
 ## Overview
-`Dependencies` is a rewrite of the legacy software [Dependency Walker](http://www.dependencywalker.com/) which was shipped along Windows SDKs, but whose developement stopped around 2006.
+`Dependencies` is a rewrite of the legacy software [Dependency Walker](http://www.dependencywalker.com/) which was shipped along Windows SDKs, but whose development stopped around 2006.
 `Dependencies` can help Windows developers troubleshooting their dll load dependencies issues.
 
 ## Releases
@@ -38,12 +38,12 @@ NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/l
 
 ## Installation and Usage
 
-`Dependencies` is currently shipped as a binary (no installer present). Just click on one of the release numbers above (probably the latest), download and uncompress the archive and click on it.
+`Dependencies` is currently shipped as a binary (no installer present). Just click on one of the release numbers above (probably the latest), download and uncompress the archive and run DependenciesGui.exe.
 Since the binary is not signed, `SmartScreen` might scream at runtime. `Dependencies` also bundle `ClrPhTester.exe`, a dumpbin-like executable used to test for non-regressions.
 
 Since `v1.6`, Dependencies is also packaged as an appx package (the Windows equivalent of a `.deb` file) which can be installed locally. However, you also need to add the test certificate `DependenciesAppx_TemporaryKey.cer` to your cert hive.
 
-`Dependencies` currently does not recursively resolve child imports when parsing a new PE since it can be really memory-hungry to do so ( it can over a GB even for "simple" PEs ). This behaviour can be overriden (app-wide) via a property located in "Options->Properties->Tree build behaviour".
+`Dependencies` currently does not recursively resolve child imports when parsing a new PE since it can be really memory-hungry to do so ( it can over a GB even for "simple" PEs ). This behavior can be overridden (app-wide) via a property located in "Options->Properties->Tree build behaviour".
 
 <p align="center">
 <img alt="User options" src="screenshots/UserOptions.png"/>
