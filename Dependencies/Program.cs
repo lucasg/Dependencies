@@ -281,8 +281,9 @@ namespace Dependencies
             }
 
             Dependencies = new List<PeDependencyItem>();
+			ResolvedImports = new List<PeDependencyItem>();
 
-            foreach (PeImportDll DllImport in Imports)
+			foreach (PeImportDll DllImport in Imports)
             {
                 string ModuleFilepath = null;
                 ModuleSearchStrategy Strategy;
@@ -298,10 +299,24 @@ namespace Dependencies
                 }
 
 
-                Debug.WriteLine("[{0:d}] [{1:s}] Adding dep {2:s}", RecursionLevel,  ModuleName, ModuleFilepath);
-                PeDependencyItem DependencyItem = Root.GetModuleItem(DllImport.Name, ModuleFilepath, Strategy, RecursionLevel + 1);
-                Dependencies.Add(DependencyItem);
-            }
+                
+				bool IsAlreadyCached = Root.isModuleCached(DllImport.Name, ModuleFilepath);
+				PeDependencyItem DependencyItem = Root.GetModuleItem(DllImport.Name, ModuleFilepath, Strategy, RecursionLevel + 1);
+				
+				// do not add twice the same imported module
+				if (ResolvedImports.Find(ri => ri.ModuleName == DllImport.Name) != null)
+				{
+					ResolvedImports.Add(DependencyItem);
+				}
+				
+				// Do not process twice a dependency. It will be displayed only once
+				if (!IsAlreadyCached)
+				{
+					Debug.WriteLine("[{0:d}] [{1:s}] Adding dep {2:s}", RecursionLevel, ModuleName, ModuleFilepath);
+					Dependencies.Add(DependencyItem);
+				}
+
+			}
 
             DependenciesResolved = true;
 
@@ -318,22 +333,38 @@ namespace Dependencies
             string Tabs = string.Concat(Enumerable.Repeat("|  ", RecursionLevel));
             Console.WriteLine("{0:s}├ {1:s} ({2:s}) : {3:s} ", Tabs, ModuleName, SearchStrategy.ToString(), Filepath);
 
-            foreach (var Dep in Dependencies)
+            foreach (var Dep in ResolvedImports)
             {
-                if (Root.VisitModule(Dep.ModuleName, Dep.Filepath))
-                {
-                    Dep.PrettyPrint();
-                }
+				bool NeverSeenModule = Root.VisitModule(Dep.ModuleName, Dep.Filepath);
+
+				if (NeverSeenModule)
+				{
+					Dep.PrettyPrint();
+				}
+				else
+				{
+					Dep.BasicPrettyPrint();
+				}
+				
             }
         }
 
-        public string ModuleName;
+		public void BasicPrettyPrint()
+		{
+			string Tabs = string.Concat(Enumerable.Repeat("|  ", RecursionLevel));
+			Console.WriteLine("{0:s}├ {1:s} ({2:s}) : {3:s} ", Tabs, ModuleName, SearchStrategy.ToString(), Filepath);
+		}
+
+		public string ModuleName;
         public string Filepath;
         public ModuleSearchStrategy SearchStrategy;
         public List<PeDependencyItem> Dependencies;
+		protected List<PeDependencyItem> ResolvedImports;
 
-        protected List<PeImportDll> Imports;
-        protected PeDependencies Root;
+		protected List<PeImportDll> Imports;
+		
+
+		protected PeDependencies Root;
         protected int RecursionLevel;
 
         private bool DependenciesResolved;
@@ -382,7 +413,14 @@ namespace Dependencies
 			);
         }
 
-        public PeDependencyItem GetModuleItem(string ModuleName, string ModuleFilepath, ModuleSearchStrategy SearchStrategy, int RecursionLevel)
+		public bool isModuleCached(string ModuleName, string ModuleFilepath)
+		{
+			// Do not process twice the same item
+			ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
+			return ModulesCache.ContainsKey(ModuleKey);
+		}
+
+		public PeDependencyItem GetModuleItem(string ModuleName, string ModuleFilepath, ModuleSearchStrategy SearchStrategy, int RecursionLevel)
         {
             // Do not process twice the same item
             ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
@@ -559,8 +597,8 @@ namespace Dependencies
                             { "sxsentries", "dump all of FILE's sxs dependencies", v => command = DumpSxsEntries },
                             { "imports", "dump FILE imports", v => command = DumpImports },
                             { "exports", "dump  FILE exports", v => command = DumpExports },
-                            { "chain", "dump FILE resolved modules", v => command = DumpDependencyChain },
-                            { "modules", "dump FILE whole dependency chain", v => command = DumpModules },
+                            { "chain", "dump FILE whole dependency chain", v => command = DumpDependencyChain },
+                            { "modules", "dump FILE resolved modules", v => command = DumpModules },
 						};
 
 			List<string> eps = opts.Parse(args);

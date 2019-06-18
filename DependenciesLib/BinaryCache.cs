@@ -58,6 +58,16 @@ namespace Dependencies
             return Instance.GetBinary(PePath);
         }
 
+		public static Tuple<ModuleSearchStrategy, PE> ResolveModule(string ModuleName)
+		{
+			PE RootPe = LoadPe(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "ntdll.dll"));
+			string WorkingDirectory = Path.GetDirectoryName(RootPe.Filepath);
+			List<string> CustomSearchFolders = new List<string>();
+			SxsEntries SxsCache = SxsManifest.GetSxsEntries(RootPe);
+
+			return ResolveModule(RootPe, ModuleName, SxsCache, CustomSearchFolders, WorkingDirectory);
+		}
+
 		public static Tuple<ModuleSearchStrategy, PE> ResolveModule(PE RootPe, string ModuleName)
 		{
 			string WorkingDirectory = Path.GetDirectoryName(RootPe.Filepath);
@@ -213,6 +223,7 @@ namespace Dependencies
 
 		public static List<Tuple<PeImport, bool>> LookupImports(PeImportDll ModuleImport, string ModuleFilePath)
         {
+			PE Module = null;
 			List<Tuple<PeImport, bool>> Result = new List<Tuple<PeImport, bool>>();
 
 			if (ModuleFilePath == null)
@@ -221,10 +232,14 @@ namespace Dependencies
             string ApiSetName = LookupApiSetLibrary(ModuleFilePath);
             if (ApiSetName != null)
             {
-                ModuleFilePath = ApiSetName;
+				Module = ResolveModule(ApiSetName).Item2;
             }
+			else
+			{
+				Module = LoadPe(ModuleFilePath);
+			}
 
-            PE Module = LoadPe(ModuleFilePath);
+            
             if (Module == null)
                 return Result;
 
