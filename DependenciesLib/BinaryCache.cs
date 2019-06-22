@@ -147,7 +147,7 @@ namespace Dependencies
                 return false;
 
             string ApiSetName = LookupApiSetLibrary(ModuleFilePath);
-            if (ApiSetName != null)
+            if (!string.IsNullOrEmpty(ApiSetName))
             {
                 ModuleFilePath = ApiSetName;
             }
@@ -230,8 +230,8 @@ namespace Dependencies
                 return Result;
 
             string ApiSetName = LookupApiSetLibrary(ModuleFilePath);
-            if (ApiSetName != null)
-            {
+			if (!string.IsNullOrEmpty(ApiSetName))
+			{
 				Module = ResolveModule(ApiSetName).Item2;
             }
 			else

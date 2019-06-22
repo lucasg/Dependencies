@@ -45,9 +45,15 @@ namespace Dependencies
         public PE LoadBinary(string path)
         {
             StatusBarMessage = String.Format("Loading module {0:s} ...", path);
-            PE pe = BinaryCache.LoadPe(path);
 
-            if (!pe.LoadSuccessful)
+			if (!NativeFile.Exists(path))
+			{
+				StatusBarMessage = String.Format("Loading PE file \"{0:s}\" failed : file not present on disk.", path);
+				return null;
+			}
+
+			PE pe = BinaryCache.LoadPe(path);
+            if (pe == null || !pe.LoadSuccessful)
             {
                 StatusBarMessage = String.Format("Loading module {0:s} failed.", path);
             }

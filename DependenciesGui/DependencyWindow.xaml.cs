@@ -386,8 +386,8 @@ namespace Dependencies
         {
             this.Pe = (Application.Current as App).LoadBinary(this.Filename);
 
-            if (!this.Pe.LoadSuccessful)
-            {
+			if (this.Pe == null || !this.Pe.LoadSuccessful)
+			{
                 MessageBox.Show(
                     String.Format("{0:s} is not a valid PE-COFF file", this.Filename),
                     "Invalid PE",
