@@ -255,33 +255,39 @@ namespace Dependencies
             Root = _Root;
             ModuleName = _ModuleName;
 
-            if (ModuleFilepath != null)
-            {
-                PE Module = BinaryCache.LoadPe(ModuleFilepath);
-                Imports = Module.GetImports();
-            }
-            else
-            {
-                //Module = null;
-                Imports = new List<PeImportDll>();
-            }
-            
-            Filepath = ModuleFilepath;
+
+			Imports = new List<PeImportDll>();
+			Filepath = ModuleFilepath;
             SearchStrategy = Strategy;
             RecursionLevel = Level;
 
             DependenciesResolved = false;
-        }
+			Dependencies = new List<PeDependencyItem>();
+			ResolvedImports = new List<PeDependencyItem>();
+		}
 
-        public void ResolveDependencies()
+		public void LoadPe()
+		{
+			if (Filepath != null)
+			{
+				PE Module = BinaryCache.LoadPe(Filepath);
+				Imports = Module.GetImports();
+			}
+			else
+			{
+				//Module = null;
+
+			}
+		}
+
+		public void ResolveDependencies()
         {
-            if (DependenciesResolved)
+
+			if (DependenciesResolved)
             {
                 return;
             }
 
-            Dependencies = new List<PeDependencyItem>();
-			ResolvedImports = new List<PeDependencyItem>();
 
 			foreach (PeImportDll DllImport in Imports)
             {
@@ -304,7 +310,7 @@ namespace Dependencies
 				PeDependencyItem DependencyItem = Root.GetModuleItem(DllImport.Name, ModuleFilepath, Strategy, RecursionLevel + 1);
 				
 				// do not add twice the same imported module
-				if (ResolvedImports.Find(ri => ri.ModuleName == DllImport.Name) != null)
+				if (ResolvedImports.Find(ri => ri.ModuleName == DllImport.Name) == null)
 				{
 					ResolvedImports.Add(DependencyItem);
 				}
@@ -319,12 +325,17 @@ namespace Dependencies
 			}
 
             DependenciesResolved = true;
+			if ((Root.MaxRecursion > 0) && ((RecursionLevel + 1) >= Root.MaxRecursion))
+			{
+				return;
+			}
 
 
-            // Recursively resolve dependencies
-            foreach (var Dep in Dependencies)
+			// Recursively resolve dependencies
+			foreach (var Dep in Dependencies)
             {
-                Dep.ResolveDependencies();
+				Dep.LoadPe();
+				Dep.ResolveDependencies();
             }
         }
 
@@ -393,16 +404,18 @@ namespace Dependencies
 
     class PeDependencies : IPrettyPrintable
     {
-        public PeDependencies(PE Application)
+		public PeDependencies(PE Application, int recursion_depth)
         {
             string RootFilename = Path.GetFileName(Application.Filepath);
 
             RootPe = Application;
             SxsEntriesCache = SxsManifest.GetSxsEntries(RootPe);
             ModulesCache = new ModuleEntries();
+			MaxRecursion = recursion_depth;
 
-            Root = GetModuleItem(RootFilename, Application.Filepath, ModuleSearchStrategy.ROOT, 0);
-            Root.ResolveDependencies();
+			Root = GetModuleItem(RootFilename, Application.Filepath, ModuleSearchStrategy.ROOT, 0);
+			Root.LoadPe();
+			Root.ResolveDependencies();
         }
 
         public Tuple<ModuleSearchStrategy, PE> ResolveModule(string ModuleName)
@@ -458,9 +471,10 @@ namespace Dependencies
         }
 
         public PeDependencyItem Root;
+		public int MaxRecursion;
 
-        private PE RootPe;
-        private SxsEntries SxsEntriesCache;
+		private PE RootPe;
+		private SxsEntries SxsEntriesCache;
         private ModuleEntries ModulesCache;
         private Dictionary<ModuleCacheKey, bool> ModulesVisited;
     }
@@ -494,32 +508,32 @@ namespace Dependencies
             Printer(ApiSet);
         }
 
-        public static void DumpManifest(PE Application, Action<IPrettyPrintable> Printer)
+		public static void DumpManifest(PE Application, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
         {
             PEManifest Manifest = new PEManifest(Application);
             Printer(Manifest);
         }
 
-        public static void DumpSxsEntries(PE Application, Action<IPrettyPrintable> Printer)
+		public static void DumpSxsEntries(PE Application, Action<IPrettyPrintable> Printer, int recursion_depth= 0)
         {
             SxsDependencies SxsDeps = new SxsDependencies(Application);
             Printer(SxsDeps);
         }
 
 
-        public static void DumpExports(PE Pe, Action<IPrettyPrintable> Printer)
+        public static void DumpExports(PE Pe, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
         {
             PEExports Exports = new PEExports(Pe);
             Printer(Exports);
         }
 
-        public static void DumpImports(PE Pe, Action<IPrettyPrintable> Printer)
+        public static void DumpImports(PE Pe, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
         {
             PEImports Imports = new PEImports(Pe);
             Printer(Imports);
         }
 
-        public static void DumpDependencyChain(PE Pe, Action<IPrettyPrintable> Printer)
+        public static void DumpDependencyChain(PE Pe, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
         {
             if (Printer == JsonPrinter)
             {
@@ -527,11 +541,11 @@ namespace Dependencies
                 return;
             }
 
-            PeDependencies Deps = new PeDependencies(Pe);
+            PeDependencies Deps = new PeDependencies(Pe, recursion_depth);
             Printer(Deps);
         }
 
-        public static void DumpModules(PE Pe, Action<IPrettyPrintable> Printer)
+        public static void DumpModules(PE Pe, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
         {
             if (Printer == JsonPrinter)
             {
@@ -539,7 +553,7 @@ namespace Dependencies
                 return;
             }
 
-            PeDependencies Deps = new PeDependencies(Pe);
+            PeDependencies Deps = new PeDependencies(Pe, recursion_depth);
             Printer(Deps.GetModules);
         }
 
@@ -576,13 +590,14 @@ namespace Dependencies
 		}
 
 
-		public delegate void DumpCommand(PE Application, Action<IPrettyPrintable> Printer);
+		public delegate void DumpCommand(PE Application, Action<IPrettyPrintable> Printer, int recursion_depth=0);
 
 		static void Main(string[] args)
-        {
+		{
 			// always the first call to make
 			Phlib.InitializePhLib();
 
+			int recursion_depth = 0;
 			bool early_exit = false;
 			bool show_help = false;
 			bool export_as_json = false;
@@ -591,6 +606,7 @@ namespace Dependencies
 			OptionSet opts = new OptionSet() {
 							{ "h|help",  "show this message and exit", v => show_help = v != null },
 							{ "json",  "Export results in json format", v => export_as_json = v != null },
+							{ "d|depth=",  "limit recursion depth when analyisng loaded modules or dependency chain. Default value is infinite", (int v) =>  recursion_depth = v },
 							{ "knowndll", "List all known dlls", v => { DumpKnownDlls(GetObjectPrinter(export_as_json));  early_exit = true; } },
 							{ "apisets", "List apisets redirections", v => { DumpApiSets(GetObjectPrinter(export_as_json));  early_exit = true; } },
                             { "manifest", "show manifest information embedded in PE file", v => command = DumpManifest },
@@ -621,7 +637,7 @@ namespace Dependencies
                 return;
             }
 
-            command(Pe, GetObjectPrinter(export_as_json));
+            command(Pe, GetObjectPrinter(export_as_json), recursion_depth);
 
         }
     }
