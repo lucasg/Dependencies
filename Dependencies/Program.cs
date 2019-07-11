@@ -619,7 +619,7 @@ namespace Dependencies
 
 			List<string> eps = opts.Parse(args);
 
-			if ((show_help) || (args.Length == 0))
+			if ((show_help) || (args.Length == 0) || (command == null))
 			{
 				DumpUsage();
 				return;
