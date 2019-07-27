@@ -212,6 +212,7 @@ namespace Dependencies
         {
             this.UserSettings.Close();
             this.UserSettings = new UserSettings();
+            this.UserSettings.Owner = this;
             this.UserSettings.Show();
         }
 
