@@ -68,6 +68,12 @@ At the moment, `Dependencies` recreates features and "features" of `depends.exe`
 * Minimal support of sxs private manifests search only.
 
 
+## Building
+
+Building is pretty straightforward.
+The only caveat is you need to select the "Debug" or "Release" configuration and "x64" or "x86" platform which may not be the default.
+
+
 ## Credits and licensing
 
 Special thanks to :
