@@ -179,45 +179,76 @@ namespace Dependencies
                         break;
                 }
 
-                Regex MajorVersionRegex = new Regex(@"([0-9]+)\.(.*)", RegexOptions.IgnoreCase);
-                Match MajorVersionMatch = MajorVersionRegex.Match(Version);
-                string MajorVersion = (MajorVersionMatch.Success) ? MajorVersionMatch.Groups[1].Value.ToString() : ".*";
+                Regex VersionRegex = new Regex(@"([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)", RegexOptions.IgnoreCase);
+                Match VersionMatch = VersionRegex.Match(Version);
 
-                // Manifest filename : {ProcArch}_{Name}_{PublicKeyToken}_{FuzzyVersion}_{Langage}_{some_hash}.manifest
-                Regex ManifestFileNameRegex = new Regex(
-                    String.Format(@"({0:s}_{1:s}_{2:s}_({3:s}\.[\.0-9]*)_none_([a-fA-F0-9]+))\.manifest",
-                        ProcessArch, 
-                        Name,
-                        PublicKeyToken,
-                        MajorVersion
-                        //Langage,
-                        // some hash
-                    ), 
-                    RegexOptions.IgnoreCase
-                );
-
-                foreach (var FileName in RegisteredManifests)
+                if (VersionMatch.Success)
                 {
-                    Match MatchingSxsFile = ManifestFileNameRegex.Match(FileName);
-                    if (MatchingSxsFile.Success)
-                    {
+                    string Major = VersionMatch.Groups[1].Value;
+                    string Minor = VersionMatch.Groups[2].Value;
+                    string Build = (VersionMatch.Groups[3].Value == "0") ? ".*" : VersionMatch.Groups[3].Value;
+                    string Patch = (VersionMatch.Groups[4].Value == "0") ? ".*" : VersionMatch.Groups[4].Value;
 
-                        TargetSxsManifestPath = Path.Combine(WinSxsManifestDir, FileName);
-                        SxsManifestDir = Path.Combine(WinSxsDir, MatchingSxsFile.Groups[1].Value);
+                    // Manifest filename : {ProcArch}_{Name}_{PublicKeyToken}_{FuzzyVersion}_{Langage}_{some_hash}.manifest
+                    Regex ManifestFileNameRegex = new Regex(
+                        String.Format(@"({0:s}_{1:s}_{2:s}_{3:s}\.{4:s}\.({5:s})\.({6:s})_none_([a-fA-F0-9]+))\.manifest",
+                            ProcessArch, 
+                            Name,
+                            PublicKeyToken,
+                            Major,
+                            Minor,
+                            Build,
+                            Patch
+                            //Langage,
+                            // some hash
+                        ), 
+                        RegexOptions.IgnoreCase
+                    );
+
+                    bool FoundMatch = false;
+                    int HighestBuild = 0;
+                    int HighestPatch = 0;
+                    string MatchSxsManifestDir = "";
+                    string MatchSxsManifestPath = "";
+
+                    foreach (var FileName in RegisteredManifests)
+                    {
+                        Match MatchingSxsFile = ManifestFileNameRegex.Match(FileName);
+                        if (MatchingSxsFile.Success)
+                        {
+                            FoundMatch = true;
+                            int MatchingBuild = Int32.Parse(MatchingSxsFile.Groups[2].Value);
+                            int MatchingPatch = Int32.Parse(MatchingSxsFile.Groups[3].Value);
+
+                            if ((MatchingBuild > HighestBuild) || ((MatchingBuild == HighestBuild) && (MatchingPatch > HighestPatch)))
+                            {
+                                HighestBuild = MatchingBuild;
+                                HighestPatch = MatchingPatch;
+                                MatchSxsManifestPath = Path.Combine(WinSxsManifestDir, FileName);
+                                MatchSxsManifestDir = MatchingSxsFile.Groups[1].Value;
+                            }
+                        }
+                    }
+
+                    if (FoundMatch)
+                    {
+                        
+                        string FullPathMatchSxsManifestDir = Path.Combine(WinSxsDir, MatchSxsManifestDir);
 
                         // "{name}.local" local sxs directory hijack ( really used for UAC bypasses )
                         if (ExecutableName != "")
                         {
                             string LocalSxsDir = Path.Combine(Folder, String.Format("{0:s}.local", ExecutableName));
-                            string MatchingLocalSxsDir = Path.Combine(LocalSxsDir, MatchingSxsFile.Groups[1].Value);
+                            string MatchingLocalSxsDir = Path.Combine(LocalSxsDir, MatchSxsManifestDir);
 
                             if (Directory.Exists(LocalSxsDir) && Directory.Exists(MatchingLocalSxsDir))
                             {
-                                SxsManifestDir = MatchingLocalSxsDir;
+                                FullPathMatchSxsManifestDir = MatchingLocalSxsDir;
                             }
                         }
 
-                        return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, Wow64Pe);
+
+                        return ExtractDependenciesFromSxsManifestFile(MatchSxsManifestPath, FullPathMatchSxsManifestDir, ExecutableName, Wow64Pe);
                     }
                 }
             }
