@@ -103,18 +103,6 @@ bool PE::InitProperties()
 	return true;
 }
 
-ApiSetSchema^ PE::GetApiSetSchema()
-{
-    PH_MAPPED_IMAGE mappedImage = m_Impl->m_PvMappedImage;
-    for (auto n = 0u; n < mappedImage.NumberOfSections; ++n)
-    {
-        IMAGE_SECTION_HEADER const & section = mappedImage.Sections[n];
-        if (strncmp(".apiset", reinterpret_cast<char const*>(section.Name), IMAGE_SIZEOF_SHORT_NAME) == 0)
-            return ApiSetSchemaImpl::ParseApiSetSchema(reinterpret_cast<PAPI_SET_NAMESPACE>(PTR_ADD_OFFSET(mappedImage.ViewBase, section.PointerToRawData)));
-    }
-    return gcnew ApiSetSchema();
-}
-
 Collections::Generic::List<PeExport^> ^ PE::GetExports()
 {
     if (m_ExportsInit)

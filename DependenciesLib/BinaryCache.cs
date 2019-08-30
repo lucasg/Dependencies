@@ -125,20 +125,10 @@ namespace Dependencies
             if (!ImportDllName.StartsWith("api-") && !ImportDllName.StartsWith("ext-"))
                 return "";
            
-            // Strip the .dll extension and the last number (which is probably a build counter)
-            string ImportDllNameWithoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
-            string ImportDllHashKey = ImportDllNameWithoutExtension.Substring(0, ImportDllNameWithoutExtension.LastIndexOf("-"));
-
-            if (ApiSetmapCache.ContainsKey(ImportDllHashKey))
-            {
-                ApiSetTarget Targets = ApiSetmapCache[ImportDllHashKey];
-                if (Targets.Count > 0)
-                {
-                    return Targets[0];
-                }
-            }
-            
-            return "";
+            // Strip the .dll extension
+            var ImportDllWIthoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
+            var Targets = ApiSetmapCache.Lookup(ImportDllWIthoutExtension);
+            return Targets.Count > 0 ? Targets[0] : "";
         }
 
         public static bool LookupImport(string ModuleFilePath, string ImportName, int ImportOrdinal, bool ImportByOrdinal)

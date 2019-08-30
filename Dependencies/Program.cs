@@ -75,7 +75,7 @@ namespace Dependencies
         {
             Console.WriteLine("[-] Api Sets Map : ");
 
-            foreach (var ApiSetEntry in this.Schema)
+            foreach (var ApiSetEntry in this.Schema.GetAll())
             {
                 ApiSetTarget ApiSetImpl = ApiSetEntry.Value;
                 string ApiSetName = ApiSetEntry.Key;

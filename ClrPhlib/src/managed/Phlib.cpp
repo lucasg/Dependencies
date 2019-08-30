@@ -136,88 +136,154 @@ PAPI_SET_NAMESPACE GetApiSetNamespace()
 }
 #endif
 
-ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap)
+struct ApiSetSchemaImpl
 {
-	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
-	for (ULONG i=0; i < ApiSetMap->Count; i++)
+    static ApiSetSchema^ ParseApiSetSchema(API_SET_NAMESPACE const * apiSetMap);
+
+private:
+    // private implementation of ApiSet schema parsing
+    static ApiSetSchema^ GetApiSetSchemaV2(API_SET_NAMESPACE_V2 const * map);
+    static ApiSetSchema^ GetApiSetSchemaV4(API_SET_NAMESPACE_V4 const * map);
+    static ApiSetSchema^ GetApiSetSchemaV6(API_SET_NAMESPACE_V6 const * map);
+};
+
+private ref class EmptyApiSetSchema sealed : ApiSetSchema
+{
+public:
+    List<KeyValuePair<String^, ApiSetTarget^>>^ GetAll() override { return gcnew List<KeyValuePair<String^, ApiSetTarget^>>(); }
+    ApiSetTarget^ Lookup(String^) override { return nullptr; }
+};
+
+private ref class V2V4ApiSetSchema sealed : ApiSetSchema
+{
+public:
+    List<KeyValuePair<String^, ApiSetTarget^>>^ const All = gcnew List<KeyValuePair<String^, ApiSetTarget^>>();
+
+    List<KeyValuePair<String^, ApiSetTarget^>>^ GetAll() override { return All; }
+    ApiSetTarget^ Lookup(String^ name) override
+    {
+        if (!name->StartsWith("api-"))
+            return nullptr;
+        name = name->Substring(4);
+
+        // Note: The list is initially alphabetically sorted!!!
+        auto min = 0;
+        auto max = All->Count - 1;
+        while (min <= max)
+        {
+            auto const cur = (min + max) / 2;
+            auto pair = All[cur];
+            auto const k = String::Compare(name, pair.Key);
+            if (k < 0)
+                max = cur - 1;
+            else if (k > 0)
+                min = cur + 1;
+            else
+                return pair.Value;
+        }
+        return nullptr;
+    }
+};
+
+ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV2(API_SET_NAMESPACE_V2 const * const map)
+{
+	auto const base = reinterpret_cast<ULONG_PTR>(map);
+	auto const schema = gcnew V2V4ApiSetSchema();
+	for (auto it = map->Array, eit = it + map->Count; it < eit; ++it)
 	{
-		auto ApiSetEntry = ApiSetMap->Array[i];
-
-		// Retrieve api min-win contract name
-		PWCHAR ApiSetEntryNameBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + ApiSetEntry.NameOffset);
-		String^ ApiSetEntryName = gcnew String(ApiSetEntryNameBuffer, 0, ApiSetEntry.NameLength/sizeof(WCHAR));
-
-		// Strip the .dll extension and the last number (which is probably a build counter)
-		String^ ApiSetEntryHashKey = ApiSetEntryName->Substring(0, ApiSetEntryName->LastIndexOf("-"));
-
-		// Retrieve dlls names implementing the contract
-		ApiSetTarget^ ApiSetEntryTargets = gcnew ApiSetTarget();
-		PAPI_SET_VALUE_ENTRY_V2 ApiSetValueEntry = reinterpret_cast<PAPI_SET_VALUE_ENTRY_V2>(ApiSetMapBaseAddress + ApiSetEntry.DataOffset);
-		for (ULONG j = 0; j < 2*(ApiSetValueEntry->NumberOfRedirections); j++) {
-			auto Redirection = ApiSetValueEntry->Redirections[j];
-
-			if (Redirection.NameLength) {
-				PWCHAR ApiSetEntryTargetBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + Redirection.NameOffset);
-				String ^HostDllName = gcnew String(ApiSetEntryTargetBuffer, 0, Redirection.NameLength / sizeof(WCHAR));
-
-				if (!ApiSetEntryTargets->Contains(HostDllName)) {
-					ApiSetEntryTargets->Add(HostDllName);
-				}
-			}
+		// Retrieve DLLs names implementing the contract
+		auto const targets = gcnew ApiSetTarget();
+		auto const value_entry = reinterpret_cast<PAPI_SET_VALUE_ENTRY_V2>(base + it->DataOffset);
+		for (auto it2 = value_entry->Redirections, eit2 = it2 + value_entry->NumberOfRedirections; it2 < eit2; ++it2)
+		{
+			auto const value_buffer = reinterpret_cast<PWCHAR>(base + it2->ValueOffset);
+			auto const value = gcnew String(value_buffer, 0, it2->ValueLength / sizeof(WCHAR));
+			targets->Add(value);
 		}
 
-		ApiSets->Add(ApiSetEntryHashKey, ApiSetEntryTargets);
+		// Retrieve api min-win contract name
+		auto const name_buffer = reinterpret_cast<PWCHAR>(base + it->NameOffset);
+		auto const name = gcnew String(name_buffer, 0, it->NameLength / sizeof(WCHAR));
+		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(name, targets));
 	}
-
-	return ApiSets;
+	return schema;
 }
 
-// TODO: Support ApiSet V4 (Win8.1)
-ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap)
+ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV4(API_SET_NAMESPACE_V4 const * const map)
 {
-	return gcnew ApiSetSchema();
-}
-
-ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap)
-{
-	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
-
-	auto ApiSetEntryIterator = reinterpret_cast<PAPI_SET_NAMESPACE_ENTRY_V6>((ApiSetMap->EntryOffset + ApiSetMapBaseAddress));
-	for (ULONG i = 0; i < ApiSetMap->Count; i++) {
+	auto const base = reinterpret_cast<ULONG_PTR>(map);
+	auto const schema = gcnew V2V4ApiSetSchema();
+	for (auto it = map->Array, eit = it + map->Count; it < eit; ++it)
+	{
+		// Retrieve DLLs names implementing the contract
+		auto const targets = gcnew ApiSetTarget();
+		auto const value_entry = reinterpret_cast<PAPI_SET_VALUE_ENTRY_V4>(base + it->DataOffset);
+		for (auto it2 = value_entry->Redirections, eit2 = it2 + value_entry->NumberOfRedirections; it2 < eit2; ++it2)
+		{
+			auto const value_buffer = reinterpret_cast<PWCHAR>(base + it2->ValueOffset);
+			auto const value = gcnew String(value_buffer, 0, it2->ValueLength / sizeof(WCHAR));
+			targets->Add(value);
+		}
 
 		// Retrieve api min-win contract name
-		PWCHAR ApiSetEntryNameBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + ApiSetEntryIterator->NameOffset);
-		String^ ApiSetEntryName = gcnew String(ApiSetEntryNameBuffer, 0, ApiSetEntryIterator->NameLength/sizeof(WCHAR));
+		auto const name_buffer = reinterpret_cast<PWCHAR>(base + it->NameOffset);
+		auto const name = gcnew String(name_buffer, 0, it->NameLength / sizeof(WCHAR));
+		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(name, targets));
+	}
+	return schema;
+}
 
-		// Strip the .dll extension and the last number (which is probably a build counter)
-		String^ ApiSetEntryHashKey = ApiSetEntryName->Substring(0, ApiSetEntryName->LastIndexOf("-"));
+private ref class V6ApiSetSchema sealed : ApiSetSchema
+{
+public:
+    List<KeyValuePair<String^, ApiSetTarget^>>^ const All = gcnew List<KeyValuePair<String^, ApiSetTarget^>>();
+    List<KeyValuePair<String^, ApiSetTarget^>>^ HashedAll = gcnew List<KeyValuePair<String^, ApiSetTarget^>>();
 
-		ApiSetTarget^ ApiSetEntryTargets = gcnew ApiSetTarget();
+    List<KeyValuePair<String^, ApiSetTarget^>>^ GetAll() override { return All; }
+    ApiSetTarget^ Lookup(String^ name) override
+    {
+        // Note: The list is initially alphabetically sorted!!!
+        auto min = 0;
+        auto max = HashedAll->Count - 1;
+        while (min <= max)
+        {
+            auto const cur = (min + max) / 2;
+            auto pair = HashedAll[cur];
+            if (name->StartsWith(pair.Key))
+                return pair.Value;
+            if (String::Compare(name, pair.Key) < 0)
+                max = cur - 1;
+            else
+                min = cur + 1;
+        }
+        return nullptr;
+    }
+};
 
+ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV6(API_SET_NAMESPACE_V6 const * const map)
+{
+	auto const base = reinterpret_cast<ULONG_PTR>(map);
+	auto const schema = gcnew V6ApiSetSchema();
+	for (auto it = reinterpret_cast<PAPI_SET_NAMESPACE_ENTRY_V6>(map->EntryOffset + base), eit = it + map->Count; it < eit; ++it)
+	{
 		// Iterate over all the host dll for this contract
-		auto valueEntry = reinterpret_cast<PAPI_SET_VALUE_ENTRY_V6>(ApiSetMapBaseAddress + ApiSetEntryIterator->ValueOffset);
-		for (ULONG j = 0; j < ApiSetEntryIterator->ValueCount; j++) {
-			
-			// Retrieve dll name implementing the contract
-			PWCHAR ApiSetEntryTargetBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + valueEntry->ValueOffset);
-			ApiSetEntryTargets->Add(gcnew String(ApiSetEntryTargetBuffer, 0, valueEntry->ValueLength / sizeof(WCHAR)));
-
-
-			// If there's an alias...
-			if (valueEntry->NameLength != 0) {
-				PWCHAR ApiSetEntryAliasBuffer = reinterpret_cast<PWCHAR>(ApiSetMapBaseAddress + valueEntry->NameOffset);
-				ApiSetEntryTargets->Add(gcnew String(ApiSetEntryAliasBuffer, 0, valueEntry->NameLength / sizeof(WCHAR)));
-			}
-
-			valueEntry++;
+		auto const targets = gcnew ApiSetTarget();
+		for (auto it2 = static_cast<_API_SET_VALUE_ENTRY_V6*const>(reinterpret_cast<PAPI_SET_VALUE_ENTRY_V6>(base + it->ValueOffset)), eit2 = it2 + it->ValueCount; it2 < eit2; ++it2)
+		{
+			// Retrieve DLLs name implementing the contract
+			auto const value_buffer = reinterpret_cast<PWCHAR>(base + it2->ValueOffset);
+			auto const value = gcnew String(value_buffer, 0, it2->ValueLength / sizeof(WCHAR));
+			targets->Add(value);
 		}
 
-
-		ApiSets->Add(ApiSetEntryHashKey, ApiSetEntryTargets);
-		ApiSetEntryIterator++;
+		// Retrieve api min-win contract name
+		auto const name_buffer = reinterpret_cast<PWCHAR>(base + it->NameOffset);
+		auto const name = gcnew String(name_buffer, 0, it->NameLength / sizeof(WCHAR));
+		auto const hash_name = gcnew String(name_buffer, 0, it->HashedLength / sizeof(WCHAR));
+		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(name, targets));
+		schema->HashedAll->Add(KeyValuePair<String^, ApiSetTarget^>(hash_name, targets));
 	}
-
-	return ApiSets;
+	return schema;
 }
 
 ApiSetSchema^ Phlib::GetApiSetSchema()
@@ -232,26 +298,36 @@ ApiSetSchema^ Phlib::GetApiSetSchema()
     return ApiSetSchemaImpl::ParseApiSetSchema(GetApiSetNamespace());
 }
 
-ApiSetSchema^ ApiSetSchemaImpl::ParseApiSetSchema(PAPI_SET_NAMESPACE apiSetMap)
+ApiSetSchema^ PE::GetApiSetSchema()
+{
+    PH_MAPPED_IMAGE mappedImage = m_Impl->m_PvMappedImage;
+    for (auto n = 0u; n < mappedImage.NumberOfSections; ++n)
+    {
+        IMAGE_SECTION_HEADER const & section = mappedImage.Sections[n];
+        if (strncmp(".apiset", reinterpret_cast<char const*>(section.Name), IMAGE_SIZEOF_SHORT_NAME) == 0)
+            return ApiSetSchemaImpl::ParseApiSetSchema(reinterpret_cast<PAPI_SET_NAMESPACE>(PTR_ADD_OFFSET(mappedImage.ViewBase, section.PointerToRawData)));
+    }
+    return gcnew EmptyApiSetSchema();
+}
+
+ApiSetSchema^ ApiSetSchemaImpl::ParseApiSetSchema(API_SET_NAMESPACE const * const apiSetMap)
 {
 	// Check the returned api namespace is correct
-	if (!apiSetMap) {
-		return gcnew ApiSetSchema();
-	}
+	if (!apiSetMap)
+		return gcnew EmptyApiSetSchema();
 
-	auto apiSetMapAsNumber = reinterpret_cast<ULONG_PTR>(apiSetMap);
 	switch (apiSetMap->Version) 
 	{
 		case 2: // Win7
-			return GetApiSetSchemaV2(apiSetMapAsNumber, &apiSetMap->ApiSetNameSpaceV2);
+			return GetApiSetSchemaV2(&apiSetMap->ApiSetNameSpaceV2);
 
 		case 4: // Win8.1
-			return GetApiSetSchemaV4(apiSetMapAsNumber, &apiSetMap->ApiSetNameSpaceV4);
+			return GetApiSetSchemaV4(&apiSetMap->ApiSetNameSpaceV4);
 
 		case 6: // Win10
-			return GetApiSetSchemaV6(apiSetMapAsNumber, &apiSetMap->ApiSetNameSpaceV6);
+			return GetApiSetSchemaV6(&apiSetMap->ApiSetNameSpaceV6);
 
 		default: // unsupported
-			return gcnew ApiSetSchema();
+			return gcnew EmptyApiSetSchema();
 	}
 }

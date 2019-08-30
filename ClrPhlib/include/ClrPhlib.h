@@ -32,23 +32,15 @@ namespace Dependencies {
 		#pragma endregion ENUMS
 
 		#pragma region TYPES
-        public ref class ApiSetTarget : List<String^>
-        {};
+        public ref class ApiSetTarget : List<String^> {};
 
-        public ref class ApiSetSchema : Dictionary<String^, ApiSetTarget^>
-        {};
-		#pragma endregion TYPES
-
-        struct ApiSetSchemaImpl
+        public ref class ApiSetSchema abstract
         {
-            static ApiSetSchema^ ParseApiSetSchema(PAPI_SET_NAMESPACE apiSetMap);
-
-        private:
-            // private implementation of ApiSet schema parsing
-            static ApiSetSchema^ GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap);
-            static ApiSetSchema^ GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap);
-            static ApiSetSchema^ GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap);
+        public:
+            virtual List<KeyValuePair<String^, ApiSetTarget^>>^ GetAll() = 0;
+            virtual ApiSetTarget^ Lookup(String^ name) = 0;
         };
+		#pragma endregion TYPES
 
         public ref class Phlib {
         public:
