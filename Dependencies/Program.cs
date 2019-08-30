@@ -66,6 +66,11 @@ namespace Dependencies
             Schema = Phlib.GetApiSetSchema();
         }
 
+        public NtApiSet(PE ApiSetSchemaDll)
+        {
+          Schema = ApiSetSchemaDll.GetApiSetSchema();
+        }
+
         public void PrettyPrint()
         {
             Console.WriteLine("[-] Api Sets Map : ");
@@ -508,6 +513,12 @@ namespace Dependencies
             Printer(ApiSet);
         }
 
+        public static void DumpApiSets(PE Application, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
+        {
+          NtApiSet ApiSet = new NtApiSet(Application);
+          Printer(ApiSet);
+        }
+
 		public static void DumpManifest(PE Application, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
         {
             PEManifest Manifest = new PEManifest(Application);
@@ -568,6 +579,7 @@ namespace Dependencies
                 "  -h -help : display this help",
                 "  -json : activate json output.",
                 "  -apisets : dump the system's ApiSet schema (api set dll -> host dll)",
+                "  -apisetsdll : dump the ApiSet schema from apisetschema.dll (api set dll -> host dll)",
                 "  -knowndll : dump all the system's known dlls (x86 and x64)",
                 "  -manifest : dump FILE embedded manifest, if it exists.",
                 "  -sxsentries : dump all of FILE's sxs dependencies.",
@@ -609,6 +621,7 @@ namespace Dependencies
 							{ "d|depth=",  "limit recursion depth when analyisng loaded modules or dependency chain. Default value is infinite", (int v) =>  recursion_depth = v },
 							{ "knowndll", "List all known dlls", v => { DumpKnownDlls(GetObjectPrinter(export_as_json));  early_exit = true; } },
 							{ "apisets", "List apisets redirections", v => { DumpApiSets(GetObjectPrinter(export_as_json));  early_exit = true; } },
+                            { "apisetsdll", "List apisets redirections from apisetschema.dll", v => command = DumpApiSets },
                             { "manifest", "show manifest information embedded in PE file", v => command = DumpManifest },
                             { "sxsentries", "dump all of FILE's sxs dependencies", v => command = DumpSxsEntries },
                             { "imports", "dump FILE imports", v => command = DumpImports },
@@ -619,14 +632,14 @@ namespace Dependencies
 
 			List<string> eps = opts.Parse(args);
 
+			if (early_exit)
+				return;
+
 			if ((show_help) || (args.Length == 0) || (command == null))
 			{
 				DumpUsage();
 				return;
 			}
-
-			if (early_exit)
-				return;
 
 			String FileName = eps[0];
 			//Console.WriteLine("[-] Loading file {0:s} ", FileName);

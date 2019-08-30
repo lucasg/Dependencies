@@ -136,7 +136,7 @@ PAPI_SET_NAMESPACE GetApiSetNamespace()
 }
 #endif
 
-ApiSetSchema^ Phlib::GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap)
+ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap)
 {
 	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
 	for (ULONG i=0; i < ApiSetMap->Count; i++)
@@ -173,12 +173,12 @@ ApiSetSchema^ Phlib::GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_
 }
 
 // TODO: Support ApiSet V4 (Win8.1)
-ApiSetSchema^ Phlib::GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap)
+ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap)
 {
 	return gcnew ApiSetSchema();
 }
 
-ApiSetSchema^ Phlib::GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap)
+ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap)
 {
 	ApiSetSchema^ ApiSets = gcnew ApiSetSchema();
 
@@ -222,22 +222,24 @@ ApiSetSchema^ Phlib::GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_
 
 ApiSetSchema^ Phlib::GetApiSetSchema()
 {
-	// Api set schema resolution adapted from https://github.com/zodiacon/WindowsInternals/blob/master/APISetMap/APISetMap.cpp
-	// References :
-	// 		* Windows Internals v7
-	// 		* @aionescu's slides on "Hooking Nirvana" (RECON 2015)
-	//		* Quarkslab blog posts : 
-	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-i.html
-	// 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-ii.html
-	PAPI_SET_NAMESPACE apiSetMap = GetApiSetNamespace();
-	auto apiSetMapAsNumber = reinterpret_cast<ULONG_PTR>(apiSetMap);
+    // Api set schema resolution adapted from https://github.com/zodiacon/WindowsInternals/blob/master/APISetMap/APISetMap.cpp
+    // References :
+    // 		* Windows Internals v7
+    // 		* @aionescu's slides on "Hooking Nirvana" (RECON 2015)
+    //		* Quarkslab blog posts : 
+    // 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-i.html
+    // 				https://blog.quarkslab.com/runtime-dll-name-resolution-apisetschema-part-ii.html
+    return ApiSetSchemaImpl::ParseApiSetSchema(GetApiSetNamespace());
+}
 
+ApiSetSchema^ ApiSetSchemaImpl::ParseApiSetSchema(PAPI_SET_NAMESPACE apiSetMap)
+{
 	// Check the returned api namespace is correct
 	if (!apiSetMap) {
 		return gcnew ApiSetSchema();
 	}
 
-
+	auto apiSetMapAsNumber = reinterpret_cast<ULONG_PTR>(apiSetMap);
 	switch (apiSetMap->Version) 
 	{
 		case 2: // Win7

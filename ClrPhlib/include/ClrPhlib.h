@@ -39,6 +39,16 @@ namespace Dependencies {
         {};
 		#pragma endregion TYPES
 
+        struct ApiSetSchemaImpl
+        {
+            static ApiSetSchema^ ParseApiSetSchema(PAPI_SET_NAMESPACE apiSetMap);
+
+        private:
+            // private implementation of ApiSet schema parsing
+            static ApiSetSchema^ GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap);
+            static ApiSetSchema^ GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap);
+            static ApiSetSchema^ GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap);
+        };
 
         public ref class Phlib {
         public:
@@ -61,17 +71,7 @@ namespace Dependencies {
             // NB: Api set resolution rely on hash buckets who 
             // can contains more entries than this schema.
             static ApiSetSchema^ GetApiSetSchema();
-
-            
-        private:
-            // private implementation of ApiSet schema parsing
-            static ApiSetSchema^ GetApiSetSchemaV2(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V2 ApiSetMap);
-            static ApiSetSchema^ GetApiSetSchemaV4(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V4 ApiSetMap);
-            static ApiSetSchema^ GetApiSetSchemaV6(ULONG_PTR ApiSetMapBaseAddress, PAPI_SET_NAMESPACE_V6 ApiSetMap);
-
         };
-
-
 
         public ref struct PeImport {
             Int16 Hint;
@@ -162,6 +162,9 @@ namespace Dependencies {
 
             // Check if the PE is 32-bit
             bool IsWow64Dll();
+
+            // Return the ApiSetSchema
+            ApiSetSchema^ GetApiSetSchema();
 
             // Return the list of functions exported by the PE
             List<PeExport ^>^ GetExports();

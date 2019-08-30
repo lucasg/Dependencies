@@ -13,3 +13,5 @@ tests/
 *.pdb
 *.pch
 *.user
+
+_ReSharper.Caches/
