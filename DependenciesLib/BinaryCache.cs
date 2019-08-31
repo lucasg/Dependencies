@@ -120,7 +120,6 @@ namespace Dependencies
         /// <returns> Return the first host dll pointed by the apiset contract if found, otherwise it return an empty string.</returns>
         public static string LookupApiSetLibrary(string ImportDllName)
         {
-            
             // Look for api set target 
             if (!ImportDllName.StartsWith("api-") && !ImportDllName.StartsWith("ext-"))
                 return "";
@@ -128,7 +127,7 @@ namespace Dependencies
             // Strip the .dll extension
             var ImportDllWIthoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
             var Targets = ApiSetmapCache.Lookup(ImportDllWIthoutExtension);
-            return Targets.Count > 0 ? Targets[0] : "";
+            return Targets != null && Targets.Count > 0 ? Targets[0] : "";
         }
 
         public static bool LookupImport(string ModuleFilePath, string ImportName, int ImportOrdinal, bool ImportByOrdinal)
