@@ -31,7 +31,7 @@ function Copy-SystemDll {
   )
 
   $SystemFolder = [System.Environment]::GetFolderPath('SystemX86');
-  if ($env:os -eq "x64")
+  if ($env:platform -eq "x64")
   {
     # Check if it's a 32-bit powershell application, in order to force accessing System32
     if (Test-path "$([System.Environment]::GetFolderPath('Windows'))\sysnative")
