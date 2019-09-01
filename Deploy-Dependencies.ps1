@@ -33,11 +33,21 @@ function Copy-SystemDll {
   $SystemFolder = [System.Environment]::GetFolderPath('SystemX86');
   if ($env:os -eq "x64")
   {
-    $SystemFolder = [System.Environment]::GetFolderPath('System');
+    # Check if it's a 32-bit powershell application, in order to force accessing System32
+    if (Test-path "$([System.Environment]::GetFolderPath('Windows'))\sysnative")
+    {
+      $SystemFolder = "$([System.Environment]::GetFolderPath('Windows'))\sysnative";
+    }
+    else
+    {
+      $SystemFolder = [System.Environment]::GetFolderPath('System');
+    }
   }
 
   $DllPath="$($SystemFolder)\$($DllName)";
   if (Test-Path $DllPath) {
+    Write-Host "Copy system dll unresolved $DllPath";
+    Write-Host "Copy system dll $((Resolve-Path $DllPath).Path)";
     Copy-Item (Resolve-Path $DllPath).Path -Destination $OutputFolder;
   }
 }
