@@ -77,6 +77,19 @@ function Get-DependenciesDeps {
     {
       Copy-SystemDll -DllName $DllImport.Name -OutputFolder $OutputFolder;
     }
+
+    # ucrtbase
+    if ($DllImport.Name.ToLower().StartsWith("ucrtbase"))
+    {
+      Copy-SystemDll -DllName $DllImport.Name -OutputFolder $OutputFolder;
+    }
+
+     # concrt
+    if ($DllImport.Name.ToLower().StartsWith("concrt"))
+    {
+      Copy-SystemDll -DllName $DllImport.Name -OutputFolder $OutputFolder;
+    }
+
   }
 
   return [string]$PeviewBinaryFile;
