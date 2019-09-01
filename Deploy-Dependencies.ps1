@@ -46,9 +46,23 @@ function Copy-SystemDll {
 
   $DllPath="$($SystemFolder)\$($DllName)";
   if (Test-Path $DllPath) {
-    Write-Host "Copy system dll unresolved $DllPath";
     Write-Host "Copy system dll $((Resolve-Path $DllPath).Path)";
     Copy-Item (Resolve-Path $DllPath).Path -Destination $OutputFolder;
+  }
+}
+
+
+function Copy-UniversalCrt {
+  param(
+    [String] $OutputFolder
+  )
+
+  # reference : https://github.com/mozilla/gecko-dev/blob/50b3fb522bdb080a7c9c00b1fdc758d171586cb6/media/webrtc/trunk/webrtc/build/vs_toolchain.py#L203
+  $UcrtFolder = "C:\Program Files (x86)\Windows Kits\10\Redist\ucrt\DLLs\$($env:platform)";
+  
+  foreach ($ucrtdll in gci $UcrtFolder -File) {
+    Write-Host "Copy ucrt dll $($ucrtdll.FullName)";
+    Copy-Item $ucrtdll.FullName -Destination $OutputFolder;
   }
 }
 
@@ -100,6 +114,11 @@ function Get-DependenciesDeps {
       Copy-SystemDll -DllName $DllImport.Name -OutputFolder $OutputFolder;
     }
 
+  }
+
+  # Packaging universal CRT on Release builds
+  if ($($env:CONFIGURATION) -eq "Release") {
+    Copy-UniversalCrt -OutputFolder $OutputFolder;
   }
 
   return [string]$PeviewBinaryFile;
