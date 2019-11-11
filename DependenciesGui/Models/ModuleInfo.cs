@@ -268,6 +268,9 @@ namespace Dependencies
                     case 0x01c4:/*IMAGE_FILE_MACHINE_ARMNT*/
                         return "ARM Thumb-2";
 
+                    case 0xAA64:/*IMAGE_FILE_MACHINE_ARM64*/
+                        return "ARM64";
+
                     default:
                         return "Unknown";
                 }
@@ -282,7 +285,7 @@ namespace Dependencies
                 PeTypes Type = (PeTypes)_Info.Characteristics;
 
                 if ((Type & PeTypes.IMAGE_FILE_DLL) != PeTypes.None)/* IMAGE_FILE_DLL */
-                    TypeList.Add("Dll");
+                        TypeList.Add("Dll");
 
                 if ((Type & PeTypes.IMAGE_FILE_EXECUTABLE_IMAGE) != PeTypes.None) /* IMAGE_FILE_EXECUTABLE_IMAGE */
                     TypeList.Add("Executable");
