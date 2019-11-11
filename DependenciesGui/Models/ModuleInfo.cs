@@ -268,6 +268,9 @@ namespace Dependencies
                     case 0x01c4:/*IMAGE_FILE_MACHINE_ARMNT*/
                         return "ARM Thumb-2";
 
+                    case 0xAA64:/*IMAGE_FILE_MACHINE_ARM64*/
+                        return "ARM64";
+
                     default:
                         return "Unknown";
                 }
