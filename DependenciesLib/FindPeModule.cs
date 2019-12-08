@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
 
 using Dependencies.ClrPh;
 
@@ -67,8 +68,12 @@ namespace Dependencies
 				PeFilePath = Path.Combine(CandidatePath, ModuleName);
                 PE TestPe = BinaryCache.LoadPe(PeFilePath);
 
-                if ((TestPe != null) && (TestPe.LoadSuccessful) && (TestPe.IsWow64Dll() == Wow64Dll))
-                    return PeFilePath;
+                if (TestPe != null)
+                { 
+                    Debug.WriteLine("Attempt to load {0:s} {1:d} {2:d}", PeFilePath, TestPe.IsWow64Dll(), Wow64Dll);
+                    if ((TestPe.LoadSuccessful) && (TestPe.IsWow64Dll() == Wow64Dll))
+                        return PeFilePath;
+                }
             }
 
             return null;
