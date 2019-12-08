@@ -316,6 +316,29 @@ namespace Dependencies
         public virtual bool? CorrectChecksum { get { return _Info.CorrectChecksum; } }
         public virtual ModuleSearchStrategy Location { get { return _Location; } }
 
+        public string Status
+        {
+            get
+            {
+                if ((this.Flags & ModuleFlag.NotFound) != 0)
+                {
+                    return String.Format("{0:s} module could not be found on disk", this.Filepath);
+                }
+
+                if ((this.Flags & ModuleFlag.MissingImports) != 0)
+                {
+                    return String.Format("{0:s} module has missing imports", this.Filepath);
+                }
+
+                if ((this.Flags & ModuleFlag.DelayLoad) != 0)
+                {
+                    return String.Format("{0:s} module is delay-load", this.Filepath);
+                }
+
+                return String.Format("{0:s} module loaded correctly", this.Filepath); ;
+            }
+        }
+
 
         #endregion PublicAPI
 

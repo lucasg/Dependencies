@@ -61,6 +61,7 @@
 
         </ContextMenu>
 
+
     </local:DependencyCustomListView.Resources>
 
     <local:DependencyCustomListView.View>
@@ -82,7 +83,7 @@
                 </GridViewColumn.CellTemplate>
             </GridViewColumn>
             <GridViewColumn Header="Module" Width="300" DisplayMemberBinding="{Binding ModuleName, TargetNullValue='N/A'}" util:GridViewSort.PropertyName="ModuleName" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
-            <GridViewColumn Header="Machine" Width="60" DisplayMemberBinding="{Binding Cpu, TargetNullValue='N/A'}" util:GridViewSort.PropertyName="Cpu" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
+            <GridViewColumn Header="Machine"  Width="60" DisplayMemberBinding="{Binding Cpu, TargetNullValue='N/A'}" util:GridViewSort.PropertyName="Cpu" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
             <GridViewColumn Header="Type" Width="150" DisplayMemberBinding="{Binding Type, TargetNullValue='N/A'}" util:GridViewSort.PropertyName="Type" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
             <GridViewColumn Header="File Size" Width="100" DisplayMemberBinding="{Binding Filesize, TargetNullValue='N/A', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="FileSize" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
             <GridViewColumn Header="Image Base" Width="100" DisplayMemberBinding="{Binding ImageBase, TargetNullValue='N/A', StringFormat={}0x{0:x08}}" util:GridViewSort.PropertyName="ImageBase" HeaderContainerStyle="{StaticResource LeftAlignHeader}"/>
@@ -96,6 +97,7 @@
                         <TextBlock  TextAlignment="Right">
                             <TextBlock.Style>
                                 <Style TargetType="{x:Type TextBlock}">
+                                    
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding CorrectChecksum , TargetNullValue='False'}" Value="False" >
                                             <Setter Property="Text" Value="{Binding Checksum, StringFormat={}0x{0:x08} (incorrect), TargetNullValue='N/A' }"/>

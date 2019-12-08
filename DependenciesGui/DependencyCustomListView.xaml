@@ -19,6 +19,7 @@
          <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="FontFamily" Value="{Binding Source={x:Static properties:Settings.Default}, Path=Font, Mode=OneWay}" />
         <Setter Property="ContextMenu" Value="{DynamicResource ResourceKey=ItemContextMenu}" />
+        <Setter Property="ToolTip" Value="{Binding Status }" />
     </Style>
 
     <Style x:Key="DependencyCustomListViewStyle" TargetType="{x:Type local:DependencyCustomListView}">
@@ -26,6 +27,9 @@
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
         <Setter Property="util:GridViewSort.AutoSort" Value="True"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource DependencyCustomListViewItem}"/>
+        
+        
+
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DependencyCustomListView}">

@@ -185,7 +185,7 @@ namespace Dependencies
             }
         }
 
-		public ModuleTreeViewItem ParentModule
+        public ModuleTreeViewItem ParentModule
 		{
 			get
 			{
@@ -213,7 +213,11 @@ namespace Dependencies
 
 				VerifyModuleImports();
 				_importsVerified = true;
-				return ModuleInfo.HasErrors;
+
+                // Update tooltip only once some basic checks are done
+                this.ToolTip = ModuleInfo.Status;
+
+                return ModuleInfo.HasErrors;
 			}
 		}
 

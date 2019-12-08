@@ -139,6 +139,7 @@
                         
                         <Setter Property="FontFamily" Value="{Binding Source={x:Static properties:Settings.Default}, Path=Font, Mode=OneWay}" />
                         <Setter Property="ContextMenu" Value="{StaticResource TreeItemContextMenu}" />
+                        
                     </Style>
 
                 </TreeView.Resources>
