@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using System.Windows.Data;
 
 using Dragablz;
+using System.Windows.Shell;
 
 namespace Dependencies
 {
@@ -58,8 +59,7 @@ namespace Dependencies
         {
 
             InitializeComponent();
-
-            PopulateRecentFilesMenuItems(true);
+            PopulateRecentFilesMenuItems();
 
             this.AboutPage = new About();
             this.UserSettings = new UserSettings();
@@ -124,44 +124,50 @@ namespace Dependencies
         /// <summary>
         /// Populate "recent entries" mmenu items
         /// </summary>
-        /// <param name="InializeMenuEntries">Use to tell the app to initialize recent entries even with dummy ones.</param>
-        private void PopulateRecentFilesMenuItems(bool InializeMenuEntries = false)
-        { 
+        private void PopulateRecentFilesMenuItems()
+        {
 
             System.Windows.Controls.MenuItem FileMenuItem = (System.Windows.Controls.MenuItem)this.MainMenu.Items[0];
-            System.Windows.Controls.MenuItem RecentFilesItem = (System.Windows.Controls.MenuItem)FileMenuItem.Items[2];
+            
 
-            byte RecentFilesCount = (byte)Properties.Settings.Default.RecentFiles.Count;
-            byte RecentFilesIndex = (byte)Properties.Settings.Default.RecentFilesIndex;
+            if (Properties.Settings.Default.RecentFiles.Count == 0) {
+                return;
+            }
 
-            byte Index = (byte)((RecentFilesIndex + RecentFilesCount - 1) % RecentFilesCount);
-            int IndexEntry = 0;
 
-            do
+            foreach (var RecentFilePath in Properties.Settings.Default.RecentFiles)
             {
-                String RecentFilePath = Properties.Settings.Default.RecentFiles[Index];
-
-                System.Windows.Controls.MenuItem newRecentFileItem = new System.Windows.Controls.MenuItem();
-                newRecentFileItem.Header = System.IO.Path.GetFileName(RecentFilePath);
-                newRecentFileItem.DataContext = RecentFilePath;
-                newRecentFileItem.Click += new RoutedEventHandler(RecentFileCommandBinding_Clicked);
-
-                // application initialization
-                if (InializeMenuEntries)
+                // Ignore empty dummy entries
+                if (String.IsNullOrEmpty(RecentFilePath))
                 {
-                    FileMenuItem.Items.Insert(3, newRecentFileItem);
+                    continue;
                 }
-                else // update elem
-                {
-                    FileMenuItem.Items[FileMenuItem.Items.Count - 3 -  IndexEntry] = newRecentFileItem;
-                }
-                
 
-                Index = (byte)((Index - 1 + RecentFilesCount) % RecentFilesCount);
-                IndexEntry = IndexEntry + 1;
+                AddRecentFilesMenuItem(RecentFilePath, Properties.Settings.Default.RecentFiles.IndexOf(RecentFilePath));
+            }
+        }
 
-            } while (Index != Properties.Settings.Default.RecentFilesIndex);
+        private void AddRecentFilesMenuItem(string Filepath, int index)
+        {
 
+            System.Windows.Controls.MenuItem FileMenuItem = (System.Windows.Controls.MenuItem)this.MainMenu.Items[0];
+
+            // Create new menu item
+            System.Windows.Controls.MenuItem newRecentFileItem = new System.Windows.Controls.MenuItem();
+            newRecentFileItem.Header = System.IO.Path.GetFileName(Filepath);
+            newRecentFileItem.DataContext = Filepath;
+            newRecentFileItem.Click += new RoutedEventHandler(RecentFileCommandBinding_Clicked);
+
+            // check if the item already is in the list, diregarding others menu items
+            if (index + 5 < FileMenuItem.Items.Count)
+            {
+                FileMenuItem.Items[3 + index] = newRecentFileItem;
+            }
+            else
+            {
+                // Add it to the list at the top
+                FileMenuItem.Items.Insert(3, newRecentFileItem);
+            }
 
         }
 

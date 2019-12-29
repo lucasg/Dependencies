@@ -122,9 +122,22 @@ namespace Dependencies
             JumpList.AddToRecentCategory(item);
             RecentsDocs.Apply();
 
-            // Store a copy in application settings, ring buffer style
-            Dependencies.Properties.Settings.Default.RecentFiles[Dependencies.Properties.Settings.Default.RecentFilesIndex] = Filename;
-            Dependencies.Properties.Settings.Default.RecentFilesIndex = (byte) ((Dependencies.Properties.Settings.Default.RecentFilesIndex + 1) % Dependencies.Properties.Settings.Default.RecentFiles.Count);
+            // Store a copy in application settings, LRU style
+            // First check if the item is not already present in the list
+            int index = Dependencies.Properties.Settings.Default.RecentFiles.IndexOf(Filename);
+            if (index != -1)
+            {
+                Dependencies.Properties.Settings.Default.RecentFiles.RemoveAt(index);
+            }
+
+            // Second check if the list is not full
+            if (Dependencies.Properties.Settings.Default.RecentFiles.Count == 10)
+            {
+                Dependencies.Properties.Settings.Default.RecentFiles.RemoveAt(9);
+            }
+
+            // Prepend the list with the new item
+            Dependencies.Properties.Settings.Default.RecentFiles.Insert(0, Filename);
         }
 
     }

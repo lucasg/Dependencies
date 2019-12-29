@@ -72,7 +72,6 @@
                 <MenuItem x:Name="RecentItem" Header="Recents" Height="0"/>
                 <Separator Height="3" Margin="-1,0,0,0"/>
                 <MenuItem x:Name="ExitItem" Header="E_xit" Height="25"  InputGestureText="Ctrl+Q" Command="Close"/>
-
             </MenuItem>
             <MenuItem x:Name="ViewItem" Header="_View" Height="25" Width="42">
                 <MenuItem x:Name="_SystemInformation" Header="System Information ..." Height="25"  IsEnabled="False" />
