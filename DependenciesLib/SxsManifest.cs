@@ -384,6 +384,11 @@ namespace Dependencies
                 string PeManifest = xStream.ReadToEnd();
                 PeManifest = new Regex("\\\"\\\"([\\w\\d\\.]*)\\\"\\\"").Replace(PeManifest, "\"$1\""); // Regex magic here
 
+                // some manifests have "macros" that break xml parsing
+                PeManifest = new Regex("SXS_PROCESSOR_ARCHITECTURE").Replace(PeManifest, "\"amd64\""); 
+                PeManifest = new Regex("SXS_ASSEMBLY_VERSION").Replace(PeManifest, "\"\"");
+                PeManifest = new Regex("SXS_ASSEMBLY_NAME").Replace(PeManifest, "\"\"");
+
                 using (XmlTextReader xReader = new XmlTextReader(PeManifest, XmlNodeType.Document, context))
                 {
                     XmlManifest = XDocument.Load(xReader);
