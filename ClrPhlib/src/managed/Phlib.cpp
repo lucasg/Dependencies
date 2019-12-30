@@ -162,25 +162,29 @@ public:
     List<KeyValuePair<String^, ApiSetTarget^>>^ GetAll() override { return All; }
     ApiSetTarget^ Lookup(String^ name) override
     {
+		// TODO : check if ext- is not present on win7 and 8.1
         if (!name->StartsWith("api-"))
             return nullptr;
-        name = name->Substring(4);
+
+		// remove "api-" or "ext-" prefix
+		name = name->Substring(4);
 
         // Note: The list is initially alphabetically sorted!!!
         auto min = 0;
         auto max = All->Count - 1;
-        while (min <= max)
-        {
-            auto const cur = (min + max) / 2;
-            auto pair = All[cur];
-            auto const k = String::Compare(name, pair.Key);
-            if (k < 0)
-                max = cur - 1;
-            else if (k > 0)
-                min = cur + 1;
-            else
-                return pair.Value;
-        }
+		while (min <= max)
+		{
+			auto const cur = (min + max) / 2;
+			auto pair = All[cur];
+
+			if (name->StartsWith(pair.Key))
+				return pair.Value;
+
+			if (String::CompareOrdinal(name, pair.Key) < 0)
+				max = cur - 1;
+			else
+				min = cur + 1;
+		}
         return nullptr;
     }
 };
@@ -242,6 +246,9 @@ public:
     List<KeyValuePair<String^, ApiSetTarget^>>^ GetAll() override { return All; }
     ApiSetTarget^ Lookup(String^ name) override
     {
+		// remove "api-" or "ext-" prefix
+		//name = name->Substring(4);
+
         // Note: The list is initially alphabetically sorted!!!
         auto min = 0;
         auto max = HashedAll->Count - 1;
@@ -249,9 +256,11 @@ public:
         {
             auto const cur = (min + max) / 2;
             auto pair = HashedAll[cur];
-            if (name->StartsWith(pair.Key))
-                return pair.Value;
-            if (String::Compare(name, pair.Key) < 0)
+            
+			if (name->StartsWith(pair.Key))
+				return pair.Value;
+
+            if (String::CompareOrdinal(name, pair.Key) < 0)
                 max = cur - 1;
             else
                 min = cur + 1;

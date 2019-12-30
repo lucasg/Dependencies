@@ -124,17 +124,13 @@ namespace Dependencies
             if (!ImportDllName.StartsWith("api-") && !ImportDllName.StartsWith("ext-"))
                 return "";
            
-            // Strip the .dll extension
+            // Strip the .dll extension and search for matching targets
             var ImportDllWIthoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
             var Targets = ApiSetmapCache.Lookup(ImportDllWIthoutExtension);
+            if ((Targets != null) && (Targets.Count > 0))
+                return Targets[0];
 
-            // TODO : Undocumented fallback to kernelbase.dll
-            if ((Targets == null) || (Targets.Count == 0))
-            {
-                return "kernelbase.dll";
-            }
-
-            return Targets[0];
+            return "";
         }
 
         public static bool LookupImport(string ModuleFilePath, string ImportName, int ImportOrdinal, bool ImportByOrdinal)
