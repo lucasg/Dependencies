@@ -127,7 +127,14 @@ namespace Dependencies
             // Strip the .dll extension
             var ImportDllWIthoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
             var Targets = ApiSetmapCache.Lookup(ImportDllWIthoutExtension);
-            return Targets != null && Targets.Count > 0 ? Targets[0] : "";
+
+            // TODO : Undocumented fallback to kernelbase.dll
+            if ((Targets == null) || (Targets.Count == 0))
+            {
+                return "kernelbase.dll";
+            }
+
+            return Targets[0];
         }
 
         public static bool LookupImport(string ModuleFilePath, string ImportName, int ImportOrdinal, bool ImportByOrdinal)
