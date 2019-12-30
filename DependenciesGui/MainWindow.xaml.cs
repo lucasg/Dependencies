@@ -122,7 +122,7 @@ namespace Dependencies
         #endregion PublicAPI
 
         /// <summary>
-        /// Populate "recent entries" mmenu items
+        /// Populate "recent entries" menu items
         /// </summary>
         private void PopulateRecentFilesMenuItems()
         {

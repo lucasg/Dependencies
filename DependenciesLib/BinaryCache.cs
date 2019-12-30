@@ -179,7 +179,9 @@ namespace Dependencies
 				{
 					if (Import.ImportByOrdinal)
 					{
-						if ((export.Ordinal == Import.Ordinal) && export.ExportByOrdinal)
+                        // Even if the export has a Name (therefore not a pure export by ordinal) 
+                        // we can still possibly import it by its ordinal, although it's not recommended.
+						if ((export.Ordinal == Import.Ordinal) /*&& export.ExportByOrdinal*/)
 						{
 							bFoundImport = true;
 							break;
@@ -215,22 +217,30 @@ namespace Dependencies
 			PE Module = null;
 			List<Tuple<PeImport, bool>> Result = new List<Tuple<PeImport, bool>>();
 
-			if (ModuleFilePath == null)
-                return Result;
-
-            string ApiSetName = LookupApiSetLibrary(ModuleFilePath);
-			if (!string.IsNullOrEmpty(ApiSetName))
-			{
-				Module = ResolveModule(ApiSetName).Item2;
+            // if there is a module name, try to resolve apiset for attempting to load it
+			if (ModuleFilePath != null)
+            { 
+                string ApiSetName = LookupApiSetLibrary(ModuleFilePath);
+			    if (!string.IsNullOrEmpty(ApiSetName))
+			    {
+				    Module = ResolveModule(ApiSetName).Item2;
+                }
+			    else
+			    {
+				    Module = LoadPe(ModuleFilePath);
+			    }
             }
-			else
-			{
-				Module = LoadPe(ModuleFilePath);
-			}
 
-            
+            // If the module has not been found, mark all imports as not found
             if (Module == null)
+            {
+                foreach (PeImport Import in ModuleImport.ImportList)
+                {
+                    Result.Add(new Tuple<PeImport, bool>(Import, false));
+                }
+
                 return Result;
+            }
 
 			return LookupImports(ModuleImport, Module.GetExports());
 
