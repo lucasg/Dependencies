@@ -35,7 +35,22 @@ namespace Dependencies
     /// </summary>
     public class FindPe
     {
-		static bool IsFilepathInvalid(string Filepath)
+        private static List<string> environmentPath = new List<string>();
+
+        static FindPe()
+        {
+            string path = Environment.GetEnvironmentVariable("Path");
+            if (path == null) return;
+
+            foreach (var p in path.Split(';'))
+            {
+                if (IsFilepathInvalid(p)) continue;
+
+                environmentPath.Add(p);
+            }
+        }
+
+        static bool IsFilepathInvalid(string Filepath)
 		{
 			foreach (char InvalidChar in System.IO.Path.GetInvalidFileNameChars())
 			{
@@ -60,9 +75,9 @@ namespace Dependencies
 			var CuratedCandidateFolders = CandidateFolders.Where(
 				path => !IsFilepathInvalid(path)
 			);
-
-
-			foreach (String CandidatePath in CuratedCandidateFolders)
+            CuratedCandidateFolders = CuratedCandidateFolders.Concat(environmentPath);
+            
+            foreach (String CandidatePath in CuratedCandidateFolders)
 			{
 	
 				PeFilePath = Path.Combine(CandidatePath, ModuleName);
