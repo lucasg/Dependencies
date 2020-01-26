@@ -627,21 +627,21 @@ namespace Dependencies
             string Usage = String.Join(Environment.NewLine,
                 "Dependencies.exe : command line tool for dumping dependencies and various utilities.",
                 "",
-                "Usage : Dependencies.exe [OPTIONS] FILE",
+                "Usage : Dependencies.exe [OPTIONS] <FILE>",
                 "",
                 "Options :",
                 "  -h -help : display this help",
                 "  -json : activate json output.",
                 "  -apisets : dump the system's ApiSet schema (api set dll -> host dll)",
-                "  -apisetsdll : dump the ApiSet schema from apisetschema.dll (api set dll -> host dll)",
+                "  -apisetsdll : dump the ApiSet schema from apisetschema <FILE> (api set dll -> host dll)",
                 "  -knowndll : dump all the system's known dlls (x86 and x64)",
-                "  -manifest : dump FILE embedded manifest, if it exists.",
-                "  -sxsentries : dump all of FILE's sxs dependencies.",
-                "  -imports : dump FILE imports",
-                "  -exports : dump  FILE exports",
-                "  -modules : dump FILE resolved modules",
-                "  -chain : dump FILE whole dependency chain"
-                
+                "  -manifest : dump <FILE> embedded manifest, if it exists.",
+                "  -sxsentries : dump all of <FILE>'s sxs dependencies.",
+                "  -imports : dump <FILE> imports",
+                "  -exports : dump <FILE> exports",
+                "  -modules : dump <FILE> resolved modules",
+                "  -chain : dump <FILE> whole dependency chain"
+
             );
 
             Console.WriteLine(Usage);
@@ -675,13 +675,13 @@ namespace Dependencies
 							{ "d|depth=",  "limit recursion depth when analyisng loaded modules or dependency chain. Default value is infinite", (int v) =>  recursion_depth = v },
 							{ "knowndll", "List all known dlls", v => { DumpKnownDlls(GetObjectPrinter(export_as_json));  early_exit = true; } },
 							{ "apisets", "List apisets redirections", v => { DumpApiSets(GetObjectPrinter(export_as_json));  early_exit = true; } },
-                            { "apisetsdll", "List apisets redirections from apisetschema.dll", v => command = DumpApiSets },
-                            { "manifest", "show manifest information embedded in PE file", v => command = DumpManifest },
-                            { "sxsentries", "dump all of FILE's sxs dependencies", v => command = DumpSxsEntries },
-                            { "imports", "dump FILE imports", v => command = DumpImports },
-                            { "exports", "dump  FILE exports", v => command = DumpExports },
-                            { "chain", "dump FILE whole dependency chain", v => command = DumpDependencyChain },
-                            { "modules", "dump FILE resolved modules", v => command = DumpModules },
+                            { "apisetsdll", "List apisets redirections from apisetschema <FILE>", v => command = DumpApiSets },
+                            { "manifest", "show manifest information embedded in <FILE>", v => command = DumpManifest },
+                            { "sxsentries", "dump all of <FILE>'s sxs dependencies", v => command = DumpSxsEntries },
+                            { "imports", "dump <FILE> imports", v => command = DumpImports },
+                            { "exports", "dump <FILE> exports", v => command = DumpExports },
+                            { "chain", "dump <FILE> whole dependency chain", v => command = DumpDependencyChain },
+                            { "modules", "dump <FILE> resolved modules", v => command = DumpModules },
 						};
 
 			List<string> eps = opts.Parse(args);
@@ -695,8 +695,18 @@ namespace Dependencies
 				return;
 			}
 
+            if (eps.Count == 0)
+            {
+                Console.Error.WriteLine("[x] Command {0:s} needs to have a PE <FILE> argument", command.Method.Name);
+                Console.Error.WriteLine("");
+
+                DumpUsage();
+                return;
+            }
+
 			String FileName = eps[0];
-			//Console.WriteLine("[-] Loading file {0:s} ", FileName);
+
+			Debug.WriteLine("[-] Loading file {0:s} ", FileName);
 			PE Pe = new PE(FileName);
             if (!Pe.Load())
             {
