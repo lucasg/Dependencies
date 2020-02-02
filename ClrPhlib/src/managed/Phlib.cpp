@@ -54,11 +54,12 @@ List<String^>^ BuildKnownDllList(_In_ bool Wow64Dlls)
 	OBJECT_ATTRIBUTES oa;
 	UNICODE_STRING name;
 	NTSTATUS status;
+	
+	const PWCHAR KnownDllObjectName = (Wow64Dlls) ? L"\\KnownDlls32" : L"\\KnownDlls";
 
-
-	name.Length = 20;
-	name.MaximumLength = 20;
-	name.Buffer = (Wow64Dlls) ? L"\\KnownDlls32" : L"\\KnownDlls";
+	name.Length = (USHORT) wcslen(KnownDllObjectName) * sizeof(wchar_t);
+	name.MaximumLength = (USHORT) wcslen(KnownDllObjectName) * sizeof(wchar_t);
+	name.Buffer = KnownDllObjectName;
 	
 
 	InitializeObjectAttributes(
