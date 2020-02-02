@@ -307,7 +307,7 @@ namespace Dependencies
                 return false;
             }
 
-            PeviewerProcess.StartInfo.FileName = programPath;
+            PeviewerProcess.StartInfo.FileName = String.Format("\"{0:s}\"", programPath);
             PeviewerProcess.StartInfo.Arguments = Filepath;
             return PeviewerProcess.Start();
         }
@@ -328,7 +328,7 @@ namespace Dependencies
 
                         Process OtherDependenciesProcess = new Process();
                         OtherDependenciesProcess.StartInfo.FileName = System.Windows.Forms.Application.ExecutablePath;
-                        OtherDependenciesProcess.StartInfo.Arguments = Filepath;
+                        OtherDependenciesProcess.StartInfo.Arguments = String.Format("\"{0:s}\"", Filepath);
                         OtherDependenciesProcess.Start();
                     });
                 }
