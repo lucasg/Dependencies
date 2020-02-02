@@ -66,8 +66,8 @@ namespace Dependencies {
         };
 
         public ref struct PeImport {
-            Int16 Hint;
-            Int16 Ordinal;
+            UInt16 Hint;
+            UInt16 Ordinal;
             String ^ Name;
             String ^ ModuleName;
             Boolean ImportByOrdinal;
@@ -104,7 +104,7 @@ namespace Dependencies {
         };
 
         public ref struct PeExport {
-            Int16 Ordinal;
+            UInt16 Ordinal;
             String ^  Name; // may be NULL.
             Boolean ExportByOrdinal;
             Int64   VirtualAddress;

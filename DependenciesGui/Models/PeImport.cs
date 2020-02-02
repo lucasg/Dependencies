@@ -191,8 +191,8 @@ public class DisplayPeImport : SettingBindingHandler
 
 public struct PeImportInfo
 {
-   public int ordinal;
-   public int hint;
+   public ushort ordinal;
+   public ushort hint;
 
    public string name;
    public string moduleName;
