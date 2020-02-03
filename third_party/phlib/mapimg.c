@@ -783,6 +783,11 @@ NTSTATUS PhGetMappedImageExportFunction(
         return STATUS_PROCEDURE_NOT_FOUND;
 
     rva = Exports->AddressTable[Ordinal];
+	// A non-exported by name ordinal export cannot apparently have a NULL rva
+	if (!Name && !rva)
+	{
+		return STATUS_PROCEDURE_NOT_FOUND;
+	}
 
     if (
         (rva >= Exports->DataDirectory->VirtualAddress) &&

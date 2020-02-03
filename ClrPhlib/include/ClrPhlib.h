@@ -110,9 +110,11 @@ namespace Dependencies {
             Int64   VirtualAddress;
             String ^  ForwardedName;
 
-            PeExport(const UnmanagedPE &refPe, size_t Index);
+			PeExport();
             PeExport(const PeExport ^ other);
             ~PeExport();
+
+			static PeExport^ FromMapimg(const UnmanagedPE& refPe, size_t Index);
 
         };
 
