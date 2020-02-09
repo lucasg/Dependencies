@@ -705,6 +705,11 @@ namespace Dependencies
             }
 
 			String FileName = eps[0];
+            if (!NativeFile.Exists(FileName))
+            {
+                Console.Error.WriteLine("[x] Could not find file {0:s} on disk", FileName);
+                return;
+            }
 
 			Debug.WriteLine("[-] Loading file {0:s} ", FileName);
 			PE Pe = new PE(FileName);
