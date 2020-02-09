@@ -223,7 +223,12 @@ bool UndecorateSymbolDemangleName(
 		DecoratedName
 	);
 
-	if ((!PhUndecoratedName) || !wcsncmp(PhUndecoratedName->Buffer, DecoratedName, PhUndecoratedName->Length))
+	if (!PhUndecoratedName)
+	{
+		return false;
+	}
+
+	if (!wcsncmp(PhUndecoratedName->Buffer, DecoratedName, PhUndecoratedName->Length))
 	{
 		PhDereferenceObject(PhUndecoratedName);
 		return false;

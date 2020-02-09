@@ -4,7 +4,11 @@
 using namespace System;
 using namespace Dependencies::ClrPh;
 
-
+#if _WIN64
+#define DBGHELP_PATH L"C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x64\\dbghelp.dll"
+#else
+#define DBGHELP_PATH L"C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x86\\dbghelp.dll"
+#endif // _WIN64
 
 VOID PvpLoadDbgHelpFromPath(
     _In_ PWSTR DbgHelpPath
@@ -67,7 +71,7 @@ BOOLEAN PvpLoadDbgHelp(
     if (!PhSymbolProviderInitialization())
         return FALSE;
 
-    PvpLoadDbgHelpFromPath(L"C:\\Program Files (x86)\\Windows Kits\\10\\Debuggers\\x64\\dbghelp.dll");
+    PvpLoadDbgHelpFromPath(DBGHELP_PATH);
     symbolProvider = PhCreateSymbolProvider(NULL);
 
     // Load symbol path from _NT_SYMBOL_PATH if configured by the user.    
