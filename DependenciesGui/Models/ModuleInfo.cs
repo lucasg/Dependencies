@@ -441,7 +441,13 @@ namespace Dependencies
                         }
 
                         Clipboard.Clear();
-                        Clipboard.SetText((string)param, TextDataFormat.Text);
+
+                        try
+                        {
+
+                            Clipboard.SetText((string)param, TextDataFormat.Text);
+                        }
+                        catch { }
                     });
                 }
 
