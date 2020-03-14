@@ -88,8 +88,18 @@ public class DisplayPeImport : SettingBindingHandler
         }
     }
 
-    public int Hint { get { return Info.hint; } }
-    public int? Ordinal { get { if (Info.importByOrdinal) { return Info.ordinal; } return null; } }
+    public ushort? Hint
+    {
+        get
+        {
+            if (Info.importByOrdinal)
+                return null;
+
+            return Info.hint;
+        }
+    }
+
+    public ushort? Ordinal { get { if (Info.importByOrdinal) { return Info.ordinal; } return null; } }
 
     public string Name
     {

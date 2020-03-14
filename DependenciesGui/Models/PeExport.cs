@@ -75,7 +75,17 @@ public class DisplayPeExport : SettingBindingHandler
             return 0;
         }
     }
-    public ushort Hint { get { return PeInfo.hint; } }
+    public ushort ? Hint
+    {
+        get
+        {
+            if (PeInfo.exportByOrdinal)
+                return null;
+
+            return PeInfo.hint;
+        }
+    }
+
     public ushort Ordinal { get { return PeInfo.ordinal; } }
 
     public string Name
