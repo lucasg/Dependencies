@@ -16,7 +16,8 @@ namespace ClrPh {
     public:
 
         // @return true if the path actually points to a file on the disk
-        static bool Exists(_In_ String^ Path);
+		static bool Exists(_In_ String^ Path);
+        static bool Exists(_In_ String^ Path, bool IsFolder);
 
         // Copy a filename to a new location
         static void Copy(_In_ String^ sourceFileName, _In_ String^ destFileName);

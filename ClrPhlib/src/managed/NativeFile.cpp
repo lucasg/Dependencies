@@ -40,8 +40,12 @@ bool NativeFile::RevertWow64FsRedirection()
 	return (bWow64RedirectionReverted == TRUE);
 }
 
-
 bool NativeFile::Exists(_In_ String^ Path)
+{
+	return NativeFile::Exists(Path, false);
+}
+
+bool NativeFile::Exists(_In_ String^ Path, bool IsFolder)
 {
     bool bFileExists = false;
 	pin_ptr<const wchar_t> RawPath = PtrToStringChars(Path);
@@ -50,8 +54,14 @@ bool NativeFile::Exists(_In_ String^ Path)
     WITH_WOW64_FS_REDIRECTION_DISABLED({
         
         DWORD FileAttributes = GetFileAttributes(RawPath);
-        bFileExists = (FileAttributes != INVALID_FILE_ATTRIBUTES && 
-                     !(FileAttributes & FILE_ATTRIBUTE_DIRECTORY));
+		Console::WriteLine("FileAttributes: {0:x}", FileAttributes);
+		
+		bFileExists = (FileAttributes != INVALID_FILE_ATTRIBUTES);
+		if (!IsFolder)
+		{
+			bFileExists &= !(FileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+		}
+                     
     });
 
     return bFileExists;

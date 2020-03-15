@@ -216,16 +216,31 @@ namespace Dependencies
                         Match MatchingSxsFile = ManifestFileNameRegex.Match(FileName);
                         if (MatchingSxsFile.Success)
                         {
-                            FoundMatch = true;
+                            
                             int MatchingBuild = Int32.Parse(MatchingSxsFile.Groups[2].Value);
                             int MatchingPatch = Int32.Parse(MatchingSxsFile.Groups[3].Value);
 
                             if ((MatchingBuild > HighestBuild) || ((MatchingBuild == HighestBuild) && (MatchingPatch > HighestPatch)))
                             {
-                                HighestBuild = MatchingBuild;
-                                HighestPatch = MatchingPatch;
-                                MatchSxsManifestPath = Path.Combine(WinSxsManifestDir, FileName);
-                                MatchSxsManifestDir = MatchingSxsFile.Groups[1].Value;
+                                
+                                
+                                string TestMatchSxsManifestDir = MatchingSxsFile.Groups[1].Value;
+
+                                // Check the directory exists before confirming there is a match
+                                string FullPathMatchSxsManifestDir = Path.Combine(WinSxsDir, TestMatchSxsManifestDir);
+                                Console.WriteLine("FullPathMatchSxsManifestDir : Checking {0:s}", FullPathMatchSxsManifestDir);
+                                if (NativeFile.Exists(FullPathMatchSxsManifestDir, true))
+                                {
+
+                                    Console.WriteLine("FullPathMatchSxsManifestDir : Checking {0:s} TRUE", FullPathMatchSxsManifestDir);
+                                    FoundMatch = true;
+
+                                    HighestBuild = MatchingBuild;
+                                    HighestPatch = MatchingPatch;
+
+                                    MatchSxsManifestDir = TestMatchSxsManifestDir;
+                                    MatchSxsManifestPath = Path.Combine(WinSxsManifestDir, FileName);
+                                }
                             }
                         }
                     }
