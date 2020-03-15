@@ -164,8 +164,11 @@ public:
     ApiSetTarget^ Lookup(String^ name) override
     {
 		// TODO : check if ext- is not present on win7 and 8.1
-        if (!name->StartsWith("api-"))
+        if (!name->StartsWith("api-", System::StringComparison::CurrentCultureIgnoreCase))
             return nullptr;
+
+		// Force lowercase name
+		name = name->ToLower();
 
 		// remove "api-" or "ext-" prefix
 		name = name->Substring(4);
@@ -178,7 +181,7 @@ public:
 			auto const cur = (min + max) / 2;
 			auto pair = All[cur];
 
-			if (name->StartsWith(pair.Key))
+			if (name->StartsWith(pair.Key, System::StringComparison::CurrentCultureIgnoreCase))
 				return pair.Value;
 
 			if (String::CompareOrdinal(name, pair.Key) < 0)
@@ -209,7 +212,11 @@ ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV2(API_SET_NAMESPACE_V2 const * c
 		// Retrieve api min-win contract name
 		auto const name_buffer = reinterpret_cast<PWCHAR>(base + it->NameOffset);
 		auto const name = gcnew String(name_buffer, 0, it->NameLength / sizeof(WCHAR));
-		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(name, targets));
+
+		// force storing lowercase variant for comparison
+		auto const lower_name = name->ToLower();
+
+		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(lower_name, targets));
 	}
 	return schema;
 }
@@ -233,7 +240,11 @@ ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV4(API_SET_NAMESPACE_V4 const * c
 		// Retrieve api min-win contract name
 		auto const name_buffer = reinterpret_cast<PWCHAR>(base + it->NameOffset);
 		auto const name = gcnew String(name_buffer, 0, it->NameLength / sizeof(WCHAR));
-		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(name, targets));
+
+		// force storing lowercase variant for comparison
+		auto const lower_name = name->ToLower();
+
+		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(lower_name, targets));
 	}
 	return schema;
 }
@@ -247,8 +258,8 @@ public:
     List<KeyValuePair<String^, ApiSetTarget^>>^ GetAll() override { return All; }
     ApiSetTarget^ Lookup(String^ name) override
     {
-		// remove "api-" or "ext-" prefix
-		//name = name->Substring(4);
+		// Force lowercase name
+		name = name->ToLower();
 
         // Note: The list is initially alphabetically sorted!!!
         auto min = 0;
@@ -258,7 +269,7 @@ public:
             auto const cur = (min + max) / 2;
             auto pair = HashedAll[cur];
             
-			if (name->StartsWith(pair.Key))
+			if (name->StartsWith(pair.Key, System::StringComparison::CurrentCultureIgnoreCase))
 				return pair.Value;
 
             if (String::CompareOrdinal(name, pair.Key) < 0)
@@ -290,8 +301,13 @@ ApiSetSchema^ ApiSetSchemaImpl::GetApiSetSchemaV6(API_SET_NAMESPACE_V6 const * c
 		auto const name_buffer = reinterpret_cast<PWCHAR>(base + it->NameOffset);
 		auto const name = gcnew String(name_buffer, 0, it->NameLength / sizeof(WCHAR));
 		auto const hash_name = gcnew String(name_buffer, 0, it->HashedLength / sizeof(WCHAR));
-		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(name, targets));
-		schema->HashedAll->Add(KeyValuePair<String^, ApiSetTarget^>(hash_name, targets));
+
+		// force storing lowercase variant for comparison
+		auto const lower_name = name->ToLower();
+		auto const lower_hash_name = hash_name->ToLower();
+
+		schema->All->Add(KeyValuePair<String^, ApiSetTarget^>(lower_name, targets));
+		schema->HashedAll->Add(KeyValuePair<String^, ApiSetTarget^>(lower_hash_name, targets));
 	}
 	return schema;
 }

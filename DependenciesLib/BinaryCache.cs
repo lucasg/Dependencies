@@ -121,8 +121,9 @@ namespace Dependencies
         public static string LookupApiSetLibrary(string ImportDllName)
         {
             // Look for api set target 
-            if (!ImportDllName.StartsWith("api-") && !ImportDllName.StartsWith("ext-"))
+            if (!ImportDllName.StartsWith("api-", StringComparison.CurrentCultureIgnoreCase) && !ImportDllName.StartsWith("ext-", StringComparison.CurrentCultureIgnoreCase))
                 return "";
+
            
             // Strip the .dll extension and search for matching targets
             var ImportDllWIthoutExtension = Path.GetFileNameWithoutExtension(ImportDllName);
