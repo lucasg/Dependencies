@@ -1,6 +1,6 @@
 function Get-PeviewBinary {
   param(
-    [String] $Url,
+    [String] $BuildVersion,
     [String] $Hash
   )
 
@@ -9,14 +9,36 @@ function Get-PeviewBinary {
 
   # use temporary folder for download
   New-Item -ItemType Directory -Force -Path "$($env:TEMP)/tmp";
-  Set-Location "$($env:TEMP)/tmp";
+  Set-Location "$($env:TEMP)/tmp"
 
-  &wget $Url -OutFile "processhacker-2.39-bin.zip";
-  $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path "./processhacker-2.39-bin.zip").Hash;
+  $apiUrl = 'https://ci.appveyor.com/api';
+  $headers = @{
+    "Content-type" = "application/json"
+  };
+  $accountName = 'processhacker';
+  $projectName = 'processhacker';
+  $artifactFileName = "processhacker-build-bin.zip";
 
-  if ($PhArchiveHash -eq "2afb5303e191dde688c5626c3ee545e32e52f09da3b35b20f5e0d29a418432f5") {
-    &7z.exe x "./processhacker-2.39-bin.zip" "$($env:platform)/peview.exe";
-    $PeviewBinaryFile = (Resolve-Path "./$($env:platform)/peview.exe").Path;
+  # get project with last build details
+  $build = Invoke-RestMethod -Method Get -Uri "$apiUrl/projects/$accountName/$projectName/build/$BuildVersion" -Headers $headers
+
+  # processhacker builds have a single job
+  # get the job id
+  $jobId = $build.build.jobs[0].jobId;
+
+  # get the zip file job artifacts
+  Invoke-WebRequest -Uri "$apiUrl/buildjobs/$jobId/artifacts/$artifactFileName" -OutFile "./$artifactFileName"
+
+  $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path "./$artifactFileName").Hash;
+
+  $pePlatform = "32bit"
+  if ($env:platform -eq "x64") {
+    $pePlatform = "64bit"
+  }
+
+  if ($PhArchiveHash -eq $Hash) {
+    &7z.exe x "./$artifactFileName" "$($pePlatform)/peview.exe";
+    $PeviewBinaryFile = (Resolve-Path "./$($pePlatform)/peview.exe").Path;
   }
 
   # Because of wacky Powershell "return" behavior, it's better to store the result in a env variable.
@@ -73,9 +95,9 @@ function Get-DependenciesDeps {
   )
 
   # Download external dependencies like peview
-  $ProcessHackerReleaseUrl = "https://github.com/processhacker2/processhacker2/releases/download/v2.39/processhacker-2.39-bin.zip";
-  $PeviewReleaseHash = "2afb5303e191dde688c5626c3ee545e32e52f09da3b35b20f5e0d29a418432f5";
-  Get-PeviewBinary -Url $ProcessHackerReleaseUrl -Hash $PeviewReleaseHash;
+  $PeBuildVersion = "3.0.2995";
+  $PeviewBuildHash = "2d6e76f6ff752cfbd595544ae0f967843e0fa2402700418d933d4d5d3ce2b99b";
+  Get-PeviewBinary -BuildVersion $PeBuildVersion -Hash $PeviewBuildHash;
   if (-not $env:PEVIEW_PATH)
   {
     Write-Error "[x] Peview binary has not correctly been downloaded."
