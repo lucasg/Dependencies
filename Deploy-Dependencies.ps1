@@ -29,13 +29,14 @@ function Get-PeviewBinary {
   # get the zip file job artifacts
   Invoke-WebRequest -Uri "$apiUrl/buildjobs/$jobId/artifacts/$artifactFileName" -OutFile "./$artifactFileName"
 
-  $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path "./$artifactFileName").Hash;
-
+  # get the platform subfolder within the artifact zip file
   $pePlatform = "32bit"
   if ($env:platform -eq "x64") {
     $pePlatform = "64bit"
   }
 
+  # check the expected hash before extracing binaries
+  $PhArchiveHash = (Get-FileHash -Algorithm SHA256 -Path "./$artifactFileName").Hash;
   if ($PhArchiveHash -eq $Hash) {
     &7z.exe x "./$artifactFileName" "$($pePlatform)/peview.exe";
     $PeviewBinaryFile = (Resolve-Path "./$($pePlatform)/peview.exe").Path;
