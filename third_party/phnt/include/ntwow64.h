@@ -341,7 +341,7 @@ typedef struct _PEB32
     WOW64_POINTER(PVOID *) FlsCallback;
     LIST_ENTRY32 FlsListHead;
     WOW64_POINTER(PVOID) FlsBitmap;
-    ULONG FlsBitmapBits[FLS_MAXIMUM_AVAILABLE / (sizeof(ULONG) * 8)];
+    ULONG FlsBitmapBits[FLS_MAXIMUM_AVAILABLE_OLD / (sizeof(ULONG) * 8)];
     ULONG FlsHighIndex;
 
     WOW64_POINTER(PVOID) WerRegistrationData;
