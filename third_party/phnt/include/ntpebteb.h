@@ -134,7 +134,7 @@ typedef struct _PEB
     PVOID *FlsCallback;
     LIST_ENTRY FlsListHead;
     PVOID FlsBitmap;
-    ULONG FlsBitmapBits[FLS_MAXIMUM_AVAILABLE / (sizeof(ULONG) * 8)];
+    ULONG FlsBitmapBits[FLS_MAXIMUM_AVAILABLE_OLD / (sizeof(ULONG) * 8)];
     ULONG FlsHighIndex;
 
     PVOID WerRegistrationData;
