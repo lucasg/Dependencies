@@ -173,6 +173,8 @@ namespace Dependencies
                     case "x86":
                     case "wow64":
                     case "msil":
+                    case "arm":
+                    case "arm64":
                         break; // nothing to do
                     default:
                         ProcessArch = ".*";
