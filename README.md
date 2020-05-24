@@ -43,7 +43,7 @@ NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/l
 
 ## Installation and Usage
 
-`Dependencies` is currently shipped as a binary (no installer present). Just click on one of the release numbers above (probably the latest), download and uncompress the archive and run DependenciesGui.exe.
+`Dependencies` is currently shipped as two binaries (no installer present) : `Dependencies.exe` as a CLI tool and `DependenciesGui.exe` for its GUI counterpart (see screenshot). Just click on one of the release numbers above (preferably the latest), download and uncompress the archive and run `DependenciesGui.exe`.
 Since the binary is not signed, `SmartScreen` might scream at runtime. `Dependencies` also bundle `ClrPhTester.exe`, a dumpbin-like executable used to test for non-regressions.
 
 `Dependencies` currently does not recursively resolve child imports when parsing a new PE since it can be really memory-hungry to do so ( it can over a GB even for "simple" PEs ). This behavior can be overridden (app-wide) via a property located in "Options->Properties->Tree build behaviour".
