@@ -308,7 +308,7 @@ namespace Dependencies
             }
 
             PeviewerProcess.StartInfo.FileName = String.Format("\"{0:s}\"", programPath);
-            PeviewerProcess.StartInfo.Arguments = Filepath;
+            PeviewerProcess.StartInfo.Arguments = String.Format("\"{0:s}\"", Filepath); 
             return PeviewerProcess.Start();
         }
 
@@ -463,8 +463,11 @@ namespace Dependencies
             Environment.SpecialFolder WindowsSystemFolder = (this.Pe.IsWow64Dll()) ?
                 Environment.SpecialFolder.SystemX86 :
                 Environment.SpecialFolder.System;
-            string User32Filepath = Path.Combine(Environment.GetFolderPath(WindowsSystemFolder), "user32.dll");
-            string MsCoreeFilepath = Path.Combine(Environment.GetFolderPath(WindowsSystemFolder), "mscoree.dll");
+
+            string systemPath = (this.Pe.IsArm32Dll()) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SysArm32") 
+                : Environment.GetFolderPath(WindowsSystemFolder);
+            string User32Filepath = Path.Combine(systemPath, "user32.dll");
+            string MsCoreeFilepath = Path.Combine(systemPath, "mscoree.dll");
 
             foreach (PeImportDll DllImport in PeImports)
             {

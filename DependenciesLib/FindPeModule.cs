@@ -116,7 +116,8 @@ namespace Dependencies
             Environment.SpecialFolder WindowsSystemFolder = (Wow64Dll) ?
                 Environment.SpecialFolder.SystemX86 :
                 Environment.SpecialFolder.System;
-            String WindowsSystemFolderPath = Environment.GetFolderPath(WindowsSystemFolder);
+            String WindowsSystemFolderPath = (RootPe.IsArm32Dll()) ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SysArm32") 
+            : Environment.GetFolderPath(WindowsSystemFolder);
 
 
             // -1. Look in Sxs manifest (copious reversing needed)
