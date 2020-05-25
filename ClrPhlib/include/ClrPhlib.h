@@ -160,6 +160,9 @@ namespace Dependencies {
             // Check if the PE is 32-bit
             bool IsArm32Dll();
 
+            // return the processorArchiture of PE
+            String^ GetProcessor();
+
             // Return the ApiSetSchema
             ApiSetSchema^ GetApiSetSchema();
 

@@ -201,3 +201,14 @@ bool PE::IsArm32Dll()
   return ((Properties->Machine & 0xffff) == IMAGE_FILE_MACHINE_ARMNT);
 }
 
+String^ PE::GetProcessor()
+{
+  if ((Properties->Machine & 0xffff) == IMAGE_FILE_MACHINE_I386)
+    return gcnew String("x86");
+  if ((Properties->Machine & 0xffff) == IMAGE_FILE_MACHINE_ARMNT)
+    return gcnew String("arm");
+  if ((Properties->Machine & 0xffff) == IMAGE_FILE_MACHINE_ARM64)
+    return gcnew String("arm64");
+  return gcnew String("amd64");
+}
+
