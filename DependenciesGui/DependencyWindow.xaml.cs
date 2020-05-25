@@ -558,8 +558,8 @@ namespace Dependencies
                 {
                     string AppInitRegistryKey = (this.Pe.IsWow64Dll()) ?
                         "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" :
-                        (this.Pe.IsArm32Dll()) ?
-                        "HKEY_LOCAL_MACHINE\\SOFTWARE\\WowAA32Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" :
+//                        (this.Pe.IsArm32Dll()) ?
+//                        "HKEY_LOCAL_MACHINE\\SOFTWARE\\WowAA32Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" :
                         "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Windows";
 
                     int LoadAppInitDlls = (int)Registry.GetValue(AppInitRegistryKey, "LoadAppInit_DLLs", 0);
