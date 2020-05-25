@@ -118,7 +118,7 @@ namespace Dependencies
             return EntriesFromElement;
         }
 
-        public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, string ExecutableName = "", bool Wow64Pe = false)
+        public static SxsEntries ExtractDependenciesFromSxsElement(XElement SxsAssembly, string Folder, string ExecutableName = "", string ProcessorArch = "")
         {
             // Private assembly search sequence : https://msdn.microsoft.com/en-us/library/windows/desktop/aa374224(v=vs.85).aspx
             // 
@@ -167,7 +167,7 @@ namespace Dependencies
                 {
                     case "$(build.arch)":
                     case "*":
-                        ProcessArch = (Wow64Pe) ? "x86" : "amd64";
+                        ProcessArch = ProcessorArch;
                         break;
                     case "amd64":
                     case "x86":
@@ -265,7 +265,7 @@ namespace Dependencies
                         }
 
 
-                        return ExtractDependenciesFromSxsManifestFile(MatchSxsManifestPath, FullPathMatchSxsManifestDir, ExecutableName, Wow64Pe);
+                        return ExtractDependenciesFromSxsManifestFile(MatchSxsManifestPath, FullPathMatchSxsManifestDir, ExecutableName, ProcessorArch);
                     }
                 }
             }
@@ -284,7 +284,7 @@ namespace Dependencies
             TargetSxsManifestPath = Path.Combine(Folder, String.Format("{0:s}.manifest", SxsManifestName));
             if (File.Exists(TargetSxsManifestPath))
             {
-                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, Folder, ExecutableName, Wow64Pe);
+                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, Folder, ExecutableName, ProcessorArch);
             }
 
 
@@ -301,7 +301,7 @@ namespace Dependencies
             TargetSxsManifestPath = Path.Combine(SxsManifestDir, String.Format("{0:s}.manifest", SxsManifestName));
             if (Directory.Exists(SxsManifestDir) && File.Exists(TargetSxsManifestPath))
             {
-                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, Wow64Pe);
+                return ExtractDependenciesFromSxsManifestFile(TargetSxsManifestPath, SxsManifestDir, ExecutableName, ProcessorArch);
             }
 
             // TODO : do the same thing for localization
@@ -323,18 +323,18 @@ namespace Dependencies
             }
         }
 
-        public static SxsEntries ExtractDependenciesFromSxsManifestFile(string ManifestFile, string Folder, string ExecutableName = "", bool Wow64Pe = false)
+        public static SxsEntries ExtractDependenciesFromSxsManifestFile(string ManifestFile, string Folder, string ExecutableName = "", string ProcessorArch = "")
         {
             // Console.WriteLine("Extracting deps from file {0:s}", ManifestFile);
 
             using (FileStream fs = new FileStream(ManifestFile, FileMode.Open, FileAccess.Read))
             {
-                return ExtractDependenciesFromSxsManifest(fs, Folder, ExecutableName, Wow64Pe);
+                return ExtractDependenciesFromSxsManifest(fs, Folder, ExecutableName, ProcessorArch);
             }
         }
 
 
-        public static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder, string ExecutableName = "", bool Wow64Pe = false)
+        public static SxsEntries ExtractDependenciesFromSxsManifest(System.IO.Stream ManifestStream, string Folder, string ExecutableName = "", string ProcessorArch = "")
         {
             SxsEntries AdditionnalDependencies = new SxsEntries();
             
@@ -372,7 +372,7 @@ namespace Dependencies
             )
             {
                 // find target PE
-                AdditionnalDependencies.AddRange(ExtractDependenciesFromSxsElement(SxsAssembly, Folder, ExecutableName, Wow64Pe));
+                AdditionnalDependencies.AddRange(ExtractDependenciesFromSxsElement(SxsAssembly, Folder, ExecutableName, ProcessorArch));
             }
 
             return AdditionnalDependencies;
@@ -431,7 +431,7 @@ namespace Dependencies
                     OverridingManifest,
                     RootPeFolder,
                     RootPeFilename,
-                    Pe.IsWow64Dll()
+                    Pe.GetProcessor()
                 );
             }
 
@@ -448,8 +448,8 @@ namespace Dependencies
                 ManifestStream, 
                 RootPeFolder,
                 RootPeFilename,
-                Pe.IsWow64Dll()
-            );
+                Pe.GetProcessor()
+                );
             return Entries;
         }
     }
