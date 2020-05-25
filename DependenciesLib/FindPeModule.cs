@@ -70,7 +70,7 @@ namespace Dependencies
 
                 if (TestPe != null)
                 { 
-                    Debug.WriteLine("Attempt to load {0:s} {1:d} {2:s}", PeFilePath, TestPe.IsWow64Dll(), ProcessorArch);
+                    Debug.WriteLine("Attempt to load {0:s} {1:s} {2:s}", PeFilePath, TestPe.GetProcessor(), ProcessorArch);
                     if ((TestPe.LoadSuccessful) && (TestPe.GetProcessor() == ProcessorArch))
                         return PeFilePath;
                 }
