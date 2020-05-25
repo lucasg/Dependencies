@@ -51,7 +51,7 @@ namespace Dependencies
 			return false;
 		}
 
-        static string FindPeFromPath(string ModuleName, List<string> CandidateFolders, bool Wow64Dll = false)
+        static string FindPeFromPath(string ModuleName, List<string> CandidateFolders, string ProcessorArch)
         {
             string PeFilePath = null;
 
@@ -70,8 +70,8 @@ namespace Dependencies
 
                 if (TestPe != null)
                 { 
-                    Debug.WriteLine("Attempt to load {0:s} {1:d} {2:d}", PeFilePath, TestPe.IsWow64Dll(), Wow64Dll);
-                    if ((TestPe.LoadSuccessful) && (TestPe.IsWow64Dll() == Wow64Dll))
+                    Debug.WriteLine("Attempt to load {0:s} {1:d} {2:s}", PeFilePath, TestPe.IsWow64Dll(), ProcessorArch);
+                    if ((TestPe.LoadSuccessful) && (TestPe.GetProcessor() == ProcessorArch))
                         return PeFilePath;
                 }
             }
@@ -110,6 +110,7 @@ namespace Dependencies
 		public static Tuple<ModuleSearchStrategy, string> FindPeFromDefault(PE RootPe, string ModuleName, SxsEntries SxsCache, List<string> CustomSearchFolders, string WorkingDirectory)
         {
             bool Wow64Dll = RootPe.IsWow64Dll();
+            string ProcessorArch = RootPe.GetProcessor();
             string RootPeFolder = Path.GetDirectoryName(RootPe.Filepath);
             string FoundPePath = null;
             
@@ -149,7 +150,7 @@ namespace Dependencies
 
 
             // 1. Look in application folder
-            FoundPePath = FindPeFromPath(ModuleName, new List<string>(new string[] { RootPeFolder }), Wow64Dll);
+            FoundPePath = FindPeFromPath(ModuleName, new List<string>(new string[] { RootPeFolder }), ProcessorArch);
             if (FoundPePath != null)
             {
                 return new Tuple<ModuleSearchStrategy, string>(
@@ -165,7 +166,7 @@ namespace Dependencies
                 }
             );
 
-            FoundPePath = FindPeFromPath(ModuleName, SystemFolders, Wow64Dll);
+            FoundPePath = FindPeFromPath(ModuleName, SystemFolders, ProcessorArch);
             if (FoundPePath != null)
             {
                 return new Tuple<ModuleSearchStrategy, string>(
@@ -178,7 +179,7 @@ namespace Dependencies
 			// Ignored for the time being since we can't know from
 			// where the exe is run
 			// TODO : Add a user supplied path emulating %cwd%
-			FoundPePath = FindPeFromPath(ModuleName, new List<string>(new string[] { WorkingDirectory }), Wow64Dll);
+			FoundPePath = FindPeFromPath(ModuleName, new List<string>(new string[] { WorkingDirectory }), ProcessorArch);
 			if (FoundPePath != null)
 			{
 				return new Tuple<ModuleSearchStrategy, string>(
@@ -200,7 +201,7 @@ namespace Dependencies
 			PATHFolders = PATHFolders.Where(path => path.Length != 0).ToList();
 
 
-			FoundPePath = FindPeFromPath(ModuleName, PATHFolders, Wow64Dll);
+			FoundPePath = FindPeFromPath(ModuleName, PATHFolders, ProcessorArch);
             if (FoundPePath != null)
             {
                 return new Tuple<ModuleSearchStrategy, string>(
@@ -222,7 +223,7 @@ namespace Dependencies
 
 			// 0xff. Allow the user to supply custom search folders, to take into account
 			// specific cases.
-			FoundPePath = FindPeFromPath(ModuleName, CustomSearchFolders, Wow64Dll);
+			FoundPePath = FindPeFromPath(ModuleName, CustomSearchFolders, ProcessorArch);
 			if (FoundPePath != null)
 			{
 				return new Tuple<ModuleSearchStrategy, string>(
