@@ -157,6 +157,9 @@ namespace Dependencies {
             // Check if the PE is 32-bit
             bool IsWow64Dll();
 
+            // Check if the PE is 32-bit
+            bool IsArm32Dll();
+
             // Return the ApiSetSchema
             ApiSetSchema^ GetApiSetSchema();
 

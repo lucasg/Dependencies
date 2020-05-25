@@ -195,3 +195,9 @@ bool PE::IsWow64Dll()
 {
     return ((Properties->Machine & 0xffff ) == IMAGE_FILE_MACHINE_I386);
 }
+
+bool PE::IsArm32Dll()
+{
+  return ((Properties->Machine & 0xffff) == IMAGE_FILE_MACHINE_ARMNT);
+}
+
