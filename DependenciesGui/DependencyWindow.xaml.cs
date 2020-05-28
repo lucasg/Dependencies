@@ -557,7 +557,6 @@ namespace Dependencies
                 if (ImportModule.PeFilePath == User32Filepath)
                 {
                     string AppInitRegistryKey =
-                       // When the X86 version DepenciesGui.exe program opens the WowAA32Node registry, it seems like a fault occurs.
                        (this.Pe.IsArm32Dll()) ?
                         "SOFTWARE\\WowAA32Node\\Microsoft\\Windows NT\\CurrentVersion\\Windows" :
                        (this.Pe.IsWow64Dll()) ?
