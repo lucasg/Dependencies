@@ -624,125 +624,136 @@ namespace Dependencies
                     var resolver = new DefaultAssemblyResolver();
                     resolver.AddSearchDirectory(RootFolder);
 
-                    AssemblyDefinition PeAssembly = AssemblyDefinition.ReadAssembly(newPe.Filepath);
-
-                    foreach (var module in PeAssembly.Modules)
+                    AssemblyDefinition PeAssembly = null;
+                    try
                     {
-                        // Process CLR referenced assemblies
-                        foreach (var assembly in module.AssemblyReferences)
-                        {
-                            AssemblyDefinition definition;
-                            try
-                            {
-                                definition = resolver.Resolve(assembly);
-                            }
-                            catch (AssemblyResolutionException)
-                            {
-                                ImportContext AppInitImportModule = new ImportContext();
-                                AppInitImportModule.PeFilePath = null;
-                                AppInitImportModule.PeProperties = null;
-                                AppInitImportModule.ModuleName = Path.GetFileName(assembly.Name);
-                                AppInitImportModule.ApiSetModuleName = null;
-                                AppInitImportModule.Flags = ModuleFlag.ClrReference;
-                                AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
-                                AppInitImportModule.Flags |= ModuleFlag.NotFound;
+                        PeAssembly = AssemblyDefinition.ReadAssembly(newPe.Filepath);
+                    }
+                    catch (BadImageFormatException)
+                    {
+                    }
 
-                                if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
+                    if (PeAssembly != null)
+                    {
+                        foreach (var module in PeAssembly.Modules)
+                        {
+                            // Process CLR referenced assemblies
+                            foreach (var assembly in module.AssemblyReferences)
+                            {
+                                AssemblyDefinition definition;
+                                try
                                 {
-                                    NewTreeContexts.Add(AppInitImportModule.ModuleName, AppInitImportModule);
+                                    definition = resolver.Resolve(assembly);
+                                }
+                                catch (AssemblyResolutionException)
+                                {
+                                    ImportContext AppInitImportModule = new ImportContext();
+                                    AppInitImportModule.PeFilePath = null;
+                                    AppInitImportModule.PeProperties = null;
+                                    AppInitImportModule.ModuleName = Path.GetFileName(assembly.Name);
+                                    AppInitImportModule.ApiSetModuleName = null;
+                                    AppInitImportModule.Flags = ModuleFlag.ClrReference;
+                                    AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
+                                    AppInitImportModule.Flags |= ModuleFlag.NotFound;
+
+                                    if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
+                                    {
+                                        NewTreeContexts.Add(AppInitImportModule.ModuleName, AppInitImportModule);
+                                    }
+
+                                    continue;
                                 }
 
-                                continue;
+                                foreach (var AssemblyModule in definition.Modules)
+                                {
+                                    Debug.WriteLine("Referenced Assembling loading " + AssemblyModule.Name + " : " + AssemblyModule.FileName);
+
+                                    // Do not process twice the same imported module
+                                    if (null != PeImports.Find(mod => mod.Name == Path.GetFileName(AssemblyModule.FileName)))
+                                    {
+                                        continue;
+                                    }
+
+                                    ImportContext AppInitImportModule = new ImportContext();
+                                    AppInitImportModule.PeFilePath = null;
+                                    AppInitImportModule.PeProperties = null;
+                                    AppInitImportModule.ModuleName = Path.GetFileName(AssemblyModule.FileName);
+                                    AppInitImportModule.ApiSetModuleName = null;
+                                    AppInitImportModule.Flags = ModuleFlag.ClrReference;
+                                    AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
+
+                                    Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(
+                                        this.Pe,
+                                        AssemblyModule.FileName,
+                                        this.SxsEntriesCache,
+                                        this.CustomSearchFolders,
+                                        this.WorkingDirectory
+                                    );
+                                    if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
+                                    {
+                                        AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
+                                        AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
+                                    }
+                                    else
+                                    {
+                                        AppInitImportModule.Flags |= ModuleFlag.NotFound;
+                                    }
+
+                                    if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
+                                    {
+                                        NewTreeContexts.Add(AppInitImportModule.ModuleName, AppInitImportModule);
+                                    }
+                                }
+
                             }
 
-                            foreach (var AssemblyModule in definition.Modules)
-                            { 
-                                Debug.WriteLine("Referenced Assembling loading " + AssemblyModule.Name + " : "+ AssemblyModule.FileName );
-
-                                // Do not process twice the same imported module
-                                if (null != PeImports.Find(mod => mod.Name == Path.GetFileName(AssemblyModule.FileName)))
+                            // Process unmanaged dlls for native calls
+                            foreach (var UnmanagedModule in module.ModuleReferences)
+                            {
+                                // some clr dll have a reference to an "empty" dll
+                                if (UnmanagedModule.Name.Length == 0)
                                 {
                                     continue;
                                 }
 
+                                Debug.WriteLine("Referenced module loading " + UnmanagedModule.Name);
+
+                                // Do not process twice the same imported module
+                                if (null != PeImports.Find(m => m.Name == UnmanagedModule.Name))
+                                {
+                                    continue;
+                                }
+
+
+
                                 ImportContext AppInitImportModule = new ImportContext();
                                 AppInitImportModule.PeFilePath = null;
                                 AppInitImportModule.PeProperties = null;
-                                AppInitImportModule.ModuleName = Path.GetFileName(AssemblyModule.FileName);
+                                AppInitImportModule.ModuleName = UnmanagedModule.Name;
                                 AppInitImportModule.ApiSetModuleName = null;
                                 AppInitImportModule.Flags = ModuleFlag.ClrReference;
                                 AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
 
                                 Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(
-									this.Pe, 
-									AssemblyModule.FileName, 
-									this.SxsEntriesCache,
-									this.CustomSearchFolders,
-									this.WorkingDirectory
-								);
+                                    this.Pe,
+                                    UnmanagedModule.Name,
+                                    this.SxsEntriesCache,
+                                    this.CustomSearchFolders,
+                                    this.WorkingDirectory
+                                );
                                 if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
                                 {
                                     AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
                                     AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
                                 }
-								else
-								{
-									AppInitImportModule.Flags |= ModuleFlag.NotFound;
-								}
 
                                 if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
                                 {
                                     NewTreeContexts.Add(AppInitImportModule.ModuleName, AppInitImportModule);
                                 }
                             }
-
                         }
 
-                        // Process unmanaged dlls for native calls
-                        foreach (var UnmanagedModule in module.ModuleReferences)
-                        {
-                            // some clr dll have a reference to an "empty" dll
-                            if (UnmanagedModule.Name.Length == 0)
-                            {
-                                continue;
-                            }
-
-                            Debug.WriteLine("Referenced module loading " + UnmanagedModule.Name);
-
-                            // Do not process twice the same imported module
-                            if (null != PeImports.Find(m => m.Name == UnmanagedModule.Name))
-                            {
-                                continue;
-                            }
-
-                                
-
-                            ImportContext AppInitImportModule = new ImportContext();
-                            AppInitImportModule.PeFilePath = null;
-                            AppInitImportModule.PeProperties = null;
-                            AppInitImportModule.ModuleName = UnmanagedModule.Name;
-                            AppInitImportModule.ApiSetModuleName = null;
-                            AppInitImportModule.Flags = ModuleFlag.ClrReference;
-                            AppInitImportModule.ModuleLocation = ModuleSearchStrategy.ClrAssembly;
-
-                            Tuple<ModuleSearchStrategy, PE> ResolvedAppInitModule = BinaryCache.ResolveModule(
-								this.Pe, 
-								UnmanagedModule.Name, 
-								this.SxsEntriesCache,
-								this.CustomSearchFolders,
-								this.WorkingDirectory
-							);
-                            if (ResolvedAppInitModule.Item1 != ModuleSearchStrategy.NOT_FOUND)
-                            {
-                                AppInitImportModule.PeProperties = ResolvedAppInitModule.Item2;
-                                AppInitImportModule.PeFilePath = ResolvedAppInitModule.Item2.Filepath;
-                            }
-
-                            if (!NewTreeContexts.ContainsKey(AppInitImportModule.ModuleName))
-                            {
-                                NewTreeContexts.Add(AppInitImportModule.ModuleName, AppInitImportModule);
-                            }
-                        }
                     }
                 }
             }

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2003
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DependenciesGui", "DependenciesGui\DependenciesGui.csproj", "{9232B9B6-F2BA-44A3-B8A6-A352777F632C}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -53,13 +53,13 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Debug|ARM.ActiveCfg = Debug|x86
 		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Debug|x64.ActiveCfg = Debug|x64
 		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Debug|x64.Build.0 = Debug|x64
 		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Debug|x86.ActiveCfg = Debug|x86
 		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Debug|x86.Build.0 = Debug|x86
-		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Release|Any CPU.ActiveCfg = Release|x86
+		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Release|ARM.ActiveCfg = Release|x86
 		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Release|x64.ActiveCfg = Release|x64
 		{9232B9B6-F2BA-44A3-B8A6-A352777F632C}.Release|x64.Build.0 = Release|x64
