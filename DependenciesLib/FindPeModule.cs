@@ -35,6 +35,19 @@ namespace Dependencies
     /// </summary>
     public class FindPe
     {
+        public static string GetSystemPath(PE RootPe)
+        {
+            if (RootPe.IsArm32Dll())
+            {
+                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SysArm32");
+            }
+            else if (RootPe.IsWow64Dll())
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+            }
+
+            return Environment.GetFolderPath(Environment.SpecialFolder.System);
+        }
 		static bool IsFilepathInvalid(string Filepath)
 		{
 			foreach (char InvalidChar in System.IO.Path.GetInvalidFileNameChars())
