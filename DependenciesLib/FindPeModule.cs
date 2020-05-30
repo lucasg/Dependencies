@@ -43,7 +43,7 @@ namespace Dependencies
             }
             else if (RootPe.IsWow64Dll())
             {
-                Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
+                return Environment.GetFolderPath(Environment.SpecialFolder.SystemX86);
             }
 
             return Environment.GetFolderPath(Environment.SpecialFolder.System);
