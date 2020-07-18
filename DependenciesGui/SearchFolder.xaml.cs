@@ -22,22 +22,25 @@ namespace Dependencies
 
 		protected void OnPropertyChanged(string info)
 		{
-			PropertyChangedEventHandler handler = PropertyChanged;
-			if (handler != null)
-			{
-				handler(this, new PropertyChangedEventArgs(info));
-			}
-		}
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(info));
+        }
 
 		public string Folder {
 			get { return folder; }
 			set { folder = value;  OnPropertyChanged("Folder"); }
 		}
 
-		public bool Dummy { get; set; }
+        public Boolean IsEditable
+        {
+            get { return is_editable; }
+            set { is_editable = value; OnPropertyChanged("IsEditable"); }
+        }
+
+        public bool Dummy { get; set; }
 
 		private string folder;
-	}
+        private Boolean is_editable;
+    }
 
 	/// <summary>
 	/// Logique d'interaction pour SearchFolder.xaml
@@ -59,8 +62,9 @@ namespace Dependencies
 					new SearchFolderItem()
 					{
 						Folder = item,
-						Dummy = false
-					}
+						Dummy = false,
+                        IsEditable = false,
+                    }
 				);
 			}
 
@@ -75,7 +79,8 @@ namespace Dependencies
 		{
 			get
 			{
-				return _CustomSearchFolders;
+                return _CustomSearchFolders;
+                //return (ObservableCollection < SearchFolderItem >) _CustomSearchFolders.Where(sf => !sf.Dummy);
 			}
 		}
 
@@ -123,11 +128,12 @@ namespace Dependencies
 					new SearchFolderItem()
 					{
 						Folder = null,
-						Dummy = true
-					}
+						Dummy = true,
+                        IsEditable= false,
+                    }
 				);
 			}
-		}
+        }
 
 		private void OnBinaryWorkindDirectoryChange(object sender, RoutedEventArgs e)
 		{
@@ -170,7 +176,173 @@ namespace Dependencies
 			}
 		}
 
-		private void SearchFolder_DragOver(object sender, System.Windows.DragEventArgs e)
+        private void OnNewEntry(object sender, RoutedEventArgs e)
+        {
+            EnsureSearchFolderHasDummyEntry();
+
+            // The last entry is always a dummy one, so we can use it
+            SearchFolderItem newItem = _CustomSearchFolders.Last();
+
+            newItem.Dummy = false;
+            newItem.IsEditable = true;
+            newItem.PropertyChanged += SearchFolder_PropertyChanged;
+
+           
+
+            EnsureSearchFolderHasDummyEntry();
+        }
+
+        private void OnEditEntry(object sender, RoutedEventArgs e)
+        {
+            SearchFolderItem selectedItem = (SearchFolderItem)SearchFoldersList.SelectedItem;
+            if (selectedItem == null)
+            {
+                return;
+            }
+
+            selectedItem.IsEditable = true;
+            selectedItem.PropertyChanged += SearchFolder_PropertyChanged;
+
+            foreach (var sfi in _CustomSearchFolders)
+            {
+                if (sfi != selectedItem)
+                {
+                    sfi.IsEditable = false;
+                }
+            }
+
+            EnsureSearchFolderHasDummyEntry();
+        }
+
+        private void OnBrowseEntry(object sender, RoutedEventArgs e)
+        {
+            // Ask the user for a path
+            FolderBrowserDialog InputFileNameDlg = new FolderBrowserDialog();
+            if (InputFileNameDlg.ShowDialog() != System.Windows.Forms.DialogResult.OK)
+                return;
+
+            var selectedPath = InputFileNameDlg.SelectedPath;
+
+            // Either edit the selected item or add a new one 
+            SearchFolderItem selectedItem = (SearchFolderItem) SearchFoldersList.SelectedItem;
+            if (selectedItem == null || !selectedItem.IsEditable)
+            {
+                // The last entry is always a dummy one, so we can use it
+                selectedItem = _CustomSearchFolders.Last();
+            }
+
+
+            selectedItem.Folder = selectedPath;
+            selectedItem.Dummy = false;
+            selectedItem.IsEditable = true;
+
+            foreach (var sfi in _CustomSearchFolders)
+            {
+                if (sfi != selectedItem)
+                {
+                    sfi.IsEditable = false;
+                }
+            }
+
+            EnsureSearchFolderHasDummyEntry();
+        }
+
+        private void OnDeleteEntry(object sender, RoutedEventArgs e)
+        {
+            SearchFolderItem selectedItem = (SearchFolderItem) SearchFoldersList.SelectedItem;
+            if (selectedItem == null)
+            {
+                return;
+            }
+
+            _CustomSearchFolders.Remove(selectedItem);
+
+            EnsureSearchFolderHasDummyEntry();
+        }
+
+        private void OnMoveUpEntry(object sender, RoutedEventArgs e)
+        {
+            SearchFolderItem selectedItem = (SearchFolderItem)SearchFoldersList.SelectedItem;
+            if (selectedItem == null)
+            {
+                return;
+            }
+
+            // Dummy entry stays last
+            if (selectedItem.Dummy)
+            {
+                return;
+            }
+
+            // No need to move up the first entry
+            int index = _CustomSearchFolders.IndexOf(selectedItem);
+            if (index == 0)
+            {
+                return;
+            }
+            _CustomSearchFolders.Remove(selectedItem);
+            _CustomSearchFolders.Insert(index - 1, selectedItem);
+
+            EnsureSearchFolderHasDummyEntry();
+        }
+
+        private void OnMoveDownEntry(object sender, RoutedEventArgs e)
+        {
+            SearchFolderItem selectedItem = (SearchFolderItem)SearchFoldersList.SelectedItem;
+            if (selectedItem == null)
+            {
+                return;
+            }
+
+            // Dummy entry stays last
+            if (selectedItem.Dummy)
+            {
+                return;
+            }
+
+            // No need to move down the last non-dummy entry
+            int index = _CustomSearchFolders.IndexOf(selectedItem);
+            if (index == _CustomSearchFolders.Count() - 2 )
+            {
+                return;
+            }
+            _CustomSearchFolders.Remove(selectedItem);
+            _CustomSearchFolders.Insert(index + 1, selectedItem);
+
+            EnsureSearchFolderHasDummyEntry();
+        }
+
+        private void SearchFolder_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (sender.GetType() == typeof(SearchFolderItem) && e.PropertyName == "Folder")
+            {
+                SearchFolderItem ChangedSearchFolder = (SearchFolderItem)sender;
+
+                ChangedSearchFolder.IsEditable = false;
+                ChangedSearchFolder.PropertyChanged -= SearchFolder_PropertyChanged;
+                ChangeSearchFolder(ChangedSearchFolder);
+            }
+        }
+
+        private void OnSearchFolderViewSelectedItemChanged(object sender, RoutedEventArgs e)
+        {
+            SearchFolderItem selectedItem = (SearchFolderItem)SearchFoldersList.SelectedItem;
+
+            foreach(var sfi in _CustomSearchFolders)
+            {
+                if(sfi != selectedItem)
+                {
+                    sfi.IsEditable = false;
+                }
+            }
+        }
+
+        private void ChangeSearchFolder(SearchFolderItem Item)
+        {
+
+        }
+
+        private void SearchFolder_DragOver(object sender, System.Windows.DragEventArgs e)
 		{
 			if (e.Data.GetDataPresent(System.Windows.DataFormats.FileDrop))
 			{
@@ -184,7 +356,24 @@ namespace Dependencies
 			}
 		}
 
-		private void SearchFolder_DragLeave(object sender, System.Windows.DragEventArgs e)
+        private void SearchFoldersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var listbox = sender as System.Windows.Controls.ListBox;
+
+            SearchFolderItem selectedItem = (SearchFolderItem)listbox.SelectedItem;
+            if (selectedItem == null)
+            {
+                return;
+            }
+
+            selectedItem.IsEditable = true;
+            selectedItem.PropertyChanged += SearchFolder_PropertyChanged;
+
+            EnsureSearchFolderHasDummyEntry();
+        }
+
+
+        private void SearchFolder_DragLeave(object sender, System.Windows.DragEventArgs e)
 		{
 			var listbox = sender as System.Windows.Controls.ListBox;
 			listbox.Background = new SolidColorBrush(Color.FromRgb(226, 226, 226));
@@ -222,5 +411,6 @@ namespace Dependencies
 			var listbox = sender as System.Windows.Controls.ListBox;
 			listbox.Background = new SolidColorBrush(Color.FromRgb(226, 226, 226));
 		}
-	}
+
+    }
 }

@@ -5,29 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Dependencies"
         mc:Ignorable="d"
-        Title="Search folders customization" Height="350" Width="600">
-    <Grid Margin="10 20 10 20" MinHeight="100"  MinWidth="560">
+        Title="Search folders customization" Height="400" Width="600">
+    <Grid Margin="10 10 10 10" MinHeight="100"  MinWidth="560">
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="5*"/>
-            <RowDefinition Height="10*"/>
-            <RowDefinition Height="70*"/>
-            <RowDefinition Height="15*"/>
-            <RowDefinition Height="2*"/>
+            <RowDefinition Height="0*"/>
+            <RowDefinition Height="30*"/>
+            <RowDefinition Height="276*"/>
+            <RowDefinition Height="36*"/>
+            <RowDefinition Height="7*"/>
         </Grid.RowDefinitions>
-        
+
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="100"/>
-                <ColumnDefinition Width="80*"/>
+                <ColumnDefinition Width="139"/>
+                <ColumnDefinition/>
                 <ColumnDefinition Width="30"/>
             </Grid.ColumnDefinitions>
 
-            <Label Content="Binary cwd:" 
-                   HorizontalAlignment="Left" 
+            <Label Content="Binary current directory:" 
                    VerticalAlignment="Center"
                    Grid.Column="0"
-                   Height="25"
+                   Height="26" Margin="0,2"
                    />
 
             <TextBox Text="{Binding Path=WorkingDirectory, Mode=OneWay}"
@@ -35,22 +34,20 @@
                     TextWrapping="Wrap" 
                     HorizontalContentAlignment="Stretch"
                     HorizontalAlignment="Stretch"
-                    Height="20"
                     Width="auto" 
-                    Grid.Column="1"
+                    Grid.Column="1" Margin="0,5"
                     />
 
-            <Button Content="..." 
-                    Height="20"
-                    Margin="2 0 0 0"
+            <Button Content="..."
+                    Margin="2,5,0,5"
                     Click="OnBinaryWorkindDirectoryChange"
                     Grid.Column="2"/>
         </Grid>
 
         <Grid Grid.Row="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="15*"/>
-                <RowDefinition Height="85*"/>
+                <RowDefinition Height="29*"/>
+                <RowDefinition Height="247*"/>
             </Grid.RowDefinitions>
 
             <Label Content="Additional search folders:" 
@@ -59,15 +56,20 @@
                    VerticalAlignment="Top"
                    Grid.Row="0"
                    Height="25"
-                   Margin="0 0 0 0"
+                   Margin="0 0 0 0" Width="144"
                    />
-            
 
-            <ListBox ItemsSource="{Binding Path=SearchFolders}" 
-                     Grid.Row="1" 
-                     Name="SearchFoldersList" 
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70*"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="80"/>
+                </Grid.ColumnDefinitions>
+
+                <ListBox ItemsSource="{Binding Path=SearchFolders}" 
+                     Name="SearchFoldersList"
                      Height="auto" 
-                     Margin="2,0,2,0" 
+                     Margin="2,0,0,0" 
                      VerticalAlignment="Stretch"
                      VerticalContentAlignment="Stretch"
                      HorizontalContentAlignment="Stretch"
@@ -77,45 +79,71 @@
                      Drop="SearchFolder_Drop" 
                      DragOver="SearchFolder_DragOver" 
                      DragLeave="SearchFolder_DragLeave" 
+                     MouseDoubleClick ="SearchFoldersList_MouseDoubleClick"
+                     SelectionChanged="OnSearchFolderViewSelectedItemChanged"
                      Background="#FFE2E2E2" 
-                     FontSize="10">
-                <ListBox.ItemContainerStyle>
-                    <Style TargetType="ListBoxItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListBoxItem">
-                                    <StackPanel>
-                                        <Separator x:Name="Separator"/>
-                                        <ContentPresenter/>
-                                    </StackPanel>
-                                    <ControlTemplate.Triggers>
-                                        <DataTrigger Binding="{Binding RelativeSource={RelativeSource PreviousData}}" Value="{x:Null}">
-                                            <Setter Property="Visibility" TargetName="Separator" Value="Collapsed"/>
-                                        </DataTrigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListBox.ItemContainerStyle>
+                     FontSize="10"
+                     Grid.Column="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <TextBlock Text="{Binding Path=Folder}"/>
+                                <TextBox  Text="{Binding Path=Folder}" Visibility="{Binding IsEditable, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
 
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid Margin="0,2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="30" />
-                                <ColumnDefinition Width="30" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock 
-                                Text="{Binding Path=Folder}"
-                             />
-                            <Button Grid.Column="1" Content="..." Click="OnChangeSearchFolder" DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}" /> 
-                            <Button Grid.Column="2" Content="x" Click="OnRemoveSearchFolder" DataContext="{Binding RelativeSource={RelativeSource AncestorType={x:Type ListBoxItem}}}"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                <Grid Grid.Column="2">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="10"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="30"/>
+                        <RowDefinition Height="150*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Content="New" 
+                        Height="20"
+                        Margin="2,0,2,10"
+                        
+                        Click="OnNewEntry"
+                        Grid.Row="0"/>
+
+                    <Button Content="Edit" 
+                        Height="20"
+                        Margin="2,0,2,10"
+                        Click="OnEditEntry"
+                        Grid.Row="1"/>
+
+                    <Button Content="Browse ..." 
+                        Height="20"
+                        Margin="2,0,2,10"
+                        Click="OnBrowseEntry"
+                        Grid.Row="2"/>
+
+                    <Button Content="Delete" 
+                        Height="20"
+                        Margin="2,0,2,10"
+                        Click="OnDeleteEntry"
+                        Grid.Row="3"/>
+
+                    <Button Content="Move Up" 
+                        Height="20"
+                        Margin="2,0,2,10"
+                        Click="OnMoveUpEntry"
+                        Grid.Row="5"/>
+
+                    <Button Content="Move Down" 
+                        Height="20"
+                        Margin="2,0,2,10"
+                        Click="OnMoveDownEntry"
+                        Grid.Row="6"/>
+                </Grid>
+            </Grid>
         </Grid>
 
         <Grid Grid.Row="3">
