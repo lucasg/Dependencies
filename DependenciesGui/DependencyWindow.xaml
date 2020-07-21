@@ -85,7 +85,11 @@
                                 CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
                                 InputGestureText="Alt+Enter"  
                                 IsEnabled="True" />
-
+                        <MenuItem Header="AHeadLib Codegen " 
+                                Command="{Binding  Path=AheadLibCommnad, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
+                                CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
+                                InputGestureText="Alt+Enter"  
+                                IsEnabled="True" />
                         <!--AncestorType=Grid To get the current context feel like magic to me -->
                     </ContextMenu>
 

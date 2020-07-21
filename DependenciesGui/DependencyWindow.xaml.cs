@@ -13,6 +13,7 @@ using Microsoft.Win32;
 using Mono.Cecil;
 using Dependencies.ClrPh;
 
+
 namespace Dependencies
 {
 
@@ -129,7 +130,7 @@ namespace Dependencies
     /// <summary>
     /// Deprendency Tree custom node. It's DataContext is a DependencyNodeContext struct
     /// </summary>
-    public class ModuleTreeViewItem : TreeViewItem, INotifyPropertyChanged
+    public partial class ModuleTreeViewItem : TreeViewItem, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -336,9 +337,9 @@ namespace Dependencies
                 return _OpenNewAppCommand;
             }
         }
-
+        
         #endregion // Commands 
-
+        
         private RelayCommand _OpenPeviewerCommand;
         private RelayCommand _OpenNewAppCommand;
 		private ModuleTreeViewItem _Parent;
