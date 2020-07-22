@@ -168,7 +168,7 @@ namespace Dependencies
                     dllhsw.WriteLine($"#ifndef {dllfn}_H");
                     dllhsw.WriteLine($"#define {dllfn}_H");
                     dllhsw.WriteLine($"//aheadlib plugin for csharp.by snikeguo,email:408260925@qq.com");
-
+                    dllhsw.WriteLine($"//codegen time:{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss:fff")}");
                     dllhsw.WriteLine("#include<Windows.h>");
                     dllhsw.WriteLine("#include<Shlwapi.h>");
 
@@ -299,8 +299,8 @@ namespace Dependencies
                     dllcppsw.WriteLine("if(!loadresult){return FALSE;}");
                     dllcppsw.WriteLine("GetAddresses();");
                     dllcppsw.WriteLine("DWORD old = 0;");
-                    dllcppsw.WriteLine($"UINT64 Start = &pfnAheadLib_{Functions[Functions.Count - 1].NameInSourceCode};");
-                    dllcppsw.WriteLine($"UINT64 End = &pfnAheadLib_{Functions[0].NameInSourceCode};");
+                    dllcppsw.WriteLine($"UINT64 Start = (UINT64)&pfnAheadLib_{Functions[Functions.Count - 1].NameInSourceCode};");
+                    dllcppsw.WriteLine($"UINT64 End = (UINT64)&pfnAheadLib_{Functions[0].NameInSourceCode};");
                     dllcppsw.WriteLine($"int VirtualProtectResult=VirtualProtect((LPVOID)Start," +
                         $"(End-Start+(UINT64)(sizeof(PVOID)))," +
                         $"PAGE_EXECUTE_READWRITE," +
