@@ -15,6 +15,8 @@ using Dependencies.ClrPh;
 using System.Threading.Tasks;
 using System.Text;
 using Newtonsoft.Json;
+using Microsoft.WindowsAPICodePack.Dialogs;
+using System.Runtime.InteropServices;
 
 namespace Dependencies
 {
@@ -74,6 +76,45 @@ namespace Dependencies
         public ushort Ordinal { get; set; }
 
         public string Name { get; set; }//dll name
+
+        private string _UndecorateName;
+        public CallingConvention CallingConvention { get; private set; }//only c++ export
+        public bool IsCppExport { get; set; } = false;
+        public string UndecorateName
+        {
+            get
+            {
+                return _UndecorateName;
+            }
+            set
+            {
+                _UndecorateName = value;
+                if(value.IndexOf("__cdecl") !=-1)
+                {
+                    IsCppExport = true;
+                    CallingConvention = CallingConvention.Cdecl;
+                }
+                else if (value.IndexOf("__stdcall") != -1)
+                {
+                    IsCppExport = true;
+                    CallingConvention = CallingConvention.StdCall;
+                }
+                else if (value.IndexOf("__thiscall") != -1)
+                {
+                    IsCppExport = true;
+                    CallingConvention = CallingConvention.ThisCall;
+                }
+                else if (value.IndexOf("__fastcall") != -1)
+                {
+                    IsCppExport = true;
+                    CallingConvention = CallingConvention.FastCall;
+                }
+                else
+                {
+                    IsCppExport = false;
+                }
+            }
+        }
         public bool ExportByOrdinal { get; set; }
         public long VirtualAddress { get; set; }
 
@@ -92,11 +133,14 @@ namespace Dependencies
             DllTarget = dlltarget;
             Functions = new List<AheadlibFunction>();
             ReplaceRuleLoader = ReplaceRuleLoader.GetReplaceRules(cfg);
+            PhSymbolProvider symbolProvider = new PhSymbolProvider();
             foreach (var expfunction in dlltarget.Exports)
             {
                 AheadlibFunction function = new AheadlibFunction();
                 function.Ordinal = expfunction.Ordinal;
                 function.Name = expfunction.Name;
+                var dx = new DisplayPeExport(expfunction, symbolProvider);
+                function.UndecorateName = dx.Name;
                 function.NameInSourceCode = ReplaceRuleLoader.Get_NameInSourceCode_From_Name(function.Name);
                 function.ExportByOrdinal = expfunction.ExportByOrdinal;
                 function.VirtualAddress = expfunction.VirtualAddress;
@@ -105,18 +149,7 @@ namespace Dependencies
             
         }
 
-        private void EmitLoad(StreamWriter sw)
-        {
-            FileInfo dllfi = new FileInfo(DllTarget.ModuleName);
-            string dllfn = dllfi.Name.Split('.')[0];
-            sw.WriteLine($"HMODULE {dllfn}_Old_Module;");
-            sw.WriteLine("BOOL WINAPI Load()\r\n{");
-            sw.WriteLine($"{dllfn}_Old_Module=LoadLibrary(\"{dllfi.Name}\");");
-            sw.Write($"if({dllfn}_Old_Module==nullptr)");
-            sw.WriteLine("{return false;}");
-            sw.WriteLine("else\r\n{return true;}");
-            sw.WriteLine("}");
-        }
+        
         public async void CodeGen()
         {
             bool IsCodeGenSuccess = false;
@@ -129,9 +162,9 @@ namespace Dependencies
                     FileInfo dllfi = new FileInfo(DllTarget.ModuleName);
                     string dllfn = dllfi.Name.Split('.')[0];
 
-                    StreamWriter dllcppsw = new StreamWriter(CodeGenPath + "/" + dllfn + ".cpp", false, Encoding.UTF8);
+                    StreamWriter dllcppsw = new StreamWriter(CodeGenPath + "/" + dllfn + ".c", false, new UTF8Encoding(false));
 
-                    StreamWriter dllhsw = new StreamWriter(CodeGenPath + "/" + dllfn + ".h", false, Encoding.UTF8);
+                    StreamWriter dllhsw = new StreamWriter(CodeGenPath + "/" + dllfn + ".h", false, new UTF8Encoding(false));
                     dllhsw.WriteLine($"#ifndef {dllfn}_H");
                     dllhsw.WriteLine($"#define {dllfn}_H");
                     dllhsw.WriteLine($"//aheadlib plugin for csharp.by snikeguo,email:408260925@qq.com");
@@ -156,16 +189,17 @@ namespace Dependencies
                     {
                         foreach (var func in Functions)
                         {
-                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=_AheadLib_{func.NameInSourceCode},@{func.Ordinal})\"");
+                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=_AheadLib_{func.Name},@{func.Ordinal}\")");
                         }
                     }
                     else if (DllTarget.Cpu.ToLower() == "amd64")
                     {
                         foreach (var func in Functions)
                         {
-                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=AheadLib_{func.NameInSourceCode},@{func.Ordinal})\"");
+                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=AheadLib_{func.Name},@{func.Ordinal}\")");
                         }
                     }
+
 
                     foreach (var func in Functions)
                     {
@@ -175,10 +209,10 @@ namespace Dependencies
                     //load function
                     dllcppsw.WriteLine($"HMODULE {dllfn}_Old_Module;");
                     dllcppsw.WriteLine("BOOL WINAPI Load()\r\n{");
-                    dllcppsw.WriteLine($"{dllfn}_Old_Module=LoadLibrary(\"{dllfi.Name}\");");
-                    dllcppsw.Write($"if({dllfn}_Old_Module==nullptr)");
-                    dllcppsw.WriteLine("{return false;}");
-                    dllcppsw.WriteLine("else\r\n{return true;}");
+                    dllcppsw.WriteLine($"{dllfn}_Old_Module=LoadLibrary(L\"{dllfi.Name}.old\");");
+                    dllcppsw.Write($"if({dllfn}_Old_Module==NULL)");
+                    dllcppsw.WriteLine("{return FALSE;}");
+                    dllcppsw.WriteLine("else\r\n{return TRUE;}");
                     dllcppsw.WriteLine("}");
 
                     dllcppsw.WriteLine("void GetAddresses()\r\n{");
@@ -192,18 +226,42 @@ namespace Dependencies
 
                     if (DllTarget.Cpu.ToLower() == "i386")
                     {
+                        StreamWriter x32asmjmpcodesw = new StreamWriter(CodeGenPath + "/" + dllfn + "_jump.asm", false, new UTF8Encoding(false));
+
+                        x32asmjmpcodesw.WriteLine("; 把 .asm 文件添加到工程一次");
+                        x32asmjmpcodesw.WriteLine("; 右键单击文件-属性-常规-");
+                        x32asmjmpcodesw.WriteLine("; 项类型:自定义生成工具");
+                        x32asmjmpcodesw.WriteLine("; 从生成中排除:否");
+                        x32asmjmpcodesw.WriteLine("; 然后复制下面命令填入");
+                        x32asmjmpcodesw.WriteLine("; 命令行: ml /Fo $(IntDir)%(fileName).obj /c /Cp %(fileName).asm");
+                        x32asmjmpcodesw.WriteLine("; 输出: $(IntDir)%(fileName).obj;%(Outputs)");
+                        x32asmjmpcodesw.WriteLine("; 链接对象: 是");
+
+
+                        x32asmjmpcodesw.WriteLine(".686P");
+                        x32asmjmpcodesw.WriteLine(".MODEL FLAT,C");
+                        x32asmjmpcodesw.WriteLine(".DATA");
+
                         foreach (var func in Functions)
                         {
-                            string s = $"EXTERN_C __declspec(naked) void __cdecl  AheadLib_{func.NameInSourceCode}(void)\r\n";
-                            s += "{\r\n";
-                            s += $"     __asm jmp pfnAheadLib_{func.NameInSourceCode};\r\n";
-                            s += "}";
-                            dllcppsw.WriteLine(s);
+                            x32asmjmpcodesw.WriteLine($"EXTERN pfnAheadLib_{func.NameInSourceCode}:DWORD");
                         }
+                        x32asmjmpcodesw.WriteLine("\r\n\r\n;jmp code");
+                        x32asmjmpcodesw.WriteLine(".CODE");
+                        foreach (var func in Functions)
+                        {
+                            string s = $"AheadLib_{func.Name} PROC\r\n";
+                            s += $"jmp pfnAheadLib_{func.NameInSourceCode}\r\n";
+                            s += $"AheadLib_{func.Name} ENDP\r\n";
+                            x32asmjmpcodesw.WriteLine(s);
+                        }
+                        x32asmjmpcodesw.WriteLine("END");
+                        x32asmjmpcodesw.Flush();
+                        x32asmjmpcodesw.Close();
                     }
                     else if (DllTarget.Cpu.ToLower() == "amd64")
                     {
-                        StreamWriter x64asmjmpcodesw = new StreamWriter(CodeGenPath + "/" + dllfn + "_jump.asm", false, Encoding.UTF8);
+                        StreamWriter x64asmjmpcodesw = new StreamWriter(CodeGenPath + "/" + dllfn + "_jump.asm", false, new UTF8Encoding(false));
 
                         x64asmjmpcodesw.WriteLine("; 把 .asm 文件添加到工程一次");
                         x64asmjmpcodesw.WriteLine("; 右键单击文件-属性-常规-");
@@ -218,7 +276,7 @@ namespace Dependencies
                         x64asmjmpcodesw.WriteLine(".DATA");
                         foreach (var func in Functions)
                         {
-                            x64asmjmpcodesw.WriteLine($"EXTERN pfnAheadLib_{func.NameInSourceCode}:dq;");
+                            x64asmjmpcodesw.WriteLine($"EXTERN pfnAheadLib_{func.NameInSourceCode}:QWORD");
                         }
                         x64asmjmpcodesw.WriteLine("\r\n\r\n;jmp code");
                         foreach (var func in Functions)
@@ -228,6 +286,7 @@ namespace Dependencies
                             s += $"AheadLib_{func.Name} ENDP\r\n";
                             x64asmjmpcodesw.WriteLine(s);
                         }
+                        x64asmjmpcodesw.WriteLine("END");
                         x64asmjmpcodesw.Flush();
                         x64asmjmpcodesw.Close();
                     }
@@ -236,15 +295,17 @@ namespace Dependencies
                     dllcppsw.WriteLine($"BOOL WINAPI {dllfn}_Init" +
                         "(){");
 
-                    dllcppsw.WriteLine("bool loadresult=Load();");
-                    dllcppsw.WriteLine("if(!loadresult){return false;}");
+                    dllcppsw.WriteLine("BOOL loadresult=Load();");
+                    dllcppsw.WriteLine("if(!loadresult){return FALSE;}");
                     dllcppsw.WriteLine("GetAddresses();");
                     dllcppsw.WriteLine("DWORD old = 0;");
-                    dllcppsw.WriteLine($"VirtualProtect((LPVOID)&pfnAheadLib_{Functions[0].NameInSourceCode}," +
-                        $"((UINT64)&pfnAheadLib_{Functions[Functions.Count - 1].NameInSourceCode})-(UINT64)&pfnAheadLib_{Functions[0].NameInSourceCode})+(UINT64)(sizeof(PVOID))," +
+                    dllcppsw.WriteLine($"UINT64 Start = &pfnAheadLib_{Functions[Functions.Count - 1].NameInSourceCode};");
+                    dllcppsw.WriteLine($"UINT64 End = &pfnAheadLib_{Functions[0].NameInSourceCode};");
+                    dllcppsw.WriteLine($"int VirtualProtectResult=VirtualProtect((LPVOID)Start," +
+                        $"(End-Start+(UINT64)(sizeof(PVOID)))," +
                         $"PAGE_EXECUTE_READWRITE," +
                         $"&old);");
-                    dllcppsw.WriteLine("return true;\r\n}");
+                    dllcppsw.WriteLine("return TRUE;\r\n}");
 
                     dllcppsw.Flush();
                     dllcppsw.Close();
@@ -303,11 +364,12 @@ namespace Dependencies
             }
             if (openflag == true)
             {
-                System.Windows.Forms.FolderBrowserDialog dialog = new System.Windows.Forms.FolderBrowserDialog();
-                dialog.Description = "please codegen path";
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+                dialog.Title = "please codegen path";
+                dialog.IsFolderPicker = true;
+                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
                 {
-                    AheadLibCodeGenFoldPath = dialog.SelectedPath;
+                    AheadLibCodeGenFoldPath = dialog.FileName;
                 }
                 else
                 {
