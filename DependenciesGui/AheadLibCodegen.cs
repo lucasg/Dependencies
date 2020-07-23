@@ -174,12 +174,12 @@ namespace Dependencies
 
                     foreach (var func in Functions)
                     {
-                        dllhsw.WriteLine($"extern PVOID pfnAheadLib_{func.NameInSourceCode};//{func.Name}");
+                        dllhsw.WriteLine($"extern PVOID pfnAL_{func.NameInSourceCode};//{func.Name}");
                     }
 
                     foreach (var func in Functions)
                     {
-                        dllhsw.WriteLine($"extern PVOID Old_pfnAheadLib_{func.NameInSourceCode};//{func.Name}");
+                        dllhsw.WriteLine($"extern PVOID Old_pfnAL_{func.NameInSourceCode};//{func.Name}");
                     }
 
                     dllhsw.WriteLine($"extern BOOL WINAPI {dllfn}_Init" +
@@ -195,25 +195,25 @@ namespace Dependencies
                     {
                         foreach (var func in Functions)
                         {
-                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=_AheadLib_{func.Name},@{func.Ordinal}\")");
+                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=_AL_{func.Name},@{func.Ordinal}\")");
                         }
                     }
                     else if (DllTarget.Cpu.ToLower() == "amd64")
                     {
                         foreach (var func in Functions)
                         {
-                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=AheadLib_{func.Name},@{func.Ordinal}\")");
+                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=AL_{func.Name},@{func.Ordinal}\")");
                         }
                     }
 
 
                     foreach (var func in Functions)
                     {
-                        dllcppsw.WriteLine($"PVOID pfnAheadLib_{func.NameInSourceCode};");
+                        dllcppsw.WriteLine($"PVOID pfnAL_{func.NameInSourceCode};");
                     }
                     foreach (var func in Functions)
                     {
-                        dllcppsw.WriteLine($"PVOID Old_pfnAheadLib_{func.NameInSourceCode};");//define old dll function point
+                        dllcppsw.WriteLine($"PVOID Old_pfnAL_{func.NameInSourceCode};");//define old dll function point
                     }
                     //load function
                     dllcppsw.WriteLine($"HMODULE {dllfn}_Old_Module;");
@@ -228,12 +228,12 @@ namespace Dependencies
 
                     foreach (var func in Functions)
                     {
-                        dllcppsw.WriteLine($"   pfnAheadLib_{func.NameInSourceCode}=(PVOID)GetProcAddress({dllfn}_Old_Module,\"{func.Name}\");");
+                        dllcppsw.WriteLine($"   pfnAL_{func.NameInSourceCode}=(PVOID)GetProcAddress({dllfn}_Old_Module,\"{func.Name}\");");
                     }
 
                     foreach (var func in Functions)
                     {
-                        dllcppsw.WriteLine($"   Old_pfnAheadLib_{func.NameInSourceCode}=pfnAheadLib_{func.NameInSourceCode};");
+                        dllcppsw.WriteLine($"   Old_pfnAL_{func.NameInSourceCode}=pfnAL_{func.NameInSourceCode};");
                     }
 
                     dllcppsw.WriteLine("}");
@@ -258,15 +258,15 @@ namespace Dependencies
 
                         foreach (var func in Functions)
                         {
-                            x32asmjmpcodesw.WriteLine($"EXTERN pfnAheadLib_{func.NameInSourceCode}:DWORD");
+                            x32asmjmpcodesw.WriteLine($"EXTERN pfnAL_{func.NameInSourceCode}:DWORD");
                         }
                         x32asmjmpcodesw.WriteLine("\r\n\r\n;jmp code");
                         x32asmjmpcodesw.WriteLine(".CODE");
                         foreach (var func in Functions)
                         {
-                            string s = $"AheadLib_{func.Name} PROC\r\n";
-                            s += $"jmp pfnAheadLib_{func.NameInSourceCode}\r\n";
-                            s += $"AheadLib_{func.Name} ENDP\r\n";
+                            string s = $"AL_{func.Name} PROC\r\n";
+                            s += $"jmp pfnAL_{func.NameInSourceCode}\r\n";
+                            s += $"AL_{func.Name} ENDP\r\n";
                             x32asmjmpcodesw.WriteLine(s);
                         }
                         x32asmjmpcodesw.WriteLine("END");
@@ -290,14 +290,14 @@ namespace Dependencies
                         x64asmjmpcodesw.WriteLine(".DATA");
                         foreach (var func in Functions)
                         {
-                            x64asmjmpcodesw.WriteLine($"EXTERN pfnAheadLib_{func.NameInSourceCode}:QWORD");
+                            x64asmjmpcodesw.WriteLine($"EXTERN pfnAL_{func.NameInSourceCode}:QWORD");
                         }
                         x64asmjmpcodesw.WriteLine("\r\n\r\n;jmp code");
                         foreach (var func in Functions)
                         {
-                            string s = $"AheadLib_{func.Name} PROC\r\n";
-                            s += $"jmp pfnAheadLib_{func.NameInSourceCode}\r\n";
-                            s += $"AheadLib_{func.Name} ENDP\r\n";
+                            string s = $"AL_{func.Name} PROC\r\n";
+                            s += $"jmp pfnAL_{func.NameInSourceCode}\r\n";
+                            s += $"AL_{func.Name} ENDP\r\n";
                             x64asmjmpcodesw.WriteLine(s);
                         }
                         x64asmjmpcodesw.WriteLine("END");
@@ -313,8 +313,8 @@ namespace Dependencies
                     dllcppsw.WriteLine("if(!loadresult){return FALSE;}");
                     dllcppsw.WriteLine("GetAddresses();");
                     dllcppsw.WriteLine("DWORD old = 0;");
-                    dllcppsw.WriteLine($"UINT64 LowAddr = (UINT64)&Old_pfnAheadLib_{Functions[Functions.Count - 1].NameInSourceCode};");
-                    dllcppsw.WriteLine($"UINT64 HighAddr = (UINT64)&pfnAheadLib_{Functions[0].NameInSourceCode};");
+                    dllcppsw.WriteLine($"UINT64 LowAddr = (UINT64)&Old_pfnAL_{Functions[Functions.Count - 1].NameInSourceCode};");
+                    dllcppsw.WriteLine($"UINT64 HighAddr = (UINT64)&pfnAL_{Functions[0].NameInSourceCode};");
                     dllcppsw.WriteLine($"int VirtualProtectResult=VirtualProtect((LPVOID)LowAddr," +
                         $"(HighAddr-LowAddr+(UINT64)(sizeof(PVOID)))," +
                         $"PAGE_EXECUTE_READWRITE," +
