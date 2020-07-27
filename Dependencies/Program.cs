@@ -632,6 +632,7 @@ namespace Dependencies
                 "Options :",
                 "  -h -help : display this help",
                 "  -json : activate json output.",
+		"  -depth : limit recursion depth when analyisng loaded modules or dependency chain. Default value is infinite.",
                 "  -apisets : dump the system's ApiSet schema (api set dll -> host dll)",
                 "  -apisetsdll : dump the ApiSet schema from apisetschema <FILE> (api set dll -> host dll)",
                 "  -knowndll : dump all the system's known dlls (x86 and x64)",
