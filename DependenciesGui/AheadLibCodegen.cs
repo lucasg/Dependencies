@@ -461,7 +461,7 @@ namespace Dependencies
                 cfgfrm.LogPath,
                 target,
                 "aheadlib.rules");
-            //generator.CodeGen();
+            generator.CodeGen();
 
             return true;
         }
