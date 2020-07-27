@@ -139,6 +139,9 @@
       <DependentUpon>About.xaml</DependentUpon>
     </Compile>
     <Compile Include="AheadLibCodegen.cs" />
+    <Compile Include="AheadLibConfig.xaml.cs">
+      <DependentUpon>AheadLibConfig.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DependencyCustomListView.xaml.cs">
       <DependentUpon>DependencyCustomListView.xaml</DependentUpon>
     </Compile>
@@ -169,6 +172,10 @@
       <DependentUpon>UserSettings.xaml</DependentUpon>
     </Compile>
     <Page Include="About.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="AheadLibConfig.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

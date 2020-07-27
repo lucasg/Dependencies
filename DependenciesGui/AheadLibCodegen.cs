@@ -123,13 +123,20 @@ namespace Dependencies
     public class AheadlibCodeGenerator
     {
         private string CodeGenPath { get; set; }
+        private string OldDllName { get; set; }
+        private bool IsCodegenFunctionTrace { get; set; }
+        private string LogPath { get; set; }
         private List<AheadlibFunction> Functions { get; set; }
         private DisplayModuleInfo DllTarget { get; set; }
 
         private ReplaceRuleLoader ReplaceRuleLoader;
-        public AheadlibCodeGenerator(string path, DisplayModuleInfo dlltarget,string cfg)
+        public AheadlibCodeGenerator(string codeGenPath,string oldDllName,bool isCodegenFunctionTrace,string logPath, DisplayModuleInfo dlltarget,string cfg)
         {
-            CodeGenPath = path;
+            CodeGenPath = codeGenPath;
+            OldDllName = oldDllName;
+            IsCodegenFunctionTrace = isCodegenFunctionTrace;
+            LogPath = logPath;
+
             DllTarget = dlltarget;
             Functions = new List<AheadlibFunction>();
             ReplaceRuleLoader = ReplaceRuleLoader.GetReplaceRules(cfg);
@@ -218,7 +225,7 @@ namespace Dependencies
                     //load function
                     dllcppsw.WriteLine($"HMODULE {dllfn}_Old_Module;");
                     dllcppsw.WriteLine("BOOL WINAPI Load()\r\n{");
-                    dllcppsw.WriteLine($"{dllfn}_Old_Module=LoadLibrary(L\"{dllfi.Name}.old\");");
+                    dllcppsw.WriteLine($"{dllfn}_Old_Module=LoadLibrary(L\"{OldDllName}\");");
                     dllcppsw.Write($"if({dllfn}_Old_Module==NULL)");
                     dllcppsw.WriteLine("{return FALSE;}");
                     dllcppsw.WriteLine("else\r\n{return TRUE;}");
@@ -324,6 +331,66 @@ namespace Dependencies
                     dllcppsw.Flush();
                     dllcppsw.Close();
 
+                    if(IsCodegenFunctionTrace==true)
+                    {
+                        StreamWriter tracehsw = new StreamWriter(CodeGenPath + "/" + dllfn + ".trace.h", false, new UTF8Encoding(false));
+                        tracehsw.WriteLine($"#ifndef {dllfn}_TRACE_H");
+                        tracehsw.WriteLine($"#define {dllfn}_TRACE_H");
+                        tracehsw.WriteLine($"void {dllfn}_TraceInit();");
+                        tracehsw.WriteLine($"#endif");
+                        tracehsw.Close();
+
+                        StreamWriter tracecsw = new StreamWriter(CodeGenPath + "/" + dllfn + ".trace.c", false, new UTF8Encoding(false));
+                        tracecsw.WriteLine($"#include\"{dllfn}.h\"");
+                        tracecsw.WriteLine("#include<stdio.h>");
+                        tracecsw.WriteLine("static char LogFileName[256];");
+
+                        tracecsw.WriteLine("static char *GetDateTimeString(void)");
+                        tracecsw.WriteLine("{");
+                        tracecsw.WriteLine("    static char s[128];");
+                        tracecsw.WriteLine("    SYSTEMTIME sys;");
+                        tracecsw.WriteLine("    GetLocalTime(&sys);");
+                        tracecsw.WriteLine("    sprintf_s(s,128, \" %4d-%2d-%2d %2d:%2d:%2d:%4d\", sys.wYear, sys.wMonth, sys.wDay, sys.wHour, sys.wMinute, sys.wSecond, sys.wMilliseconds);");
+                        tracecsw.WriteLine("    return s;");
+                        tracecsw.WriteLine("}");
+
+                        tracecsw.WriteLine("static void TraceImpl(char *tracefuntion,char *NameInSourceCode,char *dllUndecorateName,char *dllfunction)");
+                        tracecsw.WriteLine("{");
+                        tracecsw.WriteLine("    FILE* f;");
+                        tracecsw.WriteLine("    f = fopen(LogFileName, \"at\");");
+                        tracecsw.WriteLine("    fprintf(f, \"%-64s%-100s%-100s%-100s%-100s\\n\", GetDateTimeString(),tracefuntion,NameInSourceCode,dllUndecorateName,dllfunction);");
+                        tracecsw.WriteLine("    fclose(f);");
+                        tracecsw.WriteLine("}");
+
+                        foreach (var func in Functions)
+                        {
+                            tracecsw.WriteLine($"__declspec(naked) void Trace_{func.NameInSourceCode}(void)");
+                            tracecsw.WriteLine("{");
+                            tracecsw.WriteLine($"   TraceImpl(__FUNCTION__,\"{func.NameInSourceCode}\",\"{func.UndecorateName}\",\"{func.Name}\");");
+                            string jmptemp = "{"+$"jmp Old_pfnAL_{func.NameInSourceCode}"+"}";
+                            tracecsw.WriteLine($"    __asm {jmptemp}");
+                            tracecsw.WriteLine("}");
+                        }
+
+                        tracecsw.WriteLine($"void {dllfn}_TraceInit()");
+                        tracecsw.WriteLine("{");
+                        tracecsw.WriteLine( "   SYSTEMTIME sys;");
+                        tracecsw.WriteLine( "   GetLocalTime(&sys);");
+                        tracecsw.WriteLine($"   sprintf_s(LogFileName,256, \"{LogPath}{dllfn}_%4d-%2d-%2d__%2d_%2d_%2d_%4d.txt\",sys.wYear, sys.wMonth, sys.wDay, sys.wHour, sys.wMinute, sys.wSecond, sys.wMilliseconds);");
+
+                        tracecsw.WriteLine("    FILE* f;");
+                        tracecsw.WriteLine("    f = fopen(LogFileName, \"at\");");
+                        tracecsw.WriteLine("    fprintf(f, \"%-64s%-100s%-100s%-100s%-100s\\n\",\"time\",\"trace function name\",\"NameInSourceCode\",\"UndecorateName\",\"Dll Name\");");
+                        tracecsw.WriteLine("    fclose(f);");
+
+                        foreach (var func in Functions)
+                        {
+                            tracecsw.WriteLine($"   pfnAL_{func.NameInSourceCode}=Trace_{func.NameInSourceCode};");
+                        }
+                        tracecsw.WriteLine("}");
+                        tracecsw.Close();
+                    }
+
                     IsCodeGenSuccess = true;
                 }
                 catch (Exception ex)
@@ -358,44 +425,43 @@ namespace Dependencies
                 return _AheadlibCommnad;
             }
         }
-        string AheadLibCodeGenFoldPath;
+        private string _CodeGenPath;
+        private string _OldDllFullName;
+        private bool _IsCodegenFunctionTrace;
+        private string _LogPath;
+        private string ModuleName;
         public bool AheadLibCodeGen(object Context)
         {
-            bool openflag = true;
-            //if 'AheadLibCodeGenFoldPath' is exist && no need choose the path,then use old path
-            if (Directory.Exists(AheadLibCodeGenFoldPath) == true)
-            {
-                if (MessageBox.Show("aheadlib codegen path:\r\n  " + AheadLibCodeGenFoldPath + "\r\n" +
-                    "Do you want to choose a new path?\r\n" +
-                    "YES - choose a new path\r\n" +
-                    "NO -use old path\r\n", "question",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question,
-                    MessageBoxResult.No) == MessageBoxResult.No)
-                {
-                    openflag = false;
-                }
-            }
-            if (openflag == true)
-            {
-                CommonOpenFileDialog dialog = new CommonOpenFileDialog();
-                dialog.Title = "please codegen path";
-                dialog.IsFolderPicker = true;
-                if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
-                {
-                    AheadLibCodeGenFoldPath = dialog.FileName;
-                }
-                else
-                {
-                    return true;
-                }
-            }
-
             var dnc = (DependencyNodeContext)Context;
             var target = (DisplayModuleInfo)dnc.ModuleInfo.Target;
-
-            AheadlibCodeGenerator generator = new AheadlibCodeGenerator(AheadLibCodeGenFoldPath, target,"aheadlib.rules");
-            generator.CodeGen();
+            FileInfo dllfi = new FileInfo(target.ModuleName);
+            AheadLibConfig cfgfrm = new AheadLibConfig();
+            if(ModuleName != target.ModuleName)
+            {
+                _OldDllFullName = dllfi.Name+".old";
+                _IsCodegenFunctionTrace = true;
+                _LogPath = "D:/";
+                ModuleName = target.ModuleName;
+            }
+            cfgfrm.CodeGenPath = _CodeGenPath;
+            cfgfrm.OldDllFullName = _OldDllFullName;
+            cfgfrm.IsCodegenFunctionTrace = _IsCodegenFunctionTrace;
+            cfgfrm.LogPath = _LogPath;
+            if (cfgfrm.ShowDialog() == MessageBoxResult.Cancel)
+            {
+                return false;
+            }
+            _CodeGenPath = cfgfrm.CodeGenPath;
+            _OldDllFullName = cfgfrm.OldDllFullName;
+            _IsCodegenFunctionTrace = cfgfrm.IsCodegenFunctionTrace;
+            _LogPath = cfgfrm.LogPath;
+            AheadlibCodeGenerator generator = new AheadlibCodeGenerator(cfgfrm.CodeGenPath, 
+                cfgfrm.OldDllFullName,
+                cfgfrm.IsCodegenFunctionTrace,
+                cfgfrm.LogPath,
+                target,
+                "aheadlib.rules");
+            //generator.CodeGen();
 
             return true;
         }
