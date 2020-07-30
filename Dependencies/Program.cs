@@ -632,6 +632,7 @@ namespace Dependencies
                 "Options :",
                 "  -h -help : display this help",
                 "  -json : activate json output.",
+                "  -depth : limit recursion depth when analysing loaded modules or dependency chain. Default value is infinite.",
                 "  -apisets : dump the system's ApiSet schema (api set dll -> host dll)",
                 "  -apisetsdll : dump the ApiSet schema from apisetschema <FILE> (api set dll -> host dll)",
                 "  -knowndll : dump all the system's known dlls (x86 and x64)",
@@ -672,7 +673,7 @@ namespace Dependencies
 			OptionSet opts = new OptionSet() {
 							{ "h|help",  "show this message and exit", v => show_help = v != null },
 							{ "json",  "Export results in json format", v => export_as_json = v != null },
-							{ "d|depth=",  "limit recursion depth when analyisng loaded modules or dependency chain. Default value is infinite", (int v) =>  recursion_depth = v },
+							{ "d|depth=",  "limit recursion depth when analysing loaded modules or dependency chain. Default value is infinite", (int v) =>  recursion_depth = v },
 							{ "knowndll", "List all known dlls", v => { DumpKnownDlls(GetObjectPrinter(export_as_json));  early_exit = true; } },
 							{ "apisets", "List apisets redirections", v => { DumpApiSets(GetObjectPrinter(export_as_json));  early_exit = true; } },
                             { "apisetsdll", "List apisets redirections from apisetschema <FILE>", v => command = DumpApiSets },
