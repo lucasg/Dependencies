@@ -176,6 +176,10 @@ namespace Dependencies
                     dllhsw.WriteLine($"#define {dllfn}_H");
                     dllhsw.WriteLine($"//aheadlib plugin for csharp.by snikeguo,email:408260925@qq.com");
                     dllhsw.WriteLine($"//codegen time:{DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss:fff")}");
+                    //#ifndef __cplusplus
+                    dllhsw.WriteLine("#ifdef __cplusplus");
+                    dllhsw.WriteLine("extern \"C\" {");
+                    dllhsw.WriteLine("#endif");
                     dllhsw.WriteLine("#include<Windows.h>");
                     dllhsw.WriteLine("#include<Shlwapi.h>");
 
@@ -191,6 +195,11 @@ namespace Dependencies
 
                     dllhsw.WriteLine($"extern BOOL WINAPI {dllfn}_Init" +
                        "();");
+
+                    dllhsw.WriteLine("#ifdef __cplusplus");
+                    dllhsw.WriteLine("}");
+                    dllhsw.WriteLine("#endif");
+
                     dllhsw.WriteLine("#endif");
                     dllhsw.Flush();
                     dllhsw.Close();
@@ -336,8 +345,18 @@ namespace Dependencies
                         StreamWriter tracehsw = new StreamWriter(CodeGenPath + "/" + dllfn + ".trace.h", false, new UTF8Encoding(false));
                         tracehsw.WriteLine($"#ifndef {dllfn}_TRACE_H");
                         tracehsw.WriteLine($"#define {dllfn}_TRACE_H");
+
+                        tracehsw.WriteLine("#ifdef __cplusplus");
+                        tracehsw.WriteLine("extern \"C\" {");
+                        tracehsw.WriteLine("#endif");
+
                         tracehsw.WriteLine($"void {dllfn}_TraceInit();");
                         tracehsw.WriteLine($"#endif");
+
+                        tracehsw.WriteLine("#ifdef __cplusplus");
+                        tracehsw.WriteLine("}");
+                        tracehsw.WriteLine("#endif");
+
                         tracehsw.Close();
 
                         StreamWriter tracecsw = new StreamWriter(CodeGenPath + "/" + dllfn + ".trace.c", false, new UTF8Encoding(false));
