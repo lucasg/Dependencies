@@ -8,7 +8,7 @@
         Title="AheadLibConfig" Height="239.584" Width="737.499" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Grid>
         <TextBlock HorizontalAlignment="Left" Margin="7,9,0,0" TextWrapping="Wrap" Text="CodeGenPath:" VerticalAlignment="Top" FontSize="16"/>
-        <TextBox x:Name="CodeGenPathTextBox" Text="{Binding CodeGenPath,Mode=TwoWay}" HorizontalAlignment="Left" Height="23" Margin="161,9,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="445" FontSize="16"/>
+        <TextBox x:Name="CodeGenPathTextBox" Text="{Binding CodeGenPath,Mode=TwoWay}" HorizontalAlignment="Left" Height="23" Margin="161,9,0,0" TextWrapping="NoWrap"  VerticalAlignment="Top" Width="445" FontSize="16"/>
         <Button x:Name="CodeGenBrowseButton" Content="Browse" HorizontalAlignment="Left" Margin="627,9,0,0" VerticalAlignment="Top" Width="88" Height="23" FontSize="16" Click="CodeGenBrowseButton_Click"/>
         <GroupBox  HorizontalAlignment="Left" Height="65" Margin="7,84,0,0" VerticalAlignment="Top" Width="708" FontSize="16" >
             <GroupBox.Header>
@@ -16,12 +16,12 @@
             </GroupBox.Header>
             <Grid IsEnabled="{Binding IsChecked, ElementName=FunctionTraceCheckBox}">
                 <TextBlock TextWrapping="Wrap" Text="Log Path:" Margin="0,6,609,4" />
-                <TextBox x:Name="LogPathTextBox" Height="23" TextWrapping="Wrap" Text="{Binding LogPath, ElementName=window}" Margin="92,6,104,10"/>
+                <TextBox x:Name="LogPathTextBox" Height="23" TextWrapping="NoWrap" Text="{Binding LogPath, ElementName=window}" Margin="92,6,104,10"/>
                 <Button x:Name="LogPathBrowseButton" Content="Browse" HorizontalAlignment="Left" Margin="611,5,0,0" VerticalAlignment="Top" Width="75" Click="LogPathBrowseButton_Click"/>
             </Grid>
         </GroupBox>
         <TextBlock HorizontalAlignment="Left" Margin="7,45,0,0" TextWrapping="Wrap" Text="Old Dll Full Name:" VerticalAlignment="Top" FontSize="16"/>
-        <TextBox x:Name="OldDllFullNameTextBox"  Text="{Binding OldDllFullName,Mode=TwoWay}" HorizontalAlignment="Left" Height="23" Margin="161,45,0,0" TextWrapping="Wrap"  VerticalAlignment="Top" Width="445" FontSize="16"/>
+        <TextBox x:Name="OldDllFullNameTextBox"  Text="{Binding OldDllFullName,Mode=TwoWay}" HorizontalAlignment="Left" Height="23" Margin="161,45,0,0" TextWrapping="NoWrap"  VerticalAlignment="Top" Width="445" FontSize="16"/>
         <Button x:Name="OkButton" Content="OK" HorizontalAlignment="Left" Margin="516,167,0,0" VerticalAlignment="Top" Width="75" Height="28" FontSize="16" Click="OkButton_Click"/>
         <Button x:Name="CancelButton" Content="Cancel" HorizontalAlignment="Left" Margin="640,167,0,0" VerticalAlignment="Top" Width="75" Height="28" FontSize="16" Click="CancelButton_Click"/>
 

@@ -475,9 +475,9 @@ namespace Dependencies
             _IsCodegenFunctionTrace = cfgfrm.IsCodegenFunctionTrace;
             _LogPath = cfgfrm.LogPath;
             AheadlibCodeGenerator generator = new AheadlibCodeGenerator(cfgfrm.CodeGenPath, 
-                cfgfrm.OldDllFullName,
+                cfgfrm.OldDllFullName.Replace('\\','/'),
                 cfgfrm.IsCodegenFunctionTrace,
-                cfgfrm.LogPath,
+                cfgfrm.LogPath.Replace('\\', '/'),
                 target,
                 "aheadlib.rules");
             generator.CodeGen();
