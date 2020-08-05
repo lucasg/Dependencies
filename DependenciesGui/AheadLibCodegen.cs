@@ -453,7 +453,7 @@ namespace Dependencies
         {
             var dnc = (DependencyNodeContext)Context;
             var target = (DisplayModuleInfo)dnc.ModuleInfo.Target;
-            FileInfo dllfi = new FileInfo(target.ModuleName);
+            FileInfo dllfi = new FileInfo(target.Filepath);
             AheadLibConfig cfgfrm = new AheadLibConfig();
             if(ModuleName != target.ModuleName)
             {
@@ -474,10 +474,16 @@ namespace Dependencies
             _OldDllFullName = cfgfrm.OldDllFullName;
             _IsCodegenFunctionTrace = cfgfrm.IsCodegenFunctionTrace;
             _LogPath = cfgfrm.LogPath;
+
+            var logpath = cfgfrm.LogPath.Replace('\\', '/');
+            if(logpath[logpath.Length-1]!='/')
+            {
+                logpath += '/';
+            }
             AheadlibCodeGenerator generator = new AheadlibCodeGenerator(cfgfrm.CodeGenPath, 
                 cfgfrm.OldDllFullName.Replace('\\','/'),
                 cfgfrm.IsCodegenFunctionTrace,
-                cfgfrm.LogPath.Replace('\\', '/'),
+                logpath,
                 target,
                 "aheadlib.rules");
             generator.CodeGen();
