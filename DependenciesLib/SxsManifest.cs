@@ -406,6 +406,9 @@ namespace Dependencies
                 PeManifest = new Regex("SXS_ASSEMBLY_VERSION").Replace(PeManifest, "\"\"");
                 PeManifest = new Regex("SXS_ASSEMBLY_NAME").Replace(PeManifest, "\"\"");
 
+                // Remove blank lines
+                PeManifest = Regex.Replace(PeManifest, @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline);
+
                 using (XmlTextReader xReader = new XmlTextReader(PeManifest, XmlNodeType.Document, context))
                 {
                     XmlManifest = XDocument.Load(xReader);
