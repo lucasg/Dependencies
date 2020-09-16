@@ -1,0 +1,908 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Dragablz</name>
+    </assembly>
+    <members>
+        <member name="M:Dragablz.Converters.ShowDefaultCloseButtonConverter.Convert(System.Object[],System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            [0] is owning tabcontrol ShowDefaultCloseButton value.
+            [1] is owning tabcontrol FixedHeaderCount value.
+            [2] is item LogicalIndex
+            </summary>
+            <param name="values"></param>
+            <param name="targetType"></param>
+            <param name="parameter"></param>
+            <param name="culture"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Dragablz.Core.HitTest">
+            <summary>
+            Non-client hit test values, HT*
+            </summary>
+        </member>
+        <member name="M:Dragablz.Core.Extensions.VisualTreeAncestory(System.Windows.DependencyObject)">
+            <summary>
+            Yields the visual ancestory (including the starting point).
+            </summary>
+            <param name="dependencyObject"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.Core.Extensions.LogicalTreeAncestory(System.Windows.DependencyObject)">
+            <summary>
+            Yields the logical ancestory (including the starting point).
+            </summary>
+            <param name="dependencyObject"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.Core.Extensions.GetActualLeft(System.Windows.Window)">
+            <summary>
+            Returns the actual Left of the Window independently from the WindowState
+            </summary>
+            <param name="window"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.Core.Extensions.GetActualTop(System.Windows.Window)">
+            <summary>
+            Returns the actual Top of the Window independently from the WindowState
+            </summary>
+            <param name="window"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Dragablz.Dockablz.BranchResult.Branch">
+            <summary>
+            The new branch.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.BranchResult.TabablzControl">
+            <summary>
+            The new tab control.
+            </summary>
+        </member>
+        <member name="T:Dragablz.Dockablz.LocationReport">
+            <summary>
+            Provides information about where a tab control is withing a layout structure.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.LocationReport.ParentBranch">
+            <summary>
+            Gets the parent branch if this is a leaf. If the <see cref="P:Dragablz.Dockablz.LocationReport.TabablzControl"/> is directly under the <see cref="P:Dragablz.Dockablz.LocationReport.RootLayout"/> will be <c>null</c>.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.LocationReport.IsLeaf">
+            <summary>
+            Idicates if this is a leaf in a branch. <c>True</c> if <see cref="P:Dragablz.Dockablz.LocationReport.ParentBranch"/> is not null.
+            </summary>
+        </member>
+        <member name="T:Dragablz.Dockablz.LocationReportException">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Dragablz.Dockablz.Branch.GetFirstProportion">
+            <summary>
+            Gets the proportional size of the first item, between 0 and 1, where 1 would represent the entire size of the branch.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.Dockablz.Extensions.Query(Dragablz.Dockablz.Layout)">
+            <summary>
+            Begin a query of layout content, returning an accessor for examining the children.
+            </summary>
+            <param name="layout"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.Dockablz.Extensions.Visit``1(Dragablz.Dockablz.LayoutAccessor,``0,System.Action{``0,Dragablz.Dockablz.BranchAccessor},System.Action{``0,Dragablz.TabablzControl},System.Action{``0,System.Object})">
+            <summary>
+            Helper method for <see cref="M:Dragablz.Dockablz.LayoutAccessor.Visit(System.Action{Dragablz.Dockablz.BranchAccessor},System.Action{Dragablz.TabablzControl},System.Action{System.Object})"/> which allows a context to be passed through.
+            </summary>
+            <typeparam name="TContext"></typeparam>
+            <param name="layoutAccessor"></param>
+            <param name="context"></param>
+            <param name="branchVisitor"></param>
+            <param name="tabablzControlVisitor"></param>
+            <param name="contentVisitor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.Dockablz.Extensions.Visit``1(Dragablz.Dockablz.BranchAccessor,``0,Dragablz.Dockablz.BranchItem,System.Action{``0,Dragablz.Dockablz.BranchAccessor},System.Action{``0,Dragablz.TabablzControl},System.Action{``0,System.Object})">
+            <summary>
+            Helper method for <see cref="M:Dragablz.Dockablz.BranchAccessor.Visit(Dragablz.Dockablz.BranchItem,System.Action{Dragablz.Dockablz.BranchAccessor},System.Action{Dragablz.TabablzControl},System.Action{System.Object})"/> which allows a context to be passed through.
+            </summary>
+            <typeparam name="TContext"></typeparam>
+            <param name="branchAccessor"></param>
+            <param name="context"></param>
+            <param name="childItem"></param>
+            <param name="branchVisitor"></param>
+            <param name="tabablzControlVisitor"></param>
+            <param name="contentVisitor"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Dragablz.Dockablz.FloatingItemSnapShot">
+            <summary>
+            experimentational.  might have to puish this back to mvvm only
+            </summary>    
+        </member>
+        <member name="M:Dragablz.Dockablz.Layout.GetLoadedInstances">
+            <summary>
+            Helper method to get all the currently loaded layouts.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.Dockablz.Layout.Find(Dragablz.TabablzControl)">
+            <summary>
+            Finds the location of a tab control withing a layout.
+            </summary>
+            <param name="tabablzControl"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.Dockablz.Layout.Branch(Dragablz.TabablzControl,System.Windows.Controls.Orientation,System.Boolean)">
+            <summary>
+            Creates a split in a layout, at the location of a specified <see cref="T:Dragablz.TabablzControl"/>.
+            </summary>
+            <para></para>
+            <param name="tabablzControl">Tab control to be split.</param>
+            <param name="orientation">Direction of split.</param>
+            <param name="makeSecond">Set to <c>true</c> to make the current tab control push into the right hand or bottom of the split.</param>
+            <remarks>The tab control to be split must be hosted in a layout control.</remarks>
+        </member>
+        <member name="M:Dragablz.Dockablz.Layout.Branch(Dragablz.TabablzControl,System.Windows.Controls.Orientation,System.Boolean,System.Double)">
+            <summary>
+            Creates a split in a layout, at the location of a specified <see cref="T:Dragablz.TabablzControl"/>.
+            </summary>
+            <para></para>
+            <param name="tabablzControl">Tab control to be split.</param>
+            <param name="orientation">Direction of split.</param>
+            <param name="makeSecond">Set to <c>true</c> to make the current tab control push into the right hand or bottom of the split.</param>
+            <param name="firstItemProportion">Sets the proportion of the first tab control, with 0.5 being 50% of available space.</param>
+            <remarks>The tab control to be split must be hosted in a layout control.  <see cref="P:Dragablz.Dockablz.Layout.BranchTemplate" /> should be set (typically via XAML).</remarks>
+        </member>
+        <member name="M:Dragablz.Dockablz.Layout.Branch(Dragablz.TabablzControl,Dragablz.TabablzControl,System.Windows.Controls.Orientation,System.Boolean,System.Double)">
+            <summary>
+            Creates a split in a layout, at the location of a specified <see cref="T:Dragablz.TabablzControl"/>.
+            </summary>
+            <para></para>
+            <param name="tabablzControl">Tab control to be split.</param>
+            <param name="newSiblingTabablzControl">New sibling tab control (otherwise <see cref="P:Dragablz.Dockablz.Layout.BranchTemplate"/> will be used).</param>
+            <param name="orientation">Direction of split.</param>
+            <param name="makeCurrentSecond">Set to <c>true</c> to make the current tab control push into the right hand or bottom of the split.</param>
+            <param name="firstItemProportion">Sets the proportion of the first tab control, with 0.5 being 50% of available space.</param>
+            <remarks>The tab control to be split must be hosted in a layout control. </remarks>
+        </member>
+        <member name="P:Dragablz.Dockablz.Layout.Partition">
+            <summary>
+            Use in conjuction with the <see cref="P:Dragablz.InterTabController.Partition"/> on a <see cref="T:Dragablz.TabablzControl"/>
+            to isolate drag and drop spaces/control instances.
+            </summary>
+        </member>
+        <member name="F:Dragablz.Dockablz.Layout.FloatingItemsContainerMarginProperty">
+            <summary>
+            Defines a margin for the container which hosts all floating items.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.Layout.FloatingItemsContainerMargin">
+            <summary>
+            Defines a margin for the container which hosts all floating items.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.Layout.FloatingItems">
+            <summary>
+            Floating items, such as tool/MDI windows, which will sit above the <see cref="!:Content"/>.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.Layout.FloatingItemsSource">
+            <summary>
+            Floating items, such as tool/MDI windows, which will sit above the <see cref="!:Content"/>.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.Layout.FloatingItemsControlStyle">
+            <summary>
+            The style to be applied to the <see cref="T:Dragablz.DragablzItemsControl"/> which is used to display floating items.
+            In most scenarios it should be OK to leave this to that applied by the default style.
+            </summary>
+        </member>
+        <member name="F:Dragablz.Dockablz.Layout.IsTopLeftItemProperty">
+            <summary>
+            Indicates if an item/tab control within a layout is contained at the top most and left most branch item.
+            </summary>
+        </member>
+        <member name="M:Dragablz.Dockablz.Layout.SetIsTopLeftItem(System.Windows.DependencyObject,System.Boolean)">
+            <summary>
+            Indicates if an item/tab control within a layout is contained at the top most and left most branch item.
+            </summary>
+        </member>
+        <member name="M:Dragablz.Dockablz.Layout.GetIsTopLeftItem(System.Windows.DependencyObject)">
+            <summary>
+            Indicates if an item/tab control within a layout is contained at the top most and left most branch item.
+            </summary>
+        </member>
+        <member name="M:Dragablz.Dockablz.Layout.OnApplyTemplate">
+            <summary>When overridden in a derived class, is invoked whenever application code or internal processes call <see cref="M:System.Windows.FrameworkElement.ApplyTemplate" />.</summary>
+        </member>
+        <member name="T:Dragablz.Dockablz.LayoutAccessor">
+            <summary>
+            Provides information about the <see cref="P:Dragablz.Dockablz.LayoutAccessor.Layout"/> instance.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.LayoutAccessor.BranchAccessor">
+            <summary>
+            <see cref="P:Dragablz.Dockablz.LayoutAccessor.BranchAccessor"/> and <see cref="P:Dragablz.Dockablz.LayoutAccessor.TabablzControl"/> are mutually exclusive, according to whether the layout has been split, or just contains a tab control.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Dockablz.LayoutAccessor.TabablzControl">
+            <summary>
+            <see cref="P:Dragablz.Dockablz.LayoutAccessor.BranchAccessor"/> and <see cref="P:Dragablz.Dockablz.LayoutAccessor.TabablzControl"/> are mutually exclusive, according to whether the layout has been split, or just contains a tab control.
+            </summary>
+        </member>
+        <member name="M:Dragablz.Dockablz.LayoutAccessor.Visit(System.Action{Dragablz.Dockablz.BranchAccessor},System.Action{Dragablz.TabablzControl},System.Action{System.Object})">
+            <summary>
+            Visits the content of the layout, according to its content type.  No more than one of the provided <see cref="T:System.Action"/>
+            callbacks will be called.  
+            </summary>        
+        </member>
+        <member name="M:Dragablz.Dockablz.LayoutAccessor.TabablzControls">
+            <summary>
+            Gets all the Tabablz controls in a Layout, regardless of location.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Dragablz.Dockablz.LocationSnapShot">
+            <summary>
+            Initially needed to restore MDI dragablz items styles after a max then restore,
+            as the trigger which binds the item width to the canvas width sets the  Width back to the default
+            (e.g double.NaN) when the trigger is unset.  so we need to re-apply sizes manually
+            </summary>
+        </member>
+        <member name="M:Dragablz.Dockablz.BranchAccessor.Visit(Dragablz.Dockablz.BranchItem,System.Action{Dragablz.Dockablz.BranchAccessor},System.Action{Dragablz.TabablzControl},System.Action{System.Object})">
+            <summary>
+            Visits the content of the first or second side of a branch, according to its content type.  No more than one of the provided <see cref="T:System.Action"/>
+            callbacks will be called.  
+            </summary>
+            <param name="childItem"></param>
+            <param name="childBranchVisitor"></param>
+            <param name="childTabablzControlVisitor"></param>
+            <param name="childContentVisitor"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Dragablz.EmptyHeaderSizingHint">
+            <summary>
+            Provide a hint for how the header should size itself if there are no tabs left (and a Window is still open).
+            </summary>
+        </member>
+        <member name="F:Dragablz.EmptyHeaderSizingHint.Collapse">
+            <summary>
+            The header size collapses to zero along the correct axis.
+            </summary>
+        </member>
+        <member name="F:Dragablz.EmptyHeaderSizingHint.PreviousTab">
+            <summary>
+            The header size remains that of the last tab prior to the tab header becoming empty.
+            </summary>
+        </member>
+        <member name="T:Dragablz.DefaultInterLayoutClient">
+            <summary>
+            Provides a simple implementation of <see cref="T:Dragablz.IInterLayoutClient"/>, but only really useful if 
+            <see cref="T:System.Windows.Controls.TabItem"/> instances are specified in XAML.  If you are binding via ItemsSource then
+            you most likely want to create your own implementation of <see cref="T:Dragablz.IInterLayoutClient"/>.
+            </summary>
+        </member>
+        <member name="T:Dragablz.DragablzColors">
+            <summary>
+            
+            </summary>
+            <remarks>
+            In supporting .Net 4.0 we don't have access to SystemParameters.WindowGlassBrush, and even then
+            the opacity is not provided, so this class wraps up a few issues around here.
+            </remarks>
+        </member>
+        <member name="F:Dragablz.DragablzItem.ContentRotateTransformAngleProperty">
+            <summary>
+            Allows item content to be rotated (in suppported templates), typically for use in a vertical/side tab.
+            </summary>
+        </member>
+        <member name="M:Dragablz.DragablzItem.SetContentRotateTransformAngle(System.Windows.DependencyObject,System.Double)">
+            <summary>
+            Allows item content to be rotated (in suppported templates), typically for use in a vertical/side tab.
+            </summary>
+            <param name="element"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Dragablz.DragablzItem.GetContentRotateTransformAngle(System.Windows.DependencyObject)">
+            <summary>
+            Allows item content to be rotated (in suppported templates), typically for use in a vertical/side tab.
+            </summary>
+            <param name="element"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Dragablz.DragablzItem.IsCustomThumbProperty">
+            <summary>
+            <see cref="T:Dragablz.DragablzItem" /> templates contain a thumb, which is used to drag the item around.
+            For most scenarios this is fine, but by setting this flag to <value>true</value> you can define
+            a custom thumb in your content, without having to override the template.  This can be useful if you
+            have extra content; such as a custom button that you want the user to be able to interact with (as usually
+            the default thumb will handle mouse interaction).
+            </summary>
+        </member>
+        <member name="M:Dragablz.DragablzItem.SetIsCustomThumb(System.Windows.Controls.Primitives.Thumb,System.Boolean)">
+            <summary>
+            <see cref="T:Dragablz.DragablzItem" /> templates contain a thumb, which is used to drag the item around.
+            For most scenarios this is fine, but by setting this flag to <value>true</value> you can define
+            a custom thumb in your content, without having to override the template.  This can be useful if you
+            have extra content; such as a custom button that you want the user to be able to interact with (as usually
+            the default thumb will handle mouse interaction).
+            </summary>
+        </member>
+        <member name="T:Dragablz.DragablzWindow">
+            <summary>
+            It is not necessary to use a <see cref="T:Dragablz.DragablzWindow"/> to gain tab dragging features.
+            What this Window does is allow a quick way to remove the Window border, and support transparency whilst
+            dragging.  
+            </summary>
+        </member>
+        <member name="T:Dragablz.HeaderedItemViewModel">
+            <summary>
+            Helper class to create view models, particularly for tool/MDI windows.
+            </summary>
+        </member>
+        <member name="T:Dragablz.IInterLayoutClient">
+            <summary>
+            Implementors should provide a mechanism to provide a new host control which contains a new <see cref="T:Dragablz.TabablzControl"/>.
+            </summary>
+        </member>
+        <member name="M:Dragablz.IInterLayoutClient.GetNewHost(System.Object,Dragablz.TabablzControl)">
+            <summary>
+            Provide a new host control and tab into which will be placed into a newly created layout branch.
+            </summary>
+            <param name="partition">Provides the partition where the drag operation was initiated.</param>
+            <param name="source">The source control where a dragging operation was initiated.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Dragablz.IInterTabClient">
+            <summary>
+            Implementors should provide mechanisms for providing new windows and closing old windows.
+            </summary>
+        </member>
+        <member name="M:Dragablz.IInterTabClient.GetNewHost(Dragablz.IInterTabClient,System.Object,Dragablz.TabablzControl)">
+            <summary>
+            Provide a new host window so a tab can be teared from an existing window into a new window.
+            </summary>
+            <param name="interTabClient"></param>
+            <param name="partition">Provides the partition where the drag operation was initiated.</param>
+            <param name="source">The source control where a dragging operation was initiated.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.IInterTabClient.TabEmptiedHandler(Dragablz.TabablzControl,System.Windows.Window)">
+            <summary>
+            Called when a tab has been emptied, and thus typically a window needs closing.
+            </summary>
+            <param name="tabControl"></param>
+            <param name="window"></param>
+            <returns></returns>
+        </member>
+        <member name="P:Dragablz.InterTabController.Partition">
+            <summary>
+            The partition allows on or more tab environments in a single application.  Only tabs which have a tab controller
+            with a common partition will be allowed to have tabs dragged between them.  <c>null</c> is a valid partition (i.e global).
+            </summary>
+        </member>
+        <member name="T:Dragablz.AddLocationHint">
+            <summary>
+            Specifies where an item should appear when added to tab control, as the headers order do not
+            specifically correlate to the order of the the source items.
+            </summary>
+        </member>
+        <member name="F:Dragablz.AddLocationHint.First">
+            <summary>
+            Display item in the first position.
+            </summary>
+        </member>
+        <member name="F:Dragablz.AddLocationHint.Last">
+            <summary>
+            Display item in the first position.
+            </summary>
+        </member>
+        <member name="F:Dragablz.AddLocationHint.Prior">
+            <summary>
+            Display an item prior to the selected, or specified item.
+            </summary>
+        </member>
+        <member name="F:Dragablz.AddLocationHint.After">
+            <summary>
+            Display an item after the selected, or specified item.
+            </summary>
+        </member>
+        <member name="T:Dragablz.PositionMonitor">
+            <summary>
+            Consumers can provide a position monitor to receive updates regarding the location of an item.    
+            </summary>
+            <remarks>
+            A <see cref="T:Dragablz.PositionMonitor"/> can be used to listen to  changes 
+            instead of routed events, which can be easier in a MVVM scenario.
+            </remarks>
+        </member>
+        <member name="E:Dragablz.PositionMonitor.LocationChanged">
+            <summary>
+            Raised when the X,Y coordinate of a <see cref="T:Dragablz.DragablzItem"/> changes.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Referenceless.SerialDisposable.IsDisposed">
+            <summary>
+            Gets a value that indicates whether the object is disposed.
+            
+            </summary>
+        </member>
+        <member name="P:Dragablz.Referenceless.SerialDisposable.Disposable">
+            <summary>
+            Gets or sets the underlying disposable.
+            
+            </summary>
+            
+            <remarks>
+            If the SerialDisposable has already been disposed, assignment to this property causes immediate disposal of the given disposable object. Assigning this property disposes the previous disposable object.
+            </remarks>
+        </member>
+        <member name="M:Dragablz.Referenceless.SerialDisposable.Dispose">
+            <summary>
+            Disposes the underlying disposable as well as all future replacements.
+            
+            </summary>
+        </member>
+        <member name="T:Dragablz.StackPositionMonitor">
+            <summary>
+            A linear position monitor simplifies the montoring of the order of items, where they are laid out
+            horizontally or vertically (typically via a <see cref="T:Dragablz.StackOrganiser"/>.
+            </summary>
+        </member>
+        <member name="T:Dragablz.TabablzControl">
+            <summary>
+            Extended tab control which supports tab repositioning, and drag and drop.  Also 
+            uses the common WPF technique for pesisting the visual tree across tabs.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.HeaderItemsControlPartName">
+            <summary>
+            Template part.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.ItemsHolderPartName">
+            <summary>
+            Template part.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.CloseItemCommand">
+            <summary>
+            Routed command which can be used to close a tab.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.AddItemCommand">
+            <summary>
+            Routed command which can be used to add a new tab.  See <see cref="P:Dragablz.TabablzControl.NewItemFactory"/>.
+            </summary>
+        </member>
+        <member name="M:Dragablz.TabablzControl.#ctor">
+            <summary>
+            Default constructor.
+            </summary>
+        </member>
+        <member name="M:Dragablz.TabablzControl.GetLoadedInstances">
+            <summary>
+            Helper method which returns all the currently loaded instances.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.TabablzControl.CloseItem(System.Object)">
+            <summary>
+            Helper method to close all tabs where the item is the tab's content (helpful with MVVM scenarios)
+            </summary>
+            <remarks>
+            In MVVM scenarios where you don't want to bind the routed command to your ViewModel,
+            with this helper method and embedding the TabablzControl in a UserControl, you can keep
+            the View-specific dependencies out of the ViewModel.
+            </remarks>
+            <param name="tabContentItem">An existing Tab item content (a ViewModel in MVVM scenarios) which is backing a tab control</param>
+        </member>
+        <member name="M:Dragablz.TabablzControl.AddItem(System.Object,System.Object,Dragablz.AddLocationHint)">
+            <summary>
+            Helper method to add an item next to an existing item.
+            </summary>
+            <remarks>
+            Due to the organisable nature of the control, the order of items may not reflect the order in the source collection.  This method
+            will add items to the source collection, managing their initial appearance on screen at the same time. 
+            If you are using a <see cref="P:Dragablz.InterTabController.InterTabClient"/> this will be used to add the item into the source collection.
+            </remarks>
+            <param name="item">New item to add.</param>
+            <param name="nearItem">Existing object/tab item content which defines which tab control should be used to add the object.</param>
+            <param name="addLocationHint">Location, relative to the <paramref name="nearItem"/> object</param>
+        </member>
+        <member name="M:Dragablz.TabablzControl.SelectItem(System.Object)">
+            <summary>
+            Finds and selects an item.
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="P:Dragablz.TabablzControl.CustomHeaderItemStyle">
+            <summary>
+            Style to apply to header items which are not their own item container (<see cref="T:System.Windows.Controls.TabItem"/>).  Typically items bound via the <see cref="!:ItemsSource"/> will use this style.
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.ShowDefaultCloseButton">
+            <summary>
+            Indicates whether a default close button should be displayed.  If manually templating the tab header content the close command 
+            can be called by executing the <see cref="F:Dragablz.TabablzControl.CloseItemCommand"/> command (typically via a <see cref="T:System.Windows.Controls.Button"/>).
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.ShowDefaultAddButton">
+            <summary>
+            Indicates whether a default add button should be displayed.  Alternately an add button
+            could be added in <see cref="P:Dragablz.TabablzControl.HeaderPrefixContent"/> or <see cref="P:Dragablz.TabablzControl.HeaderSuffixContent"/>, utilising 
+            <see cref="F:Dragablz.TabablzControl.AddItemCommand"/>.
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.IsHeaderPanelVisible">
+            <summary>
+            Indicates wither the heaeder panel is visible.  Default is <c>true</c>.
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.AddLocationHint">
+            <summary>
+            Gets or sets the location to add new tab items in the header.
+            </summary>
+            <remarks>
+            The logical order of the header items might not add match the content of the source items,
+            so this property allows control of where new items should appear.
+            </remarks>
+        </member>
+        <member name="P:Dragablz.TabablzControl.FixedHeaderCount">
+            <summary>
+            Allows a the first adjacent tabs to be fixed (no dragging, and default close button will not show).
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.InterTabController">
+            <summary>
+            An <see cref="P:Dragablz.TabablzControl.InterTabController"/> must be provided to enable tab tearing. Behaviour customisations can be applied
+            vie the controller.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.NewItemFactoryProperty">
+            <summary>
+            Allows a factory to be provided for generating new items. Typically used in conjunction with <see cref="F:Dragablz.TabablzControl.AddItemCommand"/>.
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.NewItemFactory">
+            <summary>
+            Allows a factory to be provided for generating new items. Typically used in conjunction with <see cref="F:Dragablz.TabablzControl.AddItemCommand"/>.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.IsEmptyProperty">
+            <summary>
+            Indicates if there are no current tab items.
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.IsEmpty">
+            <summary>
+            Indicates if there are no current tab items.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.IsEmptyChangedEvent">
+            <summary>
+            Raised when <see cref="P:Dragablz.TabablzControl.IsEmpty"/> changes.
+            </summary>
+        </member>
+        <member name="E:Dragablz.TabablzControl.IsEmptyChanged">
+            <summary>
+            Event handler to list to <see cref="F:Dragablz.TabablzControl.IsEmptyChangedEvent"/>.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.ClosingItemCallbackProperty">
+            <summary>
+            Optionally allows a close item hook to be bound in.  If this propety is provided, the func must return true for the close to continue.
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.ClosingItemCallback">
+            <summary>
+            Optionally allows a close item hook to be bound in.  If this propety is provided, the func must return true for the close to continue.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.ConsolidateOrphanedItemsProperty">
+            <summary>
+            Set to <c>true</c> to have tabs automatically be moved to another tab is a window is closed, so that they arent lost.
+            Can be useful for fixed/persistant tabs that may have been dragged into another Window.  You can further control
+            this behaviour on a per tab item basis by providing <see cref="P:Dragablz.TabablzControl.ConsolidatingOrphanedItemCallback" />.
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.ConsolidateOrphanedItems">
+            <summary>
+            Set to <c>true</c> to have tabs automatically be moved to another tab is a window is closed, so that they arent lost.
+            Can be useful for fixed/persistant tabs that may have been dragged into another Window.  You can further control
+            this behaviour on a per tab item basis by providing <see cref="P:Dragablz.TabablzControl.ConsolidatingOrphanedItemCallback" />.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.ConsolidatingOrphanedItemCallbackProperty">
+            <summary>
+            Assuming <see cref="P:Dragablz.TabablzControl.ConsolidateOrphanedItems"/> is set to <c>true</c>, consolidation of individual
+            tab items can be cancelled by providing this call back and cancelling the <see cref="T:Dragablz.ItemActionCallbackArgs`1"/>
+            instance.
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.ConsolidatingOrphanedItemCallback">
+            <summary>
+            Assuming <see cref="P:Dragablz.TabablzControl.ConsolidateOrphanedItems"/> is set to <c>true</c>, consolidation of individual
+            tab items can be cancelled by providing this call back and cancelling the <see cref="T:Dragablz.ItemActionCallbackArgs`1"/>
+            instance.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.IsDraggingWindowProperty">
+            <summary>
+            Readonly dependency property which indicates whether the owning <see cref="T:System.Windows.Window"/> 
+            is currently dragged 
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.IsDraggingWindow">
+            <summary>
+            Readonly dependency property which indicates whether the owning <see cref="T:System.Windows.Window"/> 
+            is currently dragged 
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.IsDraggingWindowChangedEvent">
+            <summary>
+            Event indicating <see cref="P:Dragablz.TabablzControl.IsDraggingWindow"/> has changed.
+            </summary>
+        </member>
+        <member name="E:Dragablz.TabablzControl.IsDraggingWindowChanged">
+            <summary>
+            Event indicating <see cref="P:Dragablz.TabablzControl.IsDraggingWindow"/> has changed.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabablzControl.IsClosingAsPartOfDragOperationProperty">
+            <summary>
+            Temporarily set by the framework if a users drag opration causes a Window to close (e.g if a tab is dragging into another tab).
+            </summary>
+        </member>
+        <member name="M:Dragablz.TabablzControl.GetIsClosingAsPartOfDragOperation(System.Windows.Window)">
+            <summary>
+            Helper method which can tell you if a <see cref="T:System.Windows.Window"/> is being automatically closed due
+            to a user instigated drag operation (typically when a single tab is dropped into another window.
+            </summary>
+            <param name="element"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Dragablz.TabablzControl.EmptyHeaderSizingHintProperty">
+            <summary>
+            Provide a hint for how the header should size itself if there are no tabs left (and a Window is still open).
+            </summary>
+        </member>
+        <member name="P:Dragablz.TabablzControl.EmptyHeaderSizingHint">
+            <summary>
+            Provide a hint for how the header should size itself if there are no tabs left (and a Window is still open).
+            </summary>
+        </member>
+        <member name="M:Dragablz.TabablzControl.AddToSource(System.Object)">
+            <summary>
+            Adds an item to the source collection.  If the InterTabController.InterTabClient is set that instance will be deferred to.
+            Otherwise an attempt will be made to add to the <see cref="!:ItemsSource" /> property, and lastly <see cref="!:Items"/>.
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:Dragablz.TabablzControl.RemoveFromSource(System.Object)">
+            <summary>
+            Removes an item from the source collection.  If the InterTabController.InterTabClient is set that instance will be deferred to.
+            Otherwise an attempt will be made to remove from the <see cref="!:ItemsSource" /> property, and lastly <see cref="!:Items"/>.
+            </summary>
+            <param name="item"></param>
+        </member>
+        <member name="M:Dragablz.TabablzControl.GetOrderedHeaders">
+            <summary>
+            Gets the header items, ordered according to their current visual position in the tab header.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.TabablzControl.OnApplyTemplate">
+            <summary>
+            Called when <see cref="M:System.Windows.FrameworkElement.ApplyTemplate"/> is called.
+            </summary>
+        </member>
+        <member name="M:Dragablz.TabablzControl.OnSelectionChanged(System.Windows.Controls.SelectionChangedEventArgs)">
+            <summary>
+            update the visible child in the ItemsHolder
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Dragablz.TabablzControl.OnItemsChanged(System.Collections.Specialized.NotifyCollectionChangedEventArgs)">
+            <summary>
+            when the items change we remove any generated panel children and add any new ones as necessary
+            </summary>
+            <param name="e"></param>
+        </member>
+        <member name="M:Dragablz.TabablzControl.OnKeyDown(System.Windows.Input.KeyEventArgs)">
+            <summary>
+            Provides class handling for the <see cref="E:System.Windows.ContentElement.KeyDown"/> routed event that occurs when the user presses a key.
+            </summary>
+            <param name="e">Provides data for <see cref="T:System.Windows.Input.KeyEventArgs"/>.</param>
+        </member>
+        <member name="M:Dragablz.TabablzControl.OnCreateAutomationPeer">
+            <summary>
+            Provides an appropriate automation peer implementation for this control
+            as part of the WPF automation infrastructure.
+            </summary>
+            <returns>The type-specific System.Windows.Automation.Peers.AutomationPeer implementation.</returns>
+        </member>
+        <member name="M:Dragablz.TabablzControl.UpdateSelectedItem">
+            <summary>
+            generate a ContentPresenter for the selected item
+            </summary>
+        </member>
+        <member name="M:Dragablz.TabablzControl.CreateChildContentPresenter(System.Object)">
+            <summary>
+            create the child ContentPresenter for the given item (could be data or a TabItem)
+            </summary>
+            <param name="item"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Dragablz.TabablzControl.FindChildContentPresenter(System.Object)">
+            <summary>
+            Find the CP for the given object.  data could be a TabItem or a piece of data
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Dragablz.TabablzHeaderSizeConverter">
+            <summary>
+            Provides a little help for sizing the header panel in the tab control
+            </summary>
+        </member>
+        <member name="M:Dragablz.TabablzHeaderSizeConverter.Convert(System.Object[],System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            The first value should be the total size available size, typically the parent control size.  
+            The second value should be from <see cref="F:Dragablz.DragablzItemsControl.ItemsPresenterWidthProperty"/> or (height equivalent)
+            All additional values should be siblings sizes (width or height) which will affect (reduce) the available size.
+            </summary>
+            <param name="values"></param>
+            <param name="targetType"></param>
+            <param name="parameter"></param>
+            <param name="culture"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Dragablz.TabablzItemStyleSelector">
+            <summary>
+            Selects style to apply to a <see cref="T:Dragablz.DragablzItem"/> according to the tab item content itself.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabEmptiedResponse.CloseWindowOrLayoutBranch">
+            <summary>
+            Allow the Window to be closed automatically.
+            </summary>
+        </member>
+        <member name="F:Dragablz.TabEmptiedResponse.DoNothing">
+            <summary>
+            The window will not be closed by the <see cref="T:Dragablz.TabablzControl"/>, probably meaning the implementor will close the window manually
+            </summary>
+        </member>
+        <member name="T:Dragablz.Themes.MaterialDesignAssist">
+            <summary>
+            Helper propries for configuring the material design style.
+            </summary>
+        </member>
+        <member name="F:Dragablz.Themes.MaterialDesignAssist.IndicatorBrushProperty">
+            <summary>
+            Framework use only.
+            </summary>
+        </member>
+        <member name="M:Dragablz.Themes.MaterialDesignAssist.SetIndicatorBrush(System.Windows.DependencyObject,System.Windows.Media.Brush)">
+            <summary>
+            The indicator (underline) brush.
+            </summary>
+            <param name="element"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Dragablz.Themes.MaterialDesignAssist.GetIndicatorBrush(System.Windows.DependencyObject)">
+            <summary>
+            The indicator (underline) brush.
+            </summary>
+            <param name="element"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Dragablz.Themes.Ripple.RecognizesAccessKeyProperty">
+            <summary>
+              The DependencyProperty for the RecognizesAccessKey property. 
+              Default Value: false 
+            </summary> 
+        </member>
+        <member name="P:Dragablz.Themes.Ripple.RecognizesAccessKey">
+            <summary> 
+              Determine if Ripple should use AccessText in its style
+            </summary> 
+        </member>
+        <member name="F:Dragablz.Themes.RippleAssist.IsCenteredProperty">
+            <summary>
+            Set to <c>true</c> to cause the ripple to originate from the centre of the 
+            content.  Otherwise the effect will originate from the mouse down position.        
+            </summary>
+        </member>
+        <member name="M:Dragablz.Themes.RippleAssist.SetIsCentered(System.Windows.DependencyObject,System.Boolean)">
+            <summary>
+            Set to <c>true</c> to cause the ripple to originate from the centre of the 
+            content.  Otherwise the effect will originate from the mouse down position.        
+            </summary>
+            <param name="element"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Dragablz.Themes.RippleAssist.GetIsCentered(System.Windows.DependencyObject)">
+            <summary>
+            Set to <c>true</c> to cause the ripple to originate from the centre of the 
+            content.  Otherwise the effect will originate from the mouse down position.        
+            </summary>
+            <param name="element"></param>        
+        </member>
+        <member name="T:Dragablz.DragablzItemsControl">
+            <summary>
+            Items control which typically uses a canvas and 
+            </summary>
+        </member>
+        <member name="M:Dragablz.DragablzItemsControl.AddToSource(System.Object,Dragablz.AddLocationHint)">
+            <summary>
+            Adds an item to the underlying source, displaying in a specific position in rendered control.
+            </summary>
+            <param name="item"></param>
+            <param name="addLocationHint"></param>
+        </member>
+        <member name="M:Dragablz.DragablzItemsControl.AddToSource(System.Object,System.Object,Dragablz.AddLocationHint)">
+            <summary>
+            Adds an item to the underlying source, displaying in a specific position in rendered control.
+            </summary>
+            <param name="item"></param>
+            <param name="nearItem"></param>
+            <param name="addLocationHint"></param>
+        </member>
+        <member name="M:Dragablz.DragablzItemsControl.MoveItem(Dragablz.MoveItemRequest)">
+            <summary>
+            Move an item in the rendered layout.
+            </summary>
+            <param name="moveItemRequest"></param>
+        </member>
+        <member name="T:Dragablz.Properties.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Properties.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Dragablz.Properties.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
+            </summary>
+        </member>
+    </members>
+</doc>

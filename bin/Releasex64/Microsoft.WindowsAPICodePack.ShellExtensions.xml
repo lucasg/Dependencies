@@ -1,0 +1,778 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Microsoft.WindowsAPICodePack.ShellExtensions</name>
+    </assembly>
+    <members>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromStream">
+            <summary>
+            This interface exposes the <see cref="M:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromStream.Load(System.IO.Stream)"/> function for initializing the 
+            Preview Handler with a <typeparamref name="Stream"/>.
+            This interface can be used in conjunction with the other intialization interfaces,
+            but only 1 will be accessed according to the priorities preset by the Windows Shell:
+            <typeparamref name="IPreviewFromStream"/>
+            <typeparamref name="IPreviewFromShellObject"/>
+            <typeparamref name="IPreviewFromFile"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromStream.Load(System.IO.Stream)">
+            <summary>
+            Provides the <typeparamref name="Stream"/> to the item from which a preview should be created.        
+            </summary>
+            <param name="stream">Stream to the previewed file, this stream is only available in the scope of this method.</param>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromFile">
+            <summary>
+            This interface exposes the <see cref="M:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromFile.Load(System.IO.FileInfo)"/> function for initializing the 
+            Preview Handler with a <typeparamref name="FileInfo"/>.
+            This interface can be used in conjunction with the other intialization interfaces,
+            but only 1 will be accessed according to the priorities preset by the Windows Shell:
+            <typeparamref name="IPreviewFromStream"/>
+            <typeparamref name="IPreviewFromShellObject"/>
+            <typeparamref name="IPreviewFromFile"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromFile.Load(System.IO.FileInfo)">
+            <summary>
+            Provides the <typeparamref name="FileInfo"/> to the item from which a preview should be created.        
+            </summary>
+            <param name="info">File information to the previewed file.</param>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromShellObject">
+            <summary>
+            This interface exposes the <see cref="M:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromShellObject.Load(Microsoft.WindowsAPICodePack.Shell.ShellObject)"/> function for initializing the 
+            Preview Handler with a <typeparamref name="ShellObject"/>.
+            This interface can be used in conjunction with the other intialization interfaces,
+            but only 1 will be accessed according to the priorities preset by the Windows Shell:
+            <typeparamref name="IPreviewFromStream"/>
+            <typeparamref name="IPreviewFromShellObject"/>
+            <typeparamref name="IPreviewFromFile"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.IPreviewFromShellObject.Load(Microsoft.WindowsAPICodePack.Shell.ShellObject)">
+            <summary>
+            Provides the <typeparamref name="ShellObject"/> from which a preview should be created.        
+            </summary>
+            <param name="shellObject">ShellObject for the previewed file, this ShellObject is only available in the scope of this method.</param>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler">
+            <summary>
+            This is the base class for all preview handlers and provides their basic functionality.
+            To create a custom preview handler a class must derive from this, use the <typeparamref name="PreviewHandlerAttribute"/>,
+            and implement 1 or more of the following interfaces: 
+            <typeparamref name="IPreviewFromStream"/>, 
+            <typeparamref name="IPreviewFromShellObject"/>, 
+            <typeparamref name="IPreviewFromFile"/>.   
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.IInitializeWithStream">
+            <summary>
+            Provides means by which to initialize with a stream.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.IInitializeWithStream.Initialize(System.Runtime.InteropServices.ComTypes.IStream,Microsoft.WindowsAPICodePack.Shell.AccessModes)">
+            <summary>
+            Initializes with a stream.
+            </summary>
+            <param name="stream"></param>
+            <param name="fileMode"></param>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.IInitializeWithItem">
+            <summary>
+            Provides means by which to initialize with a ShellObject
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.IInitializeWithItem.Initialize(Microsoft.WindowsAPICodePack.Shell.IShellItem,Microsoft.WindowsAPICodePack.Shell.AccessModes)">
+            <summary>
+            Initializes with ShellItem
+            </summary>
+            <param name="shellItem"></param>
+            <param name="accessMode"></param>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.IInitializeWithFile">
+            <summary>
+            Provides means by which to initialize with a file.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.IInitializeWithFile.Initialize(System.String,Microsoft.WindowsAPICodePack.Shell.AccessModes)">
+            <summary>
+            Initializes with a file.
+            </summary>
+            <param name="filePath"></param>
+            <param name="fileMode"></param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.Initialize">
+            <summary>
+            Called immediately before the preview is to be shown.        
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.Uninitialize">
+            <summary>
+            Called when the preview is no longer shown.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.UpdateBounds(Microsoft.WindowsAPICodePack.Shell.NativeRect)">
+            <summary>
+            Called to update the bounds and position of the preview control
+            </summary>
+            <param name="bounds"></param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.HandleInitializeException(System.Exception)">
+            <summary>
+            Called when an exception occurs during the initialization of the control
+            </summary>
+            <param name="caughtException"></param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.SetFocus">
+            <summary>
+            Called when the preview control obtains focus.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.SetBackground(System.Int32)">
+            <summary>
+            Called when a request is received to set or change the background color according to the user's preferences.
+            </summary>
+            <param name="color">An int representing the ARGB color</param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.SetForeground(System.Int32)">
+            <summary>
+            Called when a request is received to set or change the foreground color according to the user's preferences.
+            </summary>
+            <param name="color">An int representing the ARGB color</param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.SetFont(Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont)">
+            <summary>
+            Called to set the font of the preview control according to the user's preferences.
+            </summary>
+            <param name="font"></param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.SetParentHandle(System.IntPtr)">
+            <summary>
+            Called to set the parent of the preview control.
+            </summary>
+            <param name="handle"></param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.Register(System.Type)">
+            <summary>
+            Called when the assembly is registered via RegAsm.
+            </summary>
+            <param name="registerType">Type to register.</param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.Unregister(System.Type)">
+            <summary>
+            Called when the assembly is Unregistered via RegAsm.
+            </summary>
+            <param name="registerType">Type to unregister</param>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.IsPreviewShowing">
+            <summary>
+            Gets whether the preview is currently showing
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandler.Handle">
+            <summary>
+            This should return the window handle to be displayed in the Preview.
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandlerAttribute">
+            <summary>    
+            This class attribute is applied to a Preview Handler to specify registration parameters.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandlerAttribute.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Creates a new instance of the attribute.
+            </summary>
+            <param name="name">Name of the Handler</param>
+            <param name="extensions">Semi-colon-separated list of file extensions supported by the handler.</param>
+            <param name="appId">A unique guid used for process isolation.</param>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandlerAttribute.Name">
+            <summary>
+            Gets the name of the handler.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandlerAttribute.Extensions">
+            <summary>
+            Gets the semi-colon-separated list of extensions supported by the preview handler.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandlerAttribute.AppId">
+            <summary>
+            Gets the AppId associated with the handler for use with the surrogate host process.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.PreviewHandlerAttribute.DisableLowILProcessIsolation">
+            <summary>
+            Disables low integrity-level process isolation.        
+            <remarks>This should be avoided as it could be a security risk.</remarks>
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.WinFormsPreviewHandler">
+            <summary>
+            This is the base class for all WinForms-based preview handlers and provides their basic functionality.
+            To create a custom preview handler that contains a WinForms user control,
+            a class must derive from this, use the <typeparamref name="PreviewHandlerAttribute"/>,
+            and implement 1 or more of the following interfaces: 
+            <typeparamref name="IPreviewFromStream"/>, 
+            <typeparamref name="IPreviewFromShellObject"/>, 
+            <typeparamref name="IPreviewFromFile"/>.   
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.WinFormsPreviewHandler.HandleInitializeException(System.Exception)">
+            <summary>
+            Called when an exception is thrown during itialization of the preview control.
+            </summary>
+            <param name="caughtException"></param>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.WinFormsPreviewHandler.Control">
+            <summary>
+            This control must be populated by the deriving class before the preview is shown.
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.WpfPreviewHandler">
+            <summary>
+            This is the base class for all WPF-based preview handlers and provides their basic functionality.
+            To create a custom preview handler that contains a WPF user control,
+            a class must derive from this, use the <typeparamref name="PreviewHandlerAttribute"/>,
+            and implement 1 or more of the following interfaces: 
+            <typeparamref name="IPreviewFromStream"/>, 
+            <typeparamref name="IPreviewFromShellObject"/>, 
+            <typeparamref name="IPreviewFromFile"/>.   
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.WpfPreviewHandler.ThrowIfNoControl">
+            <summary>
+            Throws an exception if the Control property has not been populated.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.WpfPreviewHandler.UpdatePlacement">
+            <summary>
+            Updates the placement of the Control.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.WpfPreviewHandler.Finalize">
+            <summary>
+            Preview handler control finalizer
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.WpfPreviewHandler.Dispose">
+            <summary>
+            Disposes the control
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.WpfPreviewHandler.Dispose(System.Boolean)">
+            <summary>
+            Provides means to dispose the object.
+            When overriden, it is imperative that base.Dispose(true) is called within the implementation.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.WpfPreviewHandler.Control">
+            <summary>
+            This control must be populated by the deriving class before the preview is shown.
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.IThumbnailProvider">
+            <summary>
+            ComVisible interface for native IThumbnailProvider
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.IThumbnailProvider.GetThumbnail(System.UInt32,System.IntPtr@,System.UInt32@)">
+            <summary>
+            Gets a pointer to a bitmap to display as a thumbnail
+            </summary>
+            <param name="squareLength"></param>
+            <param name="bitmapHandle"></param>
+            <param name="bitmapType"></param>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont">
+            <summary>
+            Class for marshaling to native LogFont struct
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Height">
+            <summary>
+            Font height
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Width">
+            <summary>
+            Font width
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Escapement">
+            <summary>
+            Font escapement
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Orientation">
+            <summary>
+            Font orientation
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Weight">
+            <summary>
+            Font weight
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Italic">
+            <summary>
+            Font italic
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Underline">
+            <summary>
+            Font underline
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Strikeout">
+            <summary>
+            Font strikeout
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.CharacterSet">
+            <summary>
+            Font character set
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.OutPrecision">
+            <summary>
+            Font out precision
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.ClipPrecision">
+            <summary>
+            Font clip precision
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.Quality">
+            <summary>
+            Font quality
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.PitchAndFamily">
+            <summary>
+            Font pitch and family
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Interop.LogFont.FaceName">
+            <summary>
+            Font face name
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.PreviewHandlerControlNotInitialized">
+            <summary>
+              Looks up a localized string similar to Control has not yet been assigned. Methods requiring it cannot be called..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.PreviewHandlerInterfaceNotImplemented">
+            <summary>
+              Looks up a localized string similar to {0} must implement one or more of IPreviewFromStream, IPreviewFromShellObject or IPreviewFromFile..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.PreviewHandlerInvalidAttributes">
+            <summary>
+              Looks up a localized string similar to PreviewHandler &apos;{0}&apos; must have exactly one PreviewHandler attribute..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.PreviewHandlerUnsupportedInterfaceCalled">
+            <summary>
+              Looks up a localized string similar to Unable to call interface {0} because it is not supported on this object..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.StorageStreamBufferOverflow">
+            <summary>
+              Looks up a localized string similar to The sum of offset and count must be less than or equal to the size of the buffer..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.StorageStreamCountLessThanZero">
+            <summary>
+              Looks up a localized string similar to Count must be greater than or equal to zero..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.StorageStreamIsReadonly">
+            <summary>
+              Looks up a localized string similar to The stream was initialized as read-only..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.StorageStreamOffsetLessThanZero">
+            <summary>
+              Looks up a localized string similar to Offset must be greater than or equal to zero..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.ThumbnailProviderDisabledProcessIsolation">
+            <summary>
+              Looks up a localized string similar to {0} does not implement IThumbnailFromStream and so requires DisableProcessIsolation set to true..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.ThumbnailProviderInterfaceNotImplemented">
+            <summary>
+              Looks up a localized string similar to {0} must implement one or more of IThumbnailFromStream, IThumbnailFromShellObject or IThumbnailFromFile..
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.Resources.LocalizedMessages.WpfPreviewHandlerNoHandle">
+            <summary>
+              Looks up a localized string similar to Cannot retrieve handle because proxy window has not been created..
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream">
+            <summary>
+            A wrapper for the native IStream object.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.ReadByte">
+            <summary>
+            Reads a single byte from the stream, moving the current position ahead by 1.
+            </summary>
+            <returns>A single byte from the stream, -1 if end of stream.</returns>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.WriteByte(System.Byte)">
+            <summary>
+            Writes a single byte to the stream
+            </summary>
+            <param name="value">Byte to write to stream</param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.Read(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Reads a buffer worth of bytes from the stream.
+            </summary>
+            <param name="buffer">Buffer to fill</param>
+            <param name="offset">Offset to start filling in the buffer</param>
+            <param name="count">Number of bytes to read from the stream</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.Write(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Writes a buffer to the stream if able to do so.
+            </summary>
+            <param name="buffer">Buffer to write</param>
+            <param name="offset">Offset in buffer to start writing</param>
+            <param name="count">Number of bytes to write to the stream</param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.Seek(System.Int64,System.IO.SeekOrigin)">
+            <summary>
+            Seeks within the underlying IStream.
+            </summary>
+            <param name="offset">Offset</param>
+            <param name="origin">Where to start seeking</param>
+            <returns></returns>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.SetLength(System.Int64)">
+            <summary>
+            Sets the length of the stream
+            </summary>
+            <param name="value"></param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.Flush">
+            <summary>
+            Commits data to be written to the stream if it is being cached.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.Dispose(System.Boolean)">
+            <summary>
+            Disposes the stream.
+            </summary>
+            <param name="disposing">True if called from Dispose(), false if called from finalizer.</param>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.CanRead">
+            <summary>
+            Gets whether the stream can be read from.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.CanSeek">
+            <summary>
+            Gets whether seeking is supported by the stream.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.CanWrite">
+            <summary>
+            Gets whether the stream can be written to.
+            Always false.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.Length">
+            <summary>
+            Gets the length of the IStream
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStream.Position">
+            <summary>
+            Gets or sets the current position within the underlying IStream.
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStreamCommitOptions">
+            <summary>
+            Options for commiting (flushing) an IStream storage stream
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStreamCommitOptions.None">
+            <summary>
+            Uses default options
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStreamCommitOptions.Overwrite">
+            <summary>
+            Overwrite option
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStreamCommitOptions.OnlyIfCurrent">
+            <summary>
+            Only if current
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStreamCommitOptions.DangerouslyCommitMerelyToDiskCache">
+            <summary>
+            Commits to disk cache dangerously
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.StorageStreamCommitOptions.Consolidate">
+            <summary>
+            Consolidate
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.IThumbnailFromStream">
+            <summary>
+            This interface exposes the <see cref="!:ConsructBitmap"/> function for initializing the 
+            Thumbnail Provider with a <typeparamref name="Stream"/>.
+            If this interfaces is not used, then the handler must opt out of process isolation.
+            This interface can be used in conjunction with the other intialization interfaces,
+            but only 1 will be accessed according to the priorities preset by the Windows Shell:
+            <typeparamref name="IThumbnailFromStream"/>
+            <typeparamref name="IThumbnailFromShellObject"/>
+            <typeparamref name="IThumbnailFromFile"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.IThumbnailFromStream.ConstructBitmap(System.IO.Stream,System.Int32)">
+            <summary>
+            Provides the <typeparamref name="Stream"/> to the item from which a thumbnail should be created.
+            <remarks>Only 32bpp bitmaps support adornments. 
+            While 24bpp bitmaps will be displayed they will not display adornments.
+            Additional guidelines for developing thumbnails can be found at http://msdn.microsoft.com/en-us/library/cc144115(v=VS.85).aspx
+            </remarks>
+            </summary>
+            <param name="stream">Stream to initialize the thumbnail</param>
+            <param name="sideSize">Square side dimension in which the thumbnail should fit; the thumbnail will be scaled otherwise.</param>
+            <returns></returns>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.IThumbnailFromShellObject">
+            <summary>
+            This interface exposes the <see cref="!:ConsructBitmap"/> function for initializing the 
+            Thumbnail Provider with a <typeparamref name="ShellObject"/>.
+            This interface can be used in conjunction with the other intialization interfaces,
+            but only 1 will be accessed according to the priorities preset by the Windows Shell:
+            <typeparamref name="IThumbnailFromStream"/>
+            <typeparamref name="IThumbnailFromShellObject"/>
+            <typeparamref name="IThumbnailFromFile"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.IThumbnailFromShellObject.ConstructBitmap(Microsoft.WindowsAPICodePack.Shell.ShellObject,System.Int32)">
+            <summary>
+            Provides the <typeparamref name="ShellObject"/> to the item from which a thumbnail should be created.
+            <remarks>Only 32bpp bitmaps support adornments. 
+            While 24bpp bitmaps will be displayed they will not display adornments.
+            Additional guidelines for developing thumbnails can be found at http://msdn.microsoft.com/en-us/library/cc144115(v=VS.85).aspx
+            </remarks>
+            </summary>
+            <param name="shellObject">ShellObject to initialize the thumbnail</param>
+            <param name="sideSize">Square side dimension in which the thumbnail should fit; the thumbnail will be scaled otherwise.</param>
+            <returns>Generated thumbnail</returns>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.IThumbnailFromFile">
+            <summary>
+            This interface exposes the <see cref="!:ConsructBitmap"/> function for initializing the 
+            Thumbnail Provider with file information.
+            This interface can be used in conjunction with the other intialization interfaces,
+            but only 1 will be accessed according to the priorities preset by the Windows Shell:
+            <typeparamref name="IThumbnailFromStream"/>
+            <typeparamref name="IThumbnailFromShellObject"/>
+            <typeparamref name="IThumbnailFromFile"/>
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.IThumbnailFromFile.ConstructBitmap(System.IO.FileInfo,System.Int32)">
+            <summary>
+            Provides the <typeparamref name="FileInfo"/> to the item from which a thumbnail should be created.
+            <remarks>Only 32bpp bitmaps support adornments. 
+            While 24bpp bitmaps will be displayed they will not display adornments.
+            Additional guidelines for developing thumbnails can be found at http://msdn.microsoft.com/en-us/library/cc144115(v=VS.85).aspx
+            </remarks>
+            </summary>
+            <param name="info">FileInfo to initialize the thumbnail</param>
+            <param name="sideSize">Square side dimension in which the thumbnail should fit; the thumbnail will be scaled otherwise.</param>
+            <returns>Generated thumbnail</returns>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProvider">
+            <summary>
+            This is the base class for all thumbnail providers and provides their basic functionality.
+            To create a custom thumbnail provider a class must derive from this, use the <typeparamref name="ThumbnailProviderAttribute"/>,
+            and implement 1 or more of the following interfaces: 
+            <typeparamref name="IThumbnailFromStream"/>, <typeparamref name="IThumbnailFromShellObject"/>, <typeparamref name="IThumbnailFromFile"/>.   
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProvider.GetThumbnailAlphaType">
+            <summary>
+            Sets the AlphaType of the generated thumbnail.
+            Override this method in a derived class to change the thumbnails AlphaType, default is Unknown.
+            </summary>
+            <returns>ThumnbailAlphaType</returns>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProvider.Register(System.Type)">
+            <summary>
+            Called when the assembly is registered via RegAsm.
+            </summary>
+            <param name="registerType">Type to be registered.</param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProvider.Unregister(System.Type)">
+            <summary>
+            Called when the assembly is registered via RegAsm.
+            </summary>
+            <param name="registerType">Type to register.</param>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProvider.Finalize">
+            <summary>
+            Finalizer for the thumbnail provider.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProvider.Dispose">
+            <summary>
+            Disposes the thumbnail provider.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProvider.Dispose(System.Boolean)">
+            <summary>
+            Disploses the thumbnail provider.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProviderAttribute">
+            <summary>    
+            This class attribute is applied to a Thumbnail Provider to specify registration parameters
+            and aesthetic attributes.
+            </summary>
+        </member>
+        <member name="M:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProviderAttribute.#ctor(System.String,System.String)">
+            <summary>
+            Creates a new instance of the attribute.
+            </summary>
+            <param name="name">Name of the provider</param>
+            <param name="extensions">Semi-colon-separated list of extensions supported by this provider.</param>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProviderAttribute.Name">
+            <summary>
+            Gets the name of the provider
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProviderAttribute.Extensions">
+            <summary>
+            Gets the semi-colon-separated list of extensions supported by the provider.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProviderAttribute.DisableProcessIsolation">
+            <summary>
+            Opts-out of running within the surrogate process DllHost.exe.
+            This will reduce robustness and security.
+            This value should be true if the provider does not implement <typeparamref name="IThumbnailFromStream"/>.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProviderAttribute.ThumbnailCutoff">
+            <summary>
+            Below this size thumbnail images will not be generated - file icons will be used instead.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProviderAttribute.TypeOverlay">
+            <summary>
+            A resource reference string pointing to the icon to be used as an overlay on the bottom right of the thumbnail.
+            ex. ISVComponent.dll@,-155
+            ex. C:\Windows\System32\SampleIcon.ico
+            If an empty string is provided, no overlay will be used.
+            If the property is set to null, the default icon for the associated icon will be used as an overlay.
+            </summary>
+        </member>
+        <member name="P:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailProviderAttribute.ThumbnailAdornment">
+            <summary>
+            Specifies the <typeparamref name="ThumbnailAdornment"/> for the thumbnail.
+            <remarks>
+            Only 32bpp bitmaps support adornments. 
+            While 24bpp bitmaps will be displayed, their adornments will not.
+            If an adornment is specified by the file-type's associated application, 
+            the applications adornment will override the value specified in this registration.</remarks>
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailCutoffSize">
+            <summary>
+            Defines the minimum thumbnail size for which thumbnails will be generated.
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailCutoffSize.Square20">
+            <summary>
+            Default size of 20x20
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailCutoffSize.Square32">
+            <summary>
+            Size of 32x32
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailCutoffSize.Square16">
+            <summary>
+            Size of 16x16
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailCutoffSize.Square48">
+            <summary>
+            Size of 48x48
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailCutoffSize.Square16B">
+            <summary>
+            Size of 16x16. An alternative to Square16.
+            </summary>
+        </member>
+        <member name="T:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailAdornment">
+            <summary>
+            Adornment applied to thumbnails.
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailAdornment.Default">
+            <summary>
+            This will use the associated application's default icon as the adornment.
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailAdornment.None">
+            <summary>
+            No adornment
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailAdornment.DropShadow">
+            <summary>
+            Drop shadow adornment
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailAdornment.PhotoBorder">
+            <summary>
+            Photo border adornment
+            </summary>
+        </member>
+        <member name="F:Microsoft.WindowsAPICodePack.ShellExtensions.ThumbnailAdornment.VideoSprockets">
+            <summary>
+            Video sprocket adornment
+            </summary>
+        </member>
+    </members>
+</doc>
