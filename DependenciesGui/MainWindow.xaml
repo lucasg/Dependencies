@@ -41,6 +41,11 @@
             <!-- Hide/Show the status bar based on a global switch -->
             <local:BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
 
+            <!-- CustomHeader with middle click to close tab -->
+            <DataTemplate DataType="{x:Type local:CustomHeaderViewModel }">
+                <local:DragablzCustomHeader />
+            </DataTemplate>
+            
             <dragablz:InterTabController  x:Key="DependenciesInterTabController" x:Shared="False"  Partition="2AE89D18-F236-4D20-9605-6C03319038E6"/>
 
             <Style TargetType="{x:Type dragablz:TabablzControl}" x:Key="DependenciesTabControlStyle">
@@ -142,6 +147,8 @@
             <dragablz:TabablzControl x:Name="TabControl"
                                  Style="{StaticResource DependenciesTabControlStyle}"
                                  InterTabController="{StaticResource DependenciesInterTabController}">
+        
+                
                 <!--<dragablz:TabablzControl.HeaderSuffixContent>
                     <Grid x:Name="CustomHeaderContainerGrid" 
                           Margin="0,2,2,0">

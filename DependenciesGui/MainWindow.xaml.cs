@@ -80,7 +80,7 @@ namespace Dependencies
         public void OpenNewDependencyWindow(String Filename)
         {
             var newDependencyWindow = new DependencyWindow(Filename);
-            newDependencyWindow.Header = Path.GetFileNameWithoutExtension(Filename);
+            newDependencyWindow.Header = new CustomHeaderViewModel { Header = Path.GetFileNameWithoutExtension(Filename) };
 
             this.TabControl.AddToSource(newDependencyWindow);
             this.TabControl.SelectedItem = newDependencyWindow;

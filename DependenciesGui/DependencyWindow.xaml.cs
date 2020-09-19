@@ -351,7 +351,7 @@ namespace Dependencies
     /// <summary>
     /// Dependemcy tree analysis window for a given PE.
     /// </summary>
-    public partial class DependencyWindow : TabItem 
+    public partial class DependencyWindow :  TabItem 
     { 
 
         PE Pe;

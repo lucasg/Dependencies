@@ -1,0 +1,33 @@
+﻿<UserControl x:Class="Dependencies.DragablzCustomHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:dragablz="clr-namespace:Dragablz;assembly=Dragablz"
+             xmlns:local="clr-namespace:Dependencies"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300"
+             d:DataContext="{d:DesignInstance local:CustomHeaderViewModel, IsDesignTimeCreatable=False}">
+    
+    <!--     
+        Illustrates how to add a custom header, without completely rewriting the DragablzItem header template.
+    
+        Note that rewriting the DragablzItem header template is a perfectly valid thing to do, but this allows
+        customisation of existing templates.    
+    -->
+
+
+    <UserControl.InputBindings>
+        <MouseBinding Command="dragablz:TabablzControl.CloseItemCommand" MouseAction="MiddleClick" />
+    </UserControl.InputBindings>
+    
+    <StackPanel Orientation="Horizontal">
+        <Grid>
+            <TextBlock Text="{Binding Header}" />
+            <!-- you should provide your own Thumb, which will be used to monitor dragging -->
+            <Thumb Style="{DynamicResource InvisibleThumbStyle}"
+                   dragablz:DragablzItem.IsCustomThumb="True" />
+        </Grid>
+    </StackPanel>
+
+</UserControl>
