@@ -32,6 +32,9 @@
                     RequestNavigate="Uri_RequestNavigate">
                     https://github.com/lucasg/Dependencies/issues
                 </Hyperlink> to report issues.
+                <LineBreak />
+                <LineBreak />
+                <TextBlock Name="UpdateCheck"><Hyperlink NavigateUri="#" RequestNavigate="Uri_CheckUpdates">Check for updates</Hyperlink></TextBlock>
             </TextBlock>
         </Grid>
     </Grid>
