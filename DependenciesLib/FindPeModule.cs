@@ -54,7 +54,8 @@ namespace Dependencies
 			{
 				// do not treat these characters as invalid since the are necessary
 				// for absolute imports
-				if (InvalidChar == ':' || InvalidChar == '\\')
+                // also allow '/' because path env var manages it
+				if (InvalidChar == ':' || InvalidChar == '\\' || InvalidChar == '/')
 					continue;
 
 				if (Filepath.IndexOf(InvalidChar) != -1)
