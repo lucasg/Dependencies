@@ -80,6 +80,15 @@ namespace Dependencies
         private string _UndecorateName;
         public CallingConvention CallingConvention { get; private set; }//only c++ export
         public bool IsCppExport { get; set; } = false;
+
+        //public string SubstituteSymbol { get; private set; }
+
+        public static int Count = 0;
+        public AheadlibFunction()
+        {
+            NameInSourceCode = $"SS_{Count}";
+            Count++;
+        }
         public string UndecorateName
         {
             get
@@ -118,23 +127,35 @@ namespace Dependencies
         public bool ExportByOrdinal { get; set; }
         public long VirtualAddress { get; set; }
 
-        public string NameInSourceCode { get; set; }    
+        public string NameInSourceCode { get;private set; }    
+    }
+    public enum CodeGenDllMode
+    {
+        FileMode,
+        MemMode,
+    }
+    public class DllFunction
+    {
+         
+        
     }
     public class AheadlibCodeGenerator
     {
         private string CodeGenPath { get; set; }
         private string OldDllName { get; set; }
         private bool IsCodegenFunctionTrace { get; set; }
+        private CodeGenDllMode DllMode { get; set; }
         private string LogPath { get; set; }
         private List<AheadlibFunction> Functions { get; set; }
         private DisplayModuleInfo DllTarget { get; set; }
 
         private ReplaceRuleLoader ReplaceRuleLoader;
-        public AheadlibCodeGenerator(string codeGenPath,string oldDllName,bool isCodegenFunctionTrace,string logPath, DisplayModuleInfo dlltarget,string cfg)
+        public AheadlibCodeGenerator(string codeGenPath,string oldDllName,bool isCodegenFunctionTrace, CodeGenDllMode dllMode, string logPath, DisplayModuleInfo dlltarget,string cfg)
         {
             CodeGenPath = codeGenPath;
             OldDllName = oldDllName;
             IsCodegenFunctionTrace = isCodegenFunctionTrace;
+            DllMode = dllMode;
             LogPath = logPath;
 
             DllTarget = dlltarget;
@@ -148,7 +169,7 @@ namespace Dependencies
                 function.Name = expfunction.Name;
                 var dx = new DisplayPeExport(expfunction, symbolProvider);
                 function.UndecorateName = dx.Name;
-                function.NameInSourceCode = ReplaceRuleLoader.Get_NameInSourceCode_From_Name(function.Name);
+                //function.NameInSourceCode = function.SubstituteSymbol; //ReplaceRuleLoader.Get_NameInSourceCode_From_Name(function.Name);
                 function.ExportByOrdinal = expfunction.ExportByOrdinal;
                 function.VirtualAddress = expfunction.VirtualAddress;
                 Functions.Add(function);
@@ -156,6 +177,26 @@ namespace Dependencies
             
         }
 
+        private void FileDllLoad(StreamWriter dllcppsw,string dllfn)
+        {
+            dllcppsw.WriteLine($"HMODULE {dllfn}_Old_Module;");
+            dllcppsw.WriteLine("BOOL WINAPI Load()\r\n{");
+            dllcppsw.WriteLine($"{dllfn}_Old_Module=LoadLibrary(L\"{OldDllName}\");");
+            dllcppsw.Write($"if({dllfn}_Old_Module==NULL)");
+            dllcppsw.WriteLine("{return FALSE;}");
+            dllcppsw.WriteLine("else\r\n{return TRUE;}");
+            dllcppsw.WriteLine("}");
+        }
+        private void MemDllLoad(StreamWriter dllcppsw, string dllfn)
+        {
+            dllcppsw.WriteLine($"PMEMORYMODULE {dllfn}_MemoryModule;");
+            dllcppsw.WriteLine("BOOL WINAPI Load(void *fileData,int fileLength)\r\n{");
+            dllcppsw.WriteLine($"{dllfn}_MemoryModule=MemoryLoadLibrary(fileData ,fileLength);");
+            dllcppsw.Write($"if({dllfn}_MemoryModule==NULL)");
+            dllcppsw.WriteLine("{return FALSE;}");
+            dllcppsw.WriteLine("else\r\n{return TRUE;}");
+            dllcppsw.WriteLine("}");
+        }
         
         public async void CodeGen()
         {
@@ -181,7 +222,11 @@ namespace Dependencies
                     dllhsw.WriteLine("extern \"C\" {");
                     dllhsw.WriteLine("#endif");
                     dllhsw.WriteLine("#include<Windows.h>");
-                    dllhsw.WriteLine("#include<Shlwapi.h>");
+                    dllhsw.WriteLine("#include\"MemoryModulePP.h\"");
+                    if(DllMode== CodeGenDllMode.MemMode)
+                    {
+                        dllhsw.WriteLine("#include<Shlwapi.h>");
+                    }
 
                     foreach (var func in Functions)
                     {
@@ -192,9 +237,10 @@ namespace Dependencies
                     {
                         dllhsw.WriteLine($"extern PVOID Old_pfnAL_{func.NameInSourceCode};//{func.Name}");
                     }
-
-                    dllhsw.WriteLine($"extern BOOL WINAPI {dllfn}_Init" +
-                       "();");
+                    if(DllMode== CodeGenDllMode.FileMode)
+                    dllhsw.WriteLine($"extern BOOL WINAPI {dllfn}_Init();");
+                    else
+                    dllhsw.WriteLine($"extern BOOL WINAPI {dllfn}_Init(void *fileData,int fileLength);");
 
                     dllhsw.WriteLine("#ifdef __cplusplus");
                     dllhsw.WriteLine("}");
@@ -211,14 +257,14 @@ namespace Dependencies
                     {
                         foreach (var func in Functions)
                         {
-                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=_AL_{func.Name},@{func.Ordinal}\")");
+                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=_AL_{func.NameInSourceCode},@{func.Ordinal}\")");//有个下划线
                         }
                     }
                     else if (DllTarget.Cpu.ToLower() == "amd64")
                     {
                         foreach (var func in Functions)
                         {
-                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=AL_{func.Name},@{func.Ordinal}\")");
+                            dllcppsw.WriteLine($"#pragma comment(linker,\"/EXPORT:{func.Name}=AL_{func.NameInSourceCode},@{func.Ordinal}\")");//没有下划线
                         }
                     }
 
@@ -232,19 +278,27 @@ namespace Dependencies
                         dllcppsw.WriteLine($"PVOID Old_pfnAL_{func.NameInSourceCode};");//define old dll function point
                     }
                     //load function
-                    dllcppsw.WriteLine($"HMODULE {dllfn}_Old_Module;");
-                    dllcppsw.WriteLine("BOOL WINAPI Load()\r\n{");
-                    dllcppsw.WriteLine($"{dllfn}_Old_Module=LoadLibrary(L\"{OldDllName}\");");
-                    dllcppsw.Write($"if({dllfn}_Old_Module==NULL)");
-                    dllcppsw.WriteLine("{return FALSE;}");
-                    dllcppsw.WriteLine("else\r\n{return TRUE;}");
-                    dllcppsw.WriteLine("}");
+                    if (DllMode == CodeGenDllMode.FileMode)
+                    {
+                        FileDllLoad(dllcppsw, dllfn);
+                    }
+                    else
+                    {
+                        MemDllLoad(dllcppsw, dllfn);
+                    }
 
                     dllcppsw.WriteLine("void GetAddresses()\r\n{");
 
                     foreach (var func in Functions)
                     {
-                        dllcppsw.WriteLine($"   pfnAL_{func.NameInSourceCode}=(PVOID)GetProcAddress({dllfn}_Old_Module,\"{func.Name}\");");
+                        if (DllMode == CodeGenDllMode.FileMode)
+                        {
+                            dllcppsw.WriteLine($"   pfnAL_{func.NameInSourceCode}=(PVOID)GetProcAddress({dllfn}_Old_Module,\"{func.Name}\");");
+                        }
+                        else
+                        {
+                            dllcppsw.WriteLine($"   pfnAL_{func.NameInSourceCode}=(PVOID)MemoryGetProcAddress({dllfn}_MemoryModule,\"{func.Name}\");");
+                        }
                     }
 
                     foreach (var func in Functions)
@@ -280,9 +334,9 @@ namespace Dependencies
                         x32asmjmpcodesw.WriteLine(".CODE");
                         foreach (var func in Functions)
                         {
-                            string s = $"AL_{func.Name} PROC\r\n";
+                            string s = $"AL_{func.NameInSourceCode} PROC\r\n";
                             s += $"jmp pfnAL_{func.NameInSourceCode}\r\n";
-                            s += $"AL_{func.Name} ENDP\r\n";
+                            s += $"AL_{func.NameInSourceCode} ENDP\r\n";
                             x32asmjmpcodesw.WriteLine(s);
                         }
                         x32asmjmpcodesw.WriteLine("END");
@@ -311,9 +365,9 @@ namespace Dependencies
                         x64asmjmpcodesw.WriteLine("\r\n\r\n;jmp code");
                         foreach (var func in Functions)
                         {
-                            string s = $"AL_{func.Name} PROC\r\n";
+                            string s = $"AL_{func.NameInSourceCode} PROC\r\n";
                             s += $"jmp pfnAL_{func.NameInSourceCode}\r\n";
-                            s += $"AL_{func.Name} ENDP\r\n";
+                            s += $"AL_{func.NameInSourceCode} ENDP\r\n";
                             x64asmjmpcodesw.WriteLine(s);
                         }
                         x64asmjmpcodesw.WriteLine("END");
@@ -321,11 +375,17 @@ namespace Dependencies
                         x64asmjmpcodesw.Close();
                     }
 
+                    if (DllMode == CodeGenDllMode.FileMode)
+                    {
+                        dllcppsw.WriteLine($"BOOL WINAPI {dllfn}_Init(){{");
+                        dllcppsw.WriteLine("BOOL loadresult=Load();");
+                    }
+                    else
+                    {
+                        dllcppsw.WriteLine($"BOOL WINAPI {dllfn}_Init(void *fileData,int fileLength){{");
+                        dllcppsw.WriteLine("BOOL loadresult=Load(fileData,fileLength);");
+                    }
 
-                    dllcppsw.WriteLine($"BOOL WINAPI {dllfn}_Init" +
-                        "(){");
-
-                    dllcppsw.WriteLine("BOOL loadresult=Load();");
                     dllcppsw.WriteLine("if(!loadresult){return FALSE;}");
                     dllcppsw.WriteLine("GetAddresses();");
                     dllcppsw.WriteLine("DWORD old = 0;");
@@ -483,6 +543,7 @@ namespace Dependencies
             AheadlibCodeGenerator generator = new AheadlibCodeGenerator(cfgfrm.CodeGenPath, 
                 cfgfrm.OldDllFullName.Replace('\\','/'),
                 cfgfrm.IsCodegenFunctionTrace,
+                cfgfrm.CodeGenDllMode,
                 logpath,
                 target,
                 "aheadlib.rules");

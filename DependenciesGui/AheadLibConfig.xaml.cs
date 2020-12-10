@@ -44,7 +44,12 @@ namespace Dependencies
             get { return _IsCodegenFunctionTrace; }
             set { _IsCodegenFunctionTrace = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("IsCodegenFunctionTrace")); }
         }
-
+        private CodeGenDllMode _CodeGenDllMode =  CodeGenDllMode.FileMode;
+        public CodeGenDllMode CodeGenDllMode
+        {
+            get { return _CodeGenDllMode; }
+            set { _CodeGenDllMode = value; PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("CodeGenDllMode")); }
+        }
 
         private string _LogPath="D:/";
 
