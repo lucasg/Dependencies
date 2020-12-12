@@ -104,6 +104,7 @@
                                         <!--System icon for the current module-->
                                         <Image Grid.Column="0" Width="16" Height="16" Margin="0,0,0,0" 
                                                Source="{Binding Path=(local:ModuleTreeViewItem.ModuleFilePath), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource img} }"
+                                               ToolTip="{Binding Path=(local:ModuleTreeViewItem.Tooltip), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
                                         ></Image>
                                         
                                         <!--Overlay for additional flags (delay import, apiset, etc.)-->
@@ -130,7 +131,29 @@
                                                 </DrawingBrush>
                                             </Rectangle.OpacityMask>
                                         </Rectangle>
-                                        
+
+                                        <!--Another red rectangle overlay on modules issues-->
+                                        <Rectangle x:Name="ChildErrorModule"  Grid.Column="0" Width="14" Height="14" 
+                                                   Visibility="{Binding Path=(local:ModuleTreeViewItem.HasChildErrors), RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}, Converter={StaticResource BooleanToVisibility}}"
+                                                   >
+                                            <Rectangle.Fill>
+                                                <SolidColorBrush Color="DarkOrange" />
+                                            </Rectangle.Fill>
+                                            <Rectangle.OpacityMask>
+                                                <DrawingBrush AlignmentX="Left" AlignmentY="Top">
+                                                    <DrawingBrush.Drawing>
+                                                        <DrawingGroup>
+                                                            <GeometryDrawing Brush="#88888888">
+                                                                <GeometryDrawing.Geometry>
+                                                                    <RectangleGeometry Rect="0,0,40,40" />
+                                                                </GeometryDrawing.Geometry>
+                                                            </GeometryDrawing>
+                                                        </DrawingGroup>
+                                                    </DrawingBrush.Drawing>
+                                                </DrawingBrush>
+                                            </Rectangle.OpacityMask>
+                                        </Rectangle>
+
                                         <TextBlock Grid.Column="2" Text="{Binding}"></TextBlock>
                                     </Grid>
                                 </DataTemplate>

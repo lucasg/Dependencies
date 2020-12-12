@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.ComponentModel;
 
 using Dependencies.ClrPh;
 
@@ -23,6 +24,7 @@ public enum ModuleFlag
 	ApiSetExt = 0x08,
 	NotFound = 0x10,
     MissingImports = 0x20,
+    ChildrenError = 0x40,
 }
 
 namespace Dependencies
@@ -140,7 +142,7 @@ namespace Dependencies
         private DisplayModuleInfo UnderlyingModule;
     }
 
-    public class DisplayModuleInfo : SettingBindingHandler
+    public class DisplayModuleInfo : SettingBindingHandler, INotifyPropertyChanged
     {
         #region Constructors 
         public DisplayModuleInfo(string ModuleName)
@@ -213,6 +215,7 @@ namespace Dependencies
         public virtual ModuleFlag Flags
         {
             get { return _Flags; }
+            set { _Flags = value; }
         }
 
         public virtual List<PeImportDll> Imports
@@ -305,10 +308,12 @@ namespace Dependencies
 			set
 			{
 				_ErrorImport = value;
-			}
+                OnPropertyChanged("HasErrors");
+
+            }
 		}
 
-    
+
         public virtual UInt64? Filesize { get { return _Info.Filesize; } }
         public virtual UInt64? ImageBase { get { return _Info.ImageBase; } }
         public virtual int? VirtualSize { get { return _Info.SizeOfImage; } }
@@ -336,6 +341,11 @@ namespace Dependencies
                 if ((this.Flags & ModuleFlag.DelayLoad) != 0)
                 {
                     return String.Format("{0:s} module is delay-load", this.Filepath);
+                }
+
+                if ((this.Flags & ModuleFlag.ChildrenError) != 0)
+                {
+                    return String.Format("{0:s} module has an erroneous child module", this.Filepath);
                 }
 
                 return String.Format("{0:s} module loaded correctly", this.Filepath); ;

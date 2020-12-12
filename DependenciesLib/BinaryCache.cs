@@ -371,7 +371,7 @@ namespace Dependencies
 
         public PE GetBinary(string PePath)
         {
-            Debug.WriteLine(String.Format("Attempt to load : {0:s}", PePath), "BinaryCache");
+            //Debug.WriteLine(String.Format("Attempt to load : {0:s}", PePath), "BinaryCache");
 
             if (!NativeFile.Exists(PePath))
             {
@@ -389,7 +389,7 @@ namespace Dependencies
             }
 
             string PeHash = GetBinaryHash(PePath);
-            Debug.WriteLine(String.Format("File {0:s} hash : {1:s} ", PePath, PeHash), "BinaryCache");
+            //Debug.WriteLine(String.Format("File {0:s} hash : {1:s} ", PePath, PeHash), "BinaryCache");
 
             // A sync lock is mandatory here in order not to load twice the
             // same binary from two differents workers
@@ -404,7 +404,7 @@ namespace Dependencies
                     string DestFilePath = Path.Combine(BinaryCacheFolderPath, PeHash);
                     if (!File.Exists(DestFilePath) && (DestFilePath != PePath))
                     {
-                        Debug.WriteLine(String.Format("FileCopy from {0:s} to {1:s}", PePath, DestFilePath), "BinaryCache");
+                        // Debug.WriteLine(String.Format("FileCopy from {0:s} to {1:s}", PePath, DestFilePath), "BinaryCache");
                         NativeFile.Copy(PePath, DestFilePath);
                     }
                 

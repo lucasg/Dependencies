@@ -202,26 +202,82 @@ namespace Dependencies
             }
         }
 
+        private bool _has_error;
+
 		public bool HasErrors
 		{
             get
             {
-				if (_importsVerified)
-				{
-					return ModuleInfo.HasErrors;
-				}
+                if (!_importsVerified)
+                {
+                    _has_error = VerifyModuleImports();
+                    _importsVerified = true;
 
-				VerifyModuleImports();
-				_importsVerified = true;
+                    // Update tooltip only once some basic checks are done
+                    this.ToolTip = ModuleInfo.Status;
+                }
 
-                // Update tooltip only once some basic checks are done
-                this.ToolTip = ModuleInfo.Status;
+                // propagate error for parent
+                if (_has_error)
+                {
+                    ModuleTreeViewItem ParentModule = this.ParentModule;
+                    if (ParentModule != null)
+                    {
+                        ParentModule.HasChildErrors = true;
+                    }
+                }
 
-                return ModuleInfo.HasErrors;
-			}
+                return _has_error;
+            }
+
+            set
+            {
+                if (value == _has_error) return;
+                _has_error = value;
+                OnPropertyChanged("HasErrors");
+            }
 		}
 
-		public DisplayModuleInfo ModuleInfo
+
+        public string Tooltip
+        {
+            get
+            {
+                return ModuleInfo.Status;
+            }
+        }
+
+        public bool HasChildErrors
+        {
+            get
+            {
+                return _has_child_errors;
+            }
+            set
+            {
+                if (value)
+                {
+                    ModuleInfo.Flags |= ModuleFlag.ChildrenError;
+                }
+                else
+                {
+                    ModuleInfo.Flags &= ~ModuleFlag.ChildrenError;
+                }
+
+                ToolTip = ModuleInfo.Status;
+                _has_child_errors = true;
+                OnPropertyChanged("HasChildErrors");
+
+                // propagate error for parent
+                ModuleTreeViewItem ParentModule = this.ParentModule;
+                if (ParentModule != null)
+                {
+                    ParentModule.HasChildErrors = true;
+                }
+            }
+        }
+
+        public DisplayModuleInfo ModuleInfo
 		{
 			get
 			{
@@ -230,18 +286,24 @@ namespace Dependencies
 		}
 
 
-		private void VerifyModuleImports()
+		private bool VerifyModuleImports()
 		{
-			// no parent : it's probably the root item
-			ModuleTreeViewItem ParentModule = this.ParentModule;
-			if (ParentModule == null)
+
+            // current module has issues
+            if ((Flags & (ModuleFlag.NotFound | ModuleFlag.MissingImports | ModuleFlag.ChildrenError)) != 0)
+            {
+                return true;
+            }
+
+            // no parent : it's probably the root item
+            ModuleTreeViewItem ParentModule = this.ParentModule;
+            if (ParentModule == null)
 			{
-				ModuleInfo.HasErrors = false;
-				return;
+				return false;
 			}
 
-
-			foreach (PeImportDll DllImport in ParentModule.ModuleInfo.Imports)
+            // Check we have any imports issues
+            foreach (PeImportDll DllImport in ParentModule.ModuleInfo.Imports)
 			{
 				if (DllImport.Name != ModuleInfo._Name)
 					continue;
@@ -251,22 +313,24 @@ namespace Dependencies
 				List<Tuple<PeImport, bool>> resolvedImports = BinaryCache.LookupImports(DllImport, ModuleInfo.Filepath);
 				if (resolvedImports.Count == 0)
 				{
-					ModuleInfo.HasErrors = true;
-					return;
-				}
+                    return true;
+                }
 
 				foreach (var Import in resolvedImports)
 				{
 					if (!Import.Item2)
 					{
-						ModuleInfo.HasErrors = true;
-						return;
-					}
+                        return true;
+                    }
 				}
 			}
 
-			ModuleInfo.HasErrors = false;
-		}
+
+
+            return false;
+        }
+
+        
 
 		#endregion Getters
 
@@ -343,9 +407,10 @@ namespace Dependencies
         private RelayCommand _OpenNewAppCommand;
 		private ModuleTreeViewItem _Parent;
 		private bool _importsVerified;
+        private bool _has_child_errors;
 
 
-	}
+    }
 
 
     /// <summary>

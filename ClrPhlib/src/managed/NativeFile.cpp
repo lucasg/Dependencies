@@ -54,7 +54,7 @@ bool NativeFile::Exists(_In_ String^ Path, bool IsFolder)
     WITH_WOW64_FS_REDIRECTION_DISABLED({
         
         DWORD FileAttributes = GetFileAttributes(RawPath);
-		Console::WriteLine("FileAttributes: {0:x}", FileAttributes);
+		//Console::WriteLine("FileAttributes: {0:x}", FileAttributes);
 		
 		bFileExists = (FileAttributes != INVALID_FILE_ATTRIBUTES);
 		if (!IsFolder)
