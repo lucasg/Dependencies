@@ -15,7 +15,7 @@ public class DisplayPeExport : SettingBindingHandler
     )
     {
         PeInfo.ordinal = (ushort) PeExport.Ordinal;
-        PeInfo.hint = (ushort) (/*PeExport.Hint*/ PeExport.Ordinal - 1); // @TODO(add hints to exports)
+        //PeInfo.hint = (ushort) (/*PeExport.Hint*/ PeExport.Ordinal - 1); // @TODO(add hints to exports)
         PeInfo.name = PeExport.Name;
         PeInfo.ForwardName = PeExport.ForwardedName;
         PeInfo.exportByOrdinal = PeExport.ExportByOrdinal;
@@ -79,10 +79,7 @@ public class DisplayPeExport : SettingBindingHandler
     {
         get
         {
-            if (PeInfo.exportByOrdinal)
-                return null;
-
-            return PeInfo.hint;
+            return null;
         }
     }
 
@@ -189,7 +186,7 @@ public struct PeExportInfo
     public Boolean exportAsCppName;
     public Boolean forwardedExport;
     public ushort ordinal;
-    public ushort hint;
+    //public ushort hint;
     public long virtualAddress;
     public string name;
     public string ForwardName;

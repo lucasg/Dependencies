@@ -230,11 +230,11 @@ namespace Dependencies
 
                                 // Check the directory exists before confirming there is a match
                                 string FullPathMatchSxsManifestDir = Path.Combine(WinSxsDir, TestMatchSxsManifestDir);
-                                Console.WriteLine("FullPathMatchSxsManifestDir : Checking {0:s}", FullPathMatchSxsManifestDir);
+                                //Debug.WriteLine("FullPathMatchSxsManifestDir : Checking {0:s}", FullPathMatchSxsManifestDir);
                                 if (NativeFile.Exists(FullPathMatchSxsManifestDir, true))
                                 {
 
-                                    Console.WriteLine("FullPathMatchSxsManifestDir : Checking {0:s} TRUE", FullPathMatchSxsManifestDir);
+                                    //Debug.WriteLine("FullPathMatchSxsManifestDir : Checking {0:s} TRUE", FullPathMatchSxsManifestDir);
                                     FoundMatch = true;
 
                                     HighestBuild = MatchingBuild;

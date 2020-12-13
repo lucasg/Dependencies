@@ -42,7 +42,7 @@ public class DisplayPeImport : SettingBindingHandler
 	{
 		List<string> members = new List<string>() {
 			Ordinal != null ? String.Format("{0} (0x{0:x08})", Ordinal) : "N/A",
-			Hint != 0 ? String.Format("{0} (0x{0:x08})", Hint) : "N/A",
+			Hint != null ? String.Format("{0} (0x{0:x08})", Hint) : "N/A",
 			Name,
 			ModuleName,
 			DelayImport.ToString(),
