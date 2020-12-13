@@ -280,7 +280,7 @@ namespace Dependencies
                 RecursionLevel = Level;
 
                 DependenciesResolved = false;
-    			Dependencies = new List<PeDependencyItem>();
+                FullDependencies = new List<PeDependencyItem>();
     			ResolvedImports = new List<PeDependencyItem>();
             };
 
@@ -305,24 +305,25 @@ namespace Dependencies
             SafeExecutor(action);
 		}
 
-		public void ResolveDependencies()
+        public void ResolveDependencies()
         {
             Action action = () =>
             {
-    			if (DependenciesResolved)
+                if (DependenciesResolved)
                 {
                     return;
                 }
 
+                List<PeDependencyItem> NewDependencies = new List<PeDependencyItem>();
 
-    			foreach (PeImportDll DllImport in Imports)
+                foreach (PeImportDll DllImport in Imports)
                 {
                     string ModuleFilepath = null;
                     ModuleSearchStrategy Strategy;
-                    
+
 
                     // Find Dll in "paths"
-                    Tuple<ModuleSearchStrategy, PE> ResolvedModule =  Root.ResolveModule(DllImport.Name);
+                    Tuple<ModuleSearchStrategy, PE> ResolvedModule = Root.ResolveModule(DllImport.Name);
                     Strategy = ResolvedModule.Item1;
 
                     if (Strategy != ModuleSearchStrategy.NOT_FOUND)
@@ -331,41 +332,48 @@ namespace Dependencies
                     }
 
 
-                    
-    				bool IsAlreadyCached = Root.isModuleCached(DllImport.Name, ModuleFilepath);
-    				PeDependencyItem DependencyItem = Root.GetModuleItem(DllImport.Name, ModuleFilepath, Strategy, RecursionLevel + 1);
-    				
-    				// do not add twice the same imported module
-    				if (ResolvedImports.Find(ri => ri.ModuleName == DllImport.Name) == null)
-    				{
-    					ResolvedImports.Add(DependencyItem);
-    				}
-    				
-    				// Do not process twice a dependency. It will be displayed only once
-    				if (!IsAlreadyCached)
-    				{
-    					Debug.WriteLine("[{0:d}] [{1:s}] Adding dep {2:s}", RecursionLevel, ModuleName, ModuleFilepath);
-    					Dependencies.Add(DependencyItem);
-    				}
 
-    			}
+                    bool IsAlreadyCached = Root.isModuleCached(DllImport.Name, ModuleFilepath);
+                    PeDependencyItem DependencyItem = Root.GetModuleItem(DllImport.Name, ModuleFilepath, Strategy, RecursionLevel + 1);
+
+                    // do not add twice the same imported module
+                    if (ResolvedImports.Find(ri => ri.ModuleName == DllImport.Name) == null)
+                    {
+                        ResolvedImports.Add(DependencyItem);
+                    }
+
+                    // Do not process twice a dependency. It will be displayed only once
+                    if (!IsAlreadyCached)
+                    {
+                        Debug.WriteLine("[{0:d}] [{1:s}] Adding dep {2:s}", RecursionLevel, ModuleName, ModuleFilepath);
+                        NewDependencies.Add(DependencyItem);
+                    }
+
+                    FullDependencies.Add(DependencyItem);
+
+                }
 
                 DependenciesResolved = true;
-    			if ((Root.MaxRecursion > 0) && ((RecursionLevel + 1) >= Root.MaxRecursion))
-    			{
-    				return;
-    			}
-
-
-    			// Recursively resolve dependencies
-    			foreach (var Dep in Dependencies)
+                if ((Root.MaxRecursion > 0) && ((RecursionLevel + 1) >= Root.MaxRecursion))
                 {
-    				Dep.LoadPe();
-    				Dep.ResolveDependencies();
+                    return;
+                }
+
+
+                // Recursively resolve dependencies
+                foreach (var Dep in NewDependencies)
+                {
+                    Dep.LoadPe();
+                    Dep.ResolveDependencies();
                 }
             };
 
             SafeExecutor(action);
+        }
+
+        public bool IsNewModule()
+        {
+            return Root.VisitModule(this.ModuleName, this.Filepath);
         }
 
         public void PrettyPrint()
@@ -375,9 +383,10 @@ namespace Dependencies
 
             foreach (var Dep in ResolvedImports)
             {
-				bool NeverSeenModule = Root.VisitModule(Dep.ModuleName, Dep.Filepath);
+                bool NeverSeenModule = Dep.IsNewModule();
+                Dep.RecursionLevel = RecursionLevel + 1;
 
-				if (NeverSeenModule)
+                if (NeverSeenModule)
 				{
 					Dep.PrettyPrint();
 				}
@@ -389,9 +398,15 @@ namespace Dependencies
             }
         }
 
-		public void BasicPrettyPrint()
+		public void BasicPrettyPrint(int? OverrideRecursionLevel = null)
 		{
-			string Tabs = string.Concat(Enumerable.Repeat("|  ", RecursionLevel));
+            int localRecursionLevel = RecursionLevel;
+            if (OverrideRecursionLevel != null)
+            {
+                localRecursionLevel = (int) OverrideRecursionLevel;
+            }
+
+            string Tabs = string.Concat(Enumerable.Repeat("|  ", localRecursionLevel));
 			Console.WriteLine("{0:s}├ {1:s} ({2:s}) : {3:s} ", Tabs, ModuleName, SearchStrategy.ToString(), Filepath);
 		}
 
@@ -427,14 +442,21 @@ namespace Dependencies
             // return default(T);
         }
 
+        // Json exportable
 		public string ModuleName;
         public string Filepath;
         public ModuleSearchStrategy SearchStrategy;
-        public List<PeDependencyItem> Dependencies;
+        public List<PeDependencyItem> Dependencies
+        {
+            
+            get { return IsNewModule() ? FullDependencies : new List<PeDependencyItem>(); }
+        }
 
+        // not Json exportable
+        protected List<PeDependencyItem> FullDependencies;
 		protected List<PeDependencyItem> ResolvedImports;
 		protected List<PeImportDll> Imports;
-		protected PeDependencies Root;
+        protected PeDependencies Root;
         protected int RecursionLevel;
 
         private bool DependenciesResolved;
@@ -472,7 +494,9 @@ namespace Dependencies
             ModulesCache = new ModuleEntries();
 			MaxRecursion = recursion_depth;
 
-			Root = GetModuleItem(RootFilename, Application.Filepath, ModuleSearchStrategy.ROOT, 0);
+            ModulesVisited = new Dictionary<ModuleCacheKey, bool>();
+
+            Root = GetModuleItem(RootFilename, Application.Filepath, ModuleSearchStrategy.ROOT, 0);
 			Root.LoadPe();
 			Root.ResolveDependencies();
         }
@@ -512,7 +536,8 @@ namespace Dependencies
 
         public bool VisitModule(string ModuleName, string ModuleFilepath)
         {
-            ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
+            //ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
+            ModuleCacheKey ModuleKey = new ModuleCacheKey("", ModuleFilepath);
 
             // do not visit recursively the same node (in order to prevent stack overflow)
             if (ModulesVisited.ContainsKey(ModuleKey))
@@ -523,6 +548,8 @@ namespace Dependencies
             ModulesVisited[ModuleKey] = true;
             return true;
         }
+
+
 
         public ModuleEntries GetModules 
         {
@@ -538,6 +565,8 @@ namespace Dependencies
         private Dictionary<ModuleCacheKey, bool> ModulesVisited;
     }
 
+ 
+
     class Program
     {
         public static void PrettyPrinter(IPrettyPrintable obj)
@@ -549,7 +578,8 @@ namespace Dependencies
         {
             JsonSerializerSettings Settings = new JsonSerializerSettings
             {
-                // ReferenceLoopHandling = ReferenceLoopHandling.Serialize
+                ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
+                //PreserveReferencesHandling = PreserveReferencesHandling.Objects,
             };
 
             Console.WriteLine(JsonConvert.SerializeObject(obj, Formatting.Indented, Settings));
@@ -600,12 +630,6 @@ namespace Dependencies
 
         public static void DumpDependencyChain(PE Pe, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
         {
-            if (Printer == JsonPrinter)
-            {
-                Console.Error.WriteLine("Json output is not currently supported when dumping the dependency chain.");
-                return;
-            }
-
             PeDependencies Deps = new PeDependencies(Pe, recursion_depth);
             Printer(Deps);
         }
