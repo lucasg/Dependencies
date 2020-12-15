@@ -212,3 +212,12 @@ String^ PE::GetProcessor()
   return gcnew String("amd64");
 }
 
+bool PE::CheckProcessor(String^ ProcessorArch)
+{
+  if (((Properties->Machine & 0xffff) == IMAGE_FILE_MACHINE_ARM64) && (ProcessorArch == "amd64"))
+    return true;
+
+  if (GetProcessor() == ProcessorArch)
+    return true;
+  return false;
+}
