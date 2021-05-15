@@ -11,13 +11,34 @@ using System.Windows.Data;
 namespace Dependencies
 {
 
-    public class ModuleCacheKey : Tuple<string, string>
+    public class ModuleCacheKey
     {
-        public ModuleCacheKey(string Name, string Filepath)
-        : base(Name, Filepath)
+        public ModuleCacheKey(string _Name, string _Filepath, ModuleFlag _Flags = ModuleFlag.NoFlag)
         {
+            Name = _Name;
+            Filepath = _Filepath;
+            Flags = _Flags;
         }
+
+        public ModuleCacheKey(ImportContext import)
+        {
+            Name = import.ModuleName;
+            Filepath = import.PeFilePath;
+            Flags = import.Flags;
+        }
+
+        // mandatory since ModuleCacheKey is used as a dictionnary key
+        public override int GetHashCode()
+        {
+            return Name.GetHashCode() ^ Filepath.GetHashCode() ^ Flags.GetHashCode();
+        }
+
+        public string Name;
+        public string Filepath;
+        public ModuleFlag Flags;
     }
+
+
 
     public class ModulesCache : Dictionary<ModuleCacheKey, DisplayModuleInfo>
     {

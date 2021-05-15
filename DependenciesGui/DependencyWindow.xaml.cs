@@ -913,7 +913,7 @@ namespace Dependencies
 
                     string ModuleName = NewTreeContext.ModuleName;
                     string ModuleFilePath = NewTreeContext.PeFilePath;
-                    ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilePath);
+                    ModuleCacheKey ModuleKey = new ModuleCacheKey(NewTreeContext);
 
                     // Newly seen modules
                     if (!this.ProcessedModulesCache.ContainsKey(ModuleKey))
@@ -1147,34 +1147,49 @@ namespace Dependencies
 				this.CustomSearchFolders,
 				this.WorkingDirectory
 			);
+
             string ModuleFilepath = (ResolvedModule.Item2 != null) ? ResolvedModule.Item2.Filepath : null;
 
-            ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
-            if ( (ModuleFilepath != null) && !this.ProcessedModulesCache.ContainsKey(ModuleKey))
+            // Not found module, returning PE without update module list
+            if (ModuleFilepath == null)
             {
-                ModuleFlag DelayLoadFlag = (DelayLoad) ? ModuleFlag.DelayLoad : 0;
+                return ResolvedModule.Item2;
+            }
 
+            ModuleFlag ModuleFlags = ModuleFlag.NoFlag;
+            if (DelayLoad)
+                ModuleFlags |= ModuleFlag.DelayLoad;
+            if (ResolvedModule.Item1 == ModuleSearchStrategy.ApiSetSchema)
+                ModuleFlags |= ModuleFlag.ApiSet;
+
+            ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath, ModuleFlags);
+            if (!this.ProcessedModulesCache.ContainsKey(ModuleKey))
+            {
+                DisplayModuleInfo NewModule;
+
+                // apiset resolution are a bit trickier
                 if (ResolvedModule.Item1 == ModuleSearchStrategy.ApiSetSchema)
                 {
                     var ApiSetContractModule = new DisplayModuleInfo(
                         BinaryCache.LookupApiSetLibrary(ModuleName),
                         ResolvedModule.Item2,
                         ResolvedModule.Item1,
-                        DelayLoadFlag & ModuleFlag.ApiSet
+                        ModuleFlags
                     );
-                    var NewModule = new ApiSetModuleInfo(ModuleName, ref ApiSetContractModule);
-                    this.ProcessedModulesCache[ModuleKey] = NewModule;
+                    NewModule = new ApiSetModuleInfo(ModuleName, ref ApiSetContractModule);
                 }
                 else
                 {
-                    var NewModule = new DisplayModuleInfo(
+                    NewModule = new DisplayModuleInfo(
                         ModuleName,
                         ResolvedModule.Item2,
                         ResolvedModule.Item1,
-                        DelayLoadFlag
+                        ModuleFlags
                     );
-                    this.ProcessedModulesCache[ModuleKey] = NewModule;
+                    
                 }
+
+                this.ProcessedModulesCache[ModuleKey] = NewModule;
 
                 // add it to the module list
                 this.ModulesList.AddModule(this.ProcessedModulesCache[ModuleKey]);
