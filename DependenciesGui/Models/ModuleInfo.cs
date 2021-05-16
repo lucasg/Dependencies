@@ -31,6 +31,7 @@ public enum ModuleFlag
 
 namespace Dependencies
 {
+
     public struct ModuleInfo
     {
         // @TODO(Hack: refactor correctly for image generation)

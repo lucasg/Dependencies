@@ -7,6 +7,9 @@ using System.Windows.Data;
 
 using Dragablz;
 using System.Windows.Shell;
+using System.Globalization;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Dependencies
 {
@@ -36,6 +39,44 @@ namespace Dependencies
         }
     }
 
+    public class RecentMenuItem : INotifyPropertyChanged
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public RecentMenuItem(string _Filepath)
+        {
+            Filepath = _Filepath;
+
+            if (Properties.Settings.Default.FullPath)
+                HeaderTitle = Filepath;
+            else
+                HeaderTitle = System.IO.Path.GetFileName(Filepath);
+
+            Properties.Settings.Default.PropertyChanged += this.RecentMenuItem_PropertyChanged;
+        }
+
+        private void RecentMenuItem_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "FullPath")
+            {
+                if (Properties.Settings.Default.FullPath)
+                    HeaderTitle = Filepath;
+                else
+                    HeaderTitle = System.IO.Path.GetFileName(Filepath);
+
+                if (PropertyChanged != null)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("HeaderTitle"));
+                }
+            }
+        }
+
+        public string Filepath {get; set;}
+
+        public string HeaderTitle { get; set; }
+
+    }
+
     /// <summary>
     /// MainWindow : container for displaying one or sereral DependencyWindow tree elements.
     /// </summary>
@@ -45,7 +86,9 @@ namespace Dependencies
         public static readonly RoutedUICommand OpenUserSettingsCommand = new RoutedUICommand();
 		public static readonly RoutedUICommand OpenCustomizeSearchFolderCommand = new RoutedUICommand();
 
-		private readonly IInterTabClient _interTabClient = new DependenciesInterTabClient();
+        public ObservableCollection<RecentMenuItem> _recentsItems;
+
+        private readonly IInterTabClient _interTabClient = new DependenciesInterTabClient();
 
         private About AboutPage;
         private UserSettings UserSettings;
@@ -54,11 +97,14 @@ namespace Dependencies
         private bool _Master;
 		private bool _EnableSearchFolderCustomization;
 
-		#region PublicAPI
-		public MainWindow()
+
+        #region PublicAPI
+        public MainWindow()
         {
 
             InitializeComponent();
+
+            _recentsItems = new ObservableCollection<RecentMenuItem>();
             PopulateRecentFilesMenuItems();
 
             this.AboutPage = new About();
@@ -71,6 +117,14 @@ namespace Dependencies
 
             this._Master = false;
 			this.DataContext = this;
+        }
+
+        public ObservableCollection<RecentMenuItem> RecentsItems
+        {
+            get
+            {
+                return _recentsItems;
+            }
         }
 
         /// <summary>
@@ -119,15 +173,16 @@ namespace Dependencies
             set { _Master = value; }
         }
 
+
         #endregion PublicAPI
 
         /// <summary>
         /// Populate "recent entries" menu items
         /// </summary>
-        private void PopulateRecentFilesMenuItems()
+        public void PopulateRecentFilesMenuItems()
         {
 
-            System.Windows.Controls.MenuItem FileMenuItem = (System.Windows.Controls.MenuItem)this.MainMenu.Items[0];
+            //System.Windows.Controls.MenuItem FileMenuItem = (System.Windows.Controls.MenuItem)this.MainMenu.Items[0];
             
 
             if (Properties.Settings.Default.RecentFiles.Count == 0) {
@@ -147,27 +202,42 @@ namespace Dependencies
             }
         }
 
+
         private void AddRecentFilesMenuItem(string Filepath, int index)
         {
 
-            System.Windows.Controls.MenuItem FileMenuItem = (System.Windows.Controls.MenuItem)this.MainMenu.Items[0];
+            //System.Windows.Controls.MenuItem FileMenuItem = (System.Windows.Controls.MenuItem)this.MainMenu.Items[0];
 
             // Create new menu item
-            System.Windows.Controls.MenuItem newRecentFileItem = new System.Windows.Controls.MenuItem();
-            newRecentFileItem.Header = System.IO.Path.GetFileName(Filepath);
-            newRecentFileItem.DataContext = Filepath;
-            newRecentFileItem.Click += new RoutedEventHandler(RecentFileCommandBinding_Clicked);
+            //System.Windows.Controls.MenuItem newRecentFileItem = new System.Windows.Controls.MenuItem();
+            //newRecentFileItem.DataContext = Filepath;
+            //newRecentFileItem.Click += new RoutedEventHandler(RecentFileCommandBinding_Clicked);
+            //newRecentFileItem.Style = "FullpathStyle";
 
-            // check if the item already is in the list, diregarding others menu items
-            if (index + 5 < FileMenuItem.Items.Count)
-            {
-                FileMenuItem.Items[3 + index] = newRecentFileItem;
-            }
-            else
-            {
-                // Add it to the list at the top
-                FileMenuItem.Items.Insert(3, newRecentFileItem);
-            }
+            //RecentsItems.Add(new RecentMenuItem {
+            //    MenuItemName = "Edit"
+            //});
+            //RecentsItems.Add(
+            //    new RecentMenuItem{
+            //        MenuItemName = "Search"
+            //    }
+            //);
+
+            RecentsItems.Add(new RecentMenuItem(Filepath));
+            
+
+
+
+            //// check if the item already is in the list, diregarding others menu items
+            //if (index + 5 < FileMenuItem.Items.Count)
+            //{
+            //    FileMenuItem.Items[3 + index] = newRecentFileItem;
+            //}
+            //else
+            //{
+            //    // Add it to the list at the top
+            //    FileMenuItem.Items.Insert(3, newRecentFileItem);
+            //}
 
         }
 
@@ -175,7 +245,7 @@ namespace Dependencies
         private void RecentFileCommandBinding_Clicked(object sender, RoutedEventArgs e)
         {
             System.Windows.Controls.MenuItem RecentFile = sender as System.Windows.Controls.MenuItem;
-            String RecentFilePath = RecentFile.DataContext as String;
+            String RecentFilePath = (RecentFile.DataContext as RecentMenuItem).Filepath;
 
             if (RecentFilePath.Length != 0 )
             {
