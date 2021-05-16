@@ -2,11 +2,14 @@
 using System.Windows;
 using System.Windows.Shell;
 using System.ComponentModel;
+using System.IO;
 
 using Dependencies.ClrPh;
 
 namespace Dependencies
 {
+ 
+
     /// <summary>
     /// Application instance
     /// </summary>
@@ -70,6 +73,21 @@ namespace Dependencies
             (Application.Current as App).PropertyChanged += App_PropertyChanged;
 
             Phlib.InitializePhLib();
+
+            // Load singleton for binary caching
+            if (Dependencies.BinaryCacheOption.GetGlobalBehaviour() == Dependencies.BinaryCacheOption.BinaryCacheOptionValue.Yes)
+            {
+                string ApplicationLocalAppDataPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Dependencies"
+                );
+                BinaryCache.Instance = new BinaryCacheImpl(ApplicationLocalAppDataPath, 200);
+            }
+            else
+            {
+                BinaryCache.Instance = new BinaryNoCacheImpl();
+            }
+            
             BinaryCache.Instance.Load();
 
             mainWindow = new MainWindow();

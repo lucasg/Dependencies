@@ -184,8 +184,9 @@ namespace Dependencies
             InitializeComponent();
 
             TreeBuildCombo.ItemsSource = Enum.GetValues(typeof(TreeBuildingBehaviour.DependencyTreeBehaviour));
+            BinaryCacheCombo.ItemsSource = Enum.GetValues(typeof(BinaryCacheOption.BinaryCacheOptionValue));
             PeviewerPath = Dependencies.Properties.Settings.Default.PeViewerPath;
-            
+
         }
 
         protected override void OnInitialized(EventArgs e)
@@ -212,6 +213,18 @@ namespace Dependencies
             if (TreeBuildCombo.SelectedItem != null)
             {
                 Dependencies.Properties.Settings.Default.TreeBuildBehaviour = TreeBuildCombo.SelectedItem.ToString();
+            }
+
+            if (BinaryCacheCombo.SelectedItem != null)
+            {
+                bool newValue = (bool) (new BinaryCacheOption()).ConvertBack(BinaryCacheCombo.SelectedItem, null, null, null);
+
+                if (Dependencies.Properties.Settings.Default.BinaryCacheOptionValue != newValue)
+                {
+                    System.Windows.MessageBox.Show("The binary caching preference has been modified, you need to restart Dependencies for the modifications to be actually reloaded.");
+                }
+
+                Dependencies.Properties.Settings.Default.BinaryCacheOptionValue = newValue;
             }
 
             Dependencies.Properties.Settings.Default.Font = FontFamilyListItem.GetDisplayName(SelectedFontFamily);

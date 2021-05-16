@@ -24,7 +24,7 @@
                        Name="TextContent">
                 Dependencies v<Run Text="{Binding VersionStr,Mode=OneWay}" /> :<LineBreak />
                 <LineBreak />
-                Dependency tool made by lucasg@github.com.
+                Dependency tool made by lucasg.
                 <LineBreak />
                 Please go to 
                 <Hyperlink

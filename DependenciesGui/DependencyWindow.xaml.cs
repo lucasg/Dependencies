@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -99,6 +98,101 @@ namespace Dependencies
             }
         }
         #endregion TreeBuildingBehaviour.IValueConverter_contract
+    }
+
+    /// <summary>
+    /// Dependency tree building behaviour.
+    /// A full recursive dependency tree can be memory intensive, therefore the
+    /// choice is left to the user to override the default behaviour.
+    /// </summary>
+    public class BinaryCacheOption : IValueConverter
+    {
+        [TypeConverter(typeof(EnumToStringUsingDescription))]
+        public enum BinaryCacheOptionValue
+        {
+            [Description("No (faster, but locks dll until Dependencies is closed)")]
+            No = 0,
+
+            [Description("Yes (prevents file locking issues)")]
+            Yes = 1
+        }
+
+        public static BinaryCacheOptionValue GetGlobalBehaviour()
+        {
+            return (BinaryCacheOptionValue)(new BinaryCacheOption()).Convert(
+                Dependencies.Properties.Settings.Default.BinaryCacheOptionValue,
+                null,// targetType
+                null,// parameter
+                null // System.Globalization.CultureInfo
+            );
+        }
+
+        #region BinaryCacheOption.IValueConverter_contract
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool StrOption = (bool)value;
+
+            switch (StrOption)
+            {
+                default:
+                case true:
+                    return BinaryCacheOptionValue.Yes;
+                case false:
+                    return BinaryCacheOptionValue.No;
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            BinaryCacheOptionValue Behaviour = (BinaryCacheOptionValue)(int)value;
+
+            switch (Behaviour)
+            {
+                default:
+                case BinaryCacheOptionValue.Yes:
+                    return true;
+                case BinaryCacheOptionValue.No:
+                    return false;
+            }
+        }
+        #endregion BinaryCacheOption.IValueConverter_contract
+    }
+
+    public class EnumToStringUsingDescription : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            return (sourceType.Equals(typeof(Enum)));
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        {
+            return (destinationType.Equals(typeof(String)));
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        {
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+        {
+            if (!destinationType.Equals(typeof(String)))
+            {
+                throw new ArgumentException("Can only convert to string.", "destinationType");
+            }
+
+            if (!value.GetType().BaseType.Equals(typeof(Enum)))
+            {
+                throw new ArgumentException("Can only convert an instance of enum.", "value");
+            }
+
+            string name = value.ToString();
+            object[] attrs =
+                value.GetType().GetField(name).GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return (attrs.Length > 0) ? ((DescriptionAttribute)attrs[0]).Description : name;
+        }
     }
 
     /// <summary>
