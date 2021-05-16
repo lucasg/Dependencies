@@ -30,7 +30,14 @@ namespace Dependencies
         // mandatory since ModuleCacheKey is used as a dictionnary key
         public override int GetHashCode()
         {
-            return Name.GetHashCode() ^ Filepath.GetHashCode() ^ Flags.GetHashCode();
+            int hashcode = Name.GetHashCode() ^ Flags.GetHashCode();
+
+            if (Filepath != null)
+            {
+                hashcode ^= Filepath.GetHashCode();
+            }
+
+            return hashcode;
         }
 
         public string Name;
