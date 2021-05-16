@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 
 using Dependencies.ClrPh;
+using System.Reflection;
 
 namespace Dependencies
 {
@@ -90,6 +91,10 @@ namespace Dependencies
             
             BinaryCache.Instance.Load();
 
+
+            // https://www.red-gate.com/simple-talk/blogs/wpf-menu-displays-to-the-left-of-the-window/
+            SetDropDownMenuToBeRightAligned();
+
             mainWindow = new MainWindow();
             mainWindow.IsMaster = true;
 
@@ -107,7 +112,8 @@ namespace Dependencies
             }
             
             mainWindow.Show();
-            
+
+
 
             // Process command line args
             if (e.Args.Length > 0)
@@ -121,6 +127,22 @@ namespace Dependencies
         {
             Dependencies.Properties.Settings.Default.Save();
             BinaryCache.Instance.Unload();
+        }
+
+        private static void SetDropDownMenuToBeRightAligned()
+        {
+            var menuDropAlignmentField = typeof(SystemParameters).GetField("_menuDropAlignment", BindingFlags.NonPublic | BindingFlags.Static);
+            Action setAlignmentValue = () =>
+            {
+                if (SystemParameters.MenuDropAlignment && menuDropAlignmentField != null) menuDropAlignmentField.SetValue(null, false);
+            };
+
+            setAlignmentValue();
+
+            SystemParameters.StaticPropertyChanged += (sender, e) =>
+            {
+                setAlignmentValue();
+            };
         }
 
         public static void AddToRecentDocuments(String Filename)
