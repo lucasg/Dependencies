@@ -226,6 +226,7 @@ PhGetMappedImageExportFunctionRemote(
     );
 
 #define PH_MAPPED_IMAGE_DELAY_IMPORTS 0x1
+#define PH_MAPPED_IMAGE_DELAY_IMPORTS_V1 0x2
 
 typedef struct _PH_MAPPED_IMAGE_IMPORTS
 {

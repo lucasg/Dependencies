@@ -2,11 +2,15 @@
 using System.Windows;
 using System.Windows.Shell;
 using System.ComponentModel;
+using System.IO;
 
 using Dependencies.ClrPh;
+using System.Reflection;
 
 namespace Dependencies
 {
+ 
+
     /// <summary>
     /// Application instance
     /// </summary>
@@ -70,7 +74,26 @@ namespace Dependencies
             (Application.Current as App).PropertyChanged += App_PropertyChanged;
 
             Phlib.InitializePhLib();
+
+            // Load singleton for binary caching
+            if (Dependencies.BinaryCacheOption.GetGlobalBehaviour() == Dependencies.BinaryCacheOption.BinaryCacheOptionValue.Yes)
+            {
+                string ApplicationLocalAppDataPath = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Dependencies"
+                );
+                BinaryCache.Instance = new BinaryCacheImpl(ApplicationLocalAppDataPath, 200);
+            }
+            else
+            {
+                BinaryCache.Instance = new BinaryNoCacheImpl();
+            }
+            
             BinaryCache.Instance.Load();
+
+
+            // https://www.red-gate.com/simple-talk/blogs/wpf-menu-displays-to-the-left-of-the-window/
+            SetDropDownMenuToBeRightAligned();
 
             mainWindow = new MainWindow();
             mainWindow.IsMaster = true;
@@ -89,7 +112,8 @@ namespace Dependencies
             }
             
             mainWindow.Show();
-            
+
+
 
             // Process command line args
             if (e.Args.Length > 0)
@@ -103,6 +127,22 @@ namespace Dependencies
         {
             Dependencies.Properties.Settings.Default.Save();
             BinaryCache.Instance.Unload();
+        }
+
+        private static void SetDropDownMenuToBeRightAligned()
+        {
+            var menuDropAlignmentField = typeof(SystemParameters).GetField("_menuDropAlignment", BindingFlags.NonPublic | BindingFlags.Static);
+            Action setAlignmentValue = () =>
+            {
+                if (SystemParameters.MenuDropAlignment && menuDropAlignmentField != null) menuDropAlignmentField.SetValue(null, false);
+            };
+
+            setAlignmentValue();
+
+            SystemParameters.StaticPropertyChanged += (sender, e) =>
+            {
+                setAlignmentValue();
+            };
         }
 
         public static void AddToRecentDocuments(String Filename)

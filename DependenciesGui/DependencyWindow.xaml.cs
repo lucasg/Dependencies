@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Controls;
 using System.ComponentModel;
 using System.Windows.Input;
@@ -99,6 +98,101 @@ namespace Dependencies
             }
         }
         #endregion TreeBuildingBehaviour.IValueConverter_contract
+    }
+
+    /// <summary>
+    /// Dependency tree building behaviour.
+    /// A full recursive dependency tree can be memory intensive, therefore the
+    /// choice is left to the user to override the default behaviour.
+    /// </summary>
+    public class BinaryCacheOption : IValueConverter
+    {
+        [TypeConverter(typeof(EnumToStringUsingDescription))]
+        public enum BinaryCacheOptionValue
+        {
+            [Description("No (faster, but locks dll until Dependencies is closed)")]
+            No = 0,
+
+            [Description("Yes (prevents file locking issues)")]
+            Yes = 1
+        }
+
+        public static BinaryCacheOptionValue GetGlobalBehaviour()
+        {
+            return (BinaryCacheOptionValue)(new BinaryCacheOption()).Convert(
+                Dependencies.Properties.Settings.Default.BinaryCacheOptionValue,
+                null,// targetType
+                null,// parameter
+                null // System.Globalization.CultureInfo
+            );
+        }
+
+        #region BinaryCacheOption.IValueConverter_contract
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            bool StrOption = (bool)value;
+
+            switch (StrOption)
+            {
+                default:
+                case true:
+                    return BinaryCacheOptionValue.Yes;
+                case false:
+                    return BinaryCacheOptionValue.No;
+            }
+
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            BinaryCacheOptionValue Behaviour = (BinaryCacheOptionValue)(int)value;
+
+            switch (Behaviour)
+            {
+                default:
+                case BinaryCacheOptionValue.Yes:
+                    return true;
+                case BinaryCacheOptionValue.No:
+                    return false;
+            }
+        }
+        #endregion BinaryCacheOption.IValueConverter_contract
+    }
+
+    public class EnumToStringUsingDescription : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            return (sourceType.Equals(typeof(Enum)));
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        {
+            return (destinationType.Equals(typeof(String)));
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        {
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+        {
+            if (!destinationType.Equals(typeof(String)))
+            {
+                throw new ArgumentException("Can only convert to string.", "destinationType");
+            }
+
+            if (!value.GetType().BaseType.Equals(typeof(Enum)))
+            {
+                throw new ArgumentException("Can only convert an instance of enum.", "value");
+            }
+
+            string name = value.ToString();
+            object[] attrs =
+                value.GetType().GetField(name).GetCustomAttributes(typeof(DescriptionAttribute), false);
+            return (attrs.Length > 0) ? ((DescriptionAttribute)attrs[0]).Description : name;
+        }
     }
 
     /// <summary>
@@ -913,7 +1007,7 @@ namespace Dependencies
 
                     string ModuleName = NewTreeContext.ModuleName;
                     string ModuleFilePath = NewTreeContext.PeFilePath;
-                    ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilePath);
+                    ModuleCacheKey ModuleKey = new ModuleCacheKey(NewTreeContext);
 
                     // Newly seen modules
                     if (!this.ProcessedModulesCache.ContainsKey(ModuleKey))
@@ -1147,34 +1241,49 @@ namespace Dependencies
 				this.CustomSearchFolders,
 				this.WorkingDirectory
 			);
+
             string ModuleFilepath = (ResolvedModule.Item2 != null) ? ResolvedModule.Item2.Filepath : null;
 
-            ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath);
-            if ( (ModuleFilepath != null) && !this.ProcessedModulesCache.ContainsKey(ModuleKey))
+            // Not found module, returning PE without update module list
+            if (ModuleFilepath == null)
             {
-                ModuleFlag DelayLoadFlag = (DelayLoad) ? ModuleFlag.DelayLoad : 0;
+                return ResolvedModule.Item2;
+            }
 
+            ModuleFlag ModuleFlags = ModuleFlag.NoFlag;
+            if (DelayLoad)
+                ModuleFlags |= ModuleFlag.DelayLoad;
+            if (ResolvedModule.Item1 == ModuleSearchStrategy.ApiSetSchema)
+                ModuleFlags |= ModuleFlag.ApiSet;
+
+            ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath, ModuleFlags);
+            if (!this.ProcessedModulesCache.ContainsKey(ModuleKey))
+            {
+                DisplayModuleInfo NewModule;
+
+                // apiset resolution are a bit trickier
                 if (ResolvedModule.Item1 == ModuleSearchStrategy.ApiSetSchema)
                 {
                     var ApiSetContractModule = new DisplayModuleInfo(
                         BinaryCache.LookupApiSetLibrary(ModuleName),
                         ResolvedModule.Item2,
                         ResolvedModule.Item1,
-                        DelayLoadFlag & ModuleFlag.ApiSet
+                        ModuleFlags
                     );
-                    var NewModule = new ApiSetModuleInfo(ModuleName, ref ApiSetContractModule);
-                    this.ProcessedModulesCache[ModuleKey] = NewModule;
+                    NewModule = new ApiSetModuleInfo(ModuleName, ref ApiSetContractModule);
                 }
                 else
                 {
-                    var NewModule = new DisplayModuleInfo(
+                    NewModule = new DisplayModuleInfo(
                         ModuleName,
                         ResolvedModule.Item2,
                         ResolvedModule.Item1,
-                        DelayLoadFlag
+                        ModuleFlags
                     );
-                    this.ProcessedModulesCache[ModuleKey] = NewModule;
+                    
                 }
+
+                this.ProcessedModulesCache[ModuleKey] = NewModule;
 
                 // add it to the module list
                 this.ModulesList.AddModule(this.ProcessedModulesCache[ModuleKey]);

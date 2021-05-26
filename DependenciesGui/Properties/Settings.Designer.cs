@@ -109,7 +109,22 @@ namespace Dependencies.Properties {
                 this["TreeBuildBehaviour"] = value;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("true")]
+        public bool BinaryCacheOptionValue
+        {
+            get
+            {
+                return ((bool)(this["BinaryCacheOptionValue"]));
+            }
+            set
+            {
+                this["BinaryCacheOptionValue"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("Courier New")]

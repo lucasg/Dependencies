@@ -21,16 +21,18 @@ public class DisplayPeImport : SettingBindingHandler
        Info.name = PeImport.Name;
        Info.moduleName = PeImport.ModuleName;
        Info.modulePath = ModuleFilePath;
+       Info.importNotFound = !ImportFound;
 
        Tuple<CLRPH_DEMANGLER, string> DemanglingInfos = SymPrv.UndecorateName(PeImport.Name);
        Info.Demangler = Enum.GetName(typeof(CLRPH_DEMANGLER), DemanglingInfos.Item1); 
        Info.UndecoratedName = DemanglingInfos.Item2;
-
-       Info.delayedImport = PeImport.DelayImport;
-       Info.importAsCppName = (PeImport.Name.Length > 0 && PeImport.Name[0] == '?');
-       Info.importByOrdinal = PeImport.ImportByOrdinal;
-       Info.importNotFound = !ImportFound;
-
+        
+       if (ImportFound)
+       { 
+           Info.delayedImport = PeImport.DelayImport;
+           Info.importAsCppName = (PeImport.Name.Length > 0 && PeImport.Name[0] == '?');
+           Info.importByOrdinal = PeImport.ImportByOrdinal;
+       }
 
         AddNewEventHandler("Undecorate", "Undecorate", "Name", this.GetDisplayName);
         AddNewEventHandler("FullPath", "FullPath", "ModuleName", this.GetPathDisplayName);

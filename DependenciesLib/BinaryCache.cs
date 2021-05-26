@@ -7,13 +7,14 @@ using System.ComponentModel;
 
 namespace Dependencies
 {
+   
     /// <summary>
     /// Application wide PE cache on disk. This is used to solve the issue of phlib mapping
     /// analyzed binaries in memory and thus locking those in the filesystem (https://github.com/lucasg/Dependencies/issues/9).
     /// The BinaryCache copy every PE the application wants to open in a special folder in LocalAppData
     /// and open this one instead, prevent the original file from being locked.
     /// </summary>
-    public class BinaryCache
+    public abstract class BinaryCache
     {
         #region Singleton implementation
         private static BinaryCache SingletonInstance;
@@ -26,17 +27,11 @@ namespace Dependencies
         {
             get
             {
-                if (SingletonInstance == null)
-                {
-                    string ApplicationLocalAppDataPath = Path.Combine(
-                        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                        "Dependencies"
-                    );
-
-                    SingletonInstance = new BinaryCache(ApplicationLocalAppDataPath, 200);
-                }
-
                 return SingletonInstance;
+            }
+            set
+            {
+                SingletonInstance = value;
             }
         }
         #endregion Singleton implementation
@@ -255,27 +250,44 @@ namespace Dependencies
 
 
         #region constructors
+        #endregion constructors
+
+        #region Contract
+
+        // Attempt to load a file as a PE
+        public abstract PE GetBinary(string PePath);
+
+        // static initialization => warmup
+        public abstract void Load();
+
+        // Graceful cleanup
+        public abstract void Unload();
+
+        #endregion Contract
 
 
-        public BinaryCache(string ApplicationAppDataPath, int _MaxBinaryCount)
+        #region Members
+        #endregion Members
+    }
+
+    public class BinaryCacheImpl :  BinaryCache
+    {
+        public BinaryCacheImpl(string ApplicationAppDataPath, int _MaxBinaryCount)
         {
-            
+
             BinaryDatabase = new Dictionary<string, PE>();
             FilepathDatabase = new Dictionary<string, PE>();
             BinaryDatabaseLock = new Object();
             LruCache = new List<string>();
 
             MaxBinaryCount = _MaxBinaryCount;
-	        string platform = (IntPtr.Size == 8) ? "x64" : "x86";
+            string platform = (IntPtr.Size == 8) ? "x64" : "x86";
 
             BinaryCacheFolderPath = Path.Combine(ApplicationAppDataPath, "BinaryCache", platform);
             Directory.CreateDirectory(BinaryCacheFolderPath);
         }
 
-        #endregion constructors
-
-        
-        public void Load()
+        public override void Load()
         {
             // "warm up" the cache
             foreach (var CachedBinary in Directory.EnumerateFiles(BinaryCacheFolderPath))
@@ -289,12 +301,12 @@ namespace Dependencies
             // wow64.dll, wow64cpu.dll and wow64win.dll are listed as wow64 known dlls,
             // but they are actually x64 binaries.
             List<String> Wow64Dlls = new List<string>(new string[] {
-                "wow64.dll",
-                "wow64cpu.dll",
-                "wow64win.dll"
-            });
+                    "wow64.dll",
+                    "wow64cpu.dll",
+                    "wow64win.dll"
+                });
 
-            // preload all well konwn dlls
+            // preload all well known dlls
             foreach (String KnownDll in Phlib.GetKnownDlls(false))
             {
                 GetBinaryAsync(Path.Combine(System32Folder, KnownDll));
@@ -310,13 +322,13 @@ namespace Dependencies
                 {
                     GetBinaryAsync(Path.Combine(SysWow64Folder, KnownDll));
                 }
-                
+
             }
 
         }
 
-        public void Unload()
-        { 
+        public override void Unload()
+        {
             // cut off the LRU cache
             LruCache = LruCache.GetRange(0, Math.Min(LruCache.Count, MaxBinaryCount));
 
@@ -342,7 +354,7 @@ namespace Dependencies
                         // so only the last one alive can clear the cache.
                         Debug.WriteLine("[BinaryCache] Could not unload file {0:s} : {1:s} ", CachedBinary, uae);
                     }
-                    
+
                 }
             }
 
@@ -364,12 +376,12 @@ namespace Dependencies
             {
                 bw.RunWorkerCompleted += Callback;
             }
-            
+
 
             bw.RunWorkerAsync();
         }
 
-        public PE GetBinary(string PePath)
+        public override PE GetBinary(string PePath)
         {
             //Debug.WriteLine(String.Format("Attempt to load : {0:s}", PePath), "BinaryCache");
 
@@ -396,18 +408,18 @@ namespace Dependencies
             lock (BinaryDatabaseLock)
             {
                 bool hit = BinaryDatabase.ContainsKey(PeHash);
-                
+
                 // Cache "miss"
                 if (!hit)
                 {
-                
+
                     string DestFilePath = Path.Combine(BinaryCacheFolderPath, PeHash);
                     if (!File.Exists(DestFilePath) && (DestFilePath != PePath))
                     {
                         // Debug.WriteLine(String.Format("FileCopy from {0:s} to {1:s}", PePath, DestFilePath), "BinaryCache");
                         NativeFile.Copy(PePath, DestFilePath);
                     }
-                
+
                     PE NewShadowBinary = new PE(DestFilePath);
                     NewShadowBinary.Load();
 
@@ -446,15 +458,39 @@ namespace Dependencies
         }
 
         #region Members
-
         private List<string> LruCache;
         private Dictionary<string, PE> BinaryDatabase;
         private Dictionary<string, PE> FilepathDatabase;
-        private Object BinaryDatabaseLock; 
+        private Object BinaryDatabaseLock;
 
         private string BinaryCacheFolderPath;
         private int MaxBinaryCount;
 
         #endregion Members
     }
+
+
+    public class BinaryNoCacheImpl : BinaryCache
+    {
+        public override PE GetBinary(string PePath)
+        {
+            PE pefile = new PE(PePath);
+            pefile.Load();
+
+            return pefile;
+        }
+
+        // static initialization => warmup
+        public override void Load()
+        {
+
+        }
+
+        // Graceful cleanup
+        public override void Unload()
+        {
+
+        }
+    }
 }
+

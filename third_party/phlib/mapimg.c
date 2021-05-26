@@ -372,6 +372,44 @@ PVOID PhMappedImageRvaToVa(
         );
 }
 
+_Must_inspect_result_
+_Ret_maybenull_
+PVOID PhMappedImageVaToVa(
+	_In_ PPH_MAPPED_IMAGE MappedImage,
+	_In_ ULONG Va,
+	_Out_opt_ PIMAGE_SECTION_HEADER* Section
+)
+{
+	ULONG rva;
+	PIMAGE_SECTION_HEADER section;
+
+	if (MappedImage->Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+	{
+		rva = PtrToUlong(PTR_SUB_OFFSET(Va, MappedImage->NtHeaders32->OptionalHeader.ImageBase));
+	}
+	else if (MappedImage->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+	{
+		rva = PtrToUlong(PTR_SUB_OFFSET(Va, MappedImage->NtHeaders->OptionalHeader.ImageBase));
+	}
+	else
+	{
+		return NULL;
+	}
+
+	section = PhMappedImageRvaToSection(MappedImage, rva);
+
+	if (!section)
+		return NULL;
+
+	if (Section)
+		* Section = section;
+
+	return PTR_ADD_OFFSET(MappedImage->ViewBase, PTR_ADD_OFFSET(
+		PTR_SUB_OFFSET(rva, section->VirtualAddress),
+		section->PointerToRawData
+	));
+}
+
 BOOLEAN PhGetMappedImageSectionName(
     _In_ PIMAGE_SECTION_HEADER Section,
     _Out_writes_opt_z_(Count) PWSTR Buffer,
@@ -983,59 +1021,87 @@ NTSTATUS PhGetMappedImageImportDll(
     ImportDll->MappedImage = Imports->MappedImage;
     ImportDll->Flags = Imports->Flags;
 
-    if (!(ImportDll->Flags & PH_MAPPED_IMAGE_DELAY_IMPORTS))
-    {
-        ImportDll->Descriptor = &Imports->DescriptorTable[Index];
+	if (!(ImportDll->Flags & PH_MAPPED_IMAGE_DELAY_IMPORTS))
+	{
+		ImportDll->Descriptor = &Imports->DescriptorTable[Index];
 
-        ImportDll->Name = PhMappedImageRvaToVa(
-            ImportDll->MappedImage,
-            ImportDll->Descriptor->Name,
-            NULL
-            );
+		ImportDll->Name = PhMappedImageRvaToVa(
+			ImportDll->MappedImage,
+			ImportDll->Descriptor->Name,
+			NULL
+		);
 
-        if (!ImportDll->Name)
-            return STATUS_INVALID_PARAMETER;
+		if (!ImportDll->Name)
+			return STATUS_INVALID_PARAMETER;
 
-        // TODO: Probe the name.
+		// TODO: Probe the name.
 
-        if (ImportDll->Descriptor->OriginalFirstThunk)
-        {
-            ImportDll->LookupTable = PhMappedImageRvaToVa(
-                ImportDll->MappedImage,
-                ImportDll->Descriptor->OriginalFirstThunk,
-                NULL
-                );
-        }
-        else
-        {
-            ImportDll->LookupTable = PhMappedImageRvaToVa(
-                ImportDll->MappedImage,
-                ImportDll->Descriptor->FirstThunk,
-                NULL
-                );
-        }
-    }
-    else
-    {
-        ImportDll->DelayDescriptor = &Imports->DelayDescriptorTable[Index];
+		if (ImportDll->Descriptor->OriginalFirstThunk)
+		{
+			ImportDll->LookupTable = PhMappedImageRvaToVa(
+				ImportDll->MappedImage,
+				ImportDll->Descriptor->OriginalFirstThunk,
+				NULL
+			);
+		}
+		else
+		{
+			ImportDll->LookupTable = PhMappedImageRvaToVa(
+				ImportDll->MappedImage,
+				ImportDll->Descriptor->FirstThunk,
+				NULL
+			);
+		}
+	}
+	else
+	{
+		ImportDll->DelayDescriptor = &Imports->DelayDescriptorTable[Index];
 
-        ImportDll->Name = PhMappedImageRvaToVa(
-            ImportDll->MappedImage,
-            ImportDll->DelayDescriptor->DllNameRVA,
-            NULL
-            );
+		// Backwards compatible support for legacy V1 delay imports. (dmex)
+		if (ImportDll->DelayDescriptor->Attributes.RvaBased == 0)
+		{
+			ImportDll->Flags |= PH_MAPPED_IMAGE_DELAY_IMPORTS_V1;
+		}
 
-        if (!ImportDll->Name)
-            return STATUS_INVALID_PARAMETER;
+		if (!(ImportDll->Flags & PH_MAPPED_IMAGE_DELAY_IMPORTS_V1))
+		{
+			ImportDll->Name = PhMappedImageRvaToVa(
+				ImportDll->MappedImage,
+				ImportDll->DelayDescriptor->DllNameRVA,
+				NULL
+			);
+		}
+		else
+		{
+			ImportDll->Name = PhMappedImageVaToVa(
+				ImportDll->MappedImage,
+				ImportDll->DelayDescriptor->DllNameRVA,
+				NULL
+			);
+		}
 
-        // TODO: Probe the name.
+		if (!ImportDll->Name)
+			return STATUS_INVALID_PARAMETER;
 
-        ImportDll->LookupTable = PhMappedImageRvaToVa(
-            ImportDll->MappedImage,
-            ImportDll->DelayDescriptor->ImportNameTableRVA,
-            NULL
-            );
-    }
+		// TODO: Probe the name.
+
+		if (!(ImportDll->Flags & PH_MAPPED_IMAGE_DELAY_IMPORTS_V1))
+		{
+			ImportDll->LookupTable = PhMappedImageRvaToVa(
+				ImportDll->MappedImage,
+				ImportDll->DelayDescriptor->ImportNameTableRVA,
+				NULL
+			);
+		}
+		else
+		{
+			ImportDll->LookupTable = PhMappedImageVaToVa(
+				ImportDll->MappedImage,
+				ImportDll->DelayDescriptor->ImportNameTableRVA,
+				NULL
+			);
+		}
+	}
 
     if (!ImportDll->LookupTable)
         return STATUS_INVALID_PARAMETER;
@@ -1129,11 +1195,22 @@ NTSTATUS PhGetMappedImageImportEntry(
         }
         else
         {
-            importByName = PhMappedImageRvaToVa(
-                ImportDll->MappedImage,
-                entry.u1.AddressOfData,
-                NULL
-                );
+			if (!(ImportDll->Flags & PH_MAPPED_IMAGE_DELAY_IMPORTS_V1))
+			{
+				importByName = PhMappedImageRvaToVa(
+					ImportDll->MappedImage,
+					entry.u1.AddressOfData,
+					NULL
+				);
+			}
+			else
+			{
+				importByName = PhMappedImageVaToVa(
+					ImportDll->MappedImage,
+					entry.u1.AddressOfData,
+					NULL
+				);
+			}
         }
     }
     else if (ImportDll->MappedImage->Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
@@ -1152,11 +1229,22 @@ NTSTATUS PhGetMappedImageImportEntry(
         }
         else
         {
-            importByName = PhMappedImageRvaToVa(
-                ImportDll->MappedImage,
-                (ULONG)entry.u1.AddressOfData,
-                NULL
-                );
+			if (!(ImportDll->Flags & PH_MAPPED_IMAGE_DELAY_IMPORTS_V1))
+			{
+				importByName = PhMappedImageRvaToVa(
+					ImportDll->MappedImage,
+					(ULONG)entry.u1.AddressOfData,
+					NULL
+				);
+			}
+			else
+			{
+				importByName = PhMappedImageVaToVa(
+					ImportDll->MappedImage,
+					(ULONG)entry.u1.AddressOfData,
+					NULL
+				);
+			}
         }
     }
     else

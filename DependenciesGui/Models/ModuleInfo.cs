@@ -18,6 +18,8 @@ public enum PeTypes
 [Flags]
 public enum ModuleFlag
 {
+    NoFlag = 0x00,
+
     DelayLoad = 0x01,
     ClrReference = 0x02,
     ApiSet = 0x04,
@@ -29,6 +31,7 @@ public enum ModuleFlag
 
 namespace Dependencies
 {
+
     public struct ModuleInfo
     {
         // @TODO(Hack: refactor correctly for image generation)

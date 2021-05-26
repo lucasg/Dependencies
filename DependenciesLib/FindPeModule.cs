@@ -82,10 +82,10 @@ namespace Dependencies
 				PeFilePath = Path.Combine(CandidatePath, ModuleName);
                 PE TestPe = BinaryCache.LoadPe(PeFilePath);
 
-                if (TestPe != null)
+                if (TestPe != null && TestPe.LoadSuccessful)
                 { 
                     Debug.WriteLine("Attempt to load {0:s} {1:s} {2:s}", PeFilePath, TestPe.GetProcessor(), ProcessorArch);
-                    if ((TestPe.LoadSuccessful) && (TestPe.CheckProcessor(ProcessorArch)))
+                    if (TestPe.CheckProcessor(ProcessorArch))
                         return PeFilePath;
                 }
             }
