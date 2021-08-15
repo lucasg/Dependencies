@@ -34,6 +34,24 @@ namespace Dependencies
                 SingletonInstance = value;
             }
         }
+
+		public static void InitializeBinaryCache(bool UseCache)
+		{
+			if (UseCache)
+			{
+				string ApplicationLocalAppDataPath = Path.Combine(
+				   Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+				   "Dependencies"
+			   );
+				Instance = new BinaryCacheImpl(ApplicationLocalAppDataPath, 200);
+			}
+			else
+			{
+				Instance = new BinaryNoCacheImpl();
+			}
+
+			Instance.Load();
+		}
         #endregion Singleton implementation
 
         #region PublicAPI
