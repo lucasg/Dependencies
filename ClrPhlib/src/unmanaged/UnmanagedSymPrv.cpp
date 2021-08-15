@@ -27,13 +27,61 @@ VOID PvpGetDefaultPathForDbgHelp(
 
 }
 
+/*!
+	@brief PhLoadLibrarySafe prevents the loader from searching in an unsafe
+	 order by first requiring the loader try to load and resolve through
+	 System32. Then upping the loading flags until the library is loaded.
+
+	@param[in] LibFileName - The file name of the library to load.
+
+	@return HMODULE to the library on success, null on failure.
+*/
+_Ret_maybenull_
+PVOID
+PhLoadLibrarySafe(
+	_In_ PCWSTR LibFileName
+)
+{
+	PVOID baseAddress;
+
+	//
+	// Force LOAD_LIBRARY_SEARCH_SYSTEM32. If the library file name is a fully
+	// qualified path this will succeed.
+	//
+	baseAddress = LoadLibraryExW(LibFileName,
+		NULL,
+		LOAD_LIBRARY_SEARCH_SYSTEM32);
+	if (baseAddress)
+	{
+		return baseAddress;
+	}
+
+	//
+	// Include the application directory now.
+	//
+	return LoadLibraryExW(LibFileName,
+		NULL,
+		LOAD_LIBRARY_SEARCH_SYSTEM32 |
+		LOAD_LIBRARY_SEARCH_APPLICATION_DIR);
+}
+
 VOID PvpLoadDbgHelpFromPath(
     _In_ PWSTR DbgHelpPath
 )
 {
     HMODULE dbghelpModule;
+	
+	// try to load from windows kits installed on the machine
+	dbghelpModule = LoadLibrary(DbgHelpPath);
 
-    if (dbghelpModule = LoadLibrary(DbgHelpPath))
+	// try system32, and then current dir
+	if (!dbghelpModule)
+	{
+		dbghelpModule = (HMODULE) PhLoadLibrarySafe(L"dbghelp.dll");
+	}
+
+	// try to load symsrv.dll from the same folder as dbghelp.dll
+    if (dbghelpModule)
     {
         PPH_STRING fullDbghelpPath;
         ULONG indexOfFileName;
@@ -60,13 +108,15 @@ VOID PvpLoadDbgHelpFromPath(
 
             PhDereferenceObject(fullDbghelpPath);
         }
-    }
-    else
-    {
-        dbghelpModule = LoadLibrary(L"dbghelp.dll");
-    }
 
-    PhSymbolProviderCompleteInitialization(dbghelpModule);
+		PhSymbolProviderCompleteInitialization(dbghelpModule);
+    }
+    //else
+    //{
+    //    dbghelpModule = LoadLibrary(L"dbghelp.dll");
+    //}
+
+    /*PhSymbolProviderCompleteInitialization(dbghelpModule);*/
 }
 
 BOOLEAN PvpLoadDbgHelp(
