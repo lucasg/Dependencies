@@ -270,9 +270,17 @@ namespace Dependencies
         {
             Application = _Application;
 
-            var PeAssembly = AssemblyDefinition.ReadAssembly(Application.Filepath);
+            try
+            {
+                var PeAssembly = AssemblyDefinition.ReadAssembly(Application.Filepath);
 
-            ModuleReferences = PeAssembly.Modules.SelectMany(m => m.ModuleReferences).Where(mr => mr.Name.Length > 0);
+                ModuleReferences = PeAssembly.Modules.SelectMany(m => m.ModuleReferences)
+                    .Where(mr => mr.Name.Length > 0);
+            }
+            catch (BadImageFormatException)
+            {
+
+            }
 
         }
 
@@ -290,7 +298,7 @@ namespace Dependencies
 
         private PE Application;
 
-        public IEnumerable<ModuleReference> ModuleReferences { get; private set; }
+        public IEnumerable<ModuleReference> ModuleReferences { get; private set; } = new List<ModuleReference>();
     }
 
     internal class PEAssemblyReferences : IPrettyPrintable
@@ -299,10 +307,15 @@ namespace Dependencies
         {
             Application = _Application;
 
-            var PeAssembly = AssemblyDefinition.ReadAssembly(Application.Filepath);
+            try
+            {
+                var PeAssembly = AssemblyDefinition.ReadAssembly(Application.Filepath);
 
-            AssemblyReferences = PeAssembly.Modules.SelectMany(m => m.AssemblyReferences);
-
+                AssemblyReferences = PeAssembly.Modules.SelectMany(m => m.AssemblyReferences);
+            }
+            catch (BadImageFormatException)
+            {
+            }
         }
 
         public void PrettyPrint()
@@ -318,7 +331,9 @@ namespace Dependencies
         }
 
         private PE Application;
-        public IEnumerable<AssemblyNameReference> AssemblyReferences { get; private set; }
+
+        public IEnumerable<AssemblyNameReference> AssemblyReferences { get; private set; } =
+            new List<AssemblyNameReference>();
     }
 
     class ImportDll
