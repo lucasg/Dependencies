@@ -76,6 +76,8 @@ At the moment, `Dependencies` recreates features and "features" of `depends.exe`
 ## Building
 
 Building is pretty straightforward.
+Use Visual Studio 2019, and Make sure LLVM is installed
+
 The only caveat is you need to select the "Debug" or "Release" configuration and "x64" or "x86" platform which may not be the default.
 
 
