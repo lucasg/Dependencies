@@ -656,7 +656,8 @@ namespace Dependencies
                 "Options :",
                 "  -h -help : display this help",
                 "  -json : activate json output.",
-                "  -depth : limit recursion depth when analysing loaded modules or dependency chain. Default value is infinite.",
+				"  -cache : load and use binary cache in order to prevent dll file locking.",
+				"  -depth : limit recursion depth when analysing loaded modules or dependency chain. Default value is infinite.",
                 "  -apisets : dump the system's ApiSet schema (api set dll -> host dll)",
                 "  -apisetsdll : dump the ApiSet schema from apisetschema <FILE> (api set dll -> host dll)",
                 "  -knowndll : dump all the system's known dlls (x86 and x64)",
@@ -692,11 +693,13 @@ namespace Dependencies
 			bool early_exit = false;
 			bool show_help = false;
 			bool export_as_json = false;
+			bool use_bin_cache = false;
 			DumpCommand command = null;
 
 			OptionSet opts = new OptionSet() {
 							{ "h|help",  "show this message and exit", v => show_help = v != null },
 							{ "json",  "Export results in json format", v => export_as_json = v != null },
+							{ "cache",  "load and use binary cache to prevent dll file locking", v => use_bin_cache = v != null },
 							{ "d|depth=",  "limit recursion depth when analysing loaded modules or dependency chain. Default value is infinite", (int v) =>  recursion_depth = v },
 							{ "knowndll", "List all known dlls", v => { DumpKnownDlls(GetObjectPrinter(export_as_json));  early_exit = true; } },
 							{ "apisets", "List apisets redirections", v => { DumpApiSets(GetObjectPrinter(export_as_json));  early_exit = true; } },
@@ -720,7 +723,9 @@ namespace Dependencies
 				return;
 			}
 
-            if (eps.Count == 0)
+			BinaryCache.InitializeBinaryCache(use_bin_cache);
+
+			if (eps.Count == 0)
             {
                 Console.Error.WriteLine("[x] Command {0:s} needs to have a PE <FILE> argument", command.Method.Name);
                 Console.Error.WriteLine("");

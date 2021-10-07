@@ -75,25 +75,12 @@ namespace Dependencies
 
             Phlib.InitializePhLib();
 
-            // Load singleton for binary caching
-            if (Dependencies.BinaryCacheOption.GetGlobalBehaviour() == Dependencies.BinaryCacheOption.BinaryCacheOptionValue.Yes)
-            {
-                string ApplicationLocalAppDataPath = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "Dependencies"
-                );
-                BinaryCache.Instance = new BinaryCacheImpl(ApplicationLocalAppDataPath, 200);
-            }
-            else
-            {
-                BinaryCache.Instance = new BinaryNoCacheImpl();
-            }
-            
-            BinaryCache.Instance.Load();
+			// Load singleton for binary caching
+			BinaryCache.InitializeBinaryCache(Dependencies.BinaryCacheOption.GetGlobalBehaviour() == Dependencies.BinaryCacheOption.BinaryCacheOptionValue.Yes);
 
 
-            // https://www.red-gate.com/simple-talk/blogs/wpf-menu-displays-to-the-left-of-the-window/
-            SetDropDownMenuToBeRightAligned();
+			// https://www.red-gate.com/simple-talk/blogs/wpf-menu-displays-to-the-left-of-the-window/
+			SetDropDownMenuToBeRightAligned();
 
             mainWindow = new MainWindow();
             mainWindow.IsMaster = true;
