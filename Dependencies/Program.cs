@@ -290,7 +290,7 @@ namespace Dependencies
 
             foreach (ModuleReference moduleReference in ModuleReferences)
             {
-                Console.WriteLine("Import module {0:s} :", moduleReference.Name);
+                Console.WriteLine("-{0:s}", moduleReference.Name);
             }
 
             Console.WriteLine("[-] Import listing done");
@@ -311,7 +311,10 @@ namespace Dependencies
             {
                 var PeAssembly = AssemblyDefinition.ReadAssembly(Application.Filepath);
 
-                AssemblyReferences = PeAssembly.Modules.SelectMany(m => m.AssemblyReferences);
+				Resolver = new DefaultAssemblyResolver();
+				Resolver.AddSearchDirectory(Path.GetDirectoryName(_Application.Filepath));
+
+				AssemblyReferences = PeAssembly.Modules.SelectMany(m => m.AssemblyReferences);
             }
             catch (BadImageFormatException)
             {
@@ -320,19 +323,31 @@ namespace Dependencies
 
         public void PrettyPrint()
         {
-            Console.WriteLine("[-] Module references listing for file : {0}", Application.Filepath);
+            Console.WriteLine("[-] Assembly references listing for file : {0}", Application.Filepath);
 
             foreach (AssemblyNameReference assemblyReference in AssemblyReferences)
             {
-                Console.WriteLine("Import assembly {0:s} :", assemblyReference.Name);
+				AssemblyDefinition definition;
+				try
+				{
+					definition = Resolver.Resolve(assemblyReference);
+					Console.WriteLine("-{0:s} : {1:s}", assemblyReference.Name, definition);
+				}
+				catch (AssemblyResolutionException)
+				{
+					Console.WriteLine("-{0:s}", assemblyReference.Name);
+				}
+
+				
             }
 
             Console.WriteLine("[-] Import listing done");
         }
 
         private PE Application;
+		private DefaultAssemblyResolver Resolver;
 
-        public IEnumerable<AssemblyNameReference> AssemblyReferences { get; private set; } =
+		public IEnumerable<AssemblyNameReference> AssemblyReferences { get; private set; } =
             new List<AssemblyNameReference>();
     }
 
