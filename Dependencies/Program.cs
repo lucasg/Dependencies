@@ -8,6 +8,7 @@ using System.Diagnostics;
 using NDesk.Options;
 using Newtonsoft.Json;
 using Dependencies.ClrPh;
+using Mono.Cecil;
 
 namespace Dependencies
 {
@@ -263,6 +264,113 @@ namespace Dependencies
     }
 
 
+    internal class PEModuleReferences : IPrettyPrintable
+    {
+        public PEModuleReferences(PE _Application)
+        {
+            Application = _Application;
+
+            try
+            {
+                var PeAssembly = AssemblyDefinition.ReadAssembly(Application.Filepath);
+
+                ModuleReferences = PeAssembly.Modules.SelectMany(m => m.ModuleReferences)
+                    .Where(mr => mr.Name.Length > 0);
+            }
+            catch (BadImageFormatException)
+            {
+
+            }
+
+        }
+
+        public void PrettyPrint()
+        {
+            Console.WriteLine("[-] Module references listing for file : {0}", Application.Filepath);
+
+            foreach (ModuleReference moduleReference in ModuleReferences)
+            {
+                Console.WriteLine("-{0:s}", moduleReference.Name);
+            }
+
+            Console.WriteLine("[-] Import listing done");
+        }
+
+        private PE Application;
+
+        public IEnumerable<ModuleReference> ModuleReferences { get; private set; } = new List<ModuleReference>();
+    }
+
+    internal class PEAssemblyReferences : IPrettyPrintable
+    {
+        public PEAssemblyReferences(PE _Application)
+        {
+            Application = _Application;
+
+            try
+            {
+                var PeAssembly = AssemblyDefinition.ReadAssembly(Application.Filepath);
+
+				Resolver = new DefaultAssemblyResolver();
+				Resolver.AddSearchDirectory(Path.GetDirectoryName(_Application.Filepath));
+
+				AssemblyReferences = PeAssembly.Modules.SelectMany(m => m.AssemblyReferences);
+            }
+            catch (BadImageFormatException)
+            {
+            }
+        }
+
+        public void PrettyPrint()
+        {
+            Console.WriteLine("[-] Assembly references listing for file : {0}", Application.Filepath);
+
+            foreach (AssemblyNameReference assemblyReference in AssemblyReferences)
+            {
+				AssemblyDefinition definition;
+				try
+				{
+					definition = Resolver.Resolve(assemblyReference);
+					Console.WriteLine("-{0:s} : {1:s}", assemblyReference.Name, definition);
+				}
+				catch (AssemblyResolutionException)
+				{
+					Console.WriteLine("-{0:s}", assemblyReference.Name);
+				}
+
+				
+            }
+
+            Console.WriteLine("[-] Import listing done");
+        }
+
+        private PE Application;
+		private DefaultAssemblyResolver Resolver;
+
+		public IEnumerable<AssemblyNameReference> AssemblyReferences { get; private set; } =
+            new List<AssemblyNameReference>();
+    }
+
+    class ImportDll
+    {
+        public string Name { get; private set; }
+
+        public static ImportDll From(PeImportDll i)
+        {
+            return new ImportDll
+            {
+                Name = i.Name
+            };
+        }
+        public static ImportDll From(ModuleReference m)
+        {
+            return new ImportDll
+            {
+                Name = m.Name
+            };
+        }
+    }
+
     class PeDependencyItem : IPrettyPrintable
     {
 
@@ -274,7 +382,7 @@ namespace Dependencies
                 ModuleName = _ModuleName;
 
 
-    			Imports = new List<PeImportDll>();
+    			Imports = new List<ImportDll>();
     			Filepath = ModuleFilepath;
                 SearchStrategy = Strategy;
                 RecursionLevel = Level;
@@ -282,6 +390,8 @@ namespace Dependencies
                 DependenciesResolved = false;
                 FullDependencies = new List<PeDependencyItem>();
     			ResolvedImports = new List<PeDependencyItem>();
+                ModuleReferences = new List<ImportDll>();
+                AssemblyReferences = new List<AssemblyNameReference>();
             };
 
             SafeExecutor(action);
@@ -294,9 +404,19 @@ namespace Dependencies
     			if (Filepath != null)
     			{
     				PE Module = BinaryCache.LoadPe(Filepath);
-    				Imports = Module.GetImports();
-    			}
-    			else
+    				Imports = Module.GetImports().Select(i => ImportDll.From(i)).ToList();
+
+                    try
+                    {
+                        var PeAssembly = AssemblyDefinition.ReadAssembly(Filepath);
+
+                        ModuleReferences = PeAssembly.Modules.SelectMany(m => m.ModuleReferences).Where(mr => mr.Name.Length > 0).Select(m => ImportDll.From(m)).ToList();
+                        AssemblyReferences = PeAssembly.Modules.SelectMany(m => m.AssemblyReferences).ToList();
+                    } catch (BadImageFormatException)
+                    {
+                    }
+                }
+                else
     			{
     				//Module = null;
     			}
@@ -316,7 +436,7 @@ namespace Dependencies
 
                 List<PeDependencyItem> NewDependencies = new List<PeDependencyItem>();
 
-                foreach (PeImportDll DllImport in Imports)
+                foreach (ImportDll DllImport in Imports.Concat(ModuleReferences))
                 {
                     string ModuleFilepath = null;
                     ModuleSearchStrategy Strategy;
@@ -452,10 +572,13 @@ namespace Dependencies
             get { return IsNewModule() ? FullDependencies : new List<PeDependencyItem>(); }
         }
 
+
         // not Json exportable
         protected List<PeDependencyItem> FullDependencies;
 		protected List<PeDependencyItem> ResolvedImports;
-		protected List<PeImportDll> Imports;
+		protected List<ImportDll> Imports;
+        protected List<AssemblyNameReference> AssemblyReferences;
+        protected List<ImportDll> ModuleReferences;
         protected PeDependencies Root;
         protected int RecursionLevel;
 
@@ -627,6 +750,17 @@ namespace Dependencies
             PEImports Imports = new PEImports(Pe);
             Printer(Imports);
         }
+        public static void DumpAssemblyReferences(PE Pe, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
+        {
+            PEAssemblyReferences AssemblyReferences = new PEAssemblyReferences(Pe);
+            Printer(AssemblyReferences);
+        }
+
+        public static void DumpModuleReferences(PE Pe, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
+        {
+            PEModuleReferences ModuleReferences = new PEModuleReferences(Pe);
+            Printer(ModuleReferences);
+        }
 
         public static void DumpDependencyChain(PE Pe, Action<IPrettyPrintable> Printer, int recursion_depth = 0)
         {
@@ -708,6 +842,8 @@ namespace Dependencies
                             { "sxsentries", "dump all of <FILE>'s sxs dependencies", v => command = DumpSxsEntries },
                             { "imports", "dump <FILE> imports", v => command = DumpImports },
                             { "exports", "dump <FILE> exports", v => command = DumpExports },
+                            { "assemblyrefs", "dump <FILE> assemblyrefs", v => command = DumpAssemblyReferences},
+                            { "modulerefs", "dump <FILE> modulerefs", v => command = DumpModuleReferences},
                             { "chain", "dump <FILE> whole dependency chain", v => command = DumpDependencyChain },
                             { "modules", "dump <FILE> resolved modules", v => command = DumpModules },
 						};

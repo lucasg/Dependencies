@@ -17,6 +17,9 @@ NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/l
 `Dependencies` can help Windows developers troubleshooting their dll load dependencies issues.
 
 ## Releases
+* [v1.11](https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Release.zip) :
+	* lots of bugfixes and incremental improvements
+	* covid pandemic
 * [v1.10](https://github.com/lucasg/Dependencies/releases/download/v1.10/Dependencies_x64_Release.zip) :
 	* lots of bugfixes and incremental improvements
 	* support of Windows 8.1 apisets parsing
