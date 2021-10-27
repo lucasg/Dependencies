@@ -1,7 +1,7 @@
 # Dependencies - An open-source modern Dependency Walker
 [![Build status](https://ci.appveyor.com/api/projects/status/wtr5v8ksndbkkqxg?svg=true)](https://ci.appveyor.com/project/lucasg/dependencies)
 
-### [Download here](https://github.com/lucasg/Dependencies/releases/download/v1.10/Dependencies_x64_Release.zip)
+### [Download here](https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Release.zip)
 
 #### [(If you're running an AV, use this download instead)](https://github.com/lucasg/Dependencies/releases/download/v1.10/Dependencies_x64_Release_.without.peview.exe.zip)
 
