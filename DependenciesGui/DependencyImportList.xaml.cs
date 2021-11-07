@@ -83,5 +83,10 @@ namespace Dependencies
 			catch { }
 			
 		}
+
+		public void ResetAutoSortProperty()
+		{
+			Wpf.Util.GridViewSort.RemoveSort(this.Items, this);
+		}
 	}
 }

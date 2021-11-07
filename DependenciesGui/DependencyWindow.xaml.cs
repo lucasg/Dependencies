@@ -1222,9 +1222,11 @@ namespace Dependencies
 					var machingImports = Parent.Imports.FindAll(imp => imp.Name == SelectedModule._Name);
 					this.ImportList.SetImports(SelectedModule.Filepath, SelectedModule.Exports, machingImports, SymPrv, this);
 				}
+				this.ImportList.ResetAutoSortProperty();
 
 				this.ExportList.SetExports(SelectedModule.Exports, SymPrv);
-			}
+				this.ExportList.ResetAutoSortProperty();
+            }
         }
 
         public PE LoadImport(string ModuleName, DisplayModuleInfo CurrentModule = null, bool DelayLoad = false)

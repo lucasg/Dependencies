@@ -253,6 +253,16 @@ namespace Wpf.Util
             }
         }
 
+        public static void RemoveSort(ICollectionView view, ListView listView)
+        {
+            view.SortDescriptions.Clear();
+            GridViewColumnHeader currentSortedColumnHeader = GetSortedColumnHeader(listView);
+            if (currentSortedColumnHeader != null)
+            {
+                RemoveSortGlyph(currentSortedColumnHeader);
+            }
+        }
+
         private static void AddSortGlyph(GridViewColumnHeader columnHeader, ListSortDirection direction, ImageSource sortGlyph)
         {
             AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(columnHeader);
