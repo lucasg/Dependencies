@@ -210,7 +210,14 @@ namespace Dependencies
             // Update defaults
             Dependencies.Properties.Settings.Default.PeViewerPath = PeviewerPath;
 
-            if (TreeBuildCombo.SelectedItem != null)
+			int TreeDepth = Dependencies.Properties.Settings.Default.TreeDepth;
+			if (Int32.TryParse(TreeDepthValue.Text, out TreeDepth))
+			{
+				Dependencies.Properties.Settings.Default.TreeDepth = TreeDepth;
+			}
+			
+
+			if (TreeBuildCombo.SelectedItem != null)
             {
                 Dependencies.Properties.Settings.Default.TreeBuildBehaviour = TreeBuildCombo.SelectedItem.ToString();
             }
@@ -226,6 +233,7 @@ namespace Dependencies
 
                 Dependencies.Properties.Settings.Default.BinaryCacheOptionValue = newValue;
             }
+
 
             Dependencies.Properties.Settings.Default.Font = FontFamilyListItem.GetDisplayName(SelectedFontFamily);
             this.Close();
@@ -342,6 +350,18 @@ namespace Dependencies
             PeviewerPath = InputFileNameDlg.FileName;
         }
 
-    }
+		private void NumericOnly(System.Object sender, System.Windows.Input.TextCompositionEventArgs e)
+		{
+			e.Handled = IsTextNumeric(e.Text);
+
+		}
+
+		private static bool IsTextNumeric(string str)
+		{
+			System.Text.RegularExpressions.Regex reg = new System.Text.RegularExpressions.Regex("[^0-9]+");
+			return reg.IsMatch(str);
+
+		}
+	}
 
 }

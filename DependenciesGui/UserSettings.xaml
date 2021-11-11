@@ -25,6 +25,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -86,10 +87,27 @@
                   SelectedItem="{Binding Source={x:Static properties:Settings.Default}, Path=TreeBuildBehaviour, Mode=OneWay, Converter={StaticResource TreeBuildingBehaviourConverter}}"
                   />
 
-        
+        <!-- Tree depth -->
+        <Label Margin="5" 
+               Grid.Row="3"
+               Grid.Column="0"
+               Content="Tree depth:" 
+               HorizontalAlignment="Left" 
+               VerticalAlignment="Center" />
+
+        <TextBox  Name="TreeDepthValue"
+                  PreviewTextInput="NumericOnly"
+                  Grid.Row="3"
+                  Grid.Column="1" 
+                  Margin="5"
+                  Text="{Binding Source={x:Static properties:Settings.Default}, Path=TreeDepth, Mode=OneWay}"
+                  TextWrapping="Wrap" 
+                  VerticalContentAlignment="Center" />
+
+
         <!-- Font family selection -->
         <Label Margin="5"
-               Grid.Row="3"
+               Grid.Row="4"
                Grid.Column="0"
                Content="Font family:" 
                HorizontalAlignment="Left" 
@@ -97,12 +115,12 @@
 
         <ListBox Name="FontFamilyList"
                  Margin="5"
-                 Grid.Row="3"
+                 Grid.Row="4"
                  Grid.Column="1" />
         
         
         <!-- Buttons -->
-        <StackPanel Grid.Row="4" Grid.Column="1" 
+        <StackPanel Grid.Row="5" Grid.Column="1" 
                     Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="Cancel" 
                     Height="20"

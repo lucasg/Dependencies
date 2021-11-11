@@ -1098,8 +1098,13 @@ namespace Dependencies
                 }
 
 
-                // Process next batch of dll imports
-                if (SettingTreeBehaviour != TreeBuildingBehaviour.DependencyTreeBehaviour.ChildOnly)
+				// Process next batch of dll imports only if :
+				//	1. Recursive tree building has been activated
+				//  2. Recursion is not hitting the max depth level
+				bool doProcessNextLevel = (SettingTreeBehaviour != TreeBuildingBehaviour.DependencyTreeBehaviour.ChildOnly) &&
+										  (RecursionLevel < Dependencies.Properties.Settings.Default.TreeDepth);
+
+				if (doProcessNextLevel)
                 { 
                     foreach (var ImportNode in PEProcessingBacklog)
                     {
