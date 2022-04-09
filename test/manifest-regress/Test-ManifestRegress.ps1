@@ -53,7 +53,7 @@ function Test-Executable {
     }
     else 
     {
-        Write-Host -ForegroundColor Green "[+] $TestName test passed";    
+        Write-Host -ForegroundColor Green "[+] $TestName test passed";
     }
 
     Write-Output ""
@@ -73,3 +73,15 @@ Test-Executable -TestName "SystemSettings" -TestExecutable $SystemSettingsPath -
 # Double quotes in assemblyIdentity name attribute !
 $DevicePairingFolderPath = Join-Path $RegressDir "DevicePairingFolder.dll";
 Test-Executable -TestName "DevicePairingFolder" -TestExecutable $DevicePairingFolderPath -Command "-manifest" -StringToFound '<assemblyIdentity name="Microsoft.Windows.Shell.DevicePairingFolder" processorArchitecture="amd64"' -BinFolder $DependenciesDir
+
+# Redirect dll loading to a directory, so search for this directory name in the sxs dependencies
+$UseDll32Path = Join-Path $RegressDir "use_dll32.exe";
+Test-Executable -TestName "DllRedirection32" -TestExecutable $UseDll32Path -Command "-sxsentries" -StringToFound '\test_folder\depdll32.dll' -BinFolder $DependenciesDir
+
+# Redirect the dll to a directory, but also change the dll name!
+$UseDll64Path = Join-Path $RegressDir "use_dll64.exe";
+Test-Executable -TestName "DllRedirection64CustomName" -TestExecutable $UseDll64Path -Command "-sxsentries" -StringToFound '\test_folder\custom_name64.DLL' -BinFolder $DependenciesDir
+
+# Re-run the previous test, but ensure dependencies also knows the original dll name!
+$UseDll64Path = Join-Path $RegressDir "use_dll64.exe";
+Test-Executable -TestName "DllRedirection64RealName" -TestExecutable $UseDll64Path -Command "-sxsentries" -StringToFound 'depdll64.dll' -BinFolder $DependenciesDir
