@@ -42,6 +42,31 @@ namespace Dependencies
             Type = "";
             PublicKeyToken = "";
 
+            string loadFrom = SxsFile.Attribute("loadFrom")?.Value?.ToString();
+            if (!string.IsNullOrEmpty(loadFrom))
+            {
+                loadFrom = Environment.ExpandEnvironmentVariables(loadFrom);
+                if (!System.IO.Path.IsPathRooted(loadFrom))
+                {
+                    loadFrom = System.IO.Path.Combine(Folder, loadFrom);
+                }
+
+                // It's only a folder
+                if (loadFrom.EndsWith("\\") || loadFrom.EndsWith("/"))
+                {
+                    Path = System.IO.Path.Combine(loadFrom, RelPath);
+                }
+                else
+                {
+                    // It's also a dll name!
+                    Path = loadFrom;
+                    if (!Path.ToLower().EndsWith(".dll"))
+                    {
+                        Path += ".DLL";
+                    }
+                }
+            }
+
             if (SxsAssemblyIdentity != null)
             {
                 if (SxsAssemblyIdentity.Attribute("version") != null)
