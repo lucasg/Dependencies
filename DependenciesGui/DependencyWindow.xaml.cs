@@ -586,6 +586,7 @@ namespace Dependencies
             var RootFilename = Path.GetFileName(this.Filename);
             var RootModule = new DisplayModuleInfo(RootFilename, this.Pe, ModuleSearchStrategy.ROOT);
             this.ProcessedModulesCache.Add(new ModuleCacheKey(RootFilename, this.Filename), RootModule);
+            this.ModulesList.AddModule(RootModule);
 
             ModuleTreeViewItem treeNode = new ModuleTreeViewItem();
             DependencyNodeContext childTreeInfoContext = new DependencyNodeContext()
