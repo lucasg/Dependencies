@@ -85,7 +85,7 @@ namespace Dependencies
                 if (TestPe != null && TestPe.LoadSuccessful)
                 { 
                     Debug.WriteLine("Attempt to load {0:s} {1:s} {2:s}", PeFilePath, TestPe.GetProcessor(), ProcessorArch);
-                    if (TestPe.GetProcessor() == ProcessorArch)
+                    if (TestPe.CheckProcessor(ProcessorArch))
                         return PeFilePath;
                 }
             }
