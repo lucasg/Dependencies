@@ -495,15 +495,44 @@ namespace Dependencies
             }
         }
 
+        public RelayCommand CopyFilePathCommand
+        {
+            get
+            {
+                if (_CopyFilePathCommand == null)
+                {
+                    _CopyFilePathCommand = new RelayCommand((param) =>
+                    {
+                        string filePath = ModuleFilePath;
+                        if (filePath == null)
+                        {
+                            return;
+                        }
+
+                        Clipboard.Clear();
+
+                        try
+                        {
+
+                            Clipboard.SetText(filePath, TextDataFormat.Text);
+                        }
+                        catch { }
+                    });
+                }
+
+                return _CopyFilePathCommand;
+            }
+        }
+
         #endregion // Commands 
 
         private RelayCommand _OpenPeviewerCommand;
         private RelayCommand _OpenNewAppCommand;
-		private ModuleTreeViewItem _Parent;
+        private RelayCommand _CopyFilePathCommand;
+
+        private ModuleTreeViewItem _Parent;
 		private bool _importsVerified;
         private bool _has_child_errors;
-
-
     }
 
 
