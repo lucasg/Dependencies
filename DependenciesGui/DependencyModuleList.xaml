@@ -32,7 +32,7 @@
                                     Header = "{Binding DataContext.ModuleName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid}}"
                                     Command="{Binding Path=DataContext.CopyValue, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type Grid},AncestorLevel=1 }}"
                                     CommandParameter ="{Binding DataContext.ModuleName, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Grid }}"
-                                    InputGestureText="Ctrl+C"  
+                                    InputGestureText="Ctrl+C"
                                     IsEnabled="True"/>
             <MenuItem Header="Select All" 
                                 Command="ApplicationCommands.SelectAll" 

@@ -55,14 +55,14 @@
                         <MenuItem Header="Highlight Matching Module In List" 
                                 Command="{StaticResource DoFindModuleInList}"
                                 CommandParameter="{Binding RelativeSource={RelativeSource  AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
-                                InputGestureText="Ctrl+M" 
+                                InputGestureText="Ctrl+M"
                                 IsEnabled="True" />
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="Copy File Path" 
-                                Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
+                                Command="{Binding Path=CopyFilePathCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
                                 Background="WhiteSmoke" 
-                                InputGestureText="Ctrl+C" 
-                                IsEnabled="False"  />
+                                InputGestureText="Ctrl+C"
+                                IsEnabled="True"  />
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="Expand All" 
                                 Command="{StaticResource DoExpandAllNodes}"
@@ -75,7 +75,7 @@
                         <Separator Height="3" Margin="-1,0,0,0"/>
 
                         <MenuItem Header="View Module in separate application" 
-                                Command="{Binding  Path=OpenNewAppCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
+                                Command="{Binding Path=OpenNewAppCommand, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=TreeViewItem,Mode=FindAncestor}}"
                                 CommandParameter ="{Binding DataContext, RelativeSource={RelativeSource AncestorLevel=1,AncestorType=Grid,Mode=FindAncestor}}"
                                 InputGestureText="Alt+Enter"  
                                 IsEnabled="True" />
