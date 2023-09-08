@@ -980,6 +980,7 @@ namespace Dependencies
             BackgroundWorker bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true; // useless here for now
 
+            (Application.Current as App).StatusBarMessage = "Analyzing PE File " + CurrentPE.Filepath;
 
             bw.DoWork += (sender, e) => {
 
@@ -1112,7 +1113,8 @@ namespace Dependencies
                     }
                 }
 
-
+                
+                (Application.Current as App).StatusBarMessage = CurrentPE.Filepath + " Loaded successfully.";
             };
 
             bw.RunWorkerAsync();
