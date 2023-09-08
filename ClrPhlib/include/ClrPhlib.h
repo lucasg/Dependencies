@@ -159,6 +159,9 @@ namespace Dependencies {
 
             // Check if the PE is 32-bit
             bool IsArm32Dll();
+            
+            // Check if the PE is a dot net
+            bool IsClrDll();
 
             // return the processorArchiture of PE
             String^ GetProcessor();
