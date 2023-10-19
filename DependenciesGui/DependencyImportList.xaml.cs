@@ -71,7 +71,13 @@ namespace Dependencies
 				selectedImports.Add((import as DisplayPeImport));
 			}
 
-			string SelectedValues = String.Join("\n", selectedImports.Select( imp => imp.ToString()));
+			var result = MessageBox.Show("Only copy the function names?", "Copy", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
+			if (result == MessageBoxResult.Cancel)
+			{
+				return;
+			}
+
+			string SelectedValues = String.Join("\n", selectedImports.Select(imp => result == MessageBoxResult.Yes ? imp.Name : imp.ToString()));
 
 			Clipboard.Clear();
 			// sometimes another process has "opened" the clipboard, so we need to wait for it
