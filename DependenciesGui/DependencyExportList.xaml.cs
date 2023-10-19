@@ -51,7 +51,13 @@ namespace Dependencies
 				selectedExports.Add((import as DisplayPeExport));
 			}
 
-			string SelectedValues = String.Join("\n", selectedExports.Select(exp => exp.ToString()));
+			var result = MessageBox.Show("Only copy the function names?", "Copy", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
+			if (result == MessageBoxResult.Cancel)
+			{
+				return;
+			}
+
+			string SelectedValues = String.Join("\n", selectedExports.Select(exp => result == MessageBoxResult.Yes ? exp.Name : exp.ToString()));
 
 			Clipboard.Clear();
 
