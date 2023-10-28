@@ -37,19 +37,21 @@ namespace Dependencies
                     return;
                 }
 
+                //TODO: The code inside the if statement is relevant only incase we have a form? If yes, it can be deleted.
                 if (is_verbose)
                 {
                     // Redirect debug log to the console
-                    Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
+                    Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
                     Debug.AutoFlush = true;
                 }
 
                 // always the first call to make
                 Phlib.InitializePhLib();
 
+                BinaryCache.InitializeBinaryCache(true);
                 BinaryCache.Instance.Load();
 
-                foreach ( var peFilePath in eps)
+                foreach (var peFilePath in eps)
                 {
                     PE Pe = BinaryCache.LoadPe(peFilePath);
                     Console.WriteLine("Loaded PE file : {0:s}", Pe.Filepath);

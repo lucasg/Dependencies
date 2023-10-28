@@ -33,8 +33,8 @@ PeImport::PeImport(
 	this->Hint = other->Hint;
 	this->Ordinal = other->Ordinal;
 	this->DelayImport = other->DelayImport;
-	this->Name = String::Copy(other->Name);
-	this->ModuleName = String::Copy(other->ModuleName);
+	this->Name = gcnew String(other->Name);
+	this->ModuleName = gcnew String(other->ModuleName);
 	this->ImportByOrdinal = other->ImportByOrdinal;
 }
 
@@ -89,7 +89,7 @@ PeImportDll::PeImportDll(
 	memcpy(ImportDll, other->ImportDll, sizeof(PH_MAPPED_IMAGE_IMPORT_DLL));
 
 	Flags = other->Flags;
-	Name = String::Copy(other->Name);
+	Name = gcnew String(other->Name);
 	NumberOfEntries = other->NumberOfEntries;
 
 	for (size_t IndexImport = 0; IndexImport < (size_t)NumberOfEntries; IndexImport++)

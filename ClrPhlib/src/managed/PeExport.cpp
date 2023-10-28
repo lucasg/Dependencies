@@ -47,8 +47,8 @@ PeExport::PeExport(
 {
 	this->Ordinal = Ordinal;
 	this->ExportByOrdinal = ExportByOrdinal;
-	this->Name = String::Copy(other->Name);
-	this->ForwardedName = String::Copy(other->ForwardedName);
+	this->Name = gcnew String(other->Name);
+	this->ForwardedName = gcnew String(other->ForwardedName);
 	this->VirtualAddress = other->VirtualAddress;
 }
 

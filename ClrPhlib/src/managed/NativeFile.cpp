@@ -132,7 +132,7 @@ String^ NativeFile::GetPartialHashFile(_In_ String^ Path, _In_ size_t FileSize)
         goto CleanupExit;
 
 	// hash it
-	if (!HashBuffer((uint8_t *)fileBuffer, FileSize, BCRYPT_SHA256_ALGORITHM, &hash, &hash_size))
+	if (!HashBuffer((uint8_t *)fileBuffer, FileSize, (wchar_t*)BCRYPT_SHA256_ALGORITHM, &hash, &hash_size))
 		goto CleanupExit;
 
 	// Convert to hex string

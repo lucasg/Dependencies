@@ -772,7 +772,7 @@ typedef struct _PH_RELATIVE_BYTESREF
     ULONG Offset;
 } PH_RELATIVE_BYTESREF, *PPH_RELATIVE_BYTESREF, PH_RELATIVE_STRINGREF, *PPH_RELATIVE_STRINGREF;
 
-#define PH_STRINGREF_INIT(String) { sizeof(String) - sizeof(WCHAR), (String) }
+#define PH_STRINGREF_INIT(String) { sizeof(String) - sizeof(WCHAR), (PWSTR)(String) }
 #define PH_BYTESREF_INIT(String) { sizeof(String) - sizeof(CHAR), (String) }
 
 FORCEINLINE
@@ -1273,7 +1273,7 @@ PhGetStringOrEmpty(
     if (String)
         return String->Buffer;
     else
-        return L"";
+        return (PWSTR)L"";
 }
 
 /**
