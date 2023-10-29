@@ -149,7 +149,7 @@ namespace Dependencies
                 if (is_verbose)
                 {
                     // Redirect debug log to the console
-                    Debug.Listeners.Add(new TextWriterTraceListener(Console.Out));
+                    Trace.Listeners.Add(new TextWriterTraceListener(Console.Out));
                     Debug.AutoFlush = true;
                 }
 

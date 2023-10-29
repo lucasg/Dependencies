@@ -499,7 +499,7 @@ VOID PhShowStatus(
         }
         else
         {
-            PhShowError(hWnd, L"Unable to perform the operation.");
+            PhShowError(hWnd, L"%s", L"Unable to perform the operation.");
         }
 
         return;
