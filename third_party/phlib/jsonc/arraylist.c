@@ -57,6 +57,7 @@ array_list_get_idx(struct array_list *arr, int i)
   return arr->array[i];
 }
 
+
 static int array_list_expand_internal(struct array_list *arr, int max)
 {
   void *t;
@@ -64,12 +65,17 @@ static int array_list_expand_internal(struct array_list *arr, int max)
 
   if(max < arr->size) return 0;
   new_size = json_max(arr->size << 1, max);
-  if(!(t = realloc(arr->array, new_size*sizeof(void*)))) return -1;
+  t = realloc(arr->array, new_size*sizeof(void*));
+  if(!t) {
+    free(arr->array);
+    return -1;
+  }
   arr->array = (void**)t;
   (void)memset(arr->array + arr->size, 0, (new_size-arr->size)*sizeof(void*));
   arr->size = new_size;
   return 0;
 }
+
 
 int
 array_list_put_idx(struct array_list *arr, int idx, void *data)
