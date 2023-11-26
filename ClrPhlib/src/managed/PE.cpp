@@ -201,6 +201,16 @@ bool PE::IsArm32Dll()
   return ((Properties->Machine & 0xffff) == IMAGE_FILE_MACHINE_ARMNT);
 }
 
+bool PE::IsClrDll()
+{
+    PIMAGE_DATA_DIRECTORY dataDirectory;
+    if (NT_SUCCESS(PhGetMappedImageDataEntry( &m_Impl->m_PvMappedImage, IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR, &dataDirectory)))
+    {
+        return dataDirectory->VirtualAddress != 0;
+    }
+    return false;
+}
+
 String^ PE::GetProcessor()
 {
   if ((Properties->Machine & 0xffff) == IMAGE_FILE_MACHINE_I386)
