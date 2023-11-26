@@ -1,9 +1,7 @@
 # Dependencies - An open-source modern Dependency Walker
 [![Build status](https://ci.appveyor.com/api/projects/status/wtr5v8ksndbkkqxg?svg=true)](https://ci.appveyor.com/project/lucasg/dependencies)
 
-### [Download here](https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Release.zip)
-
-#### [(If you're running an AV, use this download instead)](https://github.com/lucasg/Dependencies/releases/download/v1.11.1/Dependencies_x64_Release_.without.peview.exe.zip)
+### [Download here](https://github.com/himeshsameera/Dependencies/releases/download/V2.0-alpha/Dependencies_V2.0-alpha_x64.zip)
 
 NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/library/ffkc918h.aspx), `Dependencies` needs [Visual C++  Redistributable](https://support.microsoft.com/en-us/help/2977003/the-latest-supported-visual-c-downloads) installed to run properly.
 
@@ -13,6 +11,7 @@ NB : due to [limitations on /clr compilation](https://msdn.microsoft.com/en-us/l
 
 
 ## Overview
+
 `Dependencies` is a rewrite of the legacy software [Dependency Walker](http://www.dependencywalker.com/) which was shipped along Windows SDKs, but whose development stopped around 2006.
 `Dependencies` can help Windows developers troubleshooting their dll load dependencies issues.
 
