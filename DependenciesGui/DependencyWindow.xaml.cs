@@ -972,10 +972,10 @@ namespace Dependencies
             ConstructDependencyTree(RootNode, CurrentPE, RecursionLevel);
         }
 
-        private void ConstructDependencyTree(ModuleTreeViewItem RootNode, PE CurrentPE, int RecursionLevel = 0)
+        private void ConstructDependencyTree(ModuleTreeViewItem rootNode, PE currentPE, int recursionLevel = 0)
         {
             // "Closured" variables (it 's a scope hack really).
-            Dictionary<string, ImportContext> NewTreeContexts = new Dictionary<string, ImportContext>();
+            Dictionary<string, ImportContext> contexts = new Dictionary<string, ImportContext>();
 
             BackgroundWorker bw = new BackgroundWorker();
             bw.WorkerReportsProgress = true; // useless here for now
@@ -983,15 +983,16 @@ namespace Dependencies
 
             bw.DoWork += (sender, e) => {
 
-                ProcessPe(NewTreeContexts, CurrentPE);
+                ProcessPe(contexts, currentPE);
             };
 
 
             bw.RunWorkerCompleted += (sender, e) =>
             {
-                TreeBuildingBehaviour.DependencyTreeBehaviour SettingTreeBehaviour = Dependencies.TreeBuildingBehaviour.GetGlobalBehaviour();
-                List<ModuleTreeViewItem> PeWithDummyEntries = new List<ModuleTreeViewItem>();
-                List<BacklogImport> PEProcessingBacklog = new List<BacklogImport>();
+                TreeBuildingBehaviour.DependencyTreeBehaviour treeBehaviour = Dependencies.TreeBuildingBehaviour.GetGlobalBehaviour();
+                List<ModuleTreeViewItem> peEntries = new List<ModuleTreeViewItem>();
+                List<BacklogImport> backlog = new List<BacklogImport>();
+                var cache = this.ProcessedModulesCache;
 
                 // Important !
                 // 
@@ -999,29 +1000,29 @@ namespace Dependencies
                 // which is authorized to manipulate UI elements. The BackgroundWorker is not.
                 //
 
-                foreach (ImportContext NewTreeContext in NewTreeContexts.Values)
+                foreach (ImportContext ctx in contexts.Values)
                 {
-                    ModuleTreeViewItem childTreeNode = new ModuleTreeViewItem(RootNode);
-                    DependencyNodeContext childTreeNodeContext = new DependencyNodeContext();
-                    childTreeNodeContext.IsDummy = false;
+                    ModuleTreeViewItem childNode = new ModuleTreeViewItem(rootNode);
+                    DependencyNodeContext nodeCtx = new DependencyNodeContext();
+                    nodeCtx.IsDummy = false;
 
-                    string ModuleName = NewTreeContext.ModuleName;
-                    string ModuleFilePath = NewTreeContext.PeFilePath;
-                    ModuleCacheKey ModuleKey = new ModuleCacheKey(NewTreeContext);
+                    string moduleName = ctx.ModuleName;
+                    string modulePath = ctx.PeFilePath;
+                    ModuleCacheKey moduleKey = new ModuleCacheKey(ctx);
 
                     // Newly seen modules
-                    if (!this.ProcessedModulesCache.ContainsKey(ModuleKey))
+                    if (!cache.ContainsKey(moduleKey))
                     {
                         // Missing module "found"
-                        if ((NewTreeContext.PeFilePath == null) || !NativeFile.Exists(NewTreeContext.PeFilePath)) 
+                        if ((ctx.PeFilePath == null) || !NativeFile.Exists(ctx.PeFilePath)) 
                         {
-							if (NewTreeContext.IsApiSet)
+							if (ctx.IsApiSet)
 							{
-								this.ProcessedModulesCache[ModuleKey] = new ApiSetNotFoundModuleInfo(ModuleName, NewTreeContext.ApiSetModuleName);
+								cache[moduleKey] = new ApiSetNotFoundModuleInfo(moduleName, ctx.ApiSetModuleName);
 							}
 							else
 							{
-								this.ProcessedModulesCache[ModuleKey] = new NotFoundModuleInfo(ModuleName);
+								cache[moduleKey] = new NotFoundModuleInfo(moduleName);
 							}
 								
                         }
@@ -1029,41 +1030,41 @@ namespace Dependencies
                         {
 
 
-                            if (NewTreeContext.IsApiSet)
+                            if (ctx.IsApiSet)
                             {
-                                var ApiSetContractModule = new DisplayModuleInfo(NewTreeContext.ApiSetModuleName, NewTreeContext.PeProperties, NewTreeContext.ModuleLocation, NewTreeContext.Flags);
-                                var NewModule = new ApiSetModuleInfo(NewTreeContext.ModuleName, ref ApiSetContractModule);
+                                var ApiSetContractModule = new DisplayModuleInfo(ctx.ApiSetModuleName, ctx.PeProperties, ctx.ModuleLocation, ctx.Flags);
+                                var NewModule = new ApiSetModuleInfo(ctx.ModuleName, ref ApiSetContractModule);
 
-                                this.ProcessedModulesCache[ModuleKey] = NewModule;
+                                cache[moduleKey] = NewModule;
 
-                                if (SettingTreeBehaviour == TreeBuildingBehaviour.DependencyTreeBehaviour.Recursive)
+                                if (treeBehaviour == TreeBuildingBehaviour.DependencyTreeBehaviour.Recursive)
                                 {
-                                    PEProcessingBacklog.Add(new BacklogImport(childTreeNode, ApiSetContractModule.ModuleName));
+                                    backlog.Add(new BacklogImport(childNode, ApiSetContractModule.ModuleName));
                                 }
                             }
                             else
                             {
-                                var NewModule = new DisplayModuleInfo(NewTreeContext.ModuleName, NewTreeContext.PeProperties, NewTreeContext.ModuleLocation, NewTreeContext.Flags);
-                                this.ProcessedModulesCache[ModuleKey] = NewModule;
+                                var NewModule = new DisplayModuleInfo(ctx.ModuleName, ctx.PeProperties, ctx.ModuleLocation, ctx.Flags);
+                                cache[moduleKey] = NewModule;
 
-                                switch(SettingTreeBehaviour)
+                                switch(treeBehaviour)
                                 {
                                     case TreeBuildingBehaviour.DependencyTreeBehaviour.RecursiveOnlyOnDirectImports:
-                                        if ((NewTreeContext.Flags & ModuleFlag.DelayLoad) == 0)
+                                        if ((ctx.Flags & ModuleFlag.DelayLoad) == 0)
                                         {
-                                            PEProcessingBacklog.Add(new BacklogImport(childTreeNode, NewModule.ModuleName));
+                                            backlog.Add(new BacklogImport(childNode, NewModule.ModuleName));
                                         }
                                         break;
 
                                     case TreeBuildingBehaviour.DependencyTreeBehaviour.Recursive:
-                                        PEProcessingBacklog.Add(new BacklogImport(childTreeNode, NewModule.ModuleName));
+                                        backlog.Add(new BacklogImport(childNode, NewModule.ModuleName));
                                         break;
                                 }
                             }
                         }
 
                         // add it to the module list
-                        this.ModulesList.AddModule(this.ProcessedModulesCache[ModuleKey]);
+                        this.ModulesList.AddModule(cache[moduleKey]);
                     }
                     
                     // Since we uniquely process PE, for thoses who have already been "seen",
@@ -1073,7 +1074,7 @@ namespace Dependencies
                     // it's asynchronous (we would have to wait for all the background to finish and
                     // use another Async worker to resolve).
 
-                    if ((NewTreeContext.PeProperties != null) && (NewTreeContext.PeProperties.GetImports().Count > 0))
+                    if ((ctx.PeProperties != null) && (ctx.PeProperties.GetImports().Count > 0))
                     {
                         ModuleTreeViewItem DummyEntry = new ModuleTreeViewItem();
                         DependencyNodeContext DummyContext = new DependencyNodeContext()
@@ -1086,29 +1087,29 @@ namespace Dependencies
                         DummyEntry.Header = "@Dummy : if you see this header, it's a bug.";
                         DummyEntry.IsExpanded = false;
 
-                        childTreeNode.Items.Add(DummyEntry);
-                        childTreeNode.Expanded += ResolveDummyEntries;
+                        childNode.Items.Add(DummyEntry);
+                        childNode.Expanded += ResolveDummyEntries;
                     }
 
                     // Add to tree view
-                    childTreeNodeContext.ModuleInfo = new WeakReference(this.ProcessedModulesCache[ModuleKey]);
-                    childTreeNode.DataContext = childTreeNodeContext;
-                    childTreeNode.Header = childTreeNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
-                    RootNode.Items.Add(childTreeNode);
+                    nodeCtx.ModuleInfo = new WeakReference(cache[moduleKey]);
+                    childNode.DataContext = nodeCtx;
+                    childNode.Header = childNode.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
+                    rootNode.Items.Add(childNode);
                 }
 
 
 				// Process next batch of dll imports only if :
 				//	1. Recursive tree building has been activated
 				//  2. Recursion is not hitting the max depth level
-				bool doProcessNextLevel = (SettingTreeBehaviour != TreeBuildingBehaviour.DependencyTreeBehaviour.ChildOnly) &&
-										  (RecursionLevel < Dependencies.Properties.Settings.Default.TreeDepth);
+				bool doProcessNextLevel = (treeBehaviour != TreeBuildingBehaviour.DependencyTreeBehaviour.ChildOnly) &&
+										  (recursionLevel < Dependencies.Properties.Settings.Default.TreeDepth);
 
 				if (doProcessNextLevel)
                 { 
-                    foreach (var ImportNode in PEProcessingBacklog)
+                    foreach (var ImportNode in backlog)
                     {
-                        ConstructDependencyTree(ImportNode.Item1, ImportNode.Item2, RecursionLevel + 1); // warning : recursive call
+                        ConstructDependencyTree(ImportNode.Item1, ImportNode.Item2, recursionLevel + 1); // warning : recursive call
                     }
                 }
 
@@ -1263,8 +1264,9 @@ namespace Dependencies
             if (ResolvedModule.Item1 == ModuleSearchStrategy.ApiSetSchema)
                 ModuleFlags |= ModuleFlag.ApiSet;
 
+            var cache = this.ProcessedModulesCache;
             ModuleCacheKey ModuleKey = new ModuleCacheKey(ModuleName, ModuleFilepath, ModuleFlags);
-            if (!this.ProcessedModulesCache.ContainsKey(ModuleKey))
+            if (!cache.ContainsKey(ModuleKey))
             {
                 DisplayModuleInfo NewModule;
 
@@ -1290,10 +1292,10 @@ namespace Dependencies
                     
                 }
 
-                this.ProcessedModulesCache[ModuleKey] = NewModule;
+                cache[ModuleKey] = NewModule;
 
                 // add it to the module list
-                this.ModulesList.AddModule(this.ProcessedModulesCache[ModuleKey]);
+                this.ModulesList.AddModule(cache[ModuleKey]);
             }
 
             return ResolvedModule.Item2;

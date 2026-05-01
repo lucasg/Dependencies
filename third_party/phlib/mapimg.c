@@ -335,15 +335,15 @@ PIMAGE_SECTION_HEADER PhMappedImageRvaToSection(
 {
     ULONG i;
 
+    IMAGE_SECTION_HEADER *sec = &MappedImage->Sections[0];
     for (i = 0; i < MappedImage->NumberOfSections; i++)
     {
-        if (
-            (Rva >= MappedImage->Sections[i].VirtualAddress) &&
-            (Rva < MappedImage->Sections[i].VirtualAddress + MappedImage->Sections[i].SizeOfRawData)
-            )
+        DWORD va = sec->VirtualAddress;
+        if ((Rva >= va) && (Rva < va + sec->SizeOfRawData))
         {
             return &MappedImage->Sections[i];
         }
+        ++sec;
     }
 
     return NULL;
