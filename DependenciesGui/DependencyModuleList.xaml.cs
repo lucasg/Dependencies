@@ -1,11 +1,6 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Collections.Generic;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Diagnostics;
-using System.ComponentModel;
-using System.Windows.Data;
 
 
 namespace Dependencies
@@ -38,6 +33,15 @@ namespace Dependencies
             }
 
             return hashcode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is ModuleCacheKey o)
+            {
+                return this.GetHashCode() == o.GetHashCode();
+            }
+            return false;
         }
 
         public string Name;
