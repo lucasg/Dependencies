@@ -1346,6 +1346,27 @@ namespace Dependencies
             }
         }
 
+        private void CopyFilePath_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ModuleTreeViewItem Source = e.Source as ModuleTreeViewItem;
+            String SelectedModuleName = Source.GetTreeNodeHeaderName(Dependencies.Properties.Settings.Default.FullPath);
+            if (Source == null)
+                return;
+
+            Clipboard.SetText(SelectedModuleName);
+        }
+
+        private void OpenInExplorer_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            ModuleTreeViewItem Source = e.Source as ModuleTreeViewItem;
+            if (Source == null)
+                return;
+
+            String commandParameter = "/select,\"" + Source.ModuleFilePath + "\"";
+
+            Process.Start("explorer.exe", commandParameter);
+        }
+
         private void ExpandAllParentNode(ModuleTreeViewItem Item)
         {
             if (Item != null)

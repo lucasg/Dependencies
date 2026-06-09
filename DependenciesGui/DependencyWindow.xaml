@@ -50,6 +50,8 @@
                     <RoutedUICommand x:Key="DoExpandAllNodes" Text="Expand All" />
                     <RoutedUICommand x:Key="DoCollapseAllNodes" Text="Collapse All" />
                     <RoutedUICommand x:Key="DoFindModuleInList" Text="Highlight Matching Module In List" />
+                    <RoutedUICommand x:Key="CopyFilePath" Text="Copy File Path" />
+                    <RoutedUICommand x:Key="OpenInExplorer" Text="Open in File Explorer" />
 
                     <ContextMenu x:Key="TreeItemContextMenu">
                         <MenuItem Header="Highlight Matching Module In List" 
@@ -59,10 +61,14 @@
                                 IsEnabled="True" />
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="Copy File Path" 
-                                Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
+                                Command="{StaticResource CopyFilePath}"
                                 Background="WhiteSmoke" 
                                 InputGestureText="Ctrl+C" 
-                                IsEnabled="False"  />
+                                IsEnabled="True"  />
+                        <MenuItem Header="Open in File Explorer" 
+                                Command="{StaticResource OpenInExplorer}"
+                                Background="WhiteSmoke" 
+                                IsEnabled="True"  />
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="Expand All" 
                                 Command="{StaticResource DoExpandAllNodes}"
@@ -171,6 +177,8 @@
                     <CommandBinding Command="{StaticResource DoExpandAllNodes}" Executed="ExpandAllNodes_Executed"/>
                     <CommandBinding Command="{StaticResource DoCollapseAllNodes}" Executed="CollapseAllNodes_Executed"/>
                     <CommandBinding Command="{StaticResource DoFindModuleInList}" Executed="DoFindModuleInList_Executed"/>
+                    <CommandBinding Command="{StaticResource CopyFilePath}" Executed="CopyFilePath_Executed"/>
+                    <CommandBinding Command="{StaticResource OpenInExplorer}" Executed="OpenInExplorer_Executed"/>
                 </TreeView.CommandBindings>
             </TreeView>
             

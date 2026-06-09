@@ -59,12 +59,22 @@ namespace Dependencies
             SearchBar.TargetControl = this;
         }
 
+        protected IEnumerable<object> GetSelectedItemsInDisplayOrder()
+        {
+            foreach (object item in this.Items)
+            {
+                if (this.SelectedItems.Contains(item))
+                {
+                    yield return item;
+                }
+            }
+        }
+
 
 
         #region events handlers
         protected virtual void OnListViewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            System.Windows.Controls.ListView ListView = sender as System.Windows.Controls.ListView;
             bool CtrlKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftCtrl) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightCtrl);
 			bool ShiftKeyDown = Keyboard.IsKeyDown(System.Windows.Input.Key.LeftShift) || Keyboard.IsKeyDown(System.Windows.Input.Key.RightShift);
 
@@ -72,7 +82,7 @@ namespace Dependencies
             if ((e.Key == System.Windows.Input.Key.C) && CtrlKeyDown && !ShiftKeyDown)
 			{
                 List<string> StrToCopy = new List<string>();
-                foreach (object SelectItem in ListView.SelectedItems)
+                foreach (object SelectItem in GetSelectedItemsInDisplayOrder())
                 {
                     StrToCopy.Add(CopyHandler(SelectItem));
                 }

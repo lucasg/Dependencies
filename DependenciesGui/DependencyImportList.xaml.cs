@@ -65,13 +65,17 @@ namespace Dependencies
 			if (this.SelectedItems.Count == 0)
 				return;
 
-			List<DisplayPeImport> selectedImports = new List<DisplayPeImport>();
-			foreach (var import in this.SelectedItems)
+			List<DisplayPeImport> selectedImports = GetSelectedItemsInDisplayOrder()
+				.Cast<DisplayPeImport>()
+				.ToList();
+
+			var result = MessageBox.Show("Only copy the function names?", "Copy", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
+			if (result == MessageBoxResult.Cancel)
 			{
-				selectedImports.Add((import as DisplayPeImport));
+				return;
 			}
 
-			string SelectedValues = String.Join("\n", selectedImports.Select( imp => imp.ToString()));
+			string SelectedValues = String.Join("\n", selectedImports.Select(imp => result == MessageBoxResult.Yes ? imp.Name : imp.ToString()));
 
 			Clipboard.Clear();
 			// sometimes another process has "opened" the clipboard, so we need to wait for it

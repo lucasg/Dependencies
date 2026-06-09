@@ -22,7 +22,7 @@ namespace Dependencies
 
         private void Uri_RequestNavigate(object sender, RequestNavigateEventArgs e)
         {
-            Process.Start(e.Uri.ToString());
+            Process.Start(new ProcessStartInfo { FileName = e.Uri.ToString(), UseShellExecute = true });
         }
 
         public string VersionStr

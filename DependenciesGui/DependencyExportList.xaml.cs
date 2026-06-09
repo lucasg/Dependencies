@@ -45,13 +45,17 @@ namespace Dependencies
 			if (this.SelectedItems.Count == 0)
 				return;
 
-			List<DisplayPeExport> selectedExports = new List<DisplayPeExport>();
-			foreach (var import in this.SelectedItems)
+			List<DisplayPeExport> selectedExports = GetSelectedItemsInDisplayOrder()
+				.Cast<DisplayPeExport>()
+				.ToList();
+
+			var result = MessageBox.Show("Only copy the function names?", "Copy", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
+			if (result == MessageBoxResult.Cancel)
 			{
-				selectedExports.Add((import as DisplayPeExport));
+				return;
 			}
 
-			string SelectedValues = String.Join("\n", selectedExports.Select(exp => exp.ToString()));
+			string SelectedValues = String.Join("\n", selectedExports.Select(exp => result == MessageBoxResult.Yes ? exp.Name : exp.ToString()));
 
 			Clipboard.Clear();
 

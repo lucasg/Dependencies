@@ -136,7 +136,7 @@ public class DisplayPeExport : SettingBindingHandler
                         return;
                     }
 
-                    Process.Start(@"https://docs.microsoft.com/search/?search=" + ExportName);
+                    Process.Start(new ProcessStartInfo { FileName = @"https://docs.microsoft.com/search/?search=" + ExportName, UseShellExecute = true });
                 });
             }
 
