@@ -65,17 +65,9 @@ namespace Dependencies
 			if (this.SelectedItems.Count == 0)
 				return;
 
-			List<DisplayPeImport> selectedImports = new List<DisplayPeImport>();
-			foreach (var import in this.SelectedItems)
-			{
-				selectedImports.Add((import as DisplayPeImport));
-			}
-			if (SelectedIndex != 0)
-			{
-				var firstSelectedItem = selectedImports[0];
-				selectedImports.Remove(firstSelectedItem);
-				selectedImports.Insert(SelectedIndex, firstSelectedItem);
-			}
+			List<DisplayPeImport> selectedImports = GetSelectedItemsInDisplayOrder()
+				.Cast<DisplayPeImport>()
+				.ToList();
 
 			var result = MessageBox.Show("Only copy the function names?", "Copy", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.Cancel);
 			if (result == MessageBoxResult.Cancel)
