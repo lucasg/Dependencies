@@ -76,9 +76,9 @@
             <MenuItem x:Name="FileItem" Header="_File" Height="25" Width="39" VerticalAlignment="Top" >
                 <MenuItem x:Name="OpenItem" Header="_Open" Height="25" Command="Open" InputGestureText="Ctrl+O" />
                 <Separator Height="3"/>
-                <MenuItem x:Name="RecentItems" Header="Recent Items" HorizontalAlignment="Left" ItemsSource="{Binding  Path=RecentsItems}">
+                <MenuItem x:Name="RecentItems" Header="Recent Items" HorizontalAlignment="Left" ItemsSource="{Binding Path=RecentsItems}">
                     <MenuItem.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type local:RecentMenuItem}" ItemsSource="{Binding  Path=RecentsItems}">
+                        <HierarchicalDataTemplate DataType="{x:Type local:RecentMenuItem}">
                             <TextBlock Text="{Binding Path=HeaderTitle}"/>
                         </HierarchicalDataTemplate>
                     </MenuItem.ItemTemplate>
@@ -103,7 +103,7 @@
                 <MenuItem x:Name="_StatusBarItem" Header="Status Bar" Height="25" IsCheckable="True" Margin="0" IsChecked="{Binding Source={x:Static properties:Settings.Default}, Path=ShowStatusBar, Mode=TwoWay}"/>
             </MenuItem>
             <MenuItem x:Name="OptionsItem" Header="_Options" Height="25" Width="54">
-                <MenuItem x:Name="CustomizeSearchFoldersItem" Header="_Customize search folders" Height="25" Margin="0" Command="local:MainWindow.OpenCustomizeSearchFolderCommand" IsEnabled="{Binding Path=DataContext.EnableSearchFolderCustomization, Source=OneWay}"/>
+                <MenuItem x:Name="CustomizeSearchFoldersItem" Header="_Customize search folders" Height="25" Margin="0" Command="local:MainWindow.OpenCustomizeSearchFolderCommand" IsEnabled="{Binding Path=EnableSearchFolderCustomization, Mode=OneWay}"/>
                 <Separator Height="3" Margin="0"/>
                 <MenuItem x:Name="UserSettingsItem" Header="_Properties" Height="25" Margin="0" Command="local:MainWindow.OpenUserSettingsCommand"/>
             </MenuItem>

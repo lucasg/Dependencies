@@ -122,6 +122,9 @@ public class DisplayPeImport : SettingBindingHandler
 
     public string Demangler { get { return this.Info.Demangler; } }
 
+    // used as tooltip, added to remove XAML binding fails
+    public string Status { get; } = null;
+
     protected string GetDisplayName(bool UndecorateName)
     {
         if (Info.importByOrdinal)

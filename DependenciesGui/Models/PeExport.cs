@@ -102,6 +102,9 @@ public class DisplayPeExport : SettingBindingHandler
 
     public string Demangler { get { return PeInfo.Demangler; } }
 
+    // used as tooltip, added to remove XAML binding fails
+    public string Status { get; } = null;
+
     protected string GetDisplayName(bool Undecorate)
     { 
         if (PeInfo.exportByOrdinal)
