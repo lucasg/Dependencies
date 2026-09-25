@@ -185,6 +185,8 @@ namespace Dependencies
 
             TreeBuildCombo.ItemsSource = Enum.GetValues(typeof(TreeBuildingBehaviour.DependencyTreeBehaviour));
             BinaryCacheCombo.ItemsSource = Enum.GetValues(typeof(BinaryCacheOption.BinaryCacheOptionValue));
+            ThemeCombo.ItemsSource = Enum.GetValues(typeof(AppTheme));
+            ThemeCombo.SelectedItem = ThemeManager.CurrentSetting;
             PeviewerPath = Dependencies.Properties.Settings.Default.PeViewerPath;
 
         }
@@ -236,6 +238,12 @@ namespace Dependencies
 
 
             Dependencies.Properties.Settings.Default.Font = FontFamilyListItem.GetDisplayName(SelectedFontFamily);
+
+            if (ThemeCombo.SelectedItem is AppTheme selectedTheme && selectedTheme != ThemeManager.CurrentSetting)
+            {
+                ThemeManager.SetTheme(selectedTheme);
+            }
+
             this.Close();
         }
 

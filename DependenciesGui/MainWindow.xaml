@@ -57,13 +57,13 @@
                 <Setter Property="Margin" Value="0 0 0 0" />
                 <Setter Property="AdjacentHeaderItemOffset" Value="-10" />
                 <Setter Property="FixedHeaderCount" Value="0" />
-                <Setter Property="Background" Value="#FF5C8F88"/>
+                <Setter Property="Background" Value="{DynamicResource Theme.AppBackground}"/>
             </Style>
         </ResourceDictionary>
 
     </Window.Resources>
 
-    <Grid x:Name="MainGrid" Margin="0,0,0,0" Background="#FF5C8F88">
+    <Grid x:Name="MainGrid" Margin="0,0,0,0" Background="{DynamicResource Theme.AppBackground}">
         <Grid.RowDefinitions>
             <RowDefinition Height="26"/>
             <RowDefinition Height="785*"/>
@@ -145,6 +145,8 @@
         <!-- DependencyWindow does not support being a floating window => IsFloatDropZoneEnabled="False" -->
         <!-- all dragablz controls need to reference  Partition="2AE89D18-F236-4D20-9605-6C03319038E6" in order to dock correctly -->
         <dockablz:Layout Partition="2AE89D18-F236-4D20-9605-6C03319038E6" Name="DependencyRootLayout"
+                     Background="{DynamicResource Theme.AppBackground}"
+                     BorderBrush="{DynamicResource Theme.ListBorder}"
                     IsFloatDropZoneEnabled="False"
                     FloatingItemHeaderMemberPath="Header"
                     Grid.Row="1" d:IsHidden="True">
@@ -160,6 +162,8 @@
             <!-- a root, named tab control is needed, so when a tab is torn and a new window is created, the new target tab control can be identified -->
             <dragablz:TabablzControl x:Name="TabControl"
                                  Style="{StaticResource DependenciesTabControlStyle}"
+                                 BorderBrush="{DynamicResource Theme.ListBorder}"
+                                 Background="{DynamicResource Theme.AppBackground}"
                                  InterTabController="{StaticResource DependenciesInterTabController}">
         
                 

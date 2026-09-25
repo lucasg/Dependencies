@@ -140,6 +140,7 @@
       <DependentUpon>DependencyModuleList.xaml</DependentUpon>
     </Compile>
     <Compile Include="DragablzCustomHeader.cs" />
+    <Compile Include="ThemeManager.cs" />
     <Compile Include="FilterControl\FilterControl.cs" />
     <Compile Include="Helpers\RelayCommand.cs" />
     <Compile Include="Helpers\SettingBindingHandler.cs" />
@@ -178,6 +179,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="DependencyWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\LightTheme.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\DarkTheme.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

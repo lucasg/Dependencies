@@ -1,0 +1,29 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Application specific brushes (light) -->
+    <SolidColorBrush x:Key="Theme.AppBackground" Color="#FF5C8F88" />
+    <SolidColorBrush x:Key="Theme.ListBackground" Color="White" />
+    <SolidColorBrush x:Key="Theme.ListForeground" Color="Black" />
+    <SolidColorBrush x:Key="Theme.ListSelectionBackground" Color="#FF0078D7" />
+    <SolidColorBrush x:Key="Theme.ListSelectionForeground" Color="White" />
+    <SolidColorBrush x:Key="Theme.ListHoverBackground" Color="#FFE5F3FF" />
+    <SolidColorBrush x:Key="Theme.ListBorder" Color="#FF828790" />
+    <SolidColorBrush x:Key="Theme.GroupHeaderBackground" Color="Gainsboro" />
+    <SolidColorBrush x:Key="Theme.GroupHeaderBorder" Color="LightGray" />
+    <SolidColorBrush x:Key="Theme.SearchFolderBackground" Color="#FFE2E2E2" />
+    <SolidColorBrush x:Key="Theme.FilterBorder" Color="#ADADAD" />
+    <SolidColorBrush x:Key="Theme.FilterHint" Color="#ADADAD" />
+    <SolidColorBrush x:Key="Theme.FilterInputBorder" Color="#FF7F9DB9" />
+    <SolidColorBrush x:Key="Theme.ClearButtonHoverBackground" Color="WhiteSmoke" />
+    <SolidColorBrush x:Key="Theme.DisabledMenuItemBackground" Color="WhiteSmoke" />
+
+    <!-- GridView column header (the styles themselves live in DependencyCustomListView.xaml
+         so that they follow theme changes at runtime) -->
+    <SolidColorBrush x:Key="Theme.HeaderBackground" Color="#FFF0F0F0" />
+    <SolidColorBrush x:Key="Theme.HeaderForeground" Color="Black" />
+    <SolidColorBrush x:Key="Theme.HeaderBorder" Color="#FFD5D5D5" />
+    <SolidColorBrush x:Key="Theme.HeaderHoverBackground" Color="#FFE5F3FF" />
+    <SolidColorBrush x:Key="Theme.HeaderPressedBackground" Color="#FFCCE8FF" />
+
+</ResourceDictionary>

@@ -44,5 +44,8 @@
     <Setting Name="BinaryCacheOptionValue" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
+    <Setting Name="Theme" Type="System.String" Scope="User">
+      <Value Profile="(Default)">System</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

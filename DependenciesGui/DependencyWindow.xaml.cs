@@ -1180,7 +1180,7 @@ namespace Dependencies
             if (SelectedModule.HasErrors)
             {
                 // TODO : do a proper refresh instead of asking the user to do it
-                System.Windows.MessageBox.Show(String.Format("We could not find {0:s} file on the disk anymore, please fix this problem and refresh the window via F5", SelectedModule.Filepath));
+                MessageBox.Show(String.Format("We could not find {0:s} file on the disk anymore, please fix this problem and refresh the window via F5", SelectedModule.Filepath));
             }
 
             // Root Item : no parent

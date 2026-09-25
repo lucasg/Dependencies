@@ -82,6 +82,8 @@ namespace Dependencies
 			// https://www.red-gate.com/simple-talk/blogs/wpf-menu-displays-to-the-left-of-the-window/
 			SetDropDownMenuToBeRightAligned();
 
+			ThemeManager.Initialize();
+
             mainWindow = new MainWindow();
             mainWindow.IsMaster = true;
 
@@ -113,6 +115,7 @@ namespace Dependencies
         void App_Exit(object sender, ExitEventArgs e)
         {
             Dependencies.Properties.Settings.Default.Save();
+            ThemeManager.Shutdown();
             BinaryCache.Instance.Unload();
         }
 

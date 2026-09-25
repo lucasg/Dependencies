@@ -10,9 +10,67 @@
     mc:Ignorable="d" 
     x:Class="DependencyCustomListView"
 >
-    <Style x:Key="LeftAlignHeader" TargetType="{x:Type GridViewColumnHeader}">
-        <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
-        <Setter Property="Padding" Value="5,0,0,0"></Setter>
+    <!-- Column header styles. They live here (and not in the theme dictionaries) because
+         they are referenced with StaticResource from the list views: keeping them in a
+         dictionary that is never swapped, and resolving the colors with DynamicResource,
+         makes the headers follow theme changes at runtime. -->
+    <Style TargetType="{x:Type GridViewColumnHeader}">
+        <Setter Property="Background" Value="{DynamicResource Theme.HeaderBackground}" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.HeaderForeground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource Theme.HeaderBorder}" />
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Padding" Value="2,0,2,0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type GridViewColumnHeader}">
+                    <Grid SnapsToDevicePixels="True">
+                        <Border x:Name="HeaderBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="0,0,1,1">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              MinHeight="20"
+                                              HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <Thumb x:Name="PART_HeaderGripper"
+                               HorizontalAlignment="Right"
+                               Margin="0,0,-4,0"
+                               Width="8"
+                               Cursor="SizeWE">
+                            <Thumb.Template>
+                                <ControlTemplate TargetType="{x:Type Thumb}">
+                                    <Border Background="Transparent" />
+                                </ControlTemplate>
+                            </Thumb.Template>
+                        </Thumb>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource Theme.HeaderHoverBackground}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="HeaderBorder" Property="Background" Value="{DynamicResource Theme.HeaderPressedBackground}" />
+                        </Trigger>
+                        <Trigger Property="Role" Value="Padding">
+                            <Setter TargetName="HeaderBorder" Property="BorderThickness" Value="0,0,0,1" />
+                            <Setter TargetName="PART_HeaderGripper" Property="Visibility" Value="Collapsed" />
+                        </Trigger>
+                        <Trigger Property="Role" Value="Floating">
+                            <Setter TargetName="PART_HeaderGripper" Property="Visibility" Value="Collapsed" />
+                            <Setter Property="Opacity" Value="0.7" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="LeftAlignHeader" TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="Padding" Value="5,0,0,0" />
     </Style>
 
     <Style x:Key="DependencyCustomListViewItem" TargetType="{x:Type ListViewItem}">
@@ -20,11 +78,49 @@
         <Setter Property="FontFamily" Value="{Binding Source={x:Static properties:Settings.Default}, Path=Font, Mode=OneWay}" />
         <Setter Property="ContextMenu" Value="{DynamicResource ResourceKey=ItemContextMenu}" />
         <Setter Property="ToolTip" Value="{Binding Status }" />
+        <!-- An explicit ItemContainerStyle bypasses the implicit theme styles, so the
+             theme colors have to be applied here explicitly. The default ListViewItem
+             template hardcodes a light blue selection highlight in its template triggers,
+             which is unreadable on a dark background, hence the custom template. -->
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource Theme.ListForeground}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ListViewItem}">
+                    <Border x:Name="Bd"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <GridViewRowPresenter Content="{TemplateBinding Content}"
+                                              Columns="{TemplateBinding GridView.ColumnCollection}"
+                                              SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsSelected" Value="False" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.ListHoverBackground}" />
+                        </MultiTrigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="Bd" Property="Background" Value="{DynamicResource Theme.ListSelectionBackground}" />
+                            <Setter Property="Foreground" Value="{DynamicResource Theme.ListSelectionForeground}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="DependencyCustomListViewStyle" TargetType="{x:Type local:DependencyCustomListView}">
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+        <Setter Property="Background" Value="{DynamicResource Theme.ListBackground}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Theme.ListForeground}"/>
         <Setter Property="util:GridViewSort.AutoSort" Value="True"/>
         <Setter Property="ItemContainerStyle" Value="{StaticResource DependencyCustomListViewItem}"/>
         
@@ -33,7 +129,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type local:DependencyCustomListView}">
-                    <Border x:Name="_Border" Background="White" BorderBrush="#FF828790" BorderThickness="1,1,1,1">
+                    <Border x:Name="_Border" Background="{DynamicResource Theme.ListBackground}" BorderBrush="{DynamicResource Theme.ListBorder}" BorderThickness="1,1,1,1">
                         <Grid  x:Name="_Grid"   SnapsToDevicePixels="true">
 
                             <Grid.RowDefinitions>
@@ -41,7 +137,74 @@
                                 <RowDefinition  Height="auto" MaxHeight="25"/>
                             </Grid.RowDefinitions>
 
-                            <ScrollViewer Style="{DynamicResource {x:Static GridView.GridViewScrollViewerStyleKey}}" >
+                            <ScrollViewer Background="{DynamicResource Theme.ListBackground}"
+                                          Focusable="False">
+                                <!-- Same layout as the framework GridView scroll viewer, but the corner
+                                     between the scrollbars uses the theme instead of a hardcoded white. -->
+                                <ScrollViewer.Template>
+                                    <ControlTemplate TargetType="{x:Type ScrollViewer}">
+                                        <Grid Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="*" />
+                                                <RowDefinition Height="Auto" />
+                                            </Grid.RowDefinitions>
+
+                                            <DockPanel Margin="{TemplateBinding Padding}">
+                                                <ScrollViewer DockPanel.Dock="Top"
+                                                              HorizontalScrollBarVisibility="Hidden"
+                                                              VerticalScrollBarVisibility="Hidden"
+                                                              Focusable="False">
+                                                    <GridViewHeaderRowPresenter Margin="2,0,2,0"
+                                                                                Columns="{Binding TemplatedParent.View.Columns, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                ColumnHeaderContainerStyle="{Binding TemplatedParent.View.ColumnHeaderContainerStyle, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                ColumnHeaderTemplate="{Binding TemplatedParent.View.ColumnHeaderTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                ColumnHeaderTemplateSelector="{Binding TemplatedParent.View.ColumnHeaderTemplateSelector, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                ColumnHeaderStringFormat="{Binding TemplatedParent.View.ColumnHeaderStringFormat, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                AllowsColumnReorder="{Binding TemplatedParent.View.AllowsColumnReorder, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                ColumnHeaderContextMenu="{Binding TemplatedParent.View.ColumnHeaderContextMenu, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                ColumnHeaderToolTip="{Binding TemplatedParent.View.ColumnHeaderToolTip, RelativeSource={RelativeSource TemplatedParent}}"
+                                                                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                </ScrollViewer>
+
+                                                <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
+                                                                        KeyboardNavigation.DirectionalNavigation="Local"
+                                                                        CanContentScroll="{TemplateBinding CanContentScroll}"
+                                                                        CanHorizontallyScroll="False"
+                                                                        CanVerticallyScroll="False"
+                                                                        Content="{TemplateBinding Content}"
+                                                                        ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                                        SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                            </DockPanel>
+
+                                            <ScrollBar x:Name="PART_HorizontalScrollBar"
+                                                       Grid.Row="1"
+                                                       Orientation="Horizontal"
+                                                       Cursor="Arrow"
+                                                       Minimum="0"
+                                                       Maximum="{TemplateBinding ScrollableWidth}"
+                                                       ViewportSize="{TemplateBinding ViewportWidth}"
+                                                       Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                       Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}" />
+
+                                            <ScrollBar x:Name="PART_VerticalScrollBar"
+                                                       Grid.Column="1"
+                                                       Orientation="Vertical"
+                                                       Cursor="Arrow"
+                                                       Minimum="0"
+                                                       Maximum="{TemplateBinding ScrollableHeight}"
+                                                       ViewportSize="{TemplateBinding ViewportHeight}"
+                                                       Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                                                       Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}" />
+
+                                            <Rectangle Grid.Row="1" Grid.Column="1"
+                                                       Fill="{Binding Background, ElementName=PART_VerticalScrollBar}" />
+                                        </Grid>
+                                    </ControlTemplate>
+                                </ScrollViewer.Template>
                                 <ItemsPresenter x:Name="ContentsItems" Grid.Row="0"/>
                             </ScrollViewer>
 

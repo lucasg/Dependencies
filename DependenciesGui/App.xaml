@@ -8,7 +8,10 @@
             <ResourceDictionary.MergedDictionaries>
                 <!-- Import themes for Dragablz forms -->
                 <ResourceDictionary Source="pack://application:,,,/Dragablz;component/Themes/Generic.xaml" />
-                
+
+                <!-- Application theme (swapped at runtime by ThemeManager) -->
+                <ResourceDictionary Source="pack://application:,,,/DependenciesGui;component/Themes/LightTheme.xaml" />
+
                 <!-- Import themes for FilterControl forms -->
                 <ResourceDictionary Source="pack://application:,,,/DependenciesGui;component/FilterControl/FilterControl.generic.xaml" />
 

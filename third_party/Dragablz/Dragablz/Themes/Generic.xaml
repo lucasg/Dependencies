@@ -190,6 +190,7 @@
     <!-- these tab styles are as close as possible to the default .net styles, so the tab will fit straight in to an unstyled app -->
     <SolidColorBrush x:Key="TabItem.Selected.Background" Color="#FFFFFF"/>
     <SolidColorBrush x:Key="TabItem.Selected.Border" Color="#ACACAC"/>
+    <SolidColorBrush x:Key="TabItem.Foreground" Color="Black"/>
     <SolidColorBrush x:Key="Button.Static.Background" Color="#FFDDDDDD"/>
     <SolidColorBrush x:Key="Button.Static.Border" Color="#FF707070"/>
     <SolidColorBrush x:Key="Button.MouseOver.Background" Color="#FFBEE6FD"/>
@@ -1074,9 +1075,9 @@
 
     <Style x:Key="TrapezoidDragableTabItemStyle"  TargetType="{x:Type local:DragablzItem}">
         <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}"/>
-        <Setter Property="Foreground" Value="Black"/>
-        <Setter Property="Background" Value="{StaticResource TabItem.Static.Background}"/>
-        <Setter Property="BorderBrush" Value="{StaticResource TabItem.Static.Border}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TabItem.Foreground}"/>
+        <Setter Property="Background" Value="{DynamicResource TabItem.Static.Background}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource TabItem.Static.Border}"/>
         <Setter Property="Margin" Value="0 0 0 0"/>
         <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
         <Setter Property="VerticalContentAlignment" Value="Stretch"/>
@@ -1120,8 +1121,8 @@
                             <Setter TargetName="contentPresenter" Property="Content" Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=DataContext.Header}" />
                         </Trigger>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{StaticResource TabItem.Selected.Background}" TargetName="Trapezoid"/>
-                            <Setter Property="LongBasePenBrush" Value="{StaticResource TabItem.Selected.Background}" TargetName="Trapezoid"/>
+                            <Setter Property="Background" Value="{DynamicResource TabItem.Selected.Background}" TargetName="Trapezoid"/>
+                            <Setter Property="LongBasePenBrush" Value="{DynamicResource TabItem.Selected.Background}" TargetName="Trapezoid"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

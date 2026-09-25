@@ -45,7 +45,7 @@
                     <GroupStyle>
                         <GroupStyle.HeaderTemplate>
                             <DataTemplate>
-                                <Border BorderThickness="1" Padding="0" BorderBrush="lightgray" Background="gainsboro" SnapsToDevicePixels="True">
+                                <Border BorderThickness="1" Padding="0" BorderBrush="{DynamicResource Theme.GroupHeaderBorder}" Background="{DynamicResource Theme.GroupHeaderBackground}" SnapsToDevicePixels="True">
                                     <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
                                 </Border>
                             </DataTemplate>

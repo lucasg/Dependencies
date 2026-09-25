@@ -26,6 +26,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -105,9 +106,23 @@
                   VerticalContentAlignment="Center" />
 
 
-        <!-- Font family selection -->
+        <!-- Theme selection -->
         <Label Margin="5"
                Grid.Row="4"
+               Grid.Column="0"
+               Content="Theme:" 
+               HorizontalAlignment="Left" 
+               VerticalAlignment="Center" />
+
+        <ComboBox x:Name="ThemeCombo"
+                  Margin="5"
+                  Grid.Row="4"
+                  Grid.Column="1" />
+
+
+        <!-- Font family selection -->
+        <Label Margin="5"
+               Grid.Row="5"
                Grid.Column="0"
                Content="Font family:" 
                HorizontalAlignment="Left" 
@@ -115,26 +130,28 @@
 
         <ListBox Name="FontFamilyList"
                  Margin="5"
-                 Grid.Row="4"
+                 Grid.Row="5"
                  Grid.Column="1" />
-        
-        
-        <!-- Buttons -->
-        <StackPanel Grid.Row="5" Grid.Column="1" 
-                    Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Cancel" 
-                    Height="20"
-                    Width="60"
-                    Margin="2"
-                    Padding="2"
-                    Click="OnCancel" />
 
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                    Margin="5,5,5,10"
+                    Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Content="OK" 
-                    Height="20"
-                    Width="60"
-                    Margin="2"
-                    Padding="2"
+                    MinWidth="75"
+                    MinHeight="23"
+                    Padding="10,1"
+                    IsDefault="True"
                     Click="OnValidate" />
+
+            <Button Content="Cancel" 
+                    MinWidth="75"
+                    MinHeight="23"
+                    Padding="10,1"
+                    Margin="8,0,0,0"
+                    IsCancel="True"
+                    Click="OnCancel" />
         </StackPanel>
 
     </Grid>

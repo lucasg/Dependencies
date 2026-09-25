@@ -14,7 +14,7 @@
         <!-- Hide/Show the status bar based on a global switch -->
         <local:BooleanToVisibilityConverter x:Key="BooleanToVisibility"/>
 
-        <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}">
+        <Style x:Key="LeftAlignHeaderText" TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
             <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
             <Setter Property="Padding" Value="5,0,0,0"></Setter>
         </Style>
@@ -60,7 +60,7 @@
                         <Separator Height="3" Margin="-1,0,0,0"/>
                         <MenuItem Header="Copy File Path" 
                                 Command="{Binding Path=DataContext.MoreInfo, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=ListView}}" 
-                                Background="WhiteSmoke" 
+                                Background="{DynamicResource Theme.DisabledMenuItemBackground}" 
                                 InputGestureText="Ctrl+C" 
                                 IsEnabled="False"  />
                         <Separator Height="3" Margin="-1,0,0,0"/>

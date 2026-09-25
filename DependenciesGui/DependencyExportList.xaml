@@ -49,7 +49,7 @@
         <GridView AllowsColumnReorder="true">
             <GridViewColumn Width="40" Header="E" util:GridViewSort.PropertyName="Type">
                 <GridViewColumn.HeaderContainerStyle>
-                    <Style TargetType="{x:Type GridViewColumnHeader}">
+                    <Style TargetType="{x:Type GridViewColumnHeader}" BasedOn="{StaticResource {x:Type GridViewColumnHeader}}">
                         <Setter Property="Control.ToolTip" Value="Selected's module exports"/>
                         <Setter Property="HorizontalContentAlignment" Value="Left"></Setter>
                         <Setter Property="Padding" Value="5,0,0,0"></Setter>
