@@ -1,0 +1,154 @@
+<Project>
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <Configurations>Debug;Release</Configurations>
+
+    <ProjectRoot>$(MSBuildThisFileDirectory)</ProjectRoot>
+    <BuildFolder>$(ProjectRoot)build\</BuildFolder>
+    <OutputPath>$(BuildFolder)$(Platform)\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
+    <ThirdPartySourcesDir>$(BuildFolder)TrirdPartySources</ThirdPartySourcesDir>
+    <BaseIntermediateOutputPath>$(BuildFolder)obj\$(MSBuildProjectName)\$(Platform)\$(Configuration)\</BaseIntermediateOutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+    <IntDir>$(BaseIntermediateOutputPath)</IntDir>
+
+    <!-- Assembly metadata -->
+    <Version>0.0-dev</Version>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+
+    <!-- C# projects -->
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net481</TargetFramework>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <Platforms>x64;x86;ARM64</Platforms>
+    <WarningLevel>9999</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>$(Platform)</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+
+    <!-- C++ projects -->
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <SpectreMitigation>false</SpectreMitigation>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'DependenciesLib'">
+    <Copyright>Copyright ©  2018</Copyright>
+    <AssemblyGuid>4a459493-14fc-4c87-9254-60e0959535da</AssemblyGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'Dependencies'">
+    <AssemblyGuid>5565a612-b250-4fe0-98dd-07c56916c194</AssemblyGuid>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'DependenciesGui'">
+    <Product>Dependencies</Product>
+    <Description>Modern rewrite of the depends.exe tool.</Description>
+    <Copyright>Copyright ©  2026</Copyright>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'ClrPhlib'">
+    <AssemblyVersion>1.10.*</AssemblyVersion>
+    <Copyright>Copyright (c)  2017</Copyright>
+    <GeneratedAssemblyInfoFile>$(IntDir)$(MSBuildProjectName).AssemblyInfo.cpp</GeneratedAssemblyInfoFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <AssemblyAttribute Include="System.Runtime.InteropServices.ComVisibleAttribute">
+      <_Parameter1>false</_Parameter1>
+      <_Parameter1_TypeName>System.Boolean</_Parameter1_TypeName>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.InteropServices.GuidAttribute" Condition="'$(AssemblyGuid)' != ''">
+      <_Parameter1>$(AssemblyGuid)</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'DependenciesGui'">
+    <AssemblyAttribute Include="System.Windows.ThemeInfoAttribute">
+      <_Parameter1>System.Windows.ResourceDictionaryLocation.None</_Parameter1>
+      <_Parameter1_IsLiteral>true</_Parameter1_IsLiteral>
+      <_Parameter2>System.Windows.ResourceDictionaryLocation.SourceAssembly</_Parameter2>
+      <_Parameter2_IsLiteral>true</_Parameter2_IsLiteral>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <!-- C++/CLI does not use the .NET SDK's assembly info generator. -->
+  <ItemGroup Condition="'$(MSBuildProjectName)' == 'ClrPhlib' and '$(GenerateAssemblyInfo)' == 'true'">
+    <ClCompile Include="$(GeneratedAssemblyInfoFile)" />
+  </ItemGroup>
+  <Target Name="GenerateCppAssemblyInfo" BeforeTargets="ClCompile"
+          Condition="'$(MSBuildProjectName)' == 'ClrPhlib' and '$(GenerateAssemblyInfo)' == 'true'">
+    <ItemGroup>
+      <_CppAssemblyInfo Include="// &lt;auto-generated /&gt;" />
+      <_CppAssemblyInfo Include="[assembly: System::Reflection::AssemblyTitleAttribute(L&quot;$(AssemblyTitle)&quot;)]%3B" />
+      <_CppAssemblyInfo Include="[assembly: System::Reflection::AssemblyDescriptionAttribute(L&quot;$(Description)&quot;)]%3B" />
+      <_CppAssemblyInfo Include="[assembly: System::Reflection::AssemblyConfigurationAttribute(L&quot;$(Configuration)&quot;)]%3B" />
+      <_CppAssemblyInfo Include="[assembly: System::Reflection::AssemblyCompanyAttribute(L&quot;$(Company)&quot;)]%3B" />
+      <_CppAssemblyInfo Include="[assembly: System::Reflection::AssemblyProductAttribute(L&quot;$(Product)&quot;)]%3B" />
+      <_CppAssemblyInfo Include="[assembly: System::Reflection::AssemblyCopyrightAttribute(L&quot;$(Copyright)&quot;)]%3B" />
+      <_CppAssemblyInfo Include="[assembly: System::Reflection::AssemblyVersionAttribute(L&quot;$(AssemblyVersion)&quot;)]%3B" />
+      <_CppAssemblyInfo Include="[assembly: System::Runtime::InteropServices::ComVisibleAttribute(false)]%3B" />
+      <_CppAssemblyInfo Include="[assembly: System::CLSCompliantAttribute(true)]%3B" />
+      <FileWrites Include="$(GeneratedAssemblyInfoFile)" />
+    </ItemGroup>
+    <MakeDir Directories="$(IntDir)" />
+    <WriteLinesToFile File="$(GeneratedAssemblyInfoFile)" Lines="@(_CppAssemblyInfo)"
+                      Overwrite="true" WriteOnlyWhenDifferent="true" Encoding="UTF-8" />
+  </Target>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <!-- C# projects-->
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
+
+    <!-- C++ projects-->
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <LinkIncremental>true</LinkIncremental>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- C# projects-->
+    <DebugType>pdbonly</DebugType>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+
+    <!-- C++ projects -->
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+
+  <!-- C++ projects -->
+  <ItemDefinitionGroup Condition="'$(MSBuildProjectExtension)' == '.vcxproj'">
+    <ClCompile>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel Condition="'$(MSBuildProjectName)' == 'ThirdPartyCode'">TurnOffAllWarnings</WarningLevel>
+      <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(ThirdPartySourcesDir)\processhacker\phnt\include;$(ThirdPartySourcesDir)\processhacker\phlib\include;$(ThirdPartySourcesDir)\llvm-demangle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TreatLinkerWarningAsErrors>false</TreatLinkerWarningAsErrors>
+    </Link>
+    <Lib>
+      <TreatLibWarningAsErrors>false</TreatLibWarningAsErrors>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(MSBuildProjectExtension)' == '.vcxproj' and '$(Configuration)' == 'Debug'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(MSBuildProjectExtension)' == '.vcxproj' and '$(Configuration)' == 'Release'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

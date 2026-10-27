@@ -1,6 +1,6 @@
-#include <ClrPhlib.h>
-#include <UnmanagedPh.h>
-#include <ClrPhSymbolProvider.h>
+#include "ClrPhlib.h"
+#include "UnmanagedPh.h"
+#include "ClrPhSymbolProvider.h"
 
 using namespace Dependencies;
 using namespace ClrPh;

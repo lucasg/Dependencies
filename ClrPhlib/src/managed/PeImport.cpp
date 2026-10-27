@@ -1,5 +1,5 @@
-#include <ClrPhlib.h>
-#include <UnmanagedPh.h>
+#include "ClrPhlib.h"
+#include "UnmanagedPh.h"
 
 
 using namespace Dependencies;
@@ -27,7 +27,7 @@ PeImport::PeImport(
 }
 
 PeImport::PeImport(
-	_In_ const PeImport ^ other
+	_In_ PeImport ^ other
 )
 {
 	this->Hint = other->Hint;
@@ -80,7 +80,7 @@ PeImportDll::!PeImportDll()
 }
 
 PeImportDll::PeImportDll(
-	_In_ const PeImportDll ^ other
+	_In_ PeImportDll ^ other
 )
 : ImportDll(new PH_MAPPED_IMAGE_IMPORT_DLL)
 {

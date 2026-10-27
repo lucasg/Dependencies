@@ -1,7 +1,7 @@
 #pragma once
 
-#include <ClrPhlib.h>
-#include <UnmanagedSymPrv.h>
+#include "ClrPhlib.h"
+#include "UnmanagedSymPrv.h"
 
 using namespace Dependencies::ClrPh;
 

@@ -4,7 +4,7 @@
 
 #include <ph.h>
 #include <symprv.h>
-#include <ClrPhlib.h>
+#include "ClrPhlib.h"
 
 
 // Native Symbol Provider class.

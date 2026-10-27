@@ -1,5 +1,5 @@
-#include <ClrPhlib.h>
-#include <UnmanagedPh.h>
+#include "ClrPhlib.h"
+#include "UnmanagedPh.h"
 
 
 using namespace Dependencies;
@@ -42,7 +42,7 @@ PeExport^ PeExport::FromMapimg (
 }
 
 PeExport::PeExport(
-	_In_ const PeExport ^ other
+	_In_ PeExport ^ other
 )
 {
 	this->Ordinal = other->Ordinal;

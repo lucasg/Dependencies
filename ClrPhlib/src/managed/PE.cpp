@@ -1,5 +1,5 @@
-#include <ClrPhlib.h>
-#include <UnmanagedPh.h>
+#include "ClrPhlib.h"
+#include "UnmanagedPh.h"
 
 using namespace Dependencies;
 using namespace System::Text;
@@ -70,7 +70,7 @@ bool PE::InitProperties()
     Properties->Machine = PvMappedImage.NtHeaders->FileHeader.Machine;
     Properties->Magic = m_Impl->m_PvMappedImage.Magic;
     Properties->Checksum = PvMappedImage.NtHeaders->OptionalHeader.CheckSum;
-    Properties->CorrectChecksum = (Properties->Checksum == PhCheckSumMappedImage(&PvMappedImage));
+    Properties->CorrectChecksum = (PvMappedImage.NtHeaders->OptionalHeader.CheckSum == PhCheckSumMappedImage(&PvMappedImage));
 
     RtlSecondsSince1970ToTime(PvMappedImage.NtHeaders->FileHeader.TimeDateStamp, &time);
     PhLargeIntegerToLocalSystemTime(&systemTime, &time);

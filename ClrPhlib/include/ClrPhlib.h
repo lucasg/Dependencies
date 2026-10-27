@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <UnmanagedPh.h>
+#include "UnmanagedPh.h"
 #using <System.dll>
 
 using namespace System;
@@ -74,7 +74,7 @@ namespace Dependencies {
             Boolean DelayImport;
 
             PeImport(const PPH_MAPPED_IMAGE_IMPORT_DLL importDll, size_t Index);
-            PeImport(const PeImport ^ other);
+            PeImport(PeImport ^ other);
             ~PeImport();
 
         };
@@ -88,7 +88,7 @@ namespace Dependencies {
 
             // constructors
             PeImportDll(const PPH_MAPPED_IMAGE_IMPORTS &PvMappedImports, size_t ImportDllIndex);
-            PeImportDll(const PeImportDll ^ other);
+            PeImportDll(PeImportDll ^ other);
 
             // destructors
             ~PeImportDll();
@@ -111,7 +111,7 @@ namespace Dependencies {
             String ^  ForwardedName;
 
 			PeExport();
-            PeExport(const PeExport ^ other);
+            PeExport(PeExport ^ other);
             ~PeExport();
 
 			static PeExport^ FromMapimg(const UnmanagedPE& refPe, size_t Index);

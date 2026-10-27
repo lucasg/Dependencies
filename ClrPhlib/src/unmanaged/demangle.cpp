@@ -1,4 +1,4 @@
-#include <UnmanagedSymPrv.h>
+#include "UnmanagedSymPrv.h"
 #include <llvm/Demangle/Demangle.h>
 #include <stdlib.h>
 #include <memory>
@@ -53,7 +53,7 @@ void DemanglerDebugTwoArg(wchar_t *Format, wchar_t *Arg0, wchar_t *Arg1)
 
 
 bool DemumbleDemangleName(
-	_In_ UnmanagedSymPrv* obj,
+	_In_ UnmanagedSymPrv* /*obj*/,
 	_In_ wchar_t* DecoratedName,
 	_In_ size_t DecoratedNameLen,
 	_Out_ wchar_t** UndecoratedName,
@@ -102,7 +102,7 @@ bool DemumbleDemangleName(
 }
 
 bool LLVMItaniumDemangleName(
-	_In_ UnmanagedSymPrv* obj,
+	_In_ UnmanagedSymPrv* /*obj*/,
 	_In_ wchar_t* DecoratedName,
 	_In_ size_t DecoratedNameLen,
 	_Out_ wchar_t** UndecoratedName,
@@ -151,7 +151,7 @@ bool LLVMItaniumDemangleName(
 }
 
 bool LLVMMicrosoftDemangleName(
-	_In_ UnmanagedSymPrv* obj,
+	_In_ UnmanagedSymPrv* /*obj*/,
 	_In_ wchar_t* DecoratedName,
 	_In_ size_t DecoratedNameLen,
 	_Out_ wchar_t** UndecoratedName,
@@ -202,7 +202,7 @@ bool LLVMMicrosoftDemangleName(
 bool UndecorateSymbolDemangleName(
 	_In_ UnmanagedSymPrv* obj,
 	_In_ wchar_t* DecoratedName,
-	_In_ size_t DecoratedNameLen,
+	_In_ size_t /*DecoratedNameLen*/,
 	_Out_ wchar_t** UndecoratedName,
 	_Out_ size_t* UndecoratedNameLen
 )

@@ -1,5 +1,5 @@
-#include <NativeFile.h>
-#include <ClrPhLib.h>
+#include "NativeFile.h"
+#include "ClrPhlib.h"
 #include <phconfig.h>
 #include <vcclr.h> 
 #include <bcrypt.h>
@@ -69,9 +69,6 @@ bool NativeFile::Exists(_In_ String^ Path, bool IsFolder)
 
 void NativeFile::Copy(_In_ String^ sourceFileName, _In_ String^ destFileName)
 {
-    bool bFileExists = false;
-    PVOID OldRedirectionValue = NULL;
-    BOOLEAN isWow64 = PhIsExecutingInWow64();
 	pin_ptr<const wchar_t> RawSourceFilepath = PtrToStringChars(sourceFileName);
 	pin_ptr<const wchar_t> RawDestFilepath = PtrToStringChars(destFileName);
 
@@ -87,7 +84,6 @@ void NativeFile::Copy(_In_ String^ sourceFileName, _In_ String^ destFileName)
 
 String^ NativeFile::GetPartialHashFile(_In_ String^ Path, _In_ size_t FileSize)
 {
-	bool read_success = false;
 	bool success = false;
 	void* hash = NULL;
 	size_t hash_size = 0;

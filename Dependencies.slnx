@@ -1,0 +1,40 @@
+<Solution>
+  <Configurations>
+    <Platform Name="ARM64" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/Files/">
+    <File Path=".gitignore" />
+    <File Path="build.ps1" />
+    <File Path="Directory.Build.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Project Path="ClrPhlib/ClrPhlib.vcxproj" Id="fc5ffcaf-982f-4a95-8fa6-2a95b1f7cdc8">
+    <BuildDependency Project="ThirdPartyCode/ThirdPartyCode.vcxproj" />
+  </Project>
+  <Project Path="Dependencies/Dependencies.csproj" Id="5565a612-b250-4fe0-98dd-07c56916c194">
+    <BuildDependency Project="DependenciesLib/DependenciesLib.csproj" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="DependenciesGui/DependenciesGui.csproj" Id="9232b9b6-f2ba-44a3-b8a6-a352777f632c">
+    <BuildDependency Project="DependenciesLib/DependenciesLib.csproj" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="DependenciesLib/DependenciesLib.csproj" Id="4a459493-14fc-4c87-9254-60e0959535da">
+    <BuildDependency Project="ClrPhlib/ClrPhlib.vcxproj" />
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="Test/Test.csproj">
+    <Platform Solution="*|ARM64" Project="ARM64" />
+    <Platform Solution="*|x64" Project="x64" />
+    <Platform Solution="*|x86" Project="x86" />
+  </Project>
+  <Project Path="ThirdPartyCode/ThirdPartyCode.vcxproj" Id="477d0215-f252-41a1-874b-f27e3ea1ed17" />
+</Solution>

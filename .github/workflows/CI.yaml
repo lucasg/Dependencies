@@ -1,0 +1,22 @@
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - shell: pwsh
+        run: ./build.ps1
+      - uses: softprops/action-gh-release@v3
+        if: github.ref_type == 'tag'
+        with:
+          draft: true
+          files: build/dependencies_*.zip
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Build artifacts
+          path: build/dependencies_*.zip
+          if-no-files-found: error

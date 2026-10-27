@@ -384,7 +384,7 @@ namespace Dependencies
                         Pe.GetProcessor()
                     );
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     Entries.HasError = true;
                     return Entries;
