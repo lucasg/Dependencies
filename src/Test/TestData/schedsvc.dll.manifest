@@ -1,0 +1,436 @@
+
+<assembly xmlns="urn:schemas-microsoft-com:asm.v3" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" manifestVersion="1.0">
+  <assemblyIdentity buildType="$(build.buildType)" language="neutral" name="Microsoft-Windows-TaskScheduler-Service" processorArchitecture="$(build.arch)" publicKeyToken="$(Build.WindowsPublicKeyToken)" version="$(build.version)" versionScope="nonSxS" />
+  <dependency discoverable="false" optional="false" resourceType="Resources">
+    <dependentAssembly dependencyType="prerequisite">
+      <assemblyIdentity buildType="$(build.buildType)" language="*" name="Microsoft-Windows-TaskScheduler-Service.Resources" processorArchitecture="$(build.arch)" publicKeyToken="$(Build.WindowsPublicKeyToken)" version="$(build.version)" />
+    </dependentAssembly>
+  </dependency>
+  <file buildFilter="not build.isWow" destinationPath="$(runtime.system32)\" importPath="$(build.nttree)\" name="schedsvc.dll" sourceName="schedsvc.dll" sourcePath=".\" />
+  <file buildFilter="not build.isWow" destinationPath="$(runtime.windows)\Vss\Writers\System\" importPath="$(build.nttree)\" name="D61D61C8-D73A-4EEE-8CDD-F6F9786B7124.xml" sourceName="D61D61C8-D73A-4EEE-8CDD-F6F9786B7124.xml" sourcePath=".\" writeableType="systemData" />
+  <memberships>
+    <categoryMembership buildFilter="not build.isWow">
+      <id name="Microsoft.Windows.Categories.Services" publicKeyToken="$(build.WindowsPublicKeyToken)" typeName="Service" version="$(build.version)" />
+      <categoryInstance subcategory="Schedule">
+        <serviceData dependOnService="RPCSS,SystemEventsBroker" description="@%SystemRoot%\system32\schedsvc.dll,-101" displayName="@%SystemRoot%\system32\schedsvc.dll,-100" errorControl="normal" group="SchedulerGroup" imagePath="%systemroot%\system32\svchost.exe -k netsvcs -p" name="Schedule" objectName="LocalSystem" requiredPrivileges="SeIncreaseQuotaPrivilege,SeChangeNotifyPrivilege,SeImpersonatePrivilege,SeAssignPrimaryTokenPrivilege,SeTcbPrivilege,SeRestorePrivilege,SeBackupPrivilege,SeSecurityPrivilege,SeTakeOwnershipPrivilege,SeLoadDriverPrivilege,SeSystemProfilePrivilege,SeSystemTimePrivilege,SeProfileSingleProcessPrivilege,SeIncreaseBasePriorityPrivilege,SeCreatePageFilePrivilege,SeCreatePermanentPrivilege,SeShutdownPrivilege,SeDebugPrivilege,SeAuditPrivilege,SeSystemEnvironmentPrivilege,SeUndockPrivilege,SeManageVolumePrivilege,SeIncreaseWorkingSetPrivilege,SeTimeZonePrivilege" sidType="unrestricted" start="auto" startAfterInstall="none" type="win32ShareProcess">
+          <failureActions resetPeriod="86400">
+            <actions>
+              <action delay="60000" type="restartService" />
+              <action delay="60000" type="restartService" />
+              <action delay="60000" type="restartService" />
+            </actions>
+          </failureActions>
+          <securityDescriptor name="ServiceACL" />
+        </serviceData>
+      </categoryInstance>
+    </categoryMembership>
+    <categoryMembership>
+      <id name="Microsoft.Windows.Categories" publicKeyToken="365143bb27e7ac8b" typeName="SvcHost" version="1.0.0.0" />
+      <categoryInstance subcategory="netsvcs">
+        <serviceGroup position="last" serviceName="schedule" />
+      </categoryInstance>
+    </categoryMembership>
+  </memberships>
+  <registryKeys>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\Schedule">
+      <registryValue buildFilter="not build.isWow" name="AtTaskMaxHours" value="0x48" valueType="REG_DWORD" />
+      <!-- Registry values for Service Control Manager memory limit default overrides -->
+      <registryValue name="SvcMemSoftLimitInMB" value="4" valueType="REG_DWORD" />
+      <registryValue name="SvcMemMidLimitInMB" value="6" valueType="REG_DWORD" />
+      <registryValue name="SvcMemHardLimitInMB" value="10" valueType="REG_DWORD" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Configuration">
+      <registryValue name="DataVersion" value="5" valueType="REG_DWORD" />
+      <registryValue name="TasksInMemoryQueue" value="100" valueType="REG_DWORD" />
+      <registryValue name="TasksPerHighestPrivEngine" value="100" valueType="REG_DWORD" />
+      <registryValue name="TasksPerLeastPrivEngine" value="50" valueType="REG_DWORD" />
+      <registryValue name="MissedTasksStartupDelay" value="600" valueType="REG_DWORD" />
+      <registryValue name="UseXmlStore" value="1" valueType="REG_DWORD" />
+      <securityDescriptor name="PrivateRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance">
+      <securityDescriptor name="PrivateRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Handlers">
+      <securityDescriptor name="PrivateRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Aliases">
+      <registryValue name="AtServiceAccount" value="&quot;NT AUTHORITY\System&quot;" valueType="REG_MULTI_SZ" />
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache">
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tasks">
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tree">
+      <!-- O:SYG:SYD:PAI(A;CI;FA;;;BA)(A;OI;FRFWSDWDWO;;;BA)(A;CI;FA;;;SY)(A;OI;FRFWSDWDWO;;;SY)(A;CI;FW;;;AU)(A;CI;FW;;;NS)(A;CI;FW;;;LS)(A;OICIIO;FA;;;CO) -->
+      <registryValue name="SD" value="01000494C4000000D000000000000000140000000200B0000800000000021800FF011F0001020000000000052000000020020000000118009F011F000102000000000005200000002002000000021400FF011F00010100000000000512000000000114009F011F00010100000000000512000000000214001601120001010000000000050B00000000021400160112000101000000000005140000000002140016011200010100000000000513000000000B1400FF011F00010100000000000300000000010100000000000512000000010100000000000512000000" valueType="REG_BINARY" />
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tree\Microsoft">
+      <!-- O:SYG:SYD:PAI(A;CI;FA;;;BA)(A;OI;0x1f019f;;;BA)(A;CI;FA;;;SY)(A;OI;0x1f019f;;;SY)(A;OICI;FR;;;AU)(A;OICI;FR;;;LS)(A;OICI;FR;;;NS)(A;OICIIO;FA;;;CO)S:AI -->
+      <registryValue name="SD" value="0100149CCC000000D8000000140000001C00000002000800000000000200B0000800000000021800FF011F0001020000000000052000000020020000000118009F011F000102000000000005200000002002000000021400FF011F00010100000000000512000000000114009F011F00010100000000000512000000000314008900120001010000000000050B00000000031400890012000101000000000005130000000003140089001200010100000000000514000000000B1400FF011F00010100000000000300000000010100000000000512000000010100000000000512000000" valueType="REG_BINARY" />
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Tree\Microsoft\Windows">
+      <!-- O:SYG:SYD:AI(A;CIID;FA;;;BA)(A;OIIOID;0x1f019f;;;BA)(A;CIID;FA;;;SY)(A;OIIOID;0x1f019f;;;SY)(A;OICIID;FR;;;AU)(A;OICIID;FR;;;LS)(A;OICIID;FR;;;NS)(A;OICIIOID;FA;;;CO)S:AI -->
+      <registryValue name="SD" value="0100148CCC000000D8000000140000001C00000002000800000000000200B0000800000000121800FF011F0001020000000000052000000020020000001918009F011F000102000000000005200000002002000000121400FF011F00010100000000000512000000001914009F011F00010100000000000512000000001314008900120001010000000000050B00000000131400890012000101000000000005130000000013140089001200010100000000000514000000001B1400FF011F00010100000000000300000000010100000000000512000000010100000000000512000000" valueType="REG_BINARY" />
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Logon">
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Boot">
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Plain">
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\Maintenance">
+      <securityDescriptor name="SystemRegistryACL" />
+    </registryKey>
+    <registryKey buildFilter="not build.isWow" keyName="HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\WMI\Security">
+      <!-- ACL Microsoft-Windows-IdleTriggerProvider to SD: O:SYG:SYD:(A;;0x120fff;;;SY) -->
+      <registryValue name="9e03f75a-bcbe-428a-8f3c-d46f2a444935" value="01000480300000003c000000000000001400000002001c000100000000001400ff0f1200010100000000000512000000010100000000000512000000010100000000000512000000" valueType="REG_BINARY" />
+      <!-- ACL Microsoft-Windows-TriggerEmulatorProvider to SD: O:SYG:SYD:(A;;0x120fff;;;SY) -->
+      <registryValue name="f230d19a-5d93-47d9-a83f-53829edfb8df" value="01000480300000003c000000000000001400000002001c000100000000001400ff0f1200010100000000000512000000010100000000000512000000010100000000000512000000" valueType="REG_BINARY" />
+    </registryKey>
+  </registryKeys>
+  <migration settingsVersion="0">
+    <migXml xmlns="">
+      <rules context="System">
+        <include>
+          <objectSet>
+            <pattern type="File">%windir%\System32\Tasks\* [*]</pattern>
+            <pattern type="File">%windir%\System32\Logfiles\SCM\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule [HashingCompleted]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Aliases\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Configuration\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Handlers\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\CredWom\* [*]</pattern>
+          </objectSet>
+        </include>
+        <exclude>
+          <objectSet>
+            <pattern type="File">%windir%\System32\Tasks\Microsoft\Windows\Customer Experience Improvement Program\Server [ServerRoleCollector]</pattern>
+            <pattern type="File">%windir%\System32\Tasks\Microsoft\Windows\Customer Experience Improvement Program\Server [ServerRoleUsageCollector]</pattern>
+            <pattern type="File">%windir%\System32\Logfiles\SCM\* [scm*]</pattern>
+          </objectSet>
+        </exclude>
+        <merge script="MigXmlHelper.DestinationPriority()">
+          <objectSet>
+            <pattern type="File">%windir%\System32\Tasks\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Handlers\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\CredWom\* [*]</pattern>
+          </objectSet>
+        </merge>
+        <merge script="MigXmlHelper.SourcePriority()">
+          <objectSet>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule [HashingCompleted]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Configuration\* [*]</pattern>
+            <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance\* [*]</pattern>
+          </objectSet>
+        </merge>
+        <locationModify script="MigXmlHelper.RelativeMove(' %windir%\system32\logfiles\scm','%windir%\system32\logfiles\UbpmMigratedStats ')">
+          <objectSet>
+            <pattern type="File">%windir%\System32\Logfiles\SCM\* [*]</pattern>
+          </objectSet>
+        </locationModify>
+        <locationModify script="MigXmlHelper.RelativeMove(' %windir%\system32\Tasks','%windir%\system32\Tasks_Migrated ')">
+          <objectSet>
+            <pattern type="File">%windir%\System32\Tasks\* [*]</pattern>
+          </objectSet>
+        </locationModify>
+      </rules>
+    </migXml>
+    <uninstall>
+      <migXml xmlns="">
+        <rules context="System">
+          <include>
+            <objectSet>
+              <pattern type="File">%windir%\Tasks\* [*]</pattern>
+              <pattern type="File">%windir%\System32\Tasks_Migrated\* [*]</pattern>
+              <pattern type="File">%windir%\System32\LogFiles\SCM\* [*]</pattern>
+            </objectSet>
+          </include>
+          <exclude>
+            <objectSet>
+              <pattern type="File">%windir%\System32\LogFiles\SCM\* [SCM.evm*]</pattern>
+            </objectSet>
+          </exclude>
+          <destinationcleanup>
+            <objectSet>
+              <pattern type="File">%windir%\Tasks\* [*]</pattern>
+              <pattern type="File">%windir%\System32\Tasks_Migrated\* [*]</pattern>
+              <pattern type="File">%windir%\System32\LogFiles\SCM\* [*]</pattern>
+            </objectSet>
+          </destinationcleanup>
+          <merge script="MigXmlHelper.SourcePriority()">
+            <objectSet>
+              <pattern type="File">%windir%\Tasks\* [*]</pattern>
+              <pattern type="File">%windir%\System32\Tasks_Migrated\* [*]</pattern>
+              <pattern type="File">%windir%\System32\LogFiles\SCM\* [*]</pattern>
+            </objectSet>
+          </merge>
+        </rules>
+      </migXml>
+    </uninstall>
+    <supportedComponents>
+      <supportedComponent>
+        <supportedComponentIdentity buildFilter="" buildType="$(build.buildType)" language="neutral" name="Microsoft-Windows-TaskScheduler-Service" processorArchitecture="$(build.processorArchitecture)" publicKeyToken="$(Build.WindowsPublicKeyToken)" settingsVersionRange="0" type="" versionScope="nonSxS" />
+        <migXml xmlns="">
+          <rules context="System">
+            <merge script="MigXmlHelper.DestinationPriority()">
+              <objectSet>
+                <pattern type="File">%windir%\System32\Tasks\* [*]</pattern>
+                <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\TaskCache\* [*]</pattern>
+                <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Handlers\* [*]</pattern>
+                <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\CredWom\* [*]</pattern>
+              </objectSet>
+            </merge>
+            <merge script="MigXmlHelper.SourcePriority()">
+              <objectSet>
+                <pattern type="Registry">HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Configuration\* [*]</pattern>
+              </objectSet>
+            </merge>
+            <locationModify script="MigXmlHelper.RelativeMove(' %windir%\system32\logfiles\scm','%windir%\system32\logfiles\UbpmMigratedStats ')">
+              <objectSet>
+                <pattern type="File">%windir%\System32\Logfiles\SCM\* [*]</pattern>
+              </objectSet>
+            </locationModify>
+            <locationModify script="MigXmlHelper.RelativeMove(' %windir%\system32\Tasks','%windir%\system32\Tasks_Migrated ')">
+              <objectSet>
+                <pattern type="File">%windir%\System32\Tasks\* [*]</pattern>
+              </objectSet>
+            </locationModify>
+          </rules>
+        </migXml>
+      </supportedComponent>
+    </supportedComponents>
+  </migration>
+  <imaging>
+    <sysprepInformation>
+      <sysprepProvider stage="cleanup">
+        <sysprepOrder order="0x0E00" />
+        <registryActions>
+          <deleteValue name="HashingCompleted" path="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule" />
+          <deleteValue name="MigrationCleanupCompleted" path="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule" />
+          <deleteValue name="DomainJoinDetected" path="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule" />
+        </registryActions>
+      </sysprepProvider>
+    </sysprepInformation>
+  </imaging>
+  <registryKeys buildFilter="not build.isWow">
+    <registryKey keyName="HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Schedule\Parameters">
+      <registryValue name="ServiceDll" value="%systemroot%\system32\schedsvc.dll" valueType="REG_EXPAND_SZ" />
+      <registryValue name="ServiceDllUnloadOnStop" value="0x00000001" valueType="REG_DWORD" />
+      <registryValue name="ServiceMain" value="ServiceMain" valueType="REG_SZ" />
+    </registryKey>
+  </registryKeys>
+  <directories>
+    <directory destinationPath="$(runtime.windows)\System32\Tasks" owner="True">
+      <securityDescriptor name="TasksFolderACL" />
+    </directory>
+    <directory destinationPath="$(runtime.windows)\System32\Tasks\Microsoft" owner="True">
+      <securityDescriptor name="MicrosoftTasksFolderACL" />
+    </directory>
+    <directory destinationPath="$(runtime.windows)\System32\Tasks\Microsoft\Windows" owner="True" />
+    <directory destinationPath="$(runtime.windows)\System32\Tasks\Microsoft\Windows\TaskScheduler" owner="True">
+      <securityDescriptor name="MicrosoftTaskSchedulerFolderACL" />
+    </directory>
+  </directories>
+  <trustInfo>
+    <security>
+      <accessControl>
+        <securityDescriptorDefinitions>
+          <securityDescriptorDefinition name="TasksFolderACL" sddl="D:P(A;CI;FA;;;BA)(A;OI;FRFWSDWDWO;;;BA)(A;CI;FA;;;SY)(A;OI;FRFWSDWDWO;;;SY)(A;CI;FW;;;AU)(A;CI;FW;;;NS)(A;CI;FW;;;LS)(A;OICIIO;FA;;;CO)" />
+          <securityDescriptorDefinition name="MicrosoftTasksFolderACL" sddl="D:P(A;CI;FA;;;BA)(A;OI;FRFWSDWDWO;;;BA)(A;CI;FA;;;SY)(A;OI;FRFWSDWDWO;;;SY)(A;OICI;FR;;;AU)(A;OICI;FR;;;LS)(A;OICI;FR;;;NS)(A;OICIIO;FA;;;CO)" />
+          <securityDescriptorDefinition name="MicrosoftTaskSchedulerFolderACL" sddl="D:P(A;CI;FA;;;SY)(A;CI;FR;;;BA)" />
+          <securityDescriptorDefinition name="ServiceACL" sddl="D:(A;;CCLCSWLORC;;;AU)(A;;CCLCSWRPDTLOCRRCWDWO;;;BA)(A;;CCDCLCSWRPWPDTLOCRRCWDWOSD;;;SY)(A;;CCLCSWLORC;;;BU)S:(AU;FA;CCDCLCSWRPWPDTLOCRSDRCWDWO;;;WD)" />
+          <securityDescriptorDefinition name="PrivateRegistryACL" sddl="D:P(A;OICI;KA;;;BA)(A;OICI;KA;;;SY)(A;;KR;;;AU)" />
+          <securityDescriptorDefinition name="SystemRegistryACL" sddl="D:P(A;OICI;KRSD;;;BA)(A;OICI;KA;;;SY)" />
+        </securityDescriptorDefinitions>
+      </accessControl>
+    </security>
+  </trustInfo>
+  <taskScheduler buildFilter="not build.isWow">
+    <!-- Maintenance configurator task (deprecated - left here to prevent migration from downlevel)-->
+    <Task xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+      <RegistrationInfo>
+        <URI>\Microsoft\Windows\TaskScheduler\Maintenance Configurator</URI>
+        <SecurityDescriptor>D:P(A;;FRFX;;;BA)(A;;FA;;;SY)</SecurityDescriptor>
+      </RegistrationInfo>
+      <Triggers>
+        <TimeTrigger>
+          <Enabled>true</Enabled>
+          <StartBoundary>2001-01-01T01:00:00</StartBoundary>
+          <EndBoundary>2001-01-01T02:00:00</EndBoundary>
+        </TimeTrigger>
+      </Triggers>
+      <Principals>
+        <Principal id="LocalSystem">
+          <UserId>S-1-5-18</UserId>
+        </Principal>
+      </Principals>
+      <Settings>
+        <DeleteExpiredTaskAfter>PT0S</DeleteExpiredTaskAfter>
+        <UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>
+      </Settings>
+      <Actions Context="LocalSystem">
+        <Exec>
+          <Command>cmd</Command>
+        </Exec>
+      </Actions>
+    </Task>
+    <!-- Idle maintenance launcher task (deprecated - left here to prevent migration from downlevel)-->
+    <Task xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+      <RegistrationInfo>
+        <URI>\Microsoft\Windows\TaskScheduler\Idle Maintenance</URI>
+        <SecurityDescriptor>D:P(A;;FA;;;BA)(A;;FA;;;SY)(A;;FA;;;LS)(A;;FR;;;AU)</SecurityDescriptor>
+      </RegistrationInfo>
+      <Triggers>
+        <TimeTrigger>
+          <Enabled>true</Enabled>
+          <StartBoundary>2001-01-01T01:00:00</StartBoundary>
+          <EndBoundary>2001-01-01T02:00:00</EndBoundary>
+        </TimeTrigger>
+      </Triggers>
+      <Principals>
+        <Principal id="LocalSystem">
+          <UserId>S-1-5-18</UserId>
+        </Principal>
+      </Principals>
+      <Settings>
+        <DeleteExpiredTaskAfter>PT0S</DeleteExpiredTaskAfter>
+        <UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>
+      </Settings>
+      <Actions Context="LocalSystem">
+        <Exec>
+          <Command>cmd</Command>
+        </Exec>
+      </Actions>
+    </Task>
+    <!-- Manual maintenance launcher task (deprecated - left here to prevent migration from downlevel)-->
+    <Task xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+      <RegistrationInfo>
+        <URI>\Microsoft\Windows\TaskScheduler\Manual Maintenance</URI>
+        <SecurityDescriptor>D:P(A;;FA;;;BA)(A;;FA;;;SY)(A;;FA;;;LS)(A;;FR;;;AU)</SecurityDescriptor>
+      </RegistrationInfo>
+      <Triggers>
+        <TimeTrigger>
+          <Enabled>true</Enabled>
+          <StartBoundary>2001-01-01T01:00:00</StartBoundary>
+          <EndBoundary>2001-01-01T02:00:00</EndBoundary>
+        </TimeTrigger>
+      </Triggers>
+      <Principals>
+        <Principal id="LocalSystem">
+          <UserId>S-1-5-18</UserId>
+        </Principal>
+      </Principals>
+      <Settings>
+        <DeleteExpiredTaskAfter>PT0S</DeleteExpiredTaskAfter>
+        <UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>
+      </Settings>
+      <Actions Context="LocalSystem">
+        <Exec>
+          <Command>cmd</Command>
+        </Exec>
+      </Actions>
+    </Task>
+    <!-- Regular maintenance launcher task (deprecated - left here to prevent migration from downlevel) -->
+    <Task xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+      <RegistrationInfo>
+        <URI>\Microsoft\Windows\TaskScheduler\Regular Maintenance</URI>
+        <SecurityDescriptor>D:P(A;;FA;;;BA)(A;;FA;;;SY)(A;;FA;;;LS)(A;;FR;;;AU)</SecurityDescriptor>
+      </RegistrationInfo>
+      <Triggers>
+        <TimeTrigger>
+          <Enabled>true</Enabled>
+          <StartBoundary>2001-01-01T01:00:00</StartBoundary>
+          <EndBoundary>2001-01-01T02:00:00</EndBoundary>
+        </TimeTrigger>
+      </Triggers>
+      <Principals>
+        <Principal id="LocalSystem">
+          <UserId>S-1-5-18</UserId>
+        </Principal>
+      </Principals>
+      <Settings>
+        <DeleteExpiredTaskAfter>PT0S</DeleteExpiredTaskAfter>
+        <UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>
+      </Settings>
+      <Actions Context="LocalSystem">
+        <Exec>
+          <Command>cmd</Command>
+        </Exec>
+      </Actions>
+    </Task>
+    <!-- AIT Agent task (deprecated - left here to prevent migration from downlevel) -->
+    <Task xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+      <RegistrationInfo>
+        <Version>1.0</Version>
+        <URI>\Microsoft\Windows\Application Experience\AitAgent</URI>
+        <SecurityDescriptor>D:(A;;GA;;;BA)(A;;GA;;;SY)(A;;FRFX;;;LS)</SecurityDescriptor>
+        <Source>$(@%SystemRoot%\system32\aitagent.exe,-701)</Source>
+        <Author>$(@%SystemRoot%\system32\aitagent.exe,-701)</Author>
+        <Description>$(@%SystemRoot%\system32\aitagent.exe,-702)</Description>
+      </RegistrationInfo>
+      <Triggers>
+        <TimeTrigger>
+          <Enabled>true</Enabled>
+          <StartBoundary>2001-01-01T01:00:00</StartBoundary>
+          <EndBoundary>2001-01-01T02:00:00</EndBoundary>
+        </TimeTrigger>
+      </Triggers>
+      <Principals>
+        <Principal id="LocalSystem">
+          <UserId>S-1-5-18</UserId>
+        </Principal>
+      </Principals>
+      <Settings>
+        <DeleteExpiredTaskAfter>PT0S</DeleteExpiredTaskAfter>
+        <UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>
+      </Settings>
+      <Actions Context="LocalSystem">
+        <Exec>
+          <Command>aitagent</Command>
+          <Arguments>/increment</Arguments>
+        </Exec>
+      </Actions>
+    </Task>
+    <!-- Kernel CEIP task (deprecated - left here to prevent migration from downlevel) -->
+    <Task xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+      <RegistrationInfo>
+        <URI>\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask</URI>
+        <SecurityDescriptor>D:(A;OICI;FA;;;BA)(A;OICI;FA;;;SY)(A;OICI;GRGX;;;AU)(A;OICI;SDFRFX;;;LS)</SecurityDescriptor>
+      </RegistrationInfo>
+      <Triggers>
+        <TimeTrigger>
+          <Enabled>true</Enabled>
+          <StartBoundary>2001-01-01T01:00:00</StartBoundary>
+          <EndBoundary>2001-01-01T02:00:00</EndBoundary>
+        </TimeTrigger>
+      </Triggers>
+      <Principals>
+        <Principal id="LocalService">
+          <UserId>S-1-5-19</UserId>
+        </Principal>
+      </Principals>
+      <Settings>
+        <DeleteExpiredTaskAfter>PT0S</DeleteExpiredTaskAfter>
+        <UseUnifiedSchedulingEngine>true</UseUnifiedSchedulingEngine>
+      </Settings>
+      <Actions Context="LocalService">
+        <Exec>
+          <Command>cmd</Command>
+        </Exec>
+      </Actions>
+    </Task>
+  </taskScheduler>
+</assembly>

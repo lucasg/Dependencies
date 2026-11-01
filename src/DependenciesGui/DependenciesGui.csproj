@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>Dependencies</RootNamespace>
+    <ApplicationIcon>Dependencies.ico</ApplicationIcon>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Dragablz" Version="0.0.3.234" />
+    <PackageReference Include="Mono.Cecil" Version="0.11.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClrPhlib\ClrPhlib.vcxproj" />
+    <ProjectReference Include="..\DependenciesLib\DependenciesLib.csproj" />
+    <ProjectReference Include="..\Dependencies\Dependencies.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Images\Dependencies_48px.png" />
+    <Resource Include="Images\GlyphSortAscending.png" />
+    <Resource Include="Images\GlyphSortDescending.png" />
+    <Resource Include="Images\Hourglass.png" />
+    <Resource Include="Images\Question.png" />
+    <Resource Include="Images\Dependencies_32px.png" />
+    <Resource Include="Images\Dependencies_32px-no-blur.png" />
+    <Resource Include="Images\Dependencies_48px-no-blur.png" />
+    <Resource Include="Images\export_c.png" />
+    <Resource Include="Images\export_cpp.png" />
+    <Resource Include="Images\export_forward.png" />
+    <Resource Include="Images\export_ord.png" />
+    <Resource Include="Images\import_cpp_found.png" />
+    <Resource Include="Images\import_cpp_not_found.png" />
+    <Resource Include="Images\import_c_found.png" />
+    <Resource Include="Images\import_c_not_found.png" />
+    <Resource Include="Images\import_ord_not_found.png" />
+    <Resource Include="Images\import_ord_found.png" />
+    <Resource Include="Images\Reference.png" />
+    <Resource Include="Images\InvalidOverlay.png" />
+    <Resource Include="Images\QuestionOverlay.png" />
+    <Resource Include="Images\ReferenceOverlay.png" />
+    <Resource Include="Images\HourglassOverlay.png" />
+    <Resource Include="Dependencies.ico" />
+  </ItemGroup>
+</Project>

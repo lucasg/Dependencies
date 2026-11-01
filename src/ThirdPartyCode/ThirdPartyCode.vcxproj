@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|ARM64">
+      <Configuration>Debug</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|ARM64">
+      <Configuration>Release</Configuration>
+      <Platform>ARM64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{477D0215-F252-41A1-874B-F27E3EA1ED17}</ProjectGuid>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup>
+    <TargetName>ThirdPartyCode</TargetName>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <ThirdPartyDefinitions Condition="'$(Configuration)' == 'Debug'">DEBUG;_DEBUG</ThirdPartyDefinitions>
+    <ThirdPartyDefinitions Condition="'$(Configuration)' != 'Debug'">NDEBUG</ThirdPartyDefinitions>
+    <ThirdPartyDefinitions Condition="'$(Platform)' == 'Win32'">WIN32;$(ThirdPartyDefinitions)</ThirdPartyDefinitions>
+    <ThirdPartyDefinitions Condition="'$(Platform)' == 'x64' or '$(Platform)' == 'ARM64'">WIN64;$(ThirdPartyDefinitions)</ThirdPartyDefinitions>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <PreBuildEvent>
+      <Command>powershell.exe -NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(ProjectDir)GetThirdPartySources.ps1" -Destination "$(ThirdPartySourcesDir)"</Command>
+    </PreBuildEvent>
+    <ClCompile>
+      <PreprocessorDefinitions>$(ThirdPartyDefinitions);_WINDOWS;_PHLIB_;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CallingConvention>StdCall</CallingConvention>
+      <SDLCheck>false</SDLCheck>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\format_std.cpp" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\http.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_pointer.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_visit.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\strerror_override.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-get.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\theme.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\wslsup.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\apiimport.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\appresolver.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\avltree.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\basesup.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\circbuf.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\colorbox.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\cpysave.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\data.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\dspick.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\emenu.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\error.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\extlv.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\fastlock.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\filepool.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\format.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\global.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\graph.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\guisup.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\handle.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\hexedit.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\hndlinfo.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\icotobmp.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\filestream.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\json.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\arraylist.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\debug.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_c_version.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_object.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_object_iterator.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_tokener.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_util.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\libjson.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\linkhash.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\printbuf.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\random_seed.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\kph.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\kphdata.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\lsasup.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mapexlf.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mapimg.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\maplib.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\md5.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-attr.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-entity.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-file.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-index.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-node.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-private.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-search.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-set.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-string.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\native.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\provider.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\queuedlock.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\ref.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\secdata.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\secedit.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\settings.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\sha.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\sha256.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\util.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\svcsup.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\symprv.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\sync.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\treenew.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\verify.c" />
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\workqueue.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(ThirdPartySourcesDir)\demumble\third_party\libcxxabi\cxa_demangle.cpp">
+      <PreprocessorDefinitions>_LIBCXXABI_FUNC_VIS=;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\demumble\third_party\wine\undname.c">
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\llvm-demangle\lib\Demangle\ItaniumDemangle.cpp">
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\llvm-demangle\lib\Demangle\MicrosoftDemangle.cpp">
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\llvm-demangle\lib\Demangle\MicrosoftDemangleNodes.cpp">
+      <CallingConvention>Cdecl</CallingConvention>
+    </ClCompile>
+    <None Include="GetThirdPartySources.ps1" />
+    <None Include="ProcessHacker.patch" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

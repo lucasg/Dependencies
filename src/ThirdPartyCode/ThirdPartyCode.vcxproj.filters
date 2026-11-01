@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\format_std.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\http.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_pointer.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_visit.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\strerror_override.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-get.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\theme.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\wslsup.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\apiimport.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\appresolver.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\arraylist.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\avltree.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\basesup.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\circbuf.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\colorbox.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\cpysave.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\demumble\third_party\libcxxabi\cxa_demangle.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\data.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\debug.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\dspick.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\emenu.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\error.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\extlv.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\fastlock.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\filepool.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\filestream.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\format.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\global.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\graph.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\guisup.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\handle.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\hexedit.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\hndlinfo.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\icotobmp.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\llvm-demangle\lib\Demangle\ItaniumDemangle.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\json.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_c_version.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_object.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_object_iterator.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_tokener.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\json_util.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\kph.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\kphdata.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\libjson.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\linkhash.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\lsasup.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mapexlf.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mapimg.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\maplib.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\md5.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\llvm-demangle\lib\Demangle\MicrosoftDemangle.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\llvm-demangle\lib\Demangle\MicrosoftDemangleNodes.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-attr.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-entity.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-file.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-index.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-node.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-private.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-search.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-set.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\mxml\mxml-string.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\native.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\printbuf.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\provider.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\queuedlock.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\jsonc\random_seed.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\ref.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\secdata.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\secedit.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\settings.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\sha.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\sha256.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\svcsup.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\symprv.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\sync.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\treenew.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\demumble\third_party\wine\undname.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\util.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\verify.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+    <ClCompile Include="$(ThirdPartySourcesDir)\processhacker\phlib\workqueue.c">
+      <Filter>Src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="GetThirdPartySources.ps1" />
+    <None Include="ProcessHacker.patch" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Src">
+      <UniqueIdentifier>{26d0d05d-7870-40f0-a2f1-4493168e24a0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

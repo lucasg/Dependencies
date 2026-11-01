@@ -1,0 +1,74 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    xmlns:local="clr-namespace:Dependencies"
+                    xmlns:util="clr-namespace:Wpf.Util"
+                    xmlns:properties="clr-namespace:Dependencies.Properties"
+                    mc:Ignorable="d"
+                    x:Class="DependencyCustomListView">
+  <Style x:Key="LeftAlignHeader"
+         TargetType="{x:Type GridViewColumnHeader}">
+    <Setter Property="HorizontalContentAlignment"
+            Value="Left"></Setter>
+    <Setter Property="Padding"
+            Value="5,0,0,0"></Setter>
+  </Style>
+
+  <Style x:Key="DependencyCustomListViewItem"
+         TargetType="{x:Type ListViewItem}">
+    <Setter Property="HorizontalContentAlignment"
+            Value="Stretch" />
+    <Setter Property="FontFamily"
+            Value="{Binding Source={x:Static properties:Settings.Default}, Path=Font, Mode=OneWay}" />
+    <Setter Property="ContextMenu"
+            Value="{DynamicResource ResourceKey=ItemContextMenu}" />
+    <Setter Property="ToolTip"
+            Value="{Binding Status }" />
+  </Style>
+
+  <Style x:Key="DependencyCustomListViewStyle"
+         TargetType="{x:Type local:DependencyCustomListView}">
+    <Setter Property="HorizontalContentAlignment"
+            Value="Stretch" />
+    <Setter Property="VerticalContentAlignment"
+            Value="Stretch" />
+    <Setter Property="util:GridViewSort.AutoSort"
+            Value="True" />
+    <Setter Property="ItemContainerStyle"
+            Value="{StaticResource DependencyCustomListViewItem}" />
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="{x:Type local:DependencyCustomListView}">
+          <Border x:Name="_Border"
+                  Background="White"
+                  BorderBrush="#FF828790"
+                  BorderThickness="1,1,1,1">
+            <Grid x:Name="_Grid"
+                  SnapsToDevicePixels="true">
+
+              <Grid.RowDefinitions>
+                <RowDefinition Height="46*" />
+                <RowDefinition Height="auto"
+                               MaxHeight="25" />
+              </Grid.RowDefinitions>
+
+              <ScrollViewer Style="{DynamicResource {x:Static GridView.GridViewScrollViewerStyleKey}}">
+                <ItemsPresenter x:Name="ContentsItems"
+                                Grid.Row="0" />
+              </ScrollViewer>
+
+
+              <!-- TargetControl is patched at runtime -->
+              <local:FilterControl x:Name="PART_SearchBar"
+                                   Height="25"
+                                   Grid.Row="1"
+                                   FilterTextBindingPath="{TemplateBinding SearchListFilter}"
+                                   FilterFiringInterval="20" />
+            </Grid>
+          </Border>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+</ResourceDictionary>

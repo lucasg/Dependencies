@@ -1,0 +1,190 @@
+diff --git a/phlib/include/phbase.h b/phlib/include/phbase.h
+index 910eaff..fe9dfd9 100644
+--- a/phlib/include/phbase.h
++++ b/phlib/include/phbase.h
+@@ -15,7 +15,11 @@
+ #define _CRT_SECURE_NO_WARNINGS
+ #endif
+
+-#if !defined(_PHLIB_)
++#if defined(_PHLIB_)
++#define PHLIBAPI
++#elif defined(_PHDLL_)
++#define PHLIBAPI __declspec(dllexport)
++#elif defined(__cplusplus)
+ #define PHLIBAPI __declspec(dllimport)
+ #else
+ #define PHLIBAPI
+diff --git a/phlib/include/phnativeinl.h b/phlib/include/phnativeinl.h
+index 2decdb1..52927d2 100644
+--- a/phlib/include/phnativeinl.h
++++ b/phlib/include/phnativeinl.h
+@@ -1142,7 +1142,7 @@ PhGetJobBasicAndIoAccounting(
+ {
+     return NtQueryInformationJobObject(
+         JobHandle,
+-        JobObjectBasicAndIoAccountingInformation,
++        (JOBOBJECTINFOCLASS) JobObjectBasicAndIoAccountingInformation,
+         BasicAndIoAccounting,
+         sizeof(JOBOBJECT_BASIC_AND_IO_ACCOUNTING_INFORMATION),
+         NULL
+@@ -1158,7 +1158,7 @@ PhGetJobBasicLimits(
+ {
+     return NtQueryInformationJobObject(
+         JobHandle,
+-        JobObjectBasicLimitInformation,
++        (JOBOBJECTINFOCLASS) JobObjectBasicLimitInformation,
+         BasicLimits,
+         sizeof(JOBOBJECT_BASIC_LIMIT_INFORMATION),
+         NULL
+@@ -1174,7 +1174,7 @@ PhGetJobExtendedLimits(
+ {
+     return NtQueryInformationJobObject(
+         JobHandle,
+-        JobObjectExtendedLimitInformation,
++        (JOBOBJECTINFOCLASS) JobObjectExtendedLimitInformation,
+         ExtendedLimits,
+         sizeof(JOBOBJECT_EXTENDED_LIMIT_INFORMATION),
+         NULL
+@@ -1190,7 +1190,7 @@ PhGetJobBasicUiRestrictions(
+ {
+     return NtQueryInformationJobObject(
+         JobHandle,
+-        JobObjectBasicUIRestrictions,
++        (JOBOBJECTINFOCLASS) JobObjectBasicUIRestrictions,
+         BasicUiRestrictions,
+         sizeof(JOBOBJECT_BASIC_UI_RESTRICTIONS),
+         NULL
+diff --git a/phlib/include/phsup.h b/phlib/include/phsup.h
+index 2d61081..bdfaa90 100644
+--- a/phlib/include/phsup.h
++++ b/phlib/include/phsup.h
+@@ -278,7 +278,8 @@ FORCEINLINE void *_InterlockedExchangePointer(
+
+ #endif
+
+-FORCEINLINE LONG_PTR _InterlockedExchangeAddPointer(
++// The ARM64 CRT exports helpers with these names. Keep our wrappers local.
++static FORCEINLINE LONG_PTR _InterlockedExchangeAddPointer(
+     _Inout_ _Interlocked_operand_ LONG_PTR volatile *Addend,
+     _In_ LONG_PTR Value
+     )
+@@ -290,7 +291,7 @@ FORCEINLINE LONG_PTR _InterlockedExchangeAddPointer(
+ #endif
+ }
+
+-FORCEINLINE LONG_PTR _InterlockedIncrementPointer(
++static FORCEINLINE LONG_PTR _InterlockedIncrementPointer(
+     _Inout_ _Interlocked_operand_ LONG_PTR volatile *Addend
+     )
+ {
+@@ -301,7 +302,7 @@ FORCEINLINE LONG_PTR _InterlockedIncrementPointer(
+ #endif
+ }
+
+-FORCEINLINE LONG_PTR _InterlockedDecrementPointer(
++static FORCEINLINE LONG_PTR _InterlockedDecrementPointer(
+     _Inout_ _Interlocked_operand_ LONG_PTR volatile *Addend
+     )
+ {
+diff --git a/phlib/mapimg.c b/phlib/mapimg.c
+index 6939b32..82475cd 100644
+--- a/phlib/mapimg.c
++++ b/phlib/mapimg.c
+@@ -923,8 +923,8 @@ NTSTATUS PhGetMappedImageExports(
+
+     if (
+         !Exports->AddressTable ||
+-        !Exports->NamePointerTable ||
+-        !Exports->OrdinalTable
++        (exportDirectory->NumberOfNames && !Exports->NamePointerTable) ||
++        (exportDirectory->NumberOfNames && !Exports->OrdinalTable)
+         )
+         return STATUS_INVALID_PARAMETER;
+
+@@ -1038,6 +1038,10 @@ NTSTATUS PhGetMappedImageExportFunction(
+
+     rva = Exports->AddressTable[Ordinal];
+
++    // Ignore holes in an ordinal-only export table.
++    if (!Name && !rva)
++        return STATUS_PROCEDURE_NOT_FOUND;
++
+     if (
+         (rva >= Exports->DataDirectory->VirtualAddress) &&
+         (rva < Exports->DataDirectory->VirtualAddress + Exports->DataDirectory->Size)
+diff --git a/phlib/symprv.c b/phlib/symprv.c
+index 399b218..3d737a9 100644
+--- a/phlib/symprv.c
++++ b/phlib/symprv.c
+@@ -275,7 +275,9 @@ VOID PhpSymbolProviderCompleteInitialization(
+         PPH_STRING dbghelpName;
+         PPH_STRING symsrvName;
+
+-#ifdef _WIN64
++#if defined(_M_ARM64)
++        PhMoveReference(&winsdkPath, PhConcatStringRefZ(&winsdkPath->sr, L"\\Debuggers\\arm64\\"));
++#elif defined(_WIN64)
+         PhMoveReference(&winsdkPath, PhConcatStringRefZ(&winsdkPath->sr, L"\\Debuggers\\x64\\"));
+ #else
+         PhMoveReference(&winsdkPath, PhConcatStringRefZ(&winsdkPath->sr, L"\\Debuggers\\x86\\"));
+diff --git a/phnt/include/ntexapi.h b/phnt/include/ntexapi.h
+index 3703379..169f7d8 100644
+--- a/phnt/include/ntexapi.h
++++ b/phnt/include/ntexapi.h
+@@ -4116,7 +4116,9 @@ FORCEINLINE ULONGLONG NtGetTickCount64()
+         if (tickCount.HighPart == (ULONG)USER_SHARED_DATA->TickCount.High2Time)
+             break;
+
++#ifndef _MANAGED
+         YieldProcessor();
++#endif
+     }
+
+ #endif
+@@ -4143,7 +4145,9 @@ FORCEINLINE ULONG NtGetTickCount()
+         if (tickCount.HighPart == (ULONG)USER_SHARED_DATA->TickCount.High2Time)
+             break;
+
++#ifndef _MANAGED
+         YieldProcessor();
++#endif
+     }
+
+     return (ULONG)((UInt32x32To64(tickCount.LowPart, USER_SHARED_DATA->TickCountMultiplier) >> 24) +
+diff --git a/phnt/include/ntioapi.h b/phnt/include/ntioapi.h
+index b015567..a93da8a 100644
+--- a/phnt/include/ntioapi.h
++++ b/phnt/include/ntioapi.h
+@@ -761,6 +761,7 @@ typedef struct _FILE_ID_EXTD_BOTH_DIR_INFORMATION
+     WCHAR FileName[1];
+ } FILE_ID_EXTD_BOTH_DIR_INFORMATION, *PFILE_ID_EXTD_BOTH_DIR_INFORMATION;
+
++#if !defined(NTDDI_WIN11_GE) || (NTDDI_VERSION < NTDDI_WIN11_GE)
+ // private
+ typedef struct _FILE_STAT_INFORMATION
+ {
+@@ -820,6 +821,8 @@ typedef struct _FILE_CASE_SENSITIVE_INFORMATION
+     ULONG Flags;
+ } FILE_CASE_SENSITIVE_INFORMATION, *PFILE_CASE_SENSITIVE_INFORMATION;
+
++#endif
++
+ // NtQueryDirectoryFile types
+
+ typedef struct _FILE_DIRECTORY_INFORMATION
+diff --git a/phnt/include/phnt_ntdef.h b/phnt/include/phnt_ntdef.h
+index 95d48ae..f4aa5a7 100644
+--- a/phnt/include/phnt_ntdef.h
++++ b/phnt/include/phnt_ntdef.h
+@@ -91,7 +91,9 @@ typedef LARGE_INTEGER PHYSICAL_ADDRESS, *PPHYSICAL_ADDRESS;
+
+ // Functions
+
+-#ifndef _WIN64
++#ifdef _MANAGED
++#define FASTCALL __stdcall
++#elif !defined(_WIN64)
+ #define FASTCALL __fastcall
+ #else
+ #define FASTCALL

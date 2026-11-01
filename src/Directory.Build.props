@@ -1,0 +1,95 @@
+<Project>
+  <PropertyGroup>
+    <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <Configurations>Debug;Release</Configurations>
+
+    <ProjectRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\'))</ProjectRoot>
+    <BuildFolder>$(ProjectRoot)build\</BuildFolder>
+    <OutputPath>$(BuildFolder)$(Platform)\$(Configuration)\$(MSBuildProjectName)\</OutputPath>
+    <ThirdPartySourcesDir>$(BuildFolder)ThirdPartySources</ThirdPartySourcesDir>
+    <BaseIntermediateOutputPath>$(BuildFolder)obj\$(MSBuildProjectName)\$(Platform)\$(Configuration)\</BaseIntermediateOutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+    <IntDir>$(BaseIntermediateOutputPath)</IntDir>
+
+    <!-- Assembly metadata -->
+    <Version>0.0-dev</Version>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+
+    <!-- C# projects -->
+    <LangVersion>latest</LangVersion>
+    <TargetFramework>net481</TargetFramework>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
+    <Platforms>x64;x86;ARM64</Platforms>
+    <WarningLevel>9999</WarningLevel>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <PlatformTarget>$(Platform)</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+
+    <!-- C++ projects -->
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <PlatformToolset>v145</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <SpectreMitigation>false</SpectreMitigation>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <!-- C# projects-->
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <Optimize>false</Optimize>
+
+    <!-- C++ projects-->
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <LinkIncremental>true</LinkIncremental>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <!-- C# projects-->
+    <DebugType>pdbonly</DebugType>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+
+    <!-- C++ projects -->
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+
+  <!-- C++ projects -->
+  <ItemDefinitionGroup Condition="'$(MSBuildProjectExtension)' == '.vcxproj'">
+    <ClCompile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WarningLevel>Level4</WarningLevel>
+      <WarningLevel Condition="'$(MSBuildProjectName)' == 'ThirdPartyCode'">TurnOffAllWarnings</WarningLevel>
+      <TreatAngleIncludeAsExternal>true</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>TurnOffAllWarnings</ExternalWarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>$(ThirdPartySourcesDir)\processhacker\phnt\include;$(ThirdPartySourcesDir)\processhacker\phlib\include;$(ThirdPartySourcesDir)\llvm-demangle\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
+    </Link>
+    <Lib>
+      <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(MSBuildProjectExtension)' == '.vcxproj' and '$(Configuration)' == 'Debug'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(MSBuildProjectExtension)' == '.vcxproj' and '$(Configuration)' == 'Release'">
+    <ClCompile>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <Optimization>MaxSpeed</Optimization>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>
